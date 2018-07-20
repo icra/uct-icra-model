@@ -1,0 +1,22 @@
+Ecoadvisor model kickoff meeting -- with george ekama & lluis corominas
+-----------------------------------------------------------------------
+
+1. Choose unit operations linked in the plant
+
+  WW Characteristics
+  Fractionation
+  Primary Settler
+  AS Sludge
+
+-------------------------------------------------------------------------
+
+1.1. WW characterisation
+
+BPO -> some % removed in PST
+UPO -> some % removed in PST
+BSO
+USO
+
+CIV5032Z course: pdfs, tutorials
+https://vula.uct.ac.za/
+-------------------------------------------------------------------------
