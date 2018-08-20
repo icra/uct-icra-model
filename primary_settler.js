@@ -14,8 +14,8 @@ function primary_settler(Q,bpCOD,nbpCOD,iTSS,ON,OP,VSS_COD,bpCOD_bVSS,removal_bp
     |  OP              |      1    g/m3    | organic P (TP-PO4)
     |  VSS_COD         |    2.8    g/m3    | pCOD/VSS
     |  bpCOD_bVSS      |    2.8    g/m3    | bpCOD/bVSS
-    |  removal_bpCOD   |     40       %    | removal of BPO
-    |  removal_nbpCOD  |     60       %    | removal of UPO
+    |  removal_bpCOD   |     40       %    | removal of BPO (biodegradable particulate organics)
+    |  removal_nbpCOD  |     60       %    | removal of UPO (unbiodegradable particulate organics)
     |  removal_iTSS    |     70       %    | removal of inerts
     |  removal_ON      |     66       %    | removal of organic N
     |  removal_OP      |     66       %    | removal of organic P

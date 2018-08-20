@@ -1,8 +1,7 @@
 /**
   * Framework for complete fractionation
   * for 19th Jul 2018 skype w/ george ekama & lluís corominas & lluís bosch
-  */
-
+*/
 function calculate_fractions(COD, sCOD, fSus, fSup){
   var USO  = fSus*COD;
   var BSO  = sCOD - USO;
@@ -11,43 +10,37 @@ function calculate_fractions(COD, sCOD, fSus, fSup){
   var BPO  = pCOD - UPO;
   var bCOD = BPO + BSO;
   var uCOD = UPO + USO;
-
   var results = { BSO, USO, BPO, UPO};
   console.log(results);
   return results;
 }
-//calculate_fractions(750, 199, 0.07, 0.15);
+calculate_fractions(750, 199, 0.07, 0.15);
 //calculate_fractions(450, 199, 0.113, 0.04);
 
-//variables that we can measure:
+//----------------------------------------------------------
 /*
-  Total_COD_raw 
-  Total_COD_set
-  S_VFA_inf
-
-  Total_TKN_raw 
-  Total_TKN_set 
-  S_FSA_inf
-
-  Total_TP_raw  
-  Total_TP_set
-  S_OP_inf
-
-  Total_VSS_raw 
-  Total_VSS_set
-  Total_TSS_raw 
-  Total_TSS_set
-  X_iSS_inf_raw
-  X_iSS_inf_set
-
-  Total_C_set (?)
-  Total_C_raw (?)  
-
-  alkalinity (?)
+  VARIABLES THAT CAN BE MEASURED:
+    #01 Total_COD_raw 
+    #02 Total_COD_set
+    #   S_VFA_inf
+    #   Total_TKN_raw 
+    #   Total_TKN_set 
+    #   S_FSA_inf
+    #   Total_TP_raw  
+    #   Total_TP_set
+    #   S_OP_inf
+    #   Total_VSS_raw 
+    #   Total_VSS_set
+    #   Total_TSS_raw 
+    #   Total_TSS_set
+    #   X_iSS_inf_raw
+    #   X_iSS_inf_set
+    #   Total_C_set (?)
+    #   Total_C_raw (?)  
+    #   alkalinity (?)
 */
-
 function fractionation(){
-  //state variables
+  //state variables: measurements
   var S_VFA_inf         = 50;    //VFA influent
   var S_FBSO_inf        = 186;   //fermentable biodegradable soluble organics influent
   var S_USO_inf         = 58;    //unbiodegradable soluble organics influent
@@ -59,6 +52,21 @@ function fractionation(){
   var X_iSS_inf_set     = 34;    //inorganic suspended solids influent settleable
   var S_FSA_inf         = 59.6;  //free saline ammonia influent
   var S_OP_inf          = 14.15; //orthophosphate influent
+
+  //rewrite state variables as a vector
+  var state_variables = {
+    S_VFA         : 50,    //VFA influent
+    S_FBSO        : 186,   //fermentable biodegradable soluble organics influent
+    S_USO         : 58,    //unbiodegradable soluble organics influent
+    X_BPO_non_set : 301,   //non settleable biodegradable particulate organics influent
+    X_BPO_set     : 406,   //settleable biodegradable particulate organics influent
+    X_UPO_non_set : 20,    //non settleable unbiodegradable particulate organics influent
+    X_UPO_set     : 130,   //settleable unbiodegradable particulate organics influent
+    X_iSS_raw     : 100,   //inorganic suspended solids influent raw
+    X_iSS_set     : 34,    //inorganic suspended solids influent settleable
+    S_FSA         : 59.6,  //free saline ammonia influent
+    S_OP          : 14.15, //orthophosphate influent
+  };
 
   /*mass ratios for VFA, FBSO, USO, BPO{set,non}, UPO{set,non} influent*/
   //1. VFA
@@ -188,4 +196,4 @@ function fractionation(){
   console.log(results);
   return results;
 }
-//fractionation();
+fractionation();
