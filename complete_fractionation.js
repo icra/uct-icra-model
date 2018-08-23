@@ -40,6 +40,7 @@ calculate_fractions(750, 199, 0.07, 0.15);
     #   alkalinity (?)
 */
 function fractionation(){
+
   //state variables: measurements
   var S_VFA_inf         = 50;    //VFA influent
   var S_FBSO_inf        = 186;   //fermentable biodegradable soluble organics influent
