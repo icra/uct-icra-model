@@ -19,15 +19,12 @@ function calculate_fractions(COD, sCOD, fSus, fSup){
 //calculate_fractions(450, 199, 0.113, 0.04);
 
 function fractionation(){
-
   let X_BPO_non_set_inf = 301;   //[Organics] non settleable biodegradable particulate organics
   let X_UPO_non_set_inf = 20;    //[Organics] non settleable unbiodegradable particulate organics
-
   let X_BPO_set_inf     = 406;   //[Organics] settleable biodegradable particulate organics
   let X_UPO_set_inf     = 130;   //[Organics] settleable unbiodegradable particulate organics
   let X_iSS_set_inf     = 34;    //[Solids]   inorganic suspended solids influent settleable
   let X_iSS_raw_inf     = 100;   //[Solids]   inorganic suspended solids influent raw
-
   let S_VFA_inf         = 50;    //[Organics] VFA (BSO)
   let S_FBSO_inf        = 186;   //[Organics] fermentable biodegradable soluble organics (BSO)
   let S_USO_inf         = 58;    //[Organics] unbiodegradable soluble organics
@@ -42,13 +39,22 @@ function fractionation(){
   let f_CV_USO  = 1.493, f_C_USO  = 0.498, f_N_USO  = 0.0258, f_P_USO  = 0.0000;
 
   //total COD in raw ww
-  let Total_COD_raw = S_VFA_inf + 
+  let Total_COD_raw = 
+    S_VFA_inf + 
     S_FBSO_inf + 
     S_USO_inf + 
     X_BPO_non_set_inf + 
     X_BPO_set_inf + 
     X_UPO_non_set_inf + 
     X_UPO_set_inf;
+
+  //total COD in settled ww
+  let Total_COD_set = 
+    S_VFA_inf + 
+    S_FBSO_inf + 
+    S_USO_inf +
+    X_BPO_non_set_inf + 
+    X_UPO_non_set_inf;
 
   //total C in raw ww
   let Total_C_raw = 
@@ -60,6 +66,14 @@ function fractionation(){
     f_C_UPO  / f_CV_UPO  * X_UPO_non_set_inf  +
     f_C_UPO  / f_CV_UPO  * X_UPO_set_inf      ;
 
+  //total C in settled ww
+  let Total_C_set = 
+    f_C_VFA  / f_CV_VFA  * S_VFA_inf          +
+    f_C_FBSO / f_CV_FBSO * S_FBSO_inf         +
+    f_C_USO  / f_CV_USO  * S_USO_inf          +
+    f_C_BPO  / f_CV_BPO  * X_BPO_non_set_inf  +
+    f_C_UPO  / f_CV_UPO  * X_UPO_non_set_inf;
+
   //total TKN in raw ww
   let Total_TKN_raw = S_FSA_inf + 
     f_N_VFA  / f_CV_VFA  * S_VFA_inf          +
@@ -69,6 +83,14 @@ function fractionation(){
     f_N_BPO  / f_CV_BPO  * X_BPO_set_inf      +
     f_N_UPO  / f_CV_UPO  * X_UPO_non_set_inf  +
     f_N_UPO  / f_CV_UPO  * X_UPO_set_inf      ;
+
+  //total TKN in settled ww
+  let Total_TKN_set = S_FSA_inf + 
+    f_N_VFA  / f_CV_VFA  * S_VFA_inf          +
+    f_N_FBSO / f_CV_FBSO * S_FBSO_inf         +
+    f_N_USO  / f_CV_USO  * S_USO_inf          +
+    f_N_BPO  / f_CV_BPO  * X_BPO_non_set_inf  +
+    f_N_UPO  / f_CV_UPO  * X_UPO_non_set_inf;
 
   //total TP in raw ww
   let Total_TP_raw = S_OP_inf +
@@ -80,32 +102,13 @@ function fractionation(){
     f_P_UPO  / f_CV_UPO  * X_UPO_non_set_inf  +
     f_P_UPO  / f_CV_UPO  * X_UPO_set_inf      ;
 
-  //total COD in settled ww
-  let Total_COD_set = S_VFA_inf + S_FBSO_inf + S_USO_inf + X_BPO_non_set_inf + X_UPO_non_set_inf;
-
-  //total C in settled ww
-  let Total_C_set = 
-    f_C_VFA         / f_CV_VFA         * S_VFA_inf          +
-    f_C_FBSO        / f_CV_FBSO        * S_FBSO_inf         +
-    f_C_USO         / f_CV_USO         * S_USO_inf          +
-    f_C_BPO         / f_CV_BPO         * X_BPO_non_set_inf  +
-    f_C_UPO         / f_CV_UPO         * X_UPO_non_set_inf;
-
-  //total TKN in settled ww
-  let Total_TKN_set = S_FSA_inf + 
-    f_N_VFA         / f_CV_VFA         * S_VFA_inf          +
-    f_N_FBSO        / f_CV_FBSO        * S_FBSO_inf         +
-    f_N_USO         / f_CV_USO         * S_USO_inf          +
-    f_N_BPO         / f_CV_BPO         * X_BPO_non_set_inf  +
-    f_N_UPO         / f_CV_UPO         * X_UPO_non_set_inf;
-
   //total TP in settled ww
   let Total_TP_set = S_OP_inf +
-    f_P_VFA         / f_CV_VFA         * S_VFA_inf          +
-    f_P_FBSO        / f_CV_FBSO        * S_FBSO_inf         +
-    f_P_USO         / f_CV_USO         * S_USO_inf          +
-    f_P_BPO         / f_CV_BPO         * X_BPO_non_set_inf  +
-    f_P_UPO         / f_CV_UPO         * X_UPO_non_set_inf;
+    f_P_VFA  / f_CV_VFA  * S_VFA_inf          +
+    f_P_FBSO / f_CV_FBSO * S_FBSO_inf         +
+    f_P_USO  / f_CV_USO  * S_USO_inf          +
+    f_P_BPO  / f_CV_BPO  * X_BPO_non_set_inf  +
+    f_P_UPO  / f_CV_UPO  * X_UPO_non_set_inf;
 
   //VSS in raw ww
   let Total_VSS_raw =
@@ -125,9 +128,12 @@ function fractionation(){
 
   //RESULTS (all in g/m3)
   let results = {
-    Total_COD_raw, Total_C_raw,   Total_TKN_raw, Total_TP_raw,
-    Total_COD_set, Total_C_set,   Total_TKN_set, Total_TP_set,
-    Total_VSS_raw, Total_VSS_set, Total_TSS_raw, Total_TSS_set,
+    Total_COD_raw, Total_C_raw, 
+    Total_TKN_raw, Total_TP_raw, 
+    Total_VSS_raw, Total_TSS_raw, 
+    Total_COD_set, Total_C_set, 
+    Total_TKN_set, Total_TP_set, 
+    Total_VSS_set, Total_TSS_set,
   };
   console.log(results);
   return results;
