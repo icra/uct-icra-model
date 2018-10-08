@@ -19,12 +19,16 @@ function calculate_fractions(COD, sCOD, fSus, fSup){
 //calculate_fractions(450, 199, 0.113, 0.04);
 
 function fractionation(){
+
   let X_BPO_non_set_inf = 301;   //[Organics] non settleable biodegradable particulate organics
-  let X_UPO_non_set_inf = 20;    //[Organics] non settleable unbiodegradable particulate organics
   let X_BPO_set_inf     = 406;   //[Organics] settleable biodegradable particulate organics
+
+  let X_UPO_non_set_inf = 20;    //[Organics] non settleable unbiodegradable particulate organics
   let X_UPO_set_inf     = 130;   //[Organics] settleable unbiodegradable particulate organics
+
   let X_iSS_set_inf     = 34;    //[Solids]   inorganic suspended solids influent settleable
   let X_iSS_raw_inf     = 100;   //[Solids]   inorganic suspended solids influent raw
+
   let S_VFA_inf         = 50;    //[Organics] VFA (BSO)
   let S_FBSO_inf        = 186;   //[Organics] fermentable biodegradable soluble organics (BSO)
   let S_USO_inf         = 58;    //[Organics] unbiodegradable soluble organics

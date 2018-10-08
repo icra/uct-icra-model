@@ -3,7 +3,22 @@
   <title>State variables test</title>
   <style>
     table{ border-collapse:collapse}
-  </Style>
+    input[type=number] { width:70px}
+  </style>
+  <script>
+    //UTILS
+    /*convert number to formated string: i.e. "3.999,4" instead of 3999.4*/
+    function format(number,digits){
+      digits=digits||0;
+      if(number<1000)digits=1;
+      if(number< 100)digits=2;
+      if(number<0.10)digits=3;
+      if(number<0.01)digits=4;
+      digits++;
+      var str=new Intl.NumberFormat('en-EN',{maximumFractionDigits:digits}).format(number);
+      return str;
+    }
+  </script>
 </head><body>
 <div style="display:flex;justify-content:space-between">
   <h2>State variables test</h2>
@@ -15,16 +30,16 @@
 
 <div style="display:flex;">
   <div>
-    Inputs - create a scenario
+    Inputs
     <table id=inputs border=1>
-      <tr><td>X_BPO  <td> <input id=X_BPO  type=number onchange="sv.components.organic.X_BPO   = parseFloat(this.value);test()">
-      <tr><td>X_UPO  <td> <input id=X_UPO  type=number onchange="sv.components.organic.X_UPO   = parseFloat(this.value);test()">
-      <tr><td>X_iSS  <td> <input id=X_iSS  type=number onchange="sv.components.inorganic.X_iSS = parseFloat(this.value);test()">
-      <tr><td>S_VFA  <td> <input id=S_VFA  type=number onchange="sv.components.organic.S_VFA   = parseFloat(this.value);test()">
-      <tr><td>S_FBSO <td> <input id=S_FBSO type=number onchange="sv.components.organic.S_FBSO  = parseFloat(this.value);test()">
-      <tr><td>S_USO  <td> <input id=S_USO  type=number onchange="sv.components.organic.S_USO   = parseFloat(this.value);test()">
-      <tr><td>S_FSA  <td> <input id=S_FSA  type=number onchange="sv.components.inorganic.S_FSA = parseFloat(this.value);test()">
-      <tr><td>S_OP   <td> <input id=S_OP   type=number onchange="sv.components.inorganic.S_OP  = parseFloat(this.value);test()">
+      <tr><td>X_BPO  <td> <input id=X_BPO  type=number onchange="sv.components.organic.X_BPO   = parseFloat(this.value);redisplay()">
+      <tr><td>X_UPO  <td> <input id=X_UPO  type=number onchange="sv.components.organic.X_UPO   = parseFloat(this.value);redisplay()">
+      <tr><td>X_iSS  <td> <input id=X_iSS  type=number onchange="sv.components.inorganic.X_iSS = parseFloat(this.value);redisplay()">
+      <tr><td>S_VFA  <td> <input id=S_VFA  type=number onchange="sv.components.organic.S_VFA   = parseFloat(this.value);redisplay()">
+      <tr><td>S_FBSO <td> <input id=S_FBSO type=number onchange="sv.components.organic.S_FBSO  = parseFloat(this.value);redisplay()">
+      <tr><td>S_USO  <td> <input id=S_USO  type=number onchange="sv.components.organic.S_USO   = parseFloat(this.value);redisplay()">
+      <tr><td>S_FSA  <td> <input id=S_FSA  type=number onchange="sv.components.inorganic.S_FSA = parseFloat(this.value);redisplay()">
+      <tr><td>S_OP   <td> <input id=S_OP   type=number onchange="sv.components.inorganic.S_OP  = parseFloat(this.value);redisplay()">
     </table>
     <hr>
     Mass ratios
@@ -35,41 +50,81 @@
     Outputs - Results
     <table id=outputs border=1></table>
   </div>
+
+  <div style=margin-left:8px>
+    Apply technologies
+    <fieldset id=primary_settler>
+      <legend><a href="//github.com/icra/ecoadvisor/blob/master/primary-settler.js" target=_blank>Primary settler</a></legend>
+      <table border=1>
+        <tr><td>removal BPO (%)<td><input id=removal_BPO type=number value=57.4257>
+        <tr><td>removal UPO (%)<td><input id=removal_UPO type=number value=86.6667>
+        <tr><td>removal iSS (%)<td><input id=removal_iSS type=number value=66>
+      </table>
+      <button onclick=apply_pst()>Apply</button>
+      <script>
+        function apply_pst(){
+          let removal_BPO = parseFloat(document.querySelector('#removal_BPO').value);
+          let removal_UPO = parseFloat(document.querySelector('#removal_UPO').value);
+          let removal_iSS = parseFloat(document.querySelector('#removal_iSS').value);
+          sv.primary_settler(removal_BPO, removal_UPO, removal_iSS);
+          redisplay();
+          document.querySelector('#primary_settler').appendChild((function(){
+            var div=document.createElement('div');
+            div.style.fontSize='smaller';
+            div.innerHTML="Primary Settler("+format(removal_BPO)+", "+format(removal_UPO)+", "+format(removal_iSS)+") applied";
+            return div;
+          })());
+        }
+      </script>
+    </fieldset>
+    <fieldset id=BOD_removal>
+      <legend>BOD removal</legend>
+      under development
+    </fieldset>
+  </div>
 </div>
 
+<!--app logic-->
 <script src="state-variables.js"></script>
+<script src="primary-settler.js"></script>
 <script>
+  //declare state variables
   let sv = new State_Variables();
-  document.querySelector("#X_BPO") .value = sv.components.organic.X_BPO;
-  document.querySelector("#X_UPO") .value = sv.components.organic.X_UPO;
-  document.querySelector("#X_iSS") .value = sv.components.inorganic.X_iSS;
-  document.querySelector("#S_VFA") .value = sv.components.organic.S_VFA;
-  document.querySelector("#S_FBSO").value = sv.components.organic.S_FBSO;
-  document.querySelector("#S_USO") .value = sv.components.organic.S_USO;
-  document.querySelector("#S_FSA") .value = sv.components.inorganic.S_FSA;
-  document.querySelector("#S_OP")  .value = sv.components.inorganic.S_OP;
+
   //focus
-  document.querySelector("#X_BPO") .focus()
+  document.querySelector("#X_BPO").focus();
 
-  //mass ratios
-  var mass_ratios = document.querySelector('#mass_ratios');
-  Object.entries(sv.mass_ratios).forEach(entry=>{
-    let key=entry[0];
-    let value=entry[1];
-    let newRow=mass_ratios.insertRow(-1);
-    newRow.insertCell(-1).innerHTML=key;
-    newRow.insertCell(-1).innerHTML=value;
-  });
+  { //mass ratios display
+    let mass_ratios = document.querySelector('#mass_ratios');
+    Object.entries(sv.mass_ratios).forEach(entry=>{
+      let key=entry[0];
+      let value=entry[1];
+      let newRow=mass_ratios.insertRow(-1);
+      newRow.insertCell(-1).innerHTML=key;
+      newRow.insertCell(-1).innerHTML=value;
+    });
+  }
 
-  function test(){
-    let results = sv.compute_totals()
+  //redisplay inputs and results
+  function redisplay(){
+    //redisplay inputs
+    document.querySelector("#X_BPO") .value = sv.components.organic.X_BPO;
+    document.querySelector("#X_UPO") .value = sv.components.organic.X_UPO;
+    document.querySelector("#X_iSS") .value = sv.components.inorganic.X_iSS;
+    document.querySelector("#S_VFA") .value = sv.components.organic.S_VFA;
+    document.querySelector("#S_FBSO").value = sv.components.organic.S_FBSO;
+    document.querySelector("#S_USO") .value = sv.components.organic.S_USO;
+    document.querySelector("#S_FSA") .value = sv.components.inorganic.S_FSA;
+    document.querySelector("#S_OP")  .value = sv.components.inorganic.S_OP;
+    //redisplay outputs
+    let results = sv.compute_totals();
     let outputs = document.querySelector('#outputs');
     outputs.innerHTML="";
     Object.keys(results).forEach(key=>{
       let newRow=outputs.insertRow(-1);
       newRow.insertCell(-1).innerHTML=key;
-      newRow.insertCell(-1).innerHTML=results[key];
+      newRow.insertCell(-1).innerHTML=format(results[key]);
     });
   }
-  test();
+  redisplay();
 </script>

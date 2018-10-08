@@ -96,6 +96,7 @@ State_Variables.prototype.compute_totals=function(){
       Total_TP_raw:   20.07954011687898,
       Total_VSS_raw:  565.4982813603522,
       Total_TSS_raw:  665.4982813603522,
+
       Total_COD_set:  615,
       Total_C_set:    205.2029144077899,
       Total_TKN_set:  71.8957593834829,
