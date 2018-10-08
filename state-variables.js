@@ -1,5 +1,4 @@
-/*
-  STATE VARIABLES AND MASS RATIOS ENCAPSULATION
+/* STATE VARIABLES AND MASS RATIOS ENCAPSULATION
   summary of this file:
     1. class definition (data structure)
     2. class methods (functions)
@@ -8,8 +7,7 @@
 
 //1. class definition
 function State_Variables(){
-  //components and default values
-  this.components={
+  this.components={ //components and default values (inputs)
     organic:{
       S_VFA  : 50,  // biodegradable   soluble     organics (BSO) volatile fatty acids
       S_FBSO : 186, // biodegradable   soluble     organics (BSO) fermentable
@@ -23,10 +21,8 @@ function State_Variables(){
       S_OP   : 14.15, // orthophosphate
     },
   };
-
-  //mass ratios
   this.mass_ratios={
-    /* mass ratios for:
+    /* mass ratios for COD, C, N, P vs:
         -  BPO       (biodegradable    particulate  organics)
         -  VFA+FBSO  (biodegradable    soluble      organics)
         -  UPO       (unbiodegradable  particulate  organics)
@@ -43,21 +39,16 @@ function State_Variables(){
   };
 };
 
-//2. class methods
+//2. class methods: compute total: COD, C, TKN, TP, VSS, TSS
 State_Variables.prototype.compute_totals=function(){
-  //TOTALS
-    //total organics
+  //TOTAL: COD, C, TKN, TP, VSS, TSS
     let Total_COD = Object.values(this.components.organic).reduce((pr,cu)=>{return pr+cu},0);
-
-    //total C
     let Total_C = 
       this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.organic.S_VFA  +
       this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.organic.S_FBSO +
       this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.organic.S_USO  +
       this.mass_ratios.f_C_BPO  / this.mass_ratios.f_CV_BPO  * this.components.organic.X_BPO  +
       this.mass_ratios.f_C_UPO  / this.mass_ratios.f_CV_UPO  * this.components.organic.X_UPO  ;
-
-    //total TKN
     let Total_TKN = 
       this.components.inorganic.S_FSA + 
       this.mass_ratios.f_N_VFA  / this.mass_ratios.f_CV_VFA  * this.components.organic.S_VFA  +
@@ -65,8 +56,6 @@ State_Variables.prototype.compute_totals=function(){
       this.mass_ratios.f_N_USO  / this.mass_ratios.f_CV_USO  * this.components.organic.S_USO  +
       this.mass_ratios.f_N_BPO  / this.mass_ratios.f_CV_BPO  * this.components.organic.X_BPO  +
       this.mass_ratios.f_N_UPO  / this.mass_ratios.f_CV_UPO  * this.components.organic.X_UPO  ;
-
-    //total P
     let Total_TP = 
       this.components.inorganic.S_OP +
       this.mass_ratios.f_P_VFA  / this.mass_ratios.f_CV_VFA  * this.components.organic.S_VFA  +
@@ -74,24 +63,19 @@ State_Variables.prototype.compute_totals=function(){
       this.mass_ratios.f_P_USO  / this.mass_ratios.f_CV_USO  * this.components.organic.S_USO  +
       this.mass_ratios.f_P_BPO  / this.mass_ratios.f_CV_BPO  * this.components.organic.X_BPO  +
       this.mass_ratios.f_P_UPO  / this.mass_ratios.f_CV_UPO  * this.components.organic.X_UPO  ;
-
-    //total VSS
     let Total_VSS =
       this.components.organic.X_BPO / this.mass_ratios.f_CV_BPO + 
       this.components.organic.X_UPO / this.mass_ratios.f_CV_UPO ;
-
-    //total TSS
     let Total_TSS = Total_VSS + this.components.inorganic.X_iSS;
 
   //RESULTS (in g/m3)
-  let totals={ Total_COD, Total_C, Total_TKN, Total_TP, Total_VSS, Total_TSS, };
-  console.log(totals);
+  let totals={ Total_COD, Total_C, Total_TKN, Total_TP, Total_VSS, Total_TSS };
+  //console.log(totals);console.log('\n'); //debug
   return totals;
 };
 
 //3. tests
-  //original numbers
-  /*
+  /* original numbers 
     inputs {
       X_BPO_non_set_inf: 301,
       X_BPO_set_inf:     406,
@@ -122,34 +106,30 @@ State_Variables.prototype.compute_totals=function(){
   */
 
 //2 scenarios: raw ww, settled ww
-//1. raw ww
-  console.log('Scenario 1: raw ww');
-  var sv = new State_Variables();
-  //particulated:
-  sv.components.organic.X_BPO   = 707;
-  sv.components.organic.X_UPO   = 150;
-  sv.components.inorganic.X_iSS = 100;
-  //soluble:
-  sv.components.organic.S_VFA   = 50;
-  sv.components.organic.S_FBSO  = 186;
-  sv.components.organic.S_USO   = 58;
-  sv.components.inorganic.S_FSA = 59.6;
-  sv.components.inorganic.S_OP  = 14.15;
-  //totals
-  var totals = sv.compute_totals();
+/*
+let sv = new State_Variables(); //declare new state variables identifier 'sv'
+let results; //declare identifier for results
+  //1. raw ww
+    console.log('Scenario 1: raw ww');
+    sv.components.organic.X_BPO   = 707;
+    sv.components.organic.X_UPO   = 150;
+    sv.components.inorganic.X_iSS = 100;
+    sv.components.organic.S_VFA   = 50;
+    sv.components.organic.S_FBSO  = 186;
+    sv.components.organic.S_USO   = 58;
+    sv.components.inorganic.S_FSA = 59.6;
+    sv.components.inorganic.S_OP  = 14.15;
+    results = sv.compute_totals();
 
-//2. settled ww
-  console.log('\nScenario 2: settled ww');
-  var sv = new State_Variables();
-  //particulated:
-  sv.components.organic.X_BPO   = 301;
-  sv.components.organic.X_UPO   = 20;
-  sv.components.inorganic.X_iSS = 34;
-  //soluble:
-  sv.components.organic.S_VFA   = 50;
-  sv.components.organic.S_FBSO  = 186;
-  sv.components.organic.S_USO   = 58;
-  sv.components.inorganic.S_FSA = 59.6;
-  sv.components.inorganic.S_OP  = 14.15;
-  //totals
-  var totals = sv.compute_totals();
+  //2. settled ww
+    console.log('Scenario 2: settled ww');
+    sv.components.organic.X_BPO   = 301;
+    sv.components.organic.X_UPO   = 20;
+    sv.components.inorganic.X_iSS = 34;
+    sv.components.organic.S_VFA   = 50;
+    sv.components.organic.S_FBSO  = 186;
+    sv.components.organic.S_USO   = 58;
+    sv.components.inorganic.S_FSA = 59.6;
+    sv.components.inorganic.S_OP  = 14.15;
+    results = sv.compute_totals();
+    */

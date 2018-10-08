@@ -1,0 +1,69 @@
+<!doctype html><html><head>
+  <meta charset=utf8>
+  <title>State variables test</title>
+  <style>
+    table{ border-collapse:collapse}
+  </Style>
+</head><body>
+<h2>State variables test</h2><hr>
+
+<div style="display:flex;">
+  <div>
+    Inputs - create a scenario
+    <table id=inputs border=1>
+      <tr><td>X_BPO  <td> <input id=X_BPO  type=number onchange="sv.components.organic.X_BPO   = parseFloat(this.value);test()">
+      <tr><td>X_UPO  <td> <input id=X_UPO  type=number onchange="sv.components.organic.X_UPO   = parseFloat(this.value);test()">
+      <tr><td>X_iSS  <td> <input id=X_iSS  type=number onchange="sv.components.inorganic.X_iSS = parseFloat(this.value);test()">
+      <tr><td>S_VFA  <td> <input id=S_VFA  type=number onchange="sv.components.organic.S_VFA   = parseFloat(this.value);test()">
+      <tr><td>S_FBSO <td> <input id=S_FBSO type=number onchange="sv.components.organic.S_FBSO  = parseFloat(this.value);test()">
+      <tr><td>S_USO  <td> <input id=S_USO  type=number onchange="sv.components.organic.S_USO   = parseFloat(this.value);test()">
+      <tr><td>S_FSA  <td> <input id=S_FSA  type=number onchange="sv.components.inorganic.S_FSA = parseFloat(this.value);test()">
+      <tr><td>S_OP   <td> <input id=S_OP   type=number onchange="sv.components.inorganic.S_OP  = parseFloat(this.value);test()">
+    </table>
+    <hr>
+    Mass ratios
+    <table id=mass_ratios border=1> </table>
+  </div>
+
+  <div style=margin-left:8px>
+    Outputs - Results
+    <table id=outputs border=1></table>
+  </div>
+</div>
+
+<script src="state-variables.js"></script>
+<script>
+  let sv = new State_Variables();
+  document.querySelector("#X_BPO") .value = sv.components.organic.X_BPO;
+  document.querySelector("#X_UPO") .value = sv.components.organic.X_UPO;
+  document.querySelector("#X_iSS") .value = sv.components.inorganic.X_iSS;
+  document.querySelector("#S_VFA") .value = sv.components.organic.S_VFA;
+  document.querySelector("#S_FBSO").value = sv.components.organic.S_FBSO;
+  document.querySelector("#S_USO") .value = sv.components.organic.S_USO;
+  document.querySelector("#S_FSA") .value = sv.components.inorganic.S_FSA;
+  document.querySelector("#S_OP")  .value = sv.components.inorganic.S_OP;
+  //focus
+  document.querySelector("#X_BPO") .focus()
+
+  //mass ratios
+  var mass_ratios = document.querySelector('#mass_ratios');
+  Object.entries(sv.mass_ratios).forEach(entry=>{
+    let key=entry[0];
+    let value=entry[1];
+    let newRow=mass_ratios.insertRow(-1);
+    newRow.insertCell(-1).innerHTML=key;
+    newRow.insertCell(-1).innerHTML=value;
+  });
+
+  function test(){
+    let results = sv.compute_totals()
+    let outputs = document.querySelector('#outputs');
+    outputs.innerHTML="";
+    Object.keys(results).forEach(key=>{
+      let newRow=outputs.insertRow(-1);
+      newRow.insertCell(-1).innerHTML=key;
+      newRow.insertCell(-1).innerHTML=results[key];
+    });
+  }
+  test();
+</script>
