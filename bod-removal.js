@@ -5,7 +5,28 @@
  */
 
 
-function bod_removal(Q,T,SRT){return 0}
+State_Variables.prototype.bod_removal=function(BOD,Q,T,SRT,V){
+  //constants
+    //Table 8-14, page 755
+    const mu_m = 6;    //1/d
+    const Ks   = 8;    //g_bCOD/m3
+    const YH   = 0.45; //g_VSS/g_bCOD
+    const bH   = 0.12; //1/d
+    const fd   = 0.15; //unitless
+    //aeration parameters
+    const alpha = 0.50; //8.b
+    const beta  = 0.95; //8.b
+
+  //bCOD = bsCOD (VFA+FBSO) + bpCOD
+  let bCOD = this.components.organic.S_VFA + this.components.organic.S_FBSO + this.components.organic.X_BPO;
+
+  //part A: bod removal without nitrification
+  let mu_mT = mu_m * Math.pow(1.07, T - 20); //1/d
+  var bHT   = bH * Math.pow(1.04, T - 20);  //1/d
+
+  return 0;
+}
+
 function bod_removal_only(BOD,nbVSS,TSS,VSS,bCOD_BOD_ratio,Q,T,SRT,MLSS_X_TSS,zb,Pressure,Df,DO){
   /*
     Inputs          example values
@@ -24,17 +45,8 @@ function bod_removal_only(BOD,nbVSS,TSS,VSS,bCOD_BOD_ratio,Q,T,SRT,MLSS_X_TSS,zb
     Df              4.4    m
     DO              2.0    mg/L
   */
-  var C_L=DO;//rename requested. Dissolved oxygen (DO) in the book is C_L
-
-  //aeration parameters
-  var alpha = 0.50; //8.b
-  var beta  = 0.95; //8.b
-
-  //calculate bCOD from bCOD/BOD ratio
-  var bCOD  = bCOD_BOD_ratio*BOD;
 
   //part A: bod removal without nitrification
-  var mu_mT = mu_m * Math.pow(1.07, T - 20); //1/d
   var bHT   = bH * Math.pow(1.04, T - 20);  //1/d
   var S0    = bCOD; //g/m3
   var S     = Ks*(1+bHT*SRT)/(SRT*(mu_mT-bHT)-1); //g/m3
@@ -78,7 +90,7 @@ function bod_removal_only(BOD,nbVSS,TSS,VSS,bCOD_BOD_ratio,Q,T,SRT,MLSS_X_TSS,zb
   var Pb = Pa*Math.exp(-g*M*(zb-0)/(R*(273.15+T))); //Pa -> pressure at plant site
   var C_inf_20 = C_s_20 * (1+de*Df/Pa); //mg_O2/L
   var OTRf = R0; //kgO2/h
-  var SOTR = (OTRf/(alpha*F))*(C_inf_20/(beta*C_T/C_s_20*Pb/Pa*C_inf_20-C_L))*(Math.pow(1.024,20-T)); //kg/h
+  var SOTR = (OTRf/(alpha*F))*(C_inf_20/(beta*C_T/C_s_20*Pb/Pa*C_inf_20-DO))*(Math.pow(1.024,20-T)); //kg/h
   var kg_O2_per_m3_air = density_of_air(T,Pressure)*0.2318 //oxygen in air by weight is 23.18%, by volume is 20.99%
   var air_flowrate = SOTR/(E*60*kg_O2_per_m3_air) ||0; //m3/min
   air_flowrate = isFinite(air_flowrate) ? air_flowrate : 0;

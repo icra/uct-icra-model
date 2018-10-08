@@ -69,7 +69,15 @@ State_Variables.prototype.compute_totals=function(){
     let Total_TSS = Total_VSS + this.components.inorganic.X_iSS;
 
   //RESULTS (in g/m3)
-  let totals={ Total_COD, Total_C, Total_TKN, Total_TP, Total_VSS, Total_TSS };
+  let totals={
+    Total_COD,
+    Total_C,
+    Total_TKN,
+    Total_TP,
+    Total_VSS,
+    Total_TSS
+  };
+
   //console.log(totals);console.log('\n'); //debug
   return totals;
 };
