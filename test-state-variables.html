@@ -1,6 +1,6 @@
 <!doctype html><html><head>
   <meta charset=utf8>
-  <title>State variables test</title>
+  <title>State variables</title>
   <style>
     @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
     body {
@@ -37,7 +37,7 @@
 </head><body>
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px">
   <h3>
-    State variables test
+    State variables backend testing
     <button onclick=window.location.reload()>Reset all</button>
   </h3>
   <div>
@@ -51,14 +51,14 @@
   <div>
     <div>1. Inputs - State variables</div><br>
     <table id=inputs border=1 style=width:100%>
-      <tr><td>X_BPO  <td> <input id=X_BPO  type=number min=0 onchange="sv.components.organic.X_BPO   = parseFloat(this.value);redisplay()"><td>mg/L
-      <tr><td>X_UPO  <td> <input id=X_UPO  type=number min=0 onchange="sv.components.organic.X_UPO   = parseFloat(this.value);redisplay()"><td>mg/L
-      <tr><td>X_iSS  <td> <input id=X_iSS  type=number min=0 onchange="sv.components.inorganic.X_iSS = parseFloat(this.value);redisplay()"><td>mg/L
-      <tr><td>S_VFA  <td> <input id=S_VFA  type=number min=0 onchange="sv.components.organic.S_VFA   = parseFloat(this.value);redisplay()"><td>mg/L
-      <tr><td>S_FBSO <td> <input id=S_FBSO type=number min=0 onchange="sv.components.organic.S_FBSO  = parseFloat(this.value);redisplay()"><td>mg/L
-      <tr><td>S_USO  <td> <input id=S_USO  type=number min=0 onchange="sv.components.organic.S_USO   = parseFloat(this.value);redisplay()"><td>mg/L
-      <tr><td>S_FSA  <td> <input id=S_FSA  type=number min=0 onchange="sv.components.inorganic.S_FSA = parseFloat(this.value);redisplay()"><td>mg/L
-      <tr><td>S_OP   <td> <input id=S_OP   type=number min=0 onchange="sv.components.inorganic.S_OP  = parseFloat(this.value);redisplay()"><td>mg/L
+      <tr><td>X_BPO  <td> <input id=X_BPO  type=number min=0 onchange="sv.components.organic.X_BPO   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
+      <tr><td>X_UPO  <td> <input id=X_UPO  type=number min=0 onchange="sv.components.organic.X_UPO   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
+      <tr><td>X_iSS  <td> <input id=X_iSS  type=number min=0 onchange="sv.components.inorganic.X_iSS = parseFloat(this.value);redisplay()"><td class=unit>mg/L
+      <tr><td>S_VFA  <td> <input id=S_VFA  type=number min=0 onchange="sv.components.organic.S_VFA   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
+      <tr><td>S_FBSO <td> <input id=S_FBSO type=number min=0 onchange="sv.components.organic.S_FBSO  = parseFloat(this.value);redisplay()"><td class=unit>mg/L
+      <tr><td>S_USO  <td> <input id=S_USO  type=number min=0 onchange="sv.components.organic.S_USO   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
+      <tr><td>S_FSA  <td> <input id=S_FSA  type=number min=0 onchange="sv.components.inorganic.S_FSA = parseFloat(this.value);redisplay()"><td class=unit>mg/L
+      <tr><td>S_OP   <td> <input id=S_OP   type=number min=0 onchange="sv.components.inorganic.S_OP  = parseFloat(this.value);redisplay()"><td class=unit>mg/L
     </table>
 
     <div style=font-size:smaller;margin-top:8px>
@@ -67,9 +67,15 @@
     </div>
   </div>
 
+  <!--totals and fractionation-->
+  <div style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px">
+    <div>2. Totals &amp; fractionation (mg/L)</div><br>
+    <table id=outputs border=1></table>
+  </div>
+
   <!--techs-->
   <div style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px" id=techs>
-    <div>2. Apply technologies</div><br>
+    <div>3. Apply technologies</div><br>
     <style>
       /*units*/
       #techs fieldset table td:nth-child(3){
@@ -87,9 +93,9 @@
     <fieldset id=primary_settler>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/primary-settler.js" target=_blank>Primary settler</a></legend>
       <table border=1>
-        <tr><td>removal BPO<td><input id=removal_BPO type=number value=57.4257><td>%
-        <tr><td>removal UPO<td><input id=removal_UPO type=number value=86.6667><td>%
-        <tr><td>removal iSS<td><input id=removal_iSS type=number value=66>     <td>%
+        <tr><td>removal BPO<td><input id=removal_BPO type=number value=57.4257><td class=unit>%
+        <tr><td>removal UPO<td><input id=removal_UPO type=number value=86.6667><td class=unit>%
+        <tr><td>removal iSS<td><input id=removal_iSS type=number value=66>     <td class=unit>%
       </table>
       <button onclick="apply_pst();this.disabled=true">Apply</button>
       <script>
@@ -97,12 +103,32 @@
           let removal_BPO = parseFloat(document.querySelector('#removal_BPO').value);
           let removal_UPO = parseFloat(document.querySelector('#removal_UPO').value);
           let removal_iSS = parseFloat(document.querySelector('#removal_iSS').value);
-          sv.primary_settler(removal_BPO, removal_UPO, removal_iSS);
+          let results = sv.primary_settler(removal_BPO, removal_UPO, removal_iSS);
           redisplay();
           document.querySelector('#primary_settler').appendChild((function(){
             let div=document.createElement('div');
             div.style.fontSize='smaller';
             div.innerHTML="Primary Settler("+removal_BPO+","+removal_UPO+","+removal_iSS+") applied";
+
+            let info=document.createElement('table');
+            //info.style.display='none';
+            Object.keys(results).forEach(key=>{
+              let newRow=info.insertRow(-1);
+              newRow.insertCell(-1).innerHTML=key;
+              newRow.insertCell(-1).innerHTML=format(results[key].value);
+              newRow.insertCell(-1).innerHTML=results[key].unit;
+              newRow.setAttribute('title',results[key].descr);
+            });
+
+            let info_btn=document.createElement('button');
+            info_btn.style.display='block';
+            info_btn.innerHTML="Show/Hide Info";
+            info_btn.onclick=function(){
+              info.style.display=info.style.display=='none'?'':'none';
+            };
+
+            div.appendChild(info_btn);
+            div.appendChild(info);
             return div;
           })());
         }
@@ -112,15 +138,15 @@
     <fieldset id=bod_removal>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/bod-removal.js" target=_blank>BOD removal (without nitrification)</a></legend>
       <table border=1>
-        <tr><td>BOD <td><input id=BOD type=number value=589>   <td>g/m3
-        <tr><td>Q   <td><input id=Q   type=number value=22700> <td>m3/d
-        <tr><td>T   <td><input id=T   type=number value=12>    <td>ºC
-        <tr><td>SRT <td><input id=SRT type=number value=5>     <td>d
-        <tr><td>V   <td><input id=V   type=number value=3000>  <td>m3
-        <tr><td>zb  <td><input id=zb  type=number value=500>   <td>m
-        <tr><td>Pr  <td><input id=Pr  type=number value=95600> <td>Pa
-        <tr><td>Df  <td><input id=Df  type=number value=4.4>   <td>m
-        <tr><td>DO  <td><input id=DO  type=number value=2.0>   <td>g/m3
+        <tr><td>BOD <td><input id=BOD type=number value=335.625><td class=unit>mg/L
+        <tr><td>Q   <td><input id=Q   type=number value=22700>  <td class=unit>m<sup>3</sup>/d
+        <tr><td>T   <td><input id=T   type=number value=12>     <td class=unit>ºC
+        <tr><td>SRT <td><input id=SRT type=number value=5>      <td class=unit>d
+        <tr><td>V   <td><input id=V   type=number value=3000>   <td class=unit>m<sup>3</sup>
+        <tr><td>zb  <td><input id=zb  type=number value=500>    <td class=unit>m
+        <tr><td>Pr  <td><input id=Pr  type=number value=95600>  <td class=unit>Pa
+        <tr><td>Df  <td><input id=Df  type=number value=4.4>    <td class=unit>m
+        <tr><td>DO  <td><input id=DO  type=number value=2.0>    <td class=unit>mg/L
       </table>
       <button onclick="apply_bod_removal();this.disabled=true">Apply</button>
       <script>
@@ -168,12 +194,6 @@
         }
       </script>
     </fieldset>
-  </div>
-
-  <!--totals-->
-  <div style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px">
-    <div>3. Totals &amp; fractionation</div><br>
-    <table id=outputs border=1></table>
   </div>
 </div>
 
@@ -243,13 +263,13 @@
   redisplay();
 </script>
 
-<div style=margin-top:8px>
+<hr><div style=margin-top:8px>
   Items to discuss with George Ekama:
   <ul>
     <li>
-      For table 3 I've used the notation of M&amp;EA because it is the one I'm used to, but we can change it to a std one.
+      For table 2 I've used the notation of M&amp;EA because it is the one I'm used to, but we can change it to a std one (check <a href="docs/SYMBOLES.XLSX">spreadsheet from Yves Comeau</a>).
     <li>
-      In BOD removal: the ratio for calculating nbVSS (pCOD/VSS): shouldn't we get the same number as uVSS?
+      In BOD removal: the ratio for calculating nbVSS (pCOD/VSS): shouldn't we get the same exact number as uVSS from table 2?
     <li>
       bCOD at the effluent = S = Ks*(1+bHT*SRT)/(SRT*(mu_mT-bHT)-1);<br>
       how to divide among VFA + FBSO (bsCOD==BSO) + bpCOD (==BPO)?<br>
