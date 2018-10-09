@@ -9,9 +9,12 @@
     }
 
     table{ border-collapse:collapse}
-    table td:nth-child(3){ font-size:smaller; }
+    table td.unit{font-size:smaller;}
 
-    input[type=number]{ width:70px; }
+    input[type=number]{
+      width:70px;
+      text-align:right;
+    }
 
     fieldset {
       border-width:1px;
@@ -169,7 +172,7 @@
 
   <!--totals-->
   <div style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px">
-    <div>3. Outputs - Totals</div><br>
+    <div>3. Totals &amp; fractionation</div><br>
     <table id=outputs border=1></table>
   </div>
 </div>
@@ -216,10 +219,40 @@
     outputs.innerHTML="";
     Object.keys(results).forEach(key=>{
       let newRow=outputs.insertRow(-1);
-      newRow.insertCell(-1).innerHTML=key;
-      newRow.insertCell(-1).innerHTML=format(results[key]);
-      newRow.insertCell(-1).innerHTML="mg/L";
+      let value = results[key];
+      if(typeof(value)=='number'){
+        newRow.insertCell(-1).innerHTML=key;
+        newRow.insertCell(-1).innerHTML=format(value);
+      }else{
+        newRow.insertCell(-1).innerHTML=key;
+        let newCell=newRow.insertCell(-1);
+        let table = document.createElement('table');
+        table.style.width="100%";
+        table.setAttribute('border',1);
+        newCell.appendChild(table);
+        Object.keys(results[key]).forEach(k=>{
+          let nr=table.insertRow(-1);
+          Object.keys(results[key][k]).forEach(kk=>{
+            let value=results[key][k][kk];
+            nr.insertCell(-1).innerHTML=kk+": <small>"+format(value)+"</small>";
+          });
+        });
+      }
     });
   }
   redisplay();
 </script>
+
+<div style=margin-top:8px>
+  Items to discuss with George Ekama:
+  <ul>
+    <li>
+      For table 3 I've used the notation of M&amp;EA because it is the one I'm used to, but we can change it to a std one.
+    <li>
+      In BOD removal: the ratio for calculating nbVSS (pCOD/VSS): shouldn't we get the same number as uVSS?
+    <li>
+      bCOD at the effluent = S = Ks*(1+bHT*SRT)/(SRT*(mu_mT-bHT)-1);<br>
+      how to divide among VFA + FBSO (bsCOD==BSO) + bpCOD (==BPO)?<br>
+      for now, I assumed that VFA_eff=0 and FBSO_eff=0 and BPO_eff=S
+  </ul>
+</div>

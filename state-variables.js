@@ -48,7 +48,7 @@ State_Variables.prototype.compute_totals=function(){
       this.components.organic.S_USO  +
       this.components.organic.X_BPO  +
       this.components.organic.X_UPO  ;
-    let Total_C = 
+    let Total_TC = 
       this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.organic.S_VFA  +
       this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.organic.S_FBSO +
       this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.organic.S_USO  +
@@ -72,17 +72,76 @@ State_Variables.prototype.compute_totals=function(){
       this.components.organic.X_BPO / this.mass_ratios.f_CV_BPO + 
       this.components.organic.X_UPO / this.mass_ratios.f_CV_UPO ;
     let Total_TSS = Total_VSS + this.components.inorganic.X_iSS;
-
+  //COD
+    let bsCOD = this.components.organic.S_VFA + this.components.organic.S_FBSO;
+    let usCOD = this.components.organic.S_USO;
+    let bpCOD = this.components.organic.X_BPO;
+    let upCOD = this.components.organic.X_UPO;
+    let bCOD = bsCOD + bpCOD;
+    let uCOD = usCOD + upCOD;
+    let sCOD = bsCOD + usCOD;
+    let pCOD = bpCOD + upCOD;
+    let COD=[
+      {COD:Total_COD, sCOD,  pCOD},
+      {bCOD,         bsCOD, bpCOD},
+      {uCOD,         usCOD, upCOD},
+    ];
+  //Organic Carbon
+    let bsOC = this.mass_ratios.f_C_VFA/this.mass_ratios.f_CV_VFA*this.components.organic.S_VFA+this.mass_ratios.f_C_FBSO/this.mass_ratios.f_CV_FBSO*this.components.organic.S_FBSO;
+    let usOC = this.mass_ratios.f_C_USO/this.mass_ratios.f_CV_USO*this.components.organic.S_USO;
+    let bpOC = this.mass_ratios.f_C_BPO/this.mass_ratios.f_CV_BPO*this.components.organic.X_BPO;
+    let upOC = this.mass_ratios.f_C_UPO/this.mass_ratios.f_CV_UPO*this.components.organic.X_UPO;
+    let bOC = bsOC + bpOC;
+    let uOC = usOC + upOC;
+    let sOC = bsOC + usOC;
+    let pOC = bpOC + upOC;
+    let TOC=[
+      {TOC:sOC+pOC, sOC,  pOC},
+      {bOC,        bsOC, bpOC},
+      {uOC,        usOC, upOC},
+    ];
+  //Organic Nitrogen
+    let bsON = this.mass_ratios.f_N_VFA/this.mass_ratios.f_CV_VFA*this.components.organic.S_VFA+this.mass_ratios.f_N_FBSO/this.mass_ratios.f_CV_FBSO*this.components.organic.S_FBSO;
+    let usON = this.mass_ratios.f_N_USO/this.mass_ratios.f_CV_USO*this.components.organic.S_USO;
+    let bpON = this.mass_ratios.f_N_BPO/this.mass_ratios.f_CV_BPO*this.components.organic.X_BPO;
+    let upON = this.mass_ratios.f_N_UPO/this.mass_ratios.f_CV_UPO*this.components.organic.X_UPO;
+    let bON = bsON + bpON;
+    let uON = usON + upON;
+    let sON = bsON + usON;
+    let pON = bpON + upON;
+    let ON=[
+      { ON:sON+pON, sON,  pON},
+      {bON,        bsON, bpON},
+      {uON,        usON, upON},
+    ];
+  //Organic Phosphorus
+    let bsOP = this.mass_ratios.f_P_VFA/this.mass_ratios.f_CV_VFA*this.components.organic.S_VFA+this.mass_ratios.f_P_FBSO/this.mass_ratios.f_CV_FBSO*this.components.organic.S_FBSO;
+    let usOP = this.mass_ratios.f_P_USO/this.mass_ratios.f_CV_USO*this.components.organic.S_USO;
+    let bpOP = this.mass_ratios.f_P_BPO/this.mass_ratios.f_CV_BPO*this.components.organic.X_BPO;
+    let upOP = this.mass_ratios.f_P_UPO/this.mass_ratios.f_CV_UPO*this.components.organic.X_UPO;
+    let bOP = bsOP + bpOP;
+    let uOP = usOP + upOP;
+    let sOP = bsOP + usOP;
+    let pOP = bpOP + upOP;
+    let OP=[
+      {OP:sOP+pOP,  sOP,  pOP},
+      {bOP,        bsOP, bpOP},
+      {uOP,        usOP, upOP},
+    ];
+  //VSS
+    let bVSS = this.components.organic.X_BPO / this.mass_ratios.f_CV_BPO;
+    let uVSS = this.components.organic.X_UPO / this.mass_ratios.f_CV_UPO;
+    let VSS=[
+      {VSS:Total_VSS, bVSS, uVSS },
+    ];
   //RESULTS (in g/m3)
   let totals={
-    Total_COD,
-    Total_C,
-    Total_TKN,
-    Total_TP,
-    Total_VSS,
-    Total_TSS
+    Total_COD, COD,
+    Total_TC,  TOC,
+    Total_TKN, ON,
+    Total_TP,  OP,
+    Total_TSS, VSS,
   };
-
   //console.log(totals);console.log('\n'); //debug
   return totals;
 };
