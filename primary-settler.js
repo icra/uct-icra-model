@@ -8,14 +8,14 @@ State_Variables.prototype.primary_settler=function(removal_BPO, removal_UPO, rem
   removal_UPO = removal_UPO || 100*(130/150); //%
   removal_iSS = removal_iSS || 100*(66/100);  //%
 
-  let BPO_removed = this.components.organic.X_BPO*removal_BPO/100;
-  let UPO_removed = this.components.organic.X_UPO*removal_UPO/100;
-  let iSS_removed = this.components.inorganic.X_iSS*removal_iSS/100;
+  let BPO_removed = this.components.X_BPO*removal_BPO/100;
+  let UPO_removed = this.components.X_UPO*removal_UPO/100;
+  let iSS_removed = this.components.X_iSS*removal_iSS/100;
 
   //apply the removal in the state variables
-  this.components.organic.X_BPO   -= BPO_removed;
-  this.components.organic.X_UPO   -= UPO_removed;
-  this.components.inorganic.X_iSS -= iSS_removed;
+  this.components.X_BPO   -= BPO_removed;
+  this.components.X_UPO   -= UPO_removed;
+  this.components.X_iSS -= iSS_removed;
 
   //debug
   console.log("primary_settler("+removal_BPO+","+removal_UPO+","+removal_iSS+") applied");

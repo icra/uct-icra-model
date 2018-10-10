@@ -37,15 +37,15 @@ State_Variables.prototype.bod_removal=function(BOD,Q,T,SRT,V,zb,Pr,Df,DO){
 
   //fractions at the influent
   let totals = this.compute_totals(); //object | includes: COD, TC, TKN, TP, VSS, TSS
-  let COD  = totals.Total_COD; //g/m3
-  let VSS  = totals.VSS[0].VSS; //g/m3
-  let TSS  = totals.Total_TSS; //g/m3
-  let bCOD = totals.COD[1].bCOD;
+  let COD    = totals.Total_COD;      //g/m3
+  let VSS    = totals.VSS[0].VSS;     //g/m3
+  let TSS    = totals.Total_TSS;      //g/m3
+  let bCOD   = totals.COD[0].bCOD;    //g/m3
 
   //pCOD = nbpCOD + bpCOD
-  let nbpCOD = this.components.organic.X_UPO; //g/m3
-  let nbsCOD = this.components.organic.S_USO; //g/m3
-  let pCOD   = nbpCOD + this.components.organic.X_BPO; //g/m3
+  let nbpCOD = this.components.X_UPO; //g/m3
+  let nbsCOD = this.components.S_USO; //g/m3
+  let pCOD   = nbpCOD + this.components.X_BPO; //g/m3
 
   //ratios
   let bCOD_BOD_ratio = bCOD/BOD; //gbCOD/gBOD
@@ -107,9 +107,9 @@ State_Variables.prototype.bod_removal=function(BOD,Q,T,SRT,V,zb,Pr,Df,DO){
   //end part A
 
   //TODO BOD removal eliminates the organic biodegradable components TODO
-  this.components.organic.S_VFA  = 0; //part of bsCOD
-  this.components.organic.S_FBSO = 0; //part of bsCOD
-  this.components.organic.X_BPO  = S; //equal to bpCOD
+  this.components.S_VFA  = 0; //part of bsCOD  | assume all is consumed
+  this.components.S_FBSO = 0; //part of bsCOD  | assume all is consumed
+  this.components.X_BPO  = S; //equal to bpCOD | assume is equal to S
 
   //debug
   console.log("bod_removal("+BOD+","+Q+","+T+","+SRT+","+V+","+zb+","+Pr+","+Df+","+DO+") applied");
@@ -122,23 +122,19 @@ State_Variables.prototype.bod_removal=function(BOD,Q,T,SRT,V,zb,Pr,Df,DO){
     pCOD_VSS_ratio:   {value:pCOD_VSS_ratio,   unit:"g_pCOD/g_VSS", descr:"pCOD/VSS_ratio"},
     fSus:             {value:fSus,             unit:"%",            descr:"Unbiodegradable & soluble fraction (USO/COD)"},
     fSup:             {value:fSup,             unit:"%",            descr:"Unbiodegradable & particulate fraction (UPO/COD)"},
-
     nbVSS:            {value:nbVSS,            unit:"g/m3",         descr:"Nonbiodegradable_VSS"},
     mu_mT:            {value:mu_mT,            unit:"1/d",          descr:"µ_corrected_by_temperature"},
     bHT:              {value:bHT,              unit:"1/d",          descr:"b_corrected_by_temperature"},
     S0:               {value:S0,               unit:"g/m3",         descr:"substrate (bCOD) initial concentration"},
     S:                {value:S,                unit:"g/m3",         descr:"substrate (bCOD) final concentration"},
-
     P_X_bio:          {value:P_X_bio,          unit:"kg/d",         descr:"Biomass_production"},
     P_X_VSS:          {value:P_X_VSS,          unit:"kg/d",         descr:"Net waste activated sludge produced each day"},
     P_X_TSS:          {value:P_X_TSS,          unit:"kg/d",         descr:"Total sludge produced each day"},
-
     X_VSS_V:          {value:X_VSS_V,          unit:"kg",           descr:"Mass of VSS"},
     X_TSS_V:          {value:X_TSS_V,          unit:"kg",           descr:"Mass of TSS"},
     MLSS_X_TSS:       {value:MLSS_X_TSS,       unit:"g/m3",         descr:"Mixed Liquor Suspended Solids"},
     tau:              {value:tau,              unit:"h",            descr:"&tau;_aeration_tank_detention_time"},
     MLVSS:            {value:MLVSS,            unit:"g/m3",         descr:"Mixed Liquor Volatile Suspended Solids"},
-
     FM:               {value:FM,               unit:"kg/kg·d",      descr:"Food to biomass ratio (gBOD or bsCOD / g VSS·d)"},
     BOD_loading:      {value:BOD_loading,      unit:"kg/m3·d",      descr:"Volumetric_BOD_loading"},
     bCOD_removed:     {value:bCOD_removed,     unit:"kg/d",         descr:"bCOD_removed"},

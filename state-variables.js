@@ -8,18 +8,14 @@
 //1. class definition
 function State_Variables(){
   this.components={ //components and default values (inputs)
-    organic:{
-      S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
-      S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable
-      X_BPO  : 707,   // biodegradable   particulate organics (BPO)
-      X_UPO  : 150,   // unbiodegradable particulate organics (UPO)
-      S_USO  : 58,    // unbiodegradable soluble     organics (USO)
-    },
-    inorganic:{
-      X_iSS  : 100,   // inert suspended solids
-      S_FSA  : 59.6,  // free saline ammonia
-      S_OP   : 14.15, // orthophosphate
-    },
+    S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
+    S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable
+    X_BPO  : 707,   // biodegradable   particulate organics (BPO)
+    X_UPO  : 150,   // unbiodegradable particulate organics (UPO)
+    S_USO  : 58,    // unbiodegradable soluble     organics (USO)
+    X_iSS  : 100,   // inorganic inert suspended solids (sand)
+    S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
+    S_OP   : 14.15, // inorganic orthophosphate (PO4)
   };
   this.mass_ratios={
     /* mass ratios for COD, C, N, P vs:
@@ -43,97 +39,104 @@ function State_Variables(){
 State_Variables.prototype.compute_totals=function(){
   //TOTALS: COD, TC, TKN, TP, VSS, TSS
     let Total_COD =
-      this.components.organic.S_VFA  +
-      this.components.organic.S_FBSO +
-      this.components.organic.S_USO  +
-      this.components.organic.X_BPO  +
-      this.components.organic.X_UPO  ;
+      this.components.S_VFA  +
+      this.components.S_FBSO +
+      this.components.S_USO  +
+      this.components.X_BPO  +
+      this.components.X_UPO  ;
     let Total_TC = 
-      this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.organic.S_VFA  +
-      this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.organic.S_FBSO +
-      this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.organic.S_USO  +
-      this.mass_ratios.f_C_BPO  / this.mass_ratios.f_CV_BPO  * this.components.organic.X_BPO  +
-      this.mass_ratios.f_C_UPO  / this.mass_ratios.f_CV_UPO  * this.components.organic.X_UPO  ;
+      this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
+      this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
+      this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
+      this.mass_ratios.f_C_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
+      this.mass_ratios.f_C_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
     let Total_TKN = 
-      this.components.inorganic.S_FSA + 
-      this.mass_ratios.f_N_VFA  / this.mass_ratios.f_CV_VFA  * this.components.organic.S_VFA  +
-      this.mass_ratios.f_N_FBSO / this.mass_ratios.f_CV_FBSO * this.components.organic.S_FBSO +
-      this.mass_ratios.f_N_USO  / this.mass_ratios.f_CV_USO  * this.components.organic.S_USO  +
-      this.mass_ratios.f_N_BPO  / this.mass_ratios.f_CV_BPO  * this.components.organic.X_BPO  +
-      this.mass_ratios.f_N_UPO  / this.mass_ratios.f_CV_UPO  * this.components.organic.X_UPO  ;
+      this.components.S_FSA + 
+      this.mass_ratios.f_N_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
+      this.mass_ratios.f_N_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
+      this.mass_ratios.f_N_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
+      this.mass_ratios.f_N_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
+      this.mass_ratios.f_N_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
     let Total_TP = 
-      this.components.inorganic.S_OP +
-      this.mass_ratios.f_P_VFA  / this.mass_ratios.f_CV_VFA  * this.components.organic.S_VFA  +
-      this.mass_ratios.f_P_FBSO / this.mass_ratios.f_CV_FBSO * this.components.organic.S_FBSO +
-      this.mass_ratios.f_P_USO  / this.mass_ratios.f_CV_USO  * this.components.organic.S_USO  +
-      this.mass_ratios.f_P_BPO  / this.mass_ratios.f_CV_BPO  * this.components.organic.X_BPO  +
-      this.mass_ratios.f_P_UPO  / this.mass_ratios.f_CV_UPO  * this.components.organic.X_UPO  ;
+      this.components.S_OP +
+      this.mass_ratios.f_P_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
+      this.mass_ratios.f_P_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
+      this.mass_ratios.f_P_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
+      this.mass_ratios.f_P_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
+      this.mass_ratios.f_P_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
     let Total_VSS =
-      this.components.organic.X_BPO / this.mass_ratios.f_CV_BPO + 
-      this.components.organic.X_UPO / this.mass_ratios.f_CV_UPO ;
-    let Total_TSS = Total_VSS + this.components.inorganic.X_iSS;
+      this.components.X_BPO / this.mass_ratios.f_CV_BPO + 
+      this.components.X_UPO / this.mass_ratios.f_CV_UPO ;
+    let Total_TSS = Total_VSS + this.components.X_iSS;
   //COD
-    let bsCOD = this.components.organic.S_VFA + this.components.organic.S_FBSO;
-    let usCOD = this.components.organic.S_USO;
-    let bpCOD = this.components.organic.X_BPO;
-    let upCOD = this.components.organic.X_UPO;
+    let bsCOD = this.components.S_VFA + this.components.S_FBSO;
+    let usCOD = this.components.S_USO;
+    let bpCOD = this.components.X_BPO;
+    let upCOD = this.components.X_UPO;
     let bCOD = bsCOD + bpCOD;
     let uCOD = usCOD + upCOD;
     let sCOD = bsCOD + usCOD;
     let pCOD = bpCOD + upCOD;
     let COD=[
-      {COD:Total_COD, sCOD,  pCOD},
-      {bCOD,         bsCOD, bpCOD},
-      {uCOD,         usCOD, upCOD},
+      {COD:Total_COD, bCOD,  uCOD},
+      {sCOD,          bsCOD, usCOD},
+      {pCOD,          bpCOD, upCOD},
     ];
   //Organic Carbon
-    let bsOC = this.mass_ratios.f_C_VFA/this.mass_ratios.f_CV_VFA*this.components.organic.S_VFA+this.mass_ratios.f_C_FBSO/this.mass_ratios.f_CV_FBSO*this.components.organic.S_FBSO;
-    let usOC = this.mass_ratios.f_C_USO/this.mass_ratios.f_CV_USO*this.components.organic.S_USO;
-    let bpOC = this.mass_ratios.f_C_BPO/this.mass_ratios.f_CV_BPO*this.components.organic.X_BPO;
-    let upOC = this.mass_ratios.f_C_UPO/this.mass_ratios.f_CV_UPO*this.components.organic.X_UPO;
+    let bsOC = 
+      this.mass_ratios.f_C_VFA  /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
+      this.mass_ratios.f_C_FBSO /this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
+    let usOC = this.mass_ratios.f_C_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
+    let bpOC = this.mass_ratios.f_C_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
+    let upOC = this.mass_ratios.f_C_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
     let bOC = bsOC + bpOC;
     let uOC = usOC + upOC;
     let sOC = bsOC + usOC;
     let pOC = bpOC + upOC;
     let TOC=[
-      {TOC:sOC+pOC, sOC,  pOC},
-      {bOC,        bsOC, bpOC},
-      {uOC,        usOC, upOC},
+      {TOC:sOC+pOC, bOC,  uOC},
+      {sOC,         bsOC, usOC},
+      {pOC,         bpOC, upOC},
     ];
   //Organic Nitrogen
-    let bsON = this.mass_ratios.f_N_VFA/this.mass_ratios.f_CV_VFA*this.components.organic.S_VFA+this.mass_ratios.f_N_FBSO/this.mass_ratios.f_CV_FBSO*this.components.organic.S_FBSO;
-    let usON = this.mass_ratios.f_N_USO/this.mass_ratios.f_CV_USO*this.components.organic.S_USO;
-    let bpON = this.mass_ratios.f_N_BPO/this.mass_ratios.f_CV_BPO*this.components.organic.X_BPO;
-    let upON = this.mass_ratios.f_N_UPO/this.mass_ratios.f_CV_UPO*this.components.organic.X_UPO;
+    let bsON = 
+      this.mass_ratios.f_N_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
+      this.mass_ratios.f_N_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
+    let usON = this.mass_ratios.f_N_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
+    let bpON = this.mass_ratios.f_N_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
+    let upON = this.mass_ratios.f_N_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
     let bON = bsON + bpON;
     let uON = usON + upON;
     let sON = bsON + usON;
     let pON = bpON + upON;
     let ON=[
-      { ON:sON+pON, sON,  pON},
-      {bON,        bsON, bpON},
-      {uON,        usON, upON},
+      { ON:sON+pON, bON,  uON},
+      {sON,         bsON, usON},
+      {pON,         bpON, upON},
     ];
   //Organic Phosphorus
-    let bsOP = this.mass_ratios.f_P_VFA/this.mass_ratios.f_CV_VFA*this.components.organic.S_VFA+this.mass_ratios.f_P_FBSO/this.mass_ratios.f_CV_FBSO*this.components.organic.S_FBSO;
-    let usOP = this.mass_ratios.f_P_USO/this.mass_ratios.f_CV_USO*this.components.organic.S_USO;
-    let bpOP = this.mass_ratios.f_P_BPO/this.mass_ratios.f_CV_BPO*this.components.organic.X_BPO;
-    let upOP = this.mass_ratios.f_P_UPO/this.mass_ratios.f_CV_UPO*this.components.organic.X_UPO;
+    let bsOP = 
+      this.mass_ratios.f_P_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
+      this.mass_ratios.f_P_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
+    let usOP = this.mass_ratios.f_P_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
+    let bpOP = this.mass_ratios.f_P_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
+    let upOP = this.mass_ratios.f_P_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
     let bOP = bsOP + bpOP;
     let uOP = usOP + upOP;
     let sOP = bsOP + usOP;
     let pOP = bpOP + upOP;
     let OP=[
-      {OP:sOP+pOP,  sOP,  pOP},
-      {bOP,        bsOP, bpOP},
-      {uOP,        usOP, upOP},
+      {OP:sOP+pOP,  bOP,  uOP},
+      {sOP,        bsOP, usOP},
+      {pOP,        bpOP, upOP},
     ];
   //VSS
-    let bVSS = this.components.organic.X_BPO / this.mass_ratios.f_CV_BPO;
-    let uVSS = this.components.organic.X_UPO / this.mass_ratios.f_CV_UPO;
+    let bVSS = this.components.X_BPO / this.mass_ratios.f_CV_BPO;
+    let uVSS = this.components.X_UPO / this.mass_ratios.f_CV_UPO;
     let VSS=[
       {VSS:Total_VSS, bVSS, uVSS },
     ];
+
   //RESULTS (in g/m3)
   let totals={
     Total_COD, COD,
@@ -150,10 +153,10 @@ State_Variables.prototype.compute_totals=function(){
   /* original numbers 
     inputs {
       X_BPO_non_set_inf: 301,
-      X_BPO_set_inf:     406,
       X_UPO_non_set_inf: 20,
-      X_UPO_set_inf:     130,
       X_iSS_raw_inf:     100,
+      X_BPO_set_inf:     406,
+      X_UPO_set_inf:     130,
       X_iSS_set_inf:     34,
       S_VFA_inf:         50,
       S_FBSO_inf:        186,
@@ -182,25 +185,24 @@ State_Variables.prototype.compute_totals=function(){
   let results; //declare identifier for results
     //1. raw ww
       console.log('Scenario 1: raw ww');
-      sv.components.organic.X_BPO   = 707;
-      sv.components.organic.X_UPO   = 150;
-      sv.components.inorganic.X_iSS = 100;
-      sv.components.organic.S_VFA   = 50;
-      sv.components.organic.S_FBSO  = 186;
-      sv.components.organic.S_USO   = 58;
-      sv.components.inorganic.S_FSA = 59.6;
-      sv.components.inorganic.S_OP  = 14.15;
+      sv.components.X_BPO  = 707;
+      sv.components.X_UPO  = 150;
+      sv.components.X_iSS  = 100;
+      sv.components.S_VFA  = 50;
+      sv.components.S_FBSO = 186;
+      sv.components.S_USO  = 58;
+      sv.components.S_FSA  = 59.6;
+      sv.components.S_OP   = 14.15;
       results = sv.compute_totals();
-
     //2. settled ww
       console.log('Scenario 2: settled ww');
-      sv.components.organic.X_BPO   = 301;
-      sv.components.organic.X_UPO   = 20;
-      sv.components.inorganic.X_iSS = 34;
-      sv.components.organic.S_VFA   = 50;
-      sv.components.organic.S_FBSO  = 186;
-      sv.components.organic.S_USO   = 58;
-      sv.components.inorganic.S_FSA = 59.6;
-      sv.components.inorganic.S_OP  = 14.15;
+      sv.components.X_BPO  = 301;
+      sv.components.X_UPO  = 20;
+      sv.components.X_iSS  = 34;
+      sv.components.S_VFA  = 50;
+      sv.components.S_FBSO = 186;
+      sv.components.S_USO  = 58;
+      sv.components.S_FSA  = 59.6;
+      sv.components.S_OP   = 14.15;
       results = sv.compute_totals();
   */

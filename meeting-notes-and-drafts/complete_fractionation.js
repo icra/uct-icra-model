@@ -19,7 +19,6 @@ function calculate_fractions(COD, sCOD, fSus, fSup){
 //calculate_fractions(450, 199, 0.113, 0.04);
 
 function fractionation(){
-
   let X_BPO_non_set_inf = 301;   //[Organics] non settleable biodegradable particulate organics
   let X_BPO_set_inf     = 406;   //[Organics] settleable biodegradable particulate organics
 

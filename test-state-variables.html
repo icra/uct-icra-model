@@ -14,6 +14,7 @@
     input[type=number]{
       width:70px;
       text-align:right;
+      background:#fafafa;
     }
 
     fieldset {
@@ -49,18 +50,10 @@
 <div style="display:flex;">
   <!--inputs - state variables-->
   <div>
-    <div>1. Inputs - State variables</div><br>
-    <table id=inputs border=1 style=width:100%>
-      <tr><td>X_BPO  <td> <input id=X_BPO  type=number min=0 onchange="sv.components.organic.X_BPO   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-      <tr><td>X_UPO  <td> <input id=X_UPO  type=number min=0 onchange="sv.components.organic.X_UPO   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-      <tr><td>X_iSS  <td> <input id=X_iSS  type=number min=0 onchange="sv.components.inorganic.X_iSS = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-      <tr><td>S_VFA  <td> <input id=S_VFA  type=number min=0 onchange="sv.components.organic.S_VFA   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-      <tr><td>S_FBSO <td> <input id=S_FBSO type=number min=0 onchange="sv.components.organic.S_FBSO  = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-      <tr><td>S_USO  <td> <input id=S_USO  type=number min=0 onchange="sv.components.organic.S_USO   = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-      <tr><td>S_FSA  <td> <input id=S_FSA  type=number min=0 onchange="sv.components.inorganic.S_FSA = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-      <tr><td>S_OP   <td> <input id=S_OP   type=number min=0 onchange="sv.components.inorganic.S_OP  = parseFloat(this.value);redisplay()"><td class=unit>mg/L
-    </table>
+    <div>1. State variables</div><br>
+    <table id=inputs border=1 style=width:100%></table>
 
+    <!--mass ratios-->
     <div style=font-size:smaller;margin-top:8px>
       <div>Mass ratios</div>
       <table id=mass_ratios border=1 style=width:100%></table>
@@ -204,14 +197,19 @@
 <script src="bod-removal.js"></script>
 <script>
   /*Frontend connection with backend*/
-
-  //initialize state variables
+  //initialize state variables (global variable)
   let sv=new State_Variables();
-
-  //focus the first input element you find
-  document.querySelector("input[type=number]").focus();
-
-  { //display mass ratios to table#mass_ratios
+  {//populate tables
+    //populate state variables table
+    let inputs=document.querySelector('table#inputs');
+    Object.entries(sv.components).forEach(entry=>{
+      let key=entry[0];
+      let value=entry[1];
+      let newRow=inputs.insertRow(-1);
+      newRow.insertCell(-1).innerHTML=key;
+      newRow.insertCell(-1).innerHTML="<input id="+key+" type=number min=0 onchange=sv.components."+key+"=parseFloat(this.value);redisplay()>";
+      newRow.insertCell(-1).outerHTML="<td class=unit>mg/L";
+    });
     let mass_ratios=document.querySelector('table#mass_ratios');
     Object.entries(sv.mass_ratios).forEach(entry=>{
       let key=entry[0];
@@ -224,19 +222,16 @@
 
   //redisplay inputs and results
   function redisplay(){
-    //redisplay inputs (TODO improve this part with foreach loops)
-    document.querySelector("#X_BPO") .value = sv.components.organic.X_BPO;
-    document.querySelector("#X_UPO") .value = sv.components.organic.X_UPO;
-    document.querySelector("#X_iSS") .value = sv.components.inorganic.X_iSS;
-    document.querySelector("#S_VFA") .value = sv.components.organic.S_VFA;
-    document.querySelector("#S_FBSO").value = sv.components.organic.S_FBSO;
-    document.querySelector("#S_USO") .value = sv.components.organic.S_USO;
-    document.querySelector("#S_FSA") .value = sv.components.inorganic.S_FSA;
-    document.querySelector("#S_OP")  .value = sv.components.inorganic.S_OP;
+    //redisplay inputs
+    Object.keys(sv.components).forEach(key=>{
+      let value=sv.components[key];
+      document.getElementById(key).value=value;
+    });
+
     //redisplay outputs
-    let results = sv.compute_totals();
     let outputs = document.querySelector('#outputs');
     outputs.innerHTML="";
+    let results = sv.compute_totals();
     Object.keys(results).forEach(key=>{
       let newRow=outputs.insertRow(-1);
       let value = results[key];
@@ -246,9 +241,7 @@
       }else{
         newRow.insertCell(-1).innerHTML=key;
         let newCell=newRow.insertCell(-1);
-        let table = document.createElement('table');
-        table.style.width="100%";
-        table.setAttribute('border',1);
+        let table=document.createElement('table');table.style.width="100%";table.setAttribute('border',1);
         newCell.appendChild(table);
         Object.keys(results[key]).forEach(k=>{
           let nr=table.insertRow(-1);
@@ -261,6 +254,9 @@
     });
   }
   redisplay();
+
+  //focus the first input element you find
+  document.querySelector("input[type=number]").focus();
 </script>
 
 <hr><div style=margin-top:8px>
