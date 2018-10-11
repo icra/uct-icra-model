@@ -13,8 +13,8 @@ State_Variables.prototype.primary_settler=function(removal_BPO, removal_UPO, rem
   let iSS_removed = this.components.X_iSS*removal_iSS/100;
 
   //apply the removal in the state variables
-  this.components.X_BPO   -= BPO_removed;
-  this.components.X_UPO   -= UPO_removed;
+  this.components.X_BPO -= BPO_removed;
+  this.components.X_UPO -= UPO_removed;
   this.components.X_iSS -= iSS_removed;
 
   //debug

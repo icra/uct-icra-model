@@ -6,7 +6,8 @@
 */
 
 //1. class definition
-function State_Variables(){
+function State_Variables(name){
+  this.name=name||"wastewater";
   this.components={ //components and default values (inputs)
     S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
     S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable

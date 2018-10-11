@@ -1,0 +1,174 @@
+<!doctype html><html><head>
+  <meta charset=utf8>
+  <title>State variables</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
+    body {
+      font-family: 'Roboto', verdana;
+      color: #5C5C5C;
+    }
+
+    table{ border-collapse:collapse}
+    table td.unit{font-size:smaller;}
+
+    input[type=number]{
+      width:70px;
+      text-align:right;
+    }
+
+    fieldset {
+      border-width:1px;
+    }
+  </style>
+</head><body>
+<div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px">
+  <h3>
+    State variables - steps editor
+    <button onclick=add_step()>Add step</button>
+    <script>
+      function add_step(){
+        let sv = new State_Variables("new step");
+        Object.keys(sv.components).forEach(key=>{sv.components[key]=0;}); //init to 0 all ww components
+        svs.push(sv);
+        populate();
+      }
+    </script>
+  </h3>
+  <div>
+    <a href="https://github.com/icra/ecoadvisor/blob/master/state-variables.js" target=_blank>state-variables.js</a>
+  </div>
+</div>
+
+<!--state variables-->
+<div>
+  <table id=state-variables border=1>
+    <tbody id=inputs></tbody>
+    <tbody id=outputs></tbody>
+  </table>
+</div>
+<small>Note: all units are in mg/L</small>
+
+<!--app logic-->
+<script src="format.js"></script>
+<script src="state-variables.js"></script>
+<script>
+  //create and populate all tables
+  function populate(){
+
+    //populate inputs
+    let inputs=document.querySelector('tbody#inputs');inputs.innerHTML="";
+    //populate outputs with 'compute_totals' calls
+    let outputs=document.querySelector('tbody#outputs');outputs.innerHTML="";
+
+    if(svs.length==0)return;
+
+    //sv name
+    let nameRow=inputs.insertRow(-1);
+    svs.forEach((sv,i)=>{
+      var nameCell=nameRow.insertCell(-1);
+      nameCell.colSpan=2;
+      nameCell.innerHTML=(i+1)+". ";
+
+      //text box for changing the name
+      var input=document.createElement('input');
+      input.setAttribute('maxlength',50);
+      input.onchange=function(){svs[i].name=this.value};
+      nameCell.appendChild(input);
+      input.value=sv.name;
+
+      //create delete sv button
+      var btn_x=document.createElement('button');
+      nameCell.appendChild(btn_x);
+      btn_x.innerHTML="delete";
+      btn_x.onclick=function(){svs.splice(i,1);populate()};
+    });
+
+    //inputs
+    Object.entries(svs[0].components).forEach(entry=>{
+      let newRow=inputs.insertRow(-1);
+      let key=entry[0];
+      svs.forEach((sv,i)=>{
+        newRow.insertCell(-1).innerHTML=key;
+        newRow.insertCell(-1).innerHTML="<input tabindex="+i+" type=number min=0 onchange=svs["+i+"].components."+key+"=parseFloat(this.value);redisplay("+i+"); value="+sv.components[key]+">";
+      });
+    });
+
+    //outputs
+    let results=[];
+    svs.forEach(sv=>{results.push(sv.compute_totals());});
+    let newRow=outputs.insertRow(-1);
+    results.forEach((result,i)=>{
+      let newCell=newRow.insertCell(-1);newCell.colSpan=2;
+      let table=document.createElement('table');table.style.width="100%";
+      table.setAttribute('index',i);
+      newCell.appendChild(table);
+      Object.keys(result).forEach(key=>{
+        let value  = result[key];
+        let newRow = table.insertRow(-1);
+        if(typeof(value)=='number'){
+          newRow.insertCell(-1).outerHTML="<td colspan=2>"+key+": <small><span key="+key+">"+format(value)+"</span></small>";
+        }else{
+          let newCell=newRow.insertCell(-1);
+          let table=document.createElement('table');table.style.width="100%";table.setAttribute('border',1);table.style.fontSize='smaller';
+          newCell.appendChild(table);
+          Object.keys(result[key]).forEach(k=>{
+            let nr=table.insertRow(-1);
+            Object.keys(result[key][k]).forEach(kk=>{
+              let value=result[key][k][kk];
+              nr.insertCell(-1).innerHTML=kk+": <span key="+kk+">"+format(value)+"</span>";
+            });
+          });
+        }
+      });
+    });
+  }
+
+  //redisplay values only (call 'compute_totals' for the nth sv)
+  function redisplay(n){
+    let outputs=document.querySelector('tbody#outputs');
+    let result=svs[n].compute_totals();
+    Object.keys(result).forEach(key=>{
+      let value=result[key];
+      if(typeof(value)=='number'){
+        document.querySelector('table[index="'+n+'"] span[key='+key+']').innerHTML=format(value);
+      }else{
+        Object.keys(result[key]).forEach(k=>{
+          Object.keys(result[key][k]).forEach(kk=>{
+            let value=result[key][k][kk];
+            document.querySelector('table[index="'+n+'"] span[key='+kk+']').innerHTML=format(value);
+          });
+        });
+      }
+    });
+  }
+</script>
+
+<!--user-defined-scenario-->
+<script>
+  /*
+    initialize state variables
+    create an example with with 3 scenarios: raw ww, sludge and settled ww
+  */
+  let raw_ww = new State_Variables("Raw wastewater");
+  let sludge = new State_Variables("Primary sludge");
+    sludge.components.S_VFA=0;
+    sludge.components.S_FBSO=0;
+    sludge.components.X_BPO=406;
+    sludge.components.X_UPO=130;
+    sludge.components.S_USO=0;
+    sludge.components.X_iSS=66;
+    sludge.components.S_FSA=0;
+    sludge.components.S_OP=0;
+  let set_ww = new State_Variables("Settled wastewater");
+    set_ww.components.X_BPO = raw_ww.components.X_BPO - sludge.components.X_BPO;
+    set_ww.components.X_UPO = raw_ww.components.X_UPO - sludge.components.X_UPO;
+    set_ww.components.X_iSS = raw_ww.components.X_iSS - sludge.components.X_iSS;
+
+  //svs means 'state variables'
+  let svs=[
+    raw_ww,
+    sludge,
+    set_ww,
+  ];
+  populate();
+</script>
