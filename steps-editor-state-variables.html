@@ -39,6 +39,8 @@
   </div>
 </div>
 
+<small>Note: all units are in mg/L</small><br><br>
+
 <!--state variables-->
 <div>
   <table id=state-variables border=1>
@@ -46,7 +48,6 @@
     <tbody id=outputs></tbody>
   </table>
 </div>
-<small>Note: all units are in mg/L</small>
 
 <!--app logic-->
 <script src="format.js"></script>
@@ -54,7 +55,6 @@
 <script>
   //create and populate all tables
   function populate(){
-
     //populate inputs
     let inputs=document.querySelector('tbody#inputs');inputs.innerHTML="";
     //populate outputs with 'compute_totals' calls
@@ -75,6 +75,7 @@
       input.onchange=function(){svs[i].name=this.value};
       nameCell.appendChild(input);
       input.value=sv.name;
+      input.placeholder='name';
 
       //create delete sv button
       var btn_x=document.createElement('button');
