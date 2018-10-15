@@ -8,6 +8,9 @@
 //1. class definition
 function State_Variables(name){
   this.name=name||"wastewater";
+  this.created  = new Date(), /*future*/
+  this.modified = new Date(), /*future*/
+
   this.components={ //components and default values (inputs)
     S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
     S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable
@@ -18,6 +21,7 @@ function State_Variables(name){
     S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
     S_OP   : 14.15, // inorganic orthophosphate (PO4)
   };
+
   this.mass_ratios={
     /* mass ratios for COD, C, N, P vs:
       -  BPO       (biodegradable    particulate  organics)
@@ -148,6 +152,24 @@ State_Variables.prototype.compute_totals=function(){
   };
   //console.log(totals);console.log('\n'); //debug
   return totals;
+};
+
+//create a new state variables object from the list of components
+function new_state_variables(S_VFA,S_FBSO,X_BPO,X_UPO,S_USO,X_iSS,S_FSA,S_OP){
+  var sv = new State_Variables();
+  sv.components.S_VFA  = S_VFA;
+  sv.components.S_FBSO = S_FBSO;
+  sv.components.X_BPO  = X_BPO;
+  sv.components.X_UPO  = X_UPO;
+  sv.components.S_USO  = S_USO;
+  sv.components.X_iSS  = X_iSS;
+  sv.components.S_FSA  = S_FSA;
+  sv.components.S_OP   = S_OP;
+  return sv;
+}
+
+State_Variables.prototype.set=function(component, newValue){
+  this.components[component]=newValue;
 };
 
 //3. tests
