@@ -10,7 +10,6 @@ function State_Variables(name){
   this.name=name||"wastewater";
   this.created  = new Date(), /*future*/
   this.modified = new Date(), /*future*/
-
   this.components={ //components and default values (inputs)
     S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
     S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable
@@ -18,8 +17,9 @@ function State_Variables(name){
     X_UPO  : 150,   // unbiodegradable particulate organics (UPO)
     S_USO  : 58,    // unbiodegradable soluble     organics (USO)
     X_iSS  : 100,   // inorganic inert suspended solids (sand)
-    S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
     S_OP   : 14.15, // inorganic orthophosphate (PO4)
+    S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
+    S_NOx  : 0,     // inorganic nitrite and nitrate (NO2 + NO3)
   };
 
   this.mass_ratios={
@@ -39,6 +39,9 @@ function State_Variables(name){
     /*--------------------------------------------------------------------------------*/
   };
 };
+
+//export for nodejs
+if(typeof module != "undefined"){module.exports=State_Variables;}
 
 //2. class methods: compute total: COD, C, TKN, TP, VSS, TSS
 State_Variables.prototype.compute_totals=function(){
@@ -141,7 +144,6 @@ State_Variables.prototype.compute_totals=function(){
     let VSS=[
       {VSS:Total_VSS, bVSS, uVSS },
     ];
-
   //RESULTS (in g/m3)
   let totals={
     Total_COD, COD,
@@ -152,24 +154,6 @@ State_Variables.prototype.compute_totals=function(){
   };
   //console.log(totals);console.log('\n'); //debug
   return totals;
-};
-
-//create a new state variables object from the list of components
-function new_state_variables(S_VFA,S_FBSO,X_BPO,X_UPO,S_USO,X_iSS,S_FSA,S_OP){
-  var sv = new State_Variables();
-  sv.components.S_VFA  = S_VFA;
-  sv.components.S_FBSO = S_FBSO;
-  sv.components.X_BPO  = X_BPO;
-  sv.components.X_UPO  = X_UPO;
-  sv.components.S_USO  = S_USO;
-  sv.components.X_iSS  = X_iSS;
-  sv.components.S_FSA  = S_FSA;
-  sv.components.S_OP   = S_OP;
-  return sv;
-}
-
-State_Variables.prototype.set=function(component, newValue){
-  this.components[component]=newValue;
 };
 
 //3. tests
