@@ -17,9 +17,9 @@ function State_Variables(name){
     X_UPO  : 150,   // unbiodegradable particulate organics (UPO)
     S_USO  : 58,    // unbiodegradable soluble     organics (USO)
     X_iSS  : 100,   // inorganic inert suspended solids (sand)
-    S_OP   : 14.15, // inorganic orthophosphate (PO4)
     S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
-    S_NOx  : 0,     // inorganic nitrite and nitrate (NO2 + NO3)
+    S_OP   : 14.15, // inorganic orthophosphate (PO4)
+    S_NOx  : 0,     // (not part of TKN) inorganic nitrite and nitrate (NO2 + NO3)
   };
 
   this.mass_ratios={
