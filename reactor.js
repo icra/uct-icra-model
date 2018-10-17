@@ -3,9 +3,7 @@
 */
 
 //(nodejs) import State_Variables class
-if(typeof(require)){
-  var State_Variables=require("./state-variables.js");
-}
+if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
 
 State_Variables.prototype.reactor=function(Q, T, Vp, SRT){
   //inputs
