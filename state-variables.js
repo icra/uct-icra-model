@@ -21,7 +21,6 @@ function State_Variables(name){
     S_OP   : 14.15, // inorganic orthophosphate (PO4)
     S_NOx  : 0,     // (not part of TKN) inorganic nitrite and nitrate (NO2 + NO3)
   };
-
   this.mass_ratios={
     /* mass ratios for COD, C, N, P vs:
       -  BPO       (biodegradable    particulate  organics)
@@ -31,11 +30,11 @@ function State_Variables(name){
     /*----+------------------+-----------------+------------------+-------------------+
     |     | COD              | C               | N                | P                 |
     +-----+------------------+-----------------+------------------+-------------------*/
-    /*VFA*/ f_CV_VFA  : 1.067, f_C_VFA  : 0.400, f_N_VFA  : 0.0000, f_P_VFA  : 0.0000,
-    /*FBS*/ f_CV_FBSO : 1.420, f_C_FBSO : 0.471, f_N_FBSO : 0.0231, f_P_FBSO : 0.0068,
-    /*BPO*/ f_CV_BPO  : 1.523, f_C_BPO  : 0.498, f_N_BPO  : 0.0350, f_P_BPO  : 0.0054,
-    /*UPO*/ f_CV_UPO  : 1.481, f_C_UPO  : 0.518, f_N_UPO  : 0.1000, f_P_UPO  : 0.0250,
-    /*USO*/ f_CV_USO  : 1.493, f_C_USO  : 0.498, f_N_USO  : 0.0258, f_P_USO  : 0.0000,
+    /*VFA*/ f_CV_VFA  : 1.0667, f_C_VFA  : 0.400, f_N_VFA  : 0.0000, f_P_VFA  : 0.0000,
+    /*FBS*/ f_CV_FBSO : 1.4200, f_C_FBSO : 0.471, f_N_FBSO : 0.0464, f_P_FBSO : 0.0118,
+    /*BPO*/ f_CV_BPO  : 1.5230, f_C_BPO  : 0.498, f_N_BPO  : 0.0323, f_P_BPO  : 0.0072,
+    /*UPO*/ f_CV_UPO  : 1.4810, f_C_UPO  : 0.518, f_N_UPO  : 0.1000, f_P_UPO  : 0.0250,
+    /*USO*/ f_CV_USO  : 1.4930, f_C_USO  : 0.498, f_N_USO  : 0.0366, f_P_USO  : 0.0000,
     /*--------------------------------------------------------------------------------*/
   };
 };

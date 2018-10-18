@@ -9,3 +9,9 @@ function format(number,digits){
   let str=new Intl.NumberFormat('en-EN',{maximumFractionDigits:digits}).format(number);
   return str;
 }
+
+String.prototype.prettifyUnit=function(){
+  return this
+    .replace('m3','m<sup>3</sup>')
+    .replace(/_/g,' ')
+}

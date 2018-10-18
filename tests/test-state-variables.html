@@ -7,59 +7,44 @@
       font-family: 'Roboto', verdana;
       color: #5C5C5C;
     }
-
     table{ border-collapse:collapse}
     table td.unit{font-size:smaller;}
-
     input[type=number]{
       width:70px;
       text-align:right;
     }
-
-    fieldset {
-      border-width:1px;
-    }
+    .number { text-align:right; }
+    fieldset { border-width:1px; }
+    button { outline:none; }
   </style>
+  <!--utils-->
   <script src=format.js></script>
 </head><body>
+
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px">
-  <h3>
-    State variables backend testing
-    <button onclick=window.location.reload()>Reset all</button>
-  </h3>
+  <h3>State variables + fractionation + AS</h3>
   <div>
     Source code: 
     <a href="https://github.com/icra/ecoadvisor/blob/master/state-variables.js" target=_blank>state-variables.js</a>
   </div>
 </div>
 
+<!--main-->
 <div style="display:flex;">
   <!--inputs - state variables-->
   <div>
-    <div>1. State variables</div><br>
-    <table id=inputs border=1 style=width:100%></table>
-
-    <!--mass ratios-->
-    <div style=font-size:smaller;margin-top:8px>
-      <div>Mass ratios</div>
-      <table id=mass_ratios border=1 style=width:100%></table>
-    </div>
-  </div>
-
-  <!--totals and fractionation-->
-  <div style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px">
-    <div>2. Totals &amp; fractionation (mg/L)</div><br>
-    <table id=outputs border=1></table>
+    <div>1. State variables, fractionation and mass ratios</div><br>
+    <table border=1 style=width:100%>
+      <tbody id=inputs></tbody>
+      <tbody id=outputs></tbody>
+      <tbody id=mass_ratios></tbody>
+    </table>
   </div>
 
   <!--techs-->
   <div style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px" id=techs>
-    <div>3. Apply technologies</div><br>
+    <div>2. Apply technologies</div><br>
     <style>
-      /*units*/
-      #techs fieldset table td:nth-child(3){
-        font-size:smaller;
-      }
       /*apply buttons*/
       #techs button {
         background:lightgreen;
@@ -69,9 +54,11 @@
       }
     </style>
 
-    <fieldset id=primary_settler>
+    <!--PST-->
+    <fieldset id=primary_settler style=display:none>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/primary-settler.js" target=_blank>Primary settler</a></legend>
       <table border=1>
+        <tr><td>Q          <td><input id=Q           type=number value=125>    <td class=unit>m<sup>3</sup>/d
         <tr><td>removal BPO<td><input id=removal_BPO type=number value=57.4257><td class=unit>%
         <tr><td>removal UPO<td><input id=removal_UPO type=number value=86.6667><td class=unit>%
         <tr><td>removal iSS<td><input id=removal_iSS type=number value=66>     <td class=unit>%
@@ -79,15 +66,16 @@
       <button onclick="apply_pst();this.disabled=true">Apply</button>
       <script>
         function apply_pst(){
-          let removal_BPO = parseFloat(document.querySelector('#removal_BPO').value);
-          let removal_UPO = parseFloat(document.querySelector('#removal_UPO').value);
-          let removal_iSS = parseFloat(document.querySelector('#removal_iSS').value);
-          let results = sv.primary_settler(removal_BPO, removal_UPO, removal_iSS);
+          let Q           = parseFloat(document.querySelector('#primary_settler #Q').value);
+          let removal_BPO = parseFloat(document.querySelector('#primary_settler #removal_BPO').value);
+          let removal_UPO = parseFloat(document.querySelector('#primary_settler #removal_UPO').value);
+          let removal_iSS = parseFloat(document.querySelector('#primary_settler #removal_iSS').value);
+          let results = sv.primary_settler(Q, removal_BPO, removal_UPO, removal_iSS);
           redisplay();
           document.querySelector('#primary_settler').appendChild((function(){
             let div=document.createElement('div');
             div.style.fontSize='smaller';
-            div.innerHTML="Primary Settler("+removal_BPO+","+removal_UPO+","+removal_iSS+") applied";
+            div.innerHTML="Primary Settler("+Q+","+removal_BPO+","+removal_UPO+","+removal_iSS+") applied";
 
             let info=document.createElement('table');
             //info.style.display='none';
@@ -101,7 +89,7 @@
 
             let info_btn=document.createElement('button');
             info_btn.style.display='block';
-            info_btn.innerHTML="Show/Hide Info";
+            info_btn.innerHTML="Show/Hide Results";
             info_btn.onclick=function(){
               info.style.display=info.style.display=='none'?'':'none';
             };
@@ -113,29 +101,94 @@
         }
       </script>
     </fieldset>
+
+    <!--AS-->
+    <fieldset id=activated_sludge>
+      <legend><a href="//github.com/icra/ecoadvisor/blob/master/activated-sludge.js" target=_blank>Activated Sludge</a></legend>
+      <table border=1>
+        <tr><td>Q   <td><input id=Q   type=number value=24875>  <td class=unit>m3/d
+        <tr><td>T   <td><input id=T   type=number value=16>     <td class=unit>ºC
+        <tr><td>Vp  <td><input id=Vp  type=number value=8473.3> <td class=unit>m3
+        <tr><td>SRT <td><input id=SRT type=number value=15>     <td class=unit>d
+      </table>
+      <button onclick="run_AS();">Run</button>
+      <script>
+        function run_AS(){
+          let Q   = parseFloat(document.querySelector('#activated_sludge #Q'  ).value);
+          let T   = parseFloat(document.querySelector('#activated_sludge #T'  ).value);
+          let Vp  = parseFloat(document.querySelector('#activated_sludge #Vp' ).value);
+          let SRT = parseFloat(document.querySelector('#activated_sludge #SRT').value);
+          let results = sv.activated_sludge(Q, T, Vp, SRT);
+          redisplay();
+          document.querySelector('#activated_sludge').appendChild((function(){
+            let div=document.createElement('div');
+            div.style.fontSize='smaller';
+            div.innerHTML="activated_sludge(Q="+Q+", T="+T+", Vp="+Vp+", SRT="+SRT+") calculated";
+            let info=document.createElement('table');
+            info.classList.add('info');
+            Object.keys(results).forEach(key=>{
+              let newRow=info.insertRow(-1);
+              newRow.insertCell(-1).innerHTML=key;
+              if(typeof results[key] == 'number'){
+                let fvalue = format(100*results[key]);
+                let color = parseFloat(fvalue) < 0.1 ? "green":"red";
+                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
+              }else{
+                newRow.insertCell(-1).outerHTML="<td class=number>"+format(results[key].value)+"</td>";
+                newRow.insertCell(-1).innerHTML=results[key].unit.prettifyUnit();
+                newRow.insertCell(-1).innerHTML="<small>"+results[key].descr+"<small>";
+              }
+            });
+            let info_btn=document.createElement('button'); info_btn.style.display='block'; info_btn.style.background="lightblue";
+            info_btn.innerHTML="Show/Hide Results";
+            info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
+            div.appendChild(info_btn);
+            div.appendChild(info);
+            return div;
+          })());
+          document.querySelectorAll('#activated_sludge table.info').forEach(t=>{t.style.display='none';});
+        }
+      </script>
+    </fieldset>
   </div>
 </div>
 
 <!--app logic-->
-<script src="../utils.js"></script>
 <script src="../state-variables.js"></script>
 <script src="../primary-settler.js"></script>
+<script src="../activated-sludge.js"></script>
+
+<!--user defined default scenario-->
 <script>
-  /*Frontend connection with backend*/
-  //initialize state variables (global variable)
   let sv=new State_Variables();
+  sv.components.S_VFA  = 50;
+  sv.components.S_FBSO = 115;
+  sv.components.X_BPO  = 255;
+  sv.components.X_UPO  = 10;
+  sv.components.S_USO  = 45;
+  sv.components.X_iSS  = 15;
+  sv.components.S_FSA  = 39.1;
+  sv.components.S_OP   = 7.28;
+  sv.components.S_NOx  = 0;
+</script>
+
+<!--populate page-->
+<script>
   {//populate tables
     //populate state variables table
-    let inputs=document.querySelector('table#inputs');
+    let inputs=document.querySelector('#inputs');
     Object.entries(sv.components).forEach(entry=>{
       let key=entry[0];
       let value=entry[1];
       let newRow=inputs.insertRow(-1);
       newRow.insertCell(-1).innerHTML=key;
       newRow.insertCell(-1).innerHTML="<input id="+key+" type=number min=0 onchange=sv.components."+key+"=parseFloat(this.value);redisplay()>";
-      newRow.insertCell(-1).outerHTML="<td class=unit>mg/L";
     });
-    let mass_ratios=document.querySelector('table#mass_ratios');
+    inputs.insertRow(-1).insertCell(-1).outerHTML="<td colspan=2 style=background:#ccc>";//space
+
+    let mass_ratios=document.querySelector('#mass_ratios');
+    mass_ratios.insertRow(-1).insertCell(-1).outerHTML="<td colspan=2 style=background:#ccc>";//space
+
     Object.entries(sv.mass_ratios).forEach(entry=>{
       let key=entry[0];
       let value=entry[1];

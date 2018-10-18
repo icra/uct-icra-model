@@ -150,26 +150,20 @@
     initialize state variables
     create an example with with 3 scenarios: raw ww, sludge and settled ww
   */
-  let raw_ww = new State_Variables("Raw wastewater");
-  let sludge = new State_Variables("Primary sludge");
-    sludge.components.S_VFA=0;
-    sludge.components.S_FBSO=0;
-    sludge.components.X_BPO=406;
-    sludge.components.X_UPO=130;
-    sludge.components.S_USO=0;
-    sludge.components.X_iSS=66;
-    sludge.components.S_FSA=0;
-    sludge.components.S_OP=0;
-  let set_ww = new State_Variables("Settled wastewater");
-    set_ww.components.X_BPO = raw_ww.components.X_BPO - sludge.components.X_BPO;
-    set_ww.components.X_UPO = raw_ww.components.X_UPO - sludge.components.X_UPO;
-    set_ww.components.X_iSS = raw_ww.components.X_iSS - sludge.components.X_iSS;
+  let sv = new State_Variables("Settled wastewater");
+    sv.components.S_VFA  = 50;
+    sv.components.S_FBSO = 115;
+    sv.components.X_BPO  = 255;
+    sv.components.X_UPO  = 10;
+    sv.components.S_USO  = 45;
+    sv.components.X_iSS  = 15;
+    sv.components.S_FSA  = 39.1;
+    sv.components.S_OP   = 7.28;
+    sv.components.S_NOx  = 0;
 
   //svs means 'state variables'
   let svs=[
-    raw_ww,
-    sludge,
-    set_ww,
+    sv,
   ];
   populate();
 </script>
