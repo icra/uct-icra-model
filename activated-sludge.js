@@ -21,47 +21,47 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   let BPO    = totals.COD[2].bpCOD;   //mg_COD/L
   let UPO    = totals.COD[2].upCOD;   //mg_COD/L
 
-  //fSus and fSup
+  //fSus and fSup ratios
   let fSus = USO/COD; //g_USO/g_COD
   let fSup = UPO/COD; //g_UPO/g_COD
 
   //2.1 - mass fluxes (kg/d)
   const fCV = this.mass_ratios.f_CV_UPO; //1.481
-  let FSti  = Q*COD/1000;                //kg_COD/d
-  let FSbi  = FSti*(1-fSus-fSup);        //kg_bCOD/d | biodegradable COD
-  let FXti  = FSti*fSup/fCV;             //kg_VSS/d  | UPO in VSS
-  let FiSS  = Q*iSS/1000;                //kg_iSS/d  | iSS flux
+  let FSti = Q*COD/1000;                 //kg_COD/d  | total COD influent
+  let FSbi = FSti*(1-fSus-fSup);         //kg_bCOD/d | biodegradable COD (VFA+FBSO) influent
+  let FXti = FSti*fSup/fCV;              //kg_VSS/d  | UPO in VSS influent
+  let FiSS = Q*iSS/1000;                 //kg_iSS/d  | iSS flux influent
 
-  //2.2 - calculate kinetics
-  const bH = 0.24;                         //1/d | growth rate at 20ºC
-  let bHT  = bH * Math.pow(1.029, T - 20); //1/d | corrected by temperature
+  //2.2 - kinetics
+  const bH = 0.24;                    //1/d | growth rate at 20ºC (standard)
+  let bHT  = bH*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
   //page 10
   const YH     = 0.45;                    //gVSS/gCOD
   let X_BH     = (YH*SRT)/(1+bHT*SRT);    //g_VSS*d/g_COD
-  let MX_BH    = FSbi * X_BH;             //kg_VSS
-  const fH     = 0.20;                    //tabled value
-  let MX_EH    = fH * bHT * SRT * MX_BH;  //kg_VSS
-  let MX_I     = FXti * SRT;              //kg_VSS
-  let MX_V     = MX_BH + MX_EH + MX_I;    //kg_VSS
-  const f_iOHO = 0.15;                    //g_iSS/gX
-  let MX_IO    = FiSS*SRT + f_iOHO*MX_BH; //kg_iSS
-  let MX_T     = MX_V + MX_IO;            //kg_TSS
+  let MX_BH    = FSbi * X_BH;             //kg_VSS   | biomass produced
+  const fH     = 0.20;                    //         | tabled value
+  let MX_EH    = fH * bHT * SRT * MX_BH;  //kg_VSS   | endogenous respiration OHOs
+  let MX_I     = FXti * SRT;              //kg_VSS   | unbiodegradable particulate organics
+  let MX_V     = MX_BH + MX_EH + MX_I;    //kg_VSS   | total VSS
+  const f_iOHO = 0.15;                    //g_iSS/gX | fraction of inert solids in biomass
+  let MX_IO    = FiSS*SRT + f_iOHO*MX_BH; //kg_iSS   | total inert solids
+  let MX_T     = MX_V + MX_IO;            //kg_TSS   | total TSS
 
   //2.3 - page 11
-  let MLSS_X_TSS = MX_T/Vp; //kg/m3 | solids concentration in the SST
+  let MLSS_X_TSS = MX_T/Vp; //kg/m3 | total solids concentration in the SST
   let HRT        = Vp/Q*24; //hours | hydraulic retention time
 
   //2.4 - page 12
-  let Qw = Vp/SRT; //m3/day
+  let Qw = Vp/SRT; //m3/day | wastage flow
 
-  //2.5
+  //2.5 
   let fi         = MX_V/MX_T;     //VSS/TSS ratio
-  let MLSS_X_VSS = fi*MLSS_X_TSS; //kg/m3
-  let f_avOHO    = MX_BH/MX_V;    //mgOHOVSS/mgVSS
-  let f_atOHO    = fi*f_avOHO;    //mgOHOVSS/mgTSS
+  let MLSS_X_VSS = fi*MLSS_X_TSS; //kg/m3 | VSS concentration in the SST
+  let f_avOHO    = MX_BH/MX_V;    //mgOHOVSS/mgVSS | fraction of active biomass in VSS
+  let f_atOHO    = fi*f_avOHO;    //mgOHOVSS/mgTSS | fraction of active biomass in TSS
 
-  //2.6 Nitrogen - page 12
-  const fn    = 0.10;                  //?
+  //2.6 - Nitrogen - page 12
+  const fn    = 0.10;                  //g_N/g_VSS
   let Ns      = fn*MX_V/(SRT*Q)*1000;  //mgN/L_influent | N in influent required for sludge production
   let Nte     = totals.Total_TKN - Ns; //mg/L as N (TKN effluent)
   let ON_FBSO = totals.ON[1].bsON;     //mg/L "Nobsi"
@@ -74,38 +74,73 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   let Nae_balance_error = Math.abs(1 - Nae/(this.components.S_FSA + ON_FBSO + ON_BPO - (Ns - ON_UPO))); //unitless
 
   //2.7 - oxygen demand - page 13
-  let FOc = FSbi*((1-fCV*YH)+fCV*(1-fH)*bHT*X_BH); //kg_O/d
-  let FOn = 4.57*Q*Nae/1000; //kg_O/d
-  let FOt = FOc + FOn; //kg_O/d
-  let OUR = FOt*1e3/(Vp*24); //mg/L·h
+  let FOc = FSbi*((1-fCV*YH)+fCV*(1-fH)*bHT*X_BH); //kg_O/d | carbonaceous oxygen demand
+  let FOn = 4.57*Q*Nae/1000;                       //kg_O/d | nitrogenous oxygen demand
+  let FOt = FOc + FOn;                             //kg_O/d | total oxygen demand
+  let OUR = FOt*1e3/(Vp*24);                       //mg/L·h | oxygen uptake rate
 
-  //2.8 effluent Phosphorus
-  const fp = 0.025;
-  let Ps   = fp * MX_V*1000/(Q*SRT); //mg_P/l
-  let Pti  = totals.Total_TP; //mg/L
-  let Pte  = Pti - Ps; //mg/L
-  let Pse  = Pte - totals.OP[1].usOP; //mg/L
+  //2.8 - effluent Phosphorus
+  const fp = 0.025;                  //g_P/g_VSS
+  let Ps  = fp * MX_V*1000/(Q*SRT);  //mg_P/l | P required for sludge production
+  let Pti = totals.Total_TP;         //mg/L   | total P influent
+  let Pte = Pti - Ps;                //mg/L   | total P effluent
+  let Pse = Pte - totals.OP[1].usOP; //mg/L   | total inorganic soluble P effluent
 
-  //2.9 COD Balance
-  let Suse              = totals.COD[1].usCOD; //mg/L
-  let FSe               = (Q-Qw)*Suse/1000; //kg/d as O
-  let FSw               = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O
-  let FSout             = FSe + FOc + FSw; //kg/d as O
-  let COD_balance_error = Math.abs(1 - FSti/FSout); //unitless
+  //2.9 - COD Balance
+  let Suse              = totals.COD[1].usCOD;                  //mg/L as O | USO influent concentration
+  let FSe               = (Q-Qw)*Suse/1000;                     //kg/d as O | USO effluent flux
+  let FSw               = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O | COD wastage flux
+  let FSout             = FSe + FOc + FSw;                      //kg/d as O | total COD out flux
+  let COD_balance_error = Math.abs(1 - FSti/FSout);             //unitless  | COD balance
 
-  //2.10 N balance
-  let FNti = Q*totals.Total_TKN/1000; //kg/d
-  let FNte = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000 + (Q-Qw)*(ON_USO + Nae)/1000; //kg/d
-  let N_balance_error = Math.abs(1 - FNti/FNte); //unitless
+  //2.10 - N balance
+  let FNti = Q*totals.Total_TKN/1000;                                                  //kg/d     | total TKN influent flux
+  let FNte = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000 + (Q-Qw)*(ON_USO + Nae)/1000; //kg/d     | total TKN out flux
+  let N_balance_error = Math.abs(1 - FNti/FNte);                                       //unitless | TKN balance
 
-  //2.11 P balance
-  let FPti = Q*totals.Total_TP/1000; //kg/d
-  let FPte = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000 + (Q-Qw)*Pte/1000; //kg/d
-  let P_balance_error = Math.abs(1 - FPti/FPte); //unitless
+  //2.11 - P balance
+  let FPti = Q*totals.Total_TP/1000;                               //kg/d     | total TP influent flux
+  let FPte = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000 + (Q-Qw)*Pte/1000; //kg/d     | total TP out flux
+  let P_balance_error = Math.abs(1 - FPti/FPte);                   //unitless | P balance
 
-  //MODIFY STATE VARIABLES TODO
+  //3 - nitrification
+  const µAm = 0.45;                     //1/d | growth rate at 20ºC
+  let µAmT  = µAm*Math.pow(1.123,T-20); //1/d | growth rate corrected by temperature
+  const Kn  = 1.0;                      //mg/L as N at 20ºC
+  let KnT   = Kn*Math.pow(1.123,T-20);  //mg/L as N corrected by temperature
+  const bA  = 0.04;                     //1/d at 20ºC
+  const bAT = bA*Math.pow(1.029,T-20);  //1/d | growth rate corrected by temperature
 
-  //end
+  //page 17
+  let SF  = 1.25;                    //Safety factor. Design choice. moves the sludge age
+  let fxm = 1 - SF*(bAT+1/SRT)/µAmT; //maximum design unaerated sludge mass fraction
+  let MXu = fxm*MX_T;                //kg TSS | sludge that can be unaerated and still nitrify well
+  let fxt = 0.39;                    //input or calculated? TBD
+
+  //effluent ammonia nitrification
+  let Nae_fxm = KnT/(SF-1);                                      //mg/L as N | effluent ammonia concentration if fxt == fxm
+  let Nae_fxt = KnT*(bAT + 1/SRT)/( µAmT*(1-fxt) - bAT - 1/SRT); //mg/L as N | effluent ammonia concentration if fxt <  fxm
+
+  //effluent TKN nitrification -- page 18
+  let Nte_nitri = Nae_fxt + ON_USO;                  //mg/L as N
+  let Nc        = totals.Total_TKN - Ns - Nte_nitri; //mg/L as N | Nitrification capacity
+
+  //oxygen demand
+  let FOn_nitri = 4.57*Q*Nc/1000;
+
+  //temporal return for nitrification
+  return {
+    µAmT, KnT, bAT, fxm, MXu, Nae_fxm, Nae_fxt,
+    Nte_nitri, Nc,
+    FOn_nitri,
+  }
+
+  //continue here TODO
+  //3.2 - denitrification - page 19
+  return {
+    //TODO
+  }
+
   //console.log(totals);
   return {
     //balances
@@ -135,7 +170,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
     FPte    :{value:FPte,       unit:"kg/d_as_P",     descr:"Flux TP effluent"},
     Ps      :{value:Ps,         unit:"mg/L_as_P",     descr:"P required for sludge production"},
     Pte     :{value:Pte,        unit:"mg/L_as_P",     descr:"TP concentration effluent"},
-    Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Soluble P concentration effluent"},
+    Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Inorganic Soluble P concentration effluent"},
 
     //VSS
     Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
@@ -164,9 +199,9 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   };
 };
 
-//test
-/*
-  let sv = new State_Variables('reactor');
+/* test
+*/
+  let sv               = new State_Variables('reactor');
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
   sv.components.X_BPO  = 255;
@@ -176,6 +211,4 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   sv.components.S_FSA  = 39.1;
   sv.components.S_OP   = 7.28;
   sv.components.S_NOx  = 0;
-  //call
   console.log(sv.activated_sludge());
-  */
