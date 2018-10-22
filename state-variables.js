@@ -168,8 +168,11 @@ function new_state_variables(S_VFA,S_FBSO,X_BPO,X_UPO,S_USO,X_iSS,S_FSA,S_OP){
   return sv;
 }
 
-State_Variables.prototype.set=function(component, newValue){
-  this.components[component]=newValue;
+//set component value
+State_Variables.prototype.set=function(key, newValue){
+  if(!this.components[key])       throw 'key not found';
+  if(typeof newValue != 'number') throw 'type error';
+  this.components[key]=newValue;
 };
 
 //3. tests
@@ -229,3 +232,4 @@ State_Variables.prototype.set=function(component, newValue){
       sv.components.S_OP   = 14.15;
       results = sv.compute_totals();
   */
+//end
