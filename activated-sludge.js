@@ -1,16 +1,16 @@
 /**
-  * Reactor implementation from G. Ekama hand notes
+  * AS implementation from G. Ekama hand notes
 */
 
 //import "State_Variables" class
 if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
 
-State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
+State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   //inputs
-  Q   = Q   || 24875;  //m3/d | Flowrate
-  T   = T   || 16;     //ºC   | Temperature
-  Vp  = Vp  || 8473.3; //m3   | Volume
-  SRT = SRT || 15;     //days | Solids retention time
+  Q  = Q  || 24875;  //m3/d | Flowrate
+  T  = T  || 16;     //ºC   | Temperature
+  Vp = Vp || 8473.3; //m3   | Volume
+  Rs = Rs || 15;     //days | Solids retention time
 
   //2 - page 9
   let iSS    = this.components.X_iSS; //mg_iSS/L
@@ -37,14 +37,14 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   let bHT  = bH*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
   //page 10
   const YH     = 0.45;                    //gVSS/gCOD
-  let X_BH     = (YH*SRT)/(1+bHT*SRT);    //g_VSS*d/g_COD
+  let X_BH     = (YH*Rs)/(1+bHT*Rs);    //g_VSS*d/g_COD
   let MX_BH    = FSbi * X_BH;             //kg_VSS   | biomass produced
   const fH     = 0.20;                    //         | tabled value
-  let MX_EH    = fH * bHT * SRT * MX_BH;  //kg_VSS   | endogenous respiration OHOs
-  let MX_I     = FXti * SRT;              //kg_VSS   | unbiodegradable particulate organics
+  let MX_EH    = fH * bHT * Rs * MX_BH;  //kg_VSS   | endogenous respiration OHOs
+  let MX_I     = FXti * Rs;              //kg_VSS   | unbiodegradable particulate organics
   let MX_V     = MX_BH + MX_EH + MX_I;    //kg_VSS   | total VSS
   const f_iOHO = 0.15;                    //g_iSS/gX | fraction of inert solids in biomass
-  let MX_IO    = FiSS*SRT + f_iOHO*MX_BH; //kg_iSS   | total inert solids
+  let MX_IO    = FiSS*Rs + f_iOHO*MX_BH; //kg_iSS   | total inert solids
   let MX_T     = MX_V + MX_IO;            //kg_TSS   | total TSS
 
   //2.3 - page 11
@@ -52,7 +52,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   let HRT        = Vp/Q*24; //hours | hydraulic retention time
 
   //2.4 - page 12
-  let Qw = Vp/SRT; //m3/day | wastage flow
+  let Qw = Vp/Rs; //m3/day | wastage flow
 
   //2.5 
   let fi         = MX_V/MX_T;     //VSS/TSS ratio
@@ -62,7 +62,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
 
   //2.6 - Nitrogen - page 12
   const fn    = 0.10;                  //g_N/g_VSS
-  let Ns      = fn*MX_V/(SRT*Q)*1000;  //mgN/L_influent | N in influent required for sludge production
+  let Ns      = fn*MX_V/(Rs*Q)*1000;  //mgN/L_influent | N in influent required for sludge production
   let Nte     = totals.Total_TKN - Ns; //mg/L as N (TKN effluent)
   let ON_FBSO = totals.ON[1].bsON;     //mg/L "Nobsi"
   let ON_USO  = totals.ON[1].usON;     //mg/L "Nouse"
@@ -81,7 +81,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
 
   //2.8 - effluent Phosphorus
   const fp = 0.025;                  //g_P/g_VSS
-  let Ps  = fp * MX_V*1000/(Q*SRT);  //mg_P/l | P required for sludge production
+  let Ps  = fp * MX_V*1000/(Q*Rs);  //mg_P/l | P required for sludge production
   let Pti = totals.Total_TP;         //mg/L   | total P influent
   let Pte = Pti - Ps;                //mg/L   | total P effluent
   let Pse = Pte - totals.OP[1].usOP; //mg/L   | total inorganic soluble P effluent
@@ -102,44 +102,6 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   let FPti = Q*totals.Total_TP/1000;                               //kg/d     | total TP influent flux
   let FPte = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000 + (Q-Qw)*Pte/1000; //kg/d     | total TP out flux
   let P_balance_error = Math.abs(1 - FPti/FPte);                   //unitless | P balance
-
-  //3 - nitrification
-  const µAm = 0.45;                     //1/d | growth rate at 20ºC
-  let µAmT  = µAm*Math.pow(1.123,T-20); //1/d | growth rate corrected by temperature
-  const Kn  = 1.0;                      //mg/L as N at 20ºC
-  let KnT   = Kn*Math.pow(1.123,T-20);  //mg/L as N corrected by temperature
-  const bA  = 0.04;                     //1/d at 20ºC
-  const bAT = bA*Math.pow(1.029,T-20);  //1/d | growth rate corrected by temperature
-
-  //page 17
-  let SF  = 1.25;                    //Safety factor. Design choice. moves the sludge age
-  let fxm = 1 - SF*(bAT+1/SRT)/µAmT; //maximum design unaerated sludge mass fraction
-  let MXu = fxm*MX_T;                //kg TSS | sludge that can be unaerated and still nitrify well
-  let fxt = 0.39;                    //input or calculated? TBD
-
-  //effluent ammonia nitrification
-  let Nae_fxm = KnT/(SF-1);                                      //mg/L as N | effluent ammonia concentration if fxt == fxm
-  let Nae_fxt = KnT*(bAT + 1/SRT)/( µAmT*(1-fxt) - bAT - 1/SRT); //mg/L as N | effluent ammonia concentration if fxt <  fxm
-
-  //effluent TKN nitrification -- page 18
-  let Nte_nitri = Nae_fxt + ON_USO;                  //mg/L as N
-  let Nc        = totals.Total_TKN - Ns - Nte_nitri; //mg/L as N | Nitrification capacity
-
-  //oxygen demand
-  let FOn_nitri = 4.57*Q*Nc/1000;
-
-  //temporal return for nitrification
-  return {
-    µAmT, KnT, bAT, fxm, MXu, Nae_fxm, Nae_fxt,
-    Nte_nitri, Nc,
-    FOn_nitri,
-  }
-
-  //continue here TODO
-  //3.2 - denitrification - page 19
-  return {
-    //TODO
-  }
 
   //console.log(totals);
   return {
@@ -199,8 +161,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, SRT){
   };
 };
 
-/* test
-*/
+/* test */
   let sv               = new State_Variables('reactor');
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;

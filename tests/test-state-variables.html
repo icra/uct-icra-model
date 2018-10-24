@@ -106,24 +106,24 @@
     <fieldset id=activated_sludge>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/activated-sludge.js" target=_blank>Activated Sludge</a></legend>
       <table border=1>
-        <tr><td>Q   <td><input id=Q   type=number value=24875>  <td class=unit>m3/d
-        <tr><td>T   <td><input id=T   type=number value=16>     <td class=unit>ºC
-        <tr><td>Vp  <td><input id=Vp  type=number value=8473.3> <td class=unit>m3
-        <tr><td>SRT <td><input id=SRT type=number value=15>     <td class=unit>d
+        <tr><td>Q  <td><input id=Q  type=number value=24875>  <td class=unit>m3/d
+        <tr><td>T  <td><input id=T  type=number value=16>     <td class=unit>ºC
+        <tr><td>Vp <td><input id=Vp type=number value=8473.3> <td class=unit>m3
+        <tr><td>Rs <td><input id=Rs type=number value=15>     <td class=unit>d
       </table>
       <button onclick="run_AS();">Run</button>
       <script>
         function run_AS(){
-          let Q   = parseFloat(document.querySelector('#activated_sludge #Q'  ).value);
-          let T   = parseFloat(document.querySelector('#activated_sludge #T'  ).value);
-          let Vp  = parseFloat(document.querySelector('#activated_sludge #Vp' ).value);
-          let SRT = parseFloat(document.querySelector('#activated_sludge #SRT').value);
-          let results = sv.activated_sludge(Q, T, Vp, SRT);
+          let Q  = parseFloat(document.querySelector('#activated_sludge #Q' ).value);
+          let T  = parseFloat(document.querySelector('#activated_sludge #T' ).value);
+          let Vp = parseFloat(document.querySelector('#activated_sludge #Vp').value);
+          let Rs = parseFloat(document.querySelector('#activated_sludge #Rs').value);
+          let results = sv.activated_sludge(Q, T, Vp, Rs);
           redisplay();
           document.querySelector('#activated_sludge').appendChild((function(){
             let div=document.createElement('div');
             div.style.fontSize='smaller';
-            div.innerHTML="activated_sludge(Q="+Q+", T="+T+", Vp="+Vp+", SRT="+SRT+") calculated";
+            div.innerHTML="activated_sludge(Q="+Q+", T="+T+", Vp="+Vp+", Rs="+Rs+") calculated";
             let info=document.createElement('table');
             info.classList.add('info');
             Object.keys(results).forEach(key=>{
@@ -160,16 +160,18 @@
 
 <!--user defined default scenario-->
 <script>
-  let sv=new State_Variables();
-  sv.components.S_VFA  = 50;
-  sv.components.S_FBSO = 115;
-  sv.components.X_BPO  = 255;
-  sv.components.X_UPO  = 10;
-  sv.components.S_USO  = 45;
-  sv.components.X_iSS  = 15;
-  sv.components.S_FSA  = 39.1;
-  sv.components.S_OP   = 7.28;
-  sv.components.S_NOx  = 0;
+  if(typeof sv == 'undefined'){
+    let sv=new State_Variables();
+    sv.components.S_VFA  = 50;
+    sv.components.S_FBSO = 115;
+    sv.components.X_BPO  = 255;
+    sv.components.X_UPO  = 10;
+    sv.components.S_USO  = 45;
+    sv.components.X_iSS  = 15;
+    sv.components.S_FSA  = 39.1;
+    sv.components.S_OP   = 7.28;
+    sv.components.S_NOx  = 0;
+  }
 </script>
 
 <!--populate page-->
