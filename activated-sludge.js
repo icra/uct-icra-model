@@ -6,7 +6,7 @@
 if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
 
 State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
-  //inputs
+  //inputs and default values
   Q  = Q  || 24875;  //m3/d | Flowrate
   T  = T  || 16;     //ºC   | Temperature
   Vp = Vp || 8473.3; //m3   | Volume
@@ -27,14 +27,15 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //2.1 - mass fluxes (kg/d)
   const fCV = this.mass_ratios.f_CV_UPO; //1.481
-  let FSti = Q*COD/1000;                 //kg_COD/d  | total COD influent
-  let FSbi = FSti*(1-fSus-fSup);         //kg_bCOD/d | biodegradable COD (VFA+FBSO) influent
-  let FXti = FSti*fSup/fCV;              //kg_VSS/d  | UPO in VSS influent
-  let FiSS = Q*iSS/1000;                 //kg_iSS/d  | iSS flux influent
+  let FSti  = Q*COD/1000;                //kg_COD/d  | total COD influent
+  let FSbi  = FSti*(1-fSus-fSup);        //kg_bCOD/d | biodegradable COD (VFA+FBSO) influent
+  let FXti  = FSti*fSup/fCV;             //kg_VSS/d  | UPO in VSS influent
+  let FiSS  = Q*iSS/1000;                //kg_iSS/d  | iSS flux influent
 
   //2.2 - kinetics
   const bH = 0.24;                    //1/d | growth rate at 20ºC (standard)
   let bHT  = bH*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
+
   //page 10
   const YH     = 0.45;                    //gVSS/gCOD
   let X_BH     = (YH*Rs)/(1+bHT*Rs);    //g_VSS*d/g_COD
@@ -52,7 +53,8 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let HRT        = Vp/Q*24; //hours | hydraulic retention time
 
   //2.4 - page 12
-  let Qw = Vp/Rs; //m3/day | wastage flow
+  let Qw = Vp/Rs;  //m3/day | wastage flow
+  let Qe = Q - Qw; //m3/day | effluent flow
 
   //2.5 
   let fi         = MX_V/MX_T;     //VSS/TSS ratio
@@ -135,6 +137,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
     Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Inorganic Soluble P concentration effluent"},
 
     //VSS
+    Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
     Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
     HRT     :{value:HRT,        unit:"hour",          descr:"Hydraulic Retention Time"},
     bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
@@ -162,7 +165,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 };
 
 /* test */
-  let sv               = new State_Variables('reactor');
+  let sv               = new State_Variables();
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
   sv.components.X_BPO  = 255;
