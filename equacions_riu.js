@@ -1,58 +1,68 @@
-//equacions riu.docx
+/*
+ equacions_riu.docx
 
-//1. Caracteritzar geometria
-  let wb; //amplada a llera mitjana
-  let wt; //amplada màxima del canal
-  let Di; //fondària màxima al nivell del canal (bankfull)
-  let Dt; //fondària màxima del canal
+ Estructura Taula resum de trams de riu
+  [tram influent 1, codi tram influent 2, codi edar influent]+
+  [wb, wt, Dt, angle, n, S, Li, UTM_X, UTM_Y]
+*/
 
-  //angle entre la llera i el màxim del canal
-  let angle = Math.acos(Dt/Math.sqrt(Math.pow((wt-wb)/2,2)+Math.pow(Dt,2)));
-  let wi    = wb + 2*Di*Math.tan(angle);  //amplada de la llera inundada
-  let Ai    = Di*(wb+Di*Math.tan(angle)); //area transversal inundada
-  let wpi   = wb + 2*Di/Math.cos(angle);  //perímetre humit inundat
-  let HRi   = Ai/wpi;                     //radi hidràulic
+class Tram {
+  constructor(wb,wt,Dt,S,n,Li){
+    this.wb = wb //amplada a llera mitjana
+    this.wt = wt //amplada màxima del canal
+    this.Dt = Dt //fondària màxima del canal
+    this.S  = S  //pendent de la llera : obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
+    this.n  = n  //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
+    this.Li = Li //longitud tram
 
-//2. Determinar pendent de la llera (S): usant un model digital d'elevació del terreny de resolució
-//mínima de 30m de pixel, i estimant la pendent per un tram d'1 km.
-  let S;
-
-//3. Determinar coeficient de Manning (n).
-  //Equació de Manning: estimar n a partir de regressió entre Qi (y) i HRi (x):
-  //també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
-  let n = Math.sqrt(S)/pendent;
-
-//4. Amb n determinat podem estimar wi, Ai, wpi, HRi i Qi en funció de Di. 
-  let Li; //longitud
-
-//taula resum
-  //tram influent 1, codi tram influent 2, codi edar influent \
-  //wb, wt, Dt, angle, n, S, Li, UTM X, UTM Y
-  function calcula_coses(wb,wt,Di,Dt,Li){
-    ///
-    let Qi   = (1/n)*Math.pow(HRi,2/3)*Math.sqrt(S);
-    let HRTi = Li*Ai/Qi; //el temps mig de residència de l'aigua HRTi
-    let Si   = Li*wpi;   //la superfície inundada en el tram d'interès
-    return {  
-      Qi, HRTi, Si
-    }
+    //extra info per quan connectem trams després de validar n=1
+    /*
+    this.coordenades = {start:[1,1], end:[2,2]};
+    this.id     = "identificador";
+    this.id_in1 = "indentificador influent 1";
+    this.id_in2 = "indentificador influent 2";
+    this.id_wtp = null; //indentificador EDAR que aboca al tram 
+    */
   }
-  //
-  //Les equacions determinaran Qi, HRTi, Si
 
-//Capacitat de retenció
-  //massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram
-  let Mi;
+  //calcula angle "alfa" entre la llera i el màxim del canal
+  get angle(){return Math.acos(this.Dt/Math.sqrt(Math.pow((this.wt-this.wb)/2,2)+Math.pow(this.Dt,2)));}
+
+  //en funció de la fondària (Di), tenim wi, Ai, wpi, HRi i Qi
+  wi (Di){ return this.wb + 2*Di*Math.tan(this.angle); } //amplada de la llera inundada
+  Ai (Di){ return Di*(this.wb+Di*Math.tan(this.angle));} //area transversal inundada
+  wpi(Di){ return this.wb + 2*Di/Math.cos(this.angle); } //perímetre humit inundat
+  HRi(Di){ return this.Ai(Di)/this.wpi(Di);            } //radi hidràulic
+
+  //Amb n determinat podem estimar wi, Ai, wpi, HRi i Qi en funció de Di. 
+  HRTi(Di){ return this.Li*this.Ai(Di)/this.Qi(Di); } //el temps mig de residència de l'aigua HRTi
+  Si  (Di){ return this.Li*this.wpi(Di);            } //la superfície inundada en el tram d'interès
+  Qi  (Di){ return (1/n) * Math.pow(this.HRi(Di), 2/3) * Math.sqrt(this.S); }
+
+  /*Per a fer un seguiment, s’hauria de mirar estat químic i ecològic al 
+    final del tram fluvial, així com al final de tram de barreja lateral, punt a 
+    partir del qual la química de l’aigua és resultat de la barreja de la 
+    química dels trams fluvials i EDAR influents. La longitud del tram de barreja 
+    lateral (Ll) es determina a partir de paràmetres hidràulics, amplada (wi), 
+    coeficient de dispersió lateral (ky) i velocitat mitjana (u). El coeficient de 
+    dispersió lateral es calcula a partir de la fondària (Di), la força de la 
+    gravetat (g), i la pendent de la llera fluvial (S): */
+  ky(Di){ return 0.6*Di*Math.sqrt(9.81*this.S*Di)};                                //coeficient de dispersió lateral (ky)
+  Ll(Di){ return Math.pow(this.wi(Di),2)*this.Qi(Di)/this.Ai(Di)/(2*this.ky(Di));} //longitud del tram de barreja lateral (Ll)
+
   //massa o càrrega al final del tram fluvial
-  let Mf = Mi - R_20*HRTi*Si*Math.pow(1.041,T-20)*(Mi/Qi)/(k+Mi/Qi);
+  Mf(Di,Mi,R_20,k,T){
+    //Mi   : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram
+    //R_20 : velocitat de reacció a 20ºC
+    //k    : (input, es com una ks)
+    //T    : temperatura (ºC)
+    return Mi - R_20*this.HRTi(Di)*this.Si(Di)*Math.pow(1.041,T-20)*(Mi/this.Qi(Di))/(k+Mi/this.Qi(Di));
+  }
+}
 
-//Objectiu gestió EDAR:
-  //NH4 < 0.5 mg/L
-  //PO4 < 0.5 mg/L
+//tests
+//constructor   (wb,wt,Dt,S,n,Li){
+let t = new Tram( 1, 1, 1,1,1, 1);
+console.log(t);
+console.log(t.angle);
 
-//gravetat
-const g = 9.81;
-//coeficient de dispersió lateral (ky)
-let ky = 0.6*Di*Math.sqrt(g*S*Di);
-//longitud del tram de barreja lateral (Ll)
-let Ll = Math.pow(wi,2)*Qi/Ai/(2*ky);
