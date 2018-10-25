@@ -1,9 +1,9 @@
 /*
- equacions_riu.docx
+  equacions_riu.docx
 
- Estructura Taula resum de trams de riu
-  [tram influent 1, codi tram influent 2, codi edar influent]+
-  [wb, wt, Dt, angle, n, S, Li, UTM_X, UTM_Y]
+  Estructura Taula resum de trams de riu
+    [tram influent 1, codi tram influent 2, codi edar influent]+
+    [wb, wt, Dt, angle, n, S, Li, UTM_X, UTM_Y]
 */
 
 class Tram {
@@ -37,7 +37,7 @@ class Tram {
   //Amb n determinat podem estimar wi, Ai, wpi, HRi i Qi en funció de Di. 
   HRTi(Di){ return this.Li*this.Ai(Di)/this.Qi(Di); } //el temps mig de residència de l'aigua HRTi
   Si  (Di){ return this.Li*this.wpi(Di);            } //la superfície inundada en el tram d'interès
-  Qi  (Di){ return (1/n) * Math.pow(this.HRi(Di), 2/3) * Math.sqrt(this.S); }
+  Qi  (Di){ return (1/this.n) * Math.pow(this.HRi(Di), 2/3) * Math.sqrt(this.S); }
 
   /*Per a fer un seguiment, s’hauria de mirar estat químic i ecològic al 
     final del tram fluvial, així com al final de tram de barreja lateral, punt a 
@@ -62,7 +62,21 @@ class Tram {
 
 //tests amb valors inventats
 //constructor   (wb, wt, Dt, S,   n,      Li){
-let t = new Tram(10, 50,  1, 0.5, 0.0358, 100);
+let t = new Tram(10, 50, 10, 0.5, 0.0358, 100);
 console.log(t);
-console.log(t.angle);
+console.log("angle alfa : "+t.angle);
 
+//definim una fondària concreta Di
+let Di = 5;
+console.log("wi   (Di="+Di+"): "+t.wi(Di));
+console.log("Ai   (Di="+Di+"): "+t.Ai(Di));
+console.log("wpi  (Di="+Di+"): "+t.wpi(Di));
+console.log("HRi  (Di="+Di+"): "+t.HRi(Di));
+console.log("HRTi (Di="+Di+"): "+t.HRTi(Di));
+console.log("Si   (Di="+Di+"): "+t.Si(Di));
+console.log("Qi   (Di="+Di+"): "+t.Qi(Di));
+console.log("ky   (Di="+Di+"): "+t.ky(Di));
+console.log("Ll   (Di="+Di+"): "+t.Ll(Di));
+
+let Mi=1e5, R_20=0.05, k=0.1, T=15;
+console.log("Mf   (Di="+Di+",Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Di,Mi,R_20,k,T));
