@@ -60,9 +60,9 @@ class Tram {
   }
 }
 
-//tests
-//constructor   (wb,wt,Dt,S,n,Li){
-let t = new Tram( 1, 1, 1,1,1, 1);
+//tests amb valors inventats
+//constructor   (wb, wt, Dt, S,   n,      Li){
+let t = new Tram(10, 50,  1, 0.5, 0.0358, 100);
 console.log(t);
 console.log(t.angle);
 
