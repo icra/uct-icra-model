@@ -1,48 +1,53 @@
-/* STATE VARIABLES AND MASS RATIOS ENCAPSULATION
+/* 
+  STATE VARIABLES AND MASS RATIOS ENCAPSULATION
   summary of this file:
     1. class definition (data structure)
-    2. class methods (functions)
+    2. class methods (functions, prototypes)
     3. tests
 */
 
 //1. class definition
-function State_Variables(name){
-  this.name=name||"wastewater";
-  this.created  = new Date(), /*future*/
-  this.modified = new Date(), /*future*/
-  this.components={ //components and default values (inputs)
-    S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
-    S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable
-    X_BPO  : 707,   // biodegradable   particulate organics (BPO)
-    X_UPO  : 150,   // unbiodegradable particulate organics (UPO)
-    S_USO  : 58,    // unbiodegradable soluble     organics (USO)
-    X_iSS  : 100,   // inorganic inert suspended solids (sand)
-    S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
-    S_OP   : 14.15, // inorganic orthophosphate (PO4)
-    S_NOx  : 0,     // (not part of TKN) inorganic nitrite and nitrate (NO2 + NO3)
-  };
-  this.mass_ratios={
-    /* mass ratios for COD, C, N, P vs:
-      -  BPO       (biodegradable    particulate  organics)
-      -  VFA+FBSO  (biodegradable    soluble      organics)
-      -  UPO       (unbiodegradable  particulate  organics)
-      -  USO       (unbiodegradable  soluble      organics)*/
-    /*----+------------------+-----------------+------------------+-------------------+
-    |     | COD              | C               | N                | P                 |
-    +-----+------------------+-----------------+------------------+-------------------*/
-    /*VFA*/ f_CV_VFA  : 1.0667, f_C_VFA  : 0.400, f_N_VFA  : 0.0000, f_P_VFA  : 0.0000,
-    /*FBS*/ f_CV_FBSO : 1.4200, f_C_FBSO : 0.471, f_N_FBSO : 0.0464, f_P_FBSO : 0.0118,
-    /*BPO*/ f_CV_BPO  : 1.5230, f_C_BPO  : 0.498, f_N_BPO  : 0.0323, f_P_BPO  : 0.0072,
-    /*UPO*/ f_CV_UPO  : 1.4810, f_C_UPO  : 0.518, f_N_UPO  : 0.1000, f_P_UPO  : 0.0250,
-    /*USO*/ f_CV_USO  : 1.4930, f_C_USO  : 0.498, f_N_USO  : 0.0366, f_P_USO  : 0.0000,
-    /*--------------------------------------------------------------------------------*/
-  };
-};
+class State_Variables{
+  constructor(name){
+    this.name=name||"wastewater";
+    this.created  = new Date(), /*future*/
+    this.modified = new Date(), /*future*/
+    this.components={ //components and default values (inputs)
+      S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
+      S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable
+      X_BPO  : 707,   // biodegradable   particulate organics (BPO)
+      X_UPO  : 150,   // unbiodegradable particulate organics (UPO)
+      S_USO  : 58,    // unbiodegradable soluble     organics (USO)
+      X_iSS  : 100,   // inorganic inert suspended solids (sand)
+      S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
+      S_OP   : 14.15, // inorganic orthophosphate (PO4)
+      S_NOx  : 0,     // (not part of TKN) inorganic nitrite and nitrate (NO2 + NO3)
+    };
+    this.mass_ratios={
+      /* mass ratios for COD, C, N, P vs:
+        -  BPO       (biodegradable    particulate  organics)
+        -  VFA+FBSO  (biodegradable    soluble      organics)
+        -  UPO       (unbiodegradable  particulate  organics)
+        -  USO       (unbiodegradable  soluble      organics)*/
+      /*----+------------------+-----------------+------------------+-------------------+
+      |     | COD              | C               | N                | P                 |
+      +-----+------------------+-----------------+------------------+-------------------*/
+      /*VFA*/ f_CV_VFA  : 1.0667, f_C_VFA  : 0.400, f_N_VFA  : 0.0000, f_P_VFA  : 0.0000,
+      /*FBS*/ f_CV_FBSO : 1.4200, f_C_FBSO : 0.471, f_N_FBSO : 0.0464, f_P_FBSO : 0.0118,
+      /*BPO*/ f_CV_BPO  : 1.5230, f_C_BPO  : 0.498, f_N_BPO  : 0.0323, f_P_BPO  : 0.0072,
+      /*UPO*/ f_CV_UPO  : 1.4810, f_C_UPO  : 0.518, f_N_UPO  : 0.1000, f_P_UPO  : 0.0250,
+      /*USO*/ f_CV_USO  : 1.4930, f_C_USO  : 0.498, f_N_USO  : 0.0366, f_P_USO  : 0.0000,
+      /*--------------------------------------------------------------------------------*/
+    };
+  }
+}
 
 //export for nodejs
 if(typeof module != "undefined"){module.exports=State_Variables;}
 
-//2. class methods: compute total: COD, C, TKN, TP, VSS, TSS
+//2. class methods
+
+//2.1. compute total: COD, C, TKN, TP, VSS, TSS
 State_Variables.prototype.compute_totals=function(){
   //TOTALS: COD, TC, TKN, TP, VSS, TSS
     let Total_COD =
@@ -155,16 +160,16 @@ State_Variables.prototype.compute_totals=function(){
   return totals;
 };
 
-//set a single component value
+//2.2 set a single component value
 State_Variables.prototype.set=function(key, newValue){
   if(!this.components[key])       throw 'key not found';
-  if(typeof newValue != 'number') throw 'type error';
+  if(typeof newValue != 'number') throw 'newValue is not a number';
   this.components[key]=newValue;
 };
 
 //3. tests
-  /* original numbers 
-    inputs {
+  /* original numbers from george ekama
+    inputs:
       X_BPO_non_set_inf: 301,
       X_UPO_non_set_inf: 20,
       X_iSS_raw_inf:     100,
@@ -176,8 +181,7 @@ State_Variables.prototype.set=function(key, newValue){
       S_USO_inf:         58,
       S_FSA_inf:         59.6,
       S_OP_inf:          14.15,
-    }
-    outputs {
+    outputs:
       Total_COD_raw:  1151,
       Total_C_raw:    383.4286,
       Total_TKN_raw:  90.0039,
@@ -190,33 +194,32 @@ State_Variables.prototype.set=function(key, newValue){
       Total_TP_set:   16.4455,
       Total_VSS_set:  211.1406,
       Total_TSS_set:  245.1406
-    }
   */
-  //2 scenarios: raw ww, settled ww
+
+  //create 2 scenarios: raw ww, settled ww
   /*
-  let sv = new State_Variables(); //declare new state variables identifier 'sv'
-  let results; //declare identifier for results
-    //1. raw ww
-      console.log('Scenario 1: raw ww');
-      sv.components.X_BPO  = 707;
-      sv.components.X_UPO  = 150;
-      sv.components.X_iSS  = 100;
-      sv.components.S_VFA  = 50;
-      sv.components.S_FBSO = 186;
-      sv.components.S_USO  = 58;
-      sv.components.S_FSA  = 59.6;
-      sv.components.S_OP   = 14.15;
-      results = sv.compute_totals();
-    //2. settled ww
-      console.log('Scenario 2: settled ww');
-      sv.components.X_BPO  = 301;
-      sv.components.X_UPO  = 20;
-      sv.components.X_iSS  = 34;
-      sv.components.S_VFA  = 50;
-      sv.components.S_FBSO = 186;
-      sv.components.S_USO  = 58;
-      sv.components.S_FSA  = 59.6;
-      sv.components.S_OP   = 14.15;
-      results = sv.compute_totals();
-  */
+  let sv1 = new State_Variables('raw ww');
+  let sv2 = new State_Variables('settled ww');
+  //1. raw ww
+    sv1.set("X_BPO", 707);
+    sv1.set("X_UPO", 150);
+    sv1.set("X_iSS", 100);
+    sv1.set("S_VFA", 50);
+    sv1.set("S_FBSO",186);
+    sv1.set("S_USO", 58);
+    sv1.set("S_FSA", 59.6);
+    sv1.set("S_OP",  14.15);
+  //2. settled ww
+    sv2.set('X_BPO',  301);
+    sv2.set('X_UPO',  20);
+    sv2.set('X_iSS',  34);
+    sv2.set('S_VFA',  50);
+    sv2.set('S_FBSO', 186);
+    sv2.set('S_USO',  58);
+    sv2.set('S_FSA',  59.6);
+    sv2.set('S_OP',   14.15);
+  //compute scenarios
+    console.log(sv1.compute_totals());
+    console.log(sv2.compute_totals());
 //end
+*/
