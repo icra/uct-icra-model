@@ -55,7 +55,7 @@
     </style>
 
     <!--PST-->
-    <fieldset id=primary_settler style=display:none>
+    <fieldset id=primary_settler>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/primary-settler.js" target=_blank>Primary settler</a></legend>
       <table border=1>
         <tr><td>Q          <td><input id=Q           type=number value=125>    <td class=unit>m<sup>3</sup>/d
@@ -63,9 +63,9 @@
         <tr><td>removal UPO<td><input id=removal_UPO type=number value=86.6667><td class=unit>%
         <tr><td>removal iSS<td><input id=removal_iSS type=number value=66>     <td class=unit>%
       </table>
-      <button onclick="apply_pst();this.disabled=true">Apply</button>
+      <button onclick="run_pst();">Run</button>
       <script>
-        function apply_pst(){
+        function run_pst(){
           let Q           = parseFloat(document.querySelector('#primary_settler #Q').value);
           let removal_BPO = parseFloat(document.querySelector('#primary_settler #removal_BPO').value);
           let removal_UPO = parseFloat(document.querySelector('#primary_settler #removal_UPO').value);
@@ -76,28 +76,29 @@
             let div=document.createElement('div');
             div.style.fontSize='smaller';
             div.innerHTML="Primary Settler("+Q+","+removal_BPO+","+removal_UPO+","+removal_iSS+") applied";
-
             let info=document.createElement('table');
-            //info.style.display='none';
+            info.classList.add('info');
             Object.keys(results).forEach(key=>{
               let newRow=info.insertRow(-1);
               newRow.insertCell(-1).innerHTML=key;
-              newRow.insertCell(-1).innerHTML=format(results[key].value);
-              newRow.insertCell(-1).innerHTML=results[key].unit;
-              newRow.setAttribute('title',results[key].descr);
+              if(typeof results[key] == 'number'){
+                let fvalue = format(100*results[key]);
+                let color = parseFloat(fvalue) < 0.1 ? "green":"red";
+                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
+              }else{
+                newRow.insertCell(-1).outerHTML="<td class=number>"+format(results[key].value)+"</td>";
+                newRow.insertCell(-1).innerHTML=results[key].unit.prettifyUnit();
+                newRow.insertCell(-1).innerHTML="<small>"+results[key].descr+"<small>";
+              }
             });
-
-            let info_btn=document.createElement('button');
-            info_btn.style.display='block';
+            let info_btn=document.createElement('button'); info_btn.style.display='block'; info_btn.style.background="lightblue";
             info_btn.innerHTML="Show/Hide Results";
-            info_btn.onclick=function(){
-              info.style.display=info.style.display=='none'?'':'none';
-            };
-
+            info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
             div.appendChild(info_btn);
             div.appendChild(info);
             return div;
           })());
+          document.querySelectorAll('#primary_settler table.info').forEach(t=>{t.style.display='none';});
         }
       </script>
     </fieldset>

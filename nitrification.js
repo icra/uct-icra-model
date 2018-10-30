@@ -65,12 +65,12 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
 
   //results
   return {
-    µAmT         :{value:µAmT, unit:"1/d",   descr:"Growth rate corrected by temperature"},
-    KnT          :{value:KnT,  unit:"mg/L",  descr:"Kinetic constant corrected by temperature"},
-    bAT          :{value:bAT,  unit:"1/d",   descr:"Growth rate corrected by temperature"},
-    fxm          :{value:fxm,  unit:"ratio", descr:"Maximum design unaerated sludge mass fraction"},
-    MX_unaer_fxt :{value:MX_unaer_fxt, unit:"kg TSS", descr:"Current uneaerated sludge mass"},
-    MX_unaer_fxm :{value:MX_unaer_fxm, unit:"kg TSS", descr:"Maximum design uneaerated sludge mass"},
+    µAmT         :{value:µAmT,         unit:"1/d",       descr:"Growth rate corrected by temperature"},
+    KnT          :{value:KnT,          unit:"mg/L",      descr:"Kinetic constant corrected by temperature"},
+    bAT          :{value:bAT,          unit:"1/d",       descr:"Growth rate corrected by temperature"},
+    fxm          :{value:fxm,          unit:"ratio",     descr:"Maximum design unaerated sludge mass fraction"},
+    MX_unaer_fxt :{value:MX_unaer_fxt, unit:"kg TSS",    descr:"Current uneaerated sludge mass"},
+    MX_unaer_fxm :{value:MX_unaer_fxm, unit:"kg TSS",    descr:"Maximum design uneaerated sludge mass"},
     Nae_fxt      :{value:Nae_fxt,      unit:"mg/L as N", descr:"Effluent ammonia concentration if fxt < fxm"},
     Nae_fxm      :{value:Nae_fxm,      unit:"mg/L as N", descr:"Effluent ammonia concentration if fxt = fxm"},
     Nte_fxt      :{value:Nte_fxt,      unit:"mg/L as N", descr:"Effluent TKN concentration if fxt < fxm"},
@@ -82,8 +82,10 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   }
 };
 
-/*test
-  let sv = new State_Variables('reactor');
+/*test */
+(function test(){
+  return;
+  let sv = new State_Variables();
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
   sv.components.X_BPO  = 255;
@@ -94,4 +96,4 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   sv.components.S_OP   = 7.28;
   sv.components.S_NOx  = 0;
   console.log(sv.nitrification());
-  */
+})();

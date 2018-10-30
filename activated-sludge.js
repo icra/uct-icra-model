@@ -3,9 +3,7 @@
 */
 
 //import "State_Variables" class only in node
-if(typeof document == "undefined"){
-  State_Variables=require("./state-variables.js");
-}
+if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
 
 State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   //inputs and default values
@@ -166,7 +164,9 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   };
 };
 
-/* test
+/* test */
+(function(){
+  return;
   let sv               = new State_Variables();
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
@@ -178,4 +178,4 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   sv.components.S_OP   = 7.28;
   sv.components.S_NOx  = 0;
   console.log(sv.activated_sludge());
-  */
+})();
