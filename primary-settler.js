@@ -3,7 +3,7 @@
 */
 
 //import "State_Variables" class
-if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
+//if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
 
 State_Variables.prototype.primary_settler=function(Q, removal_BPO, removal_UPO, removal_iSS){
 

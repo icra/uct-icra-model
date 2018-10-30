@@ -150,6 +150,59 @@
         }
       </script>
     </fieldset>
+
+    <!--AS+nitri-->
+    <fieldset id=nitrification>
+      <legend><a href="//github.com/icra/ecoadvisor/blob/master/nitrification.js" target=_blank>Activated Sludge + Nitrification</a></legend>
+      <table border=1>
+        <tr><td>Q   <td><input id=Q   type=number value=24875>  <td class=unit>m3/d
+        <tr><td>T   <td><input id=T   type=number value=16>     <td class=unit>ºC
+        <tr><td>Vp  <td><input id=Vp  type=number value=8473.3> <td class=unit>m3
+        <tr><td>Rs  <td><input id=Rs  type=number value=15>     <td class=unit>d
+        <tr><td>SF  <td><input id=SF  type=number value=1.25>   <td class=unit>&empty;
+        <tr><td>fxt <td><input id=fxt type=number value=0.39>   <td class=unit>ratio
+      </table>
+      <button onclick="run_nitri();">Run</button>
+      <script>
+        function run_nitri(){
+          let Q   = parseFloat(document.querySelector('#nitrification #Q' ).value);
+          let T   = parseFloat(document.querySelector('#nitrification #T' ).value);
+          let Vp  = parseFloat(document.querySelector('#nitrification #Vp').value);
+          let Rs  = parseFloat(document.querySelector('#nitrification #Rs').value);
+          let SF  = parseFloat(document.querySelector('#nitrification #SF').value);
+          let fxt = parseFloat(document.querySelector('#nitrification #fxt').value);
+          let results = sv.nitrification(Q, T, Vp, Rs, SF, fxt);
+          redisplay();
+          document.querySelector('#nitrification').appendChild((function(){
+            let div=document.createElement('div');
+            div.style.fontSize='smaller';
+            div.innerHTML="nitrification(Q="+Q+", T="+T+", Vp="+Vp+", Rs="+Rs+", SF="+SF+", fxt="+fxt+") calculated";
+            let info=document.createElement('table');
+            info.classList.add('info');
+            Object.keys(results).forEach(key=>{
+              let newRow=info.insertRow(-1);
+              newRow.insertCell(-1).innerHTML=key;
+              if(typeof results[key] == 'number'){
+                let fvalue = format(100*results[key]);
+                let color = parseFloat(fvalue) < 0.1 ? "green":"red";
+                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
+              }else{
+                newRow.insertCell(-1).outerHTML="<td class=number>"+format(results[key].value)+"</td>";
+                newRow.insertCell(-1).innerHTML=results[key].unit.prettifyUnit();
+                newRow.insertCell(-1).innerHTML="<small>"+results[key].descr+"<small>";
+              }
+            });
+            let info_btn=document.createElement('button'); info_btn.style.display='block'; info_btn.style.background="lightblue";
+            info_btn.innerHTML="Show/Hide Results";
+            info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
+            div.appendChild(info_btn);
+            div.appendChild(info);
+            return div;
+          })());
+          document.querySelectorAll('#nitrification table.info').forEach(t=>{t.style.display='none';});
+        }
+      </script>
+    </fieldset>
   </div>
 </div>
 
@@ -157,11 +210,12 @@
 <script src="../state-variables.js"></script>
 <script src="../primary-settler.js"></script>
 <script src="../activated-sludge.js"></script>
+<script src="../nitrification.js"></script>
 
 <!--user defined default scenario-->
 <script>
   if(typeof sv == 'undefined'){
-    let sv=new State_Variables();
+    var sv=new State_Variables();
     sv.components.S_VFA  = 50;
     sv.components.S_FBSO = 115;
     sv.components.X_BPO  = 255;

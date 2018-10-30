@@ -2,22 +2,32 @@
   * Nitrification implementation from G. Ekama hand notes
 */
 
-//import "State_Variables" class
-if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
+//import "State_Variables" class only in node
+if(typeof document == "undefined"){
+  State_Variables=require("./state-variables.js");
+  require("./activated-sludge.js");
+}
 
-State_Variables.prototype.nitrification=function(Q, T, Rs){
-  /* inputs */
-  Q  = Q  || 24875; //m3/d | Flowrate
-  T  = T  || 16;    //ºC   | Temperature
-  Rs = Rs || 15;    //days | Solids retention time
+State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
+  //inputs and default values
+  Q   = Q   || 24875;  //m3/d | Flowrate
+  T   = T   || 16;     //ºC   | Temperature
+  Vp  = Vp  || 8473.3; //m3   | Volume
+  Rs  = Rs  || 15;     //days | Solids retention time
+  SF  = SF  || 1.25;   //safety factor | Design choice. Moves the sludge age.
+  fxt = fxt || 0.39;   //ratio | current unaerated sludge mass fraction
 
-  //dependencies from activated_sludge TODO convert to inputs at the end of implementation
-  let Nti   = 50.04; //mg/L  | total TKN influent
-  let Nouse = 1.103; //mg/L  | total N_USO effluent
-  let MX_T  = 38130; //kg    | total sludge produced
-  let Ns    = 8.046; //mg/L  | N required from sludge production
-  let SF    = 1.25;  //--    | Safety factor. Design choice. Moves the sludge age.
-  let fxt   = 0.39;  //ratio | unaerated sludge mass fraction
+  //compute influent fractionation
+  let totals     = this.compute_totals();
+
+  //compute activated sludge without nitrification
+  let AS_results = this.activated_sludge(Q,T,Vp,Rs);
+
+  //get necessary variables from activated_sludge
+  let Nti   = totals.Total_TKN;      //mg/L | total TKN influent
+  let Nouse = totals.ON[1].usON;     //mg/L | total N_USO_influent = N_USO_effluent
+  let MX_T  = AS_results.MX_T.value; //kg   | total sludge produced
+  let Ns    = AS_results.Ns.value;   //mg/L | N required from sludge production
 
   //nitrification starts at page 17
 
@@ -55,16 +65,24 @@ State_Variables.prototype.nitrification=function(Q, T, Rs){
 
   //results
   return {
-    µAmT, KnT, bAT, fxm, 
-    MX_unaer_fxt, MX_unaer_fxm, 
-    Nae_fxt,      Nae_fxm, 
-    Nte_fxt,      Nte_fxm, 
-    Nc_fxt,       Nc_fxm,
-    FOn_fxt,      FOn_fxm,
+    µAmT         :{value:µAmT, unit:"1/d",   descr:"Growth rate corrected by temperature"},
+    KnT          :{value:KnT,  unit:"mg/L",  descr:"Kinetic constant corrected by temperature"},
+    bAT          :{value:bAT,  unit:"1/d",   descr:"Growth rate corrected by temperature"},
+    fxm          :{value:fxm,  unit:"ratio", descr:"Maximum design unaerated sludge mass fraction"},
+    MX_unaer_fxt :{value:MX_unaer_fxt, unit:"kg TSS", descr:"Current uneaerated sludge mass"},
+    MX_unaer_fxm :{value:MX_unaer_fxm, unit:"kg TSS", descr:"Maximum design uneaerated sludge mass"},
+    Nae_fxt      :{value:Nae_fxt,      unit:"mg/L as N", descr:"Effluent ammonia concentration if fxt < fxm"},
+    Nae_fxm      :{value:Nae_fxm,      unit:"mg/L as N", descr:"Effluent ammonia concentration if fxt = fxm"},
+    Nte_fxt      :{value:Nte_fxt,      unit:"mg/L as N", descr:"Effluent TKN concentration if fxt < fxm"},
+    Nte_fxm      :{value:Nte_fxm,      unit:"mg/L as N", descr:"Effluent TKN concentration if fxt = fxm"},
+    Nc_fxt       :{value:Nc_fxt,       unit:"mg/L as N", descr:"Nitrification capacity if fxt < fxm"},
+    Nc_fxm       :{value:Nc_fxm,       unit:"mg/L as N", descr:"Nitrification capacity if fxt = fxm"},
+    FOn_fxt      :{value:FOn_fxt,      unit:"kg/d as O", descr:"Oxygen demand if fxt < fxm"},
+    FOn_fxm      :{value:FOn_fxm,      unit:"kg/d as O", descr:"Oxygen demand if fxt = fxm"},
   }
 };
 
-/*test*/
+/*test
   let sv = new State_Variables('reactor');
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
@@ -76,3 +94,4 @@ State_Variables.prototype.nitrification=function(Q, T, Rs){
   sv.components.S_OP   = 7.28;
   sv.components.S_NOx  = 0;
   console.log(sv.nitrification());
+  */

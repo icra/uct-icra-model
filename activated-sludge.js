@@ -2,8 +2,10 @@
   * AS implementation from G. Ekama hand notes
 */
 
-//import "State_Variables" class
-if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
+//import "State_Variables" class only in node
+if(typeof document == "undefined"){
+  State_Variables=require("./state-variables.js");
+}
 
 State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   //inputs and default values
@@ -38,14 +40,14 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //page 10
   const YH     = 0.45;                    //gVSS/gCOD
-  let X_BH     = (YH*Rs)/(1+bHT*Rs);    //g_VSS*d/g_COD
+  let X_BH     = (YH*Rs)/(1+bHT*Rs);      //g_VSS*d/g_COD
   let MX_BH    = FSbi * X_BH;             //kg_VSS   | biomass produced
   const fH     = 0.20;                    //         | tabled value
-  let MX_EH    = fH * bHT * Rs * MX_BH;  //kg_VSS   | endogenous respiration OHOs
-  let MX_I     = FXti * Rs;              //kg_VSS   | unbiodegradable particulate organics
+  let MX_EH    = fH * bHT * Rs * MX_BH;   //kg_VSS   | endogenous respiration OHOs
+  let MX_I     = FXti * Rs;               //kg_VSS   | unbiodegradable particulate organics
   let MX_V     = MX_BH + MX_EH + MX_I;    //kg_VSS   | total VSS
   const f_iOHO = 0.15;                    //g_iSS/gX | fraction of inert solids in biomass
-  let MX_IO    = FiSS*Rs + f_iOHO*MX_BH; //kg_iSS   | total inert solids
+  let MX_IO    = FiSS*Rs + f_iOHO*MX_BH;  //kg_iSS   | total inert solids
   let MX_T     = MX_V + MX_IO;            //kg_TSS   | total TSS
 
   //2.3 - page 11
@@ -64,7 +66,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //2.6 - Nitrogen - page 12
   const fn    = 0.10;                  //g_N/g_VSS
-  let Ns      = fn*MX_V/(Rs*Q)*1000;  //mgN/L_influent | N in influent required for sludge production
+  let Ns      = fn*MX_V/(Rs*Q)*1000;   //mgN/L_influent | N in influent required for sludge production
   let Nte     = totals.Total_TKN - Ns; //mg/L as N (TKN effluent)
   let ON_FBSO = totals.ON[1].bsON;     //mg/L "Nobsi"
   let ON_USO  = totals.ON[1].usON;     //mg/L "Nouse"
@@ -83,7 +85,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //2.8 - effluent Phosphorus
   const fp = 0.025;                  //g_P/g_VSS
-  let Ps  = fp * MX_V*1000/(Q*Rs);  //mg_P/l | P required for sludge production
+  let Ps  = fp * MX_V*1000/(Q*Rs);   //mg_P/l | P required for sludge production
   let Pti = totals.Total_TP;         //mg/L   | total P influent
   let Pte = Pti - Ps;                //mg/L   | total P effluent
   let Pse = Pte - totals.OP[1].usOP; //mg/L   | total inorganic soluble P effluent
@@ -164,7 +166,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   };
 };
 
-/* test */
+/* test
   let sv               = new State_Variables();
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
@@ -176,3 +178,4 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   sv.components.S_OP   = 7.28;
   sv.components.S_NOx  = 0;
   console.log(sv.activated_sludge());
+  */
