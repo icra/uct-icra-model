@@ -1,11 +1,12 @@
 /*convert a number to a string: i.e. 3999.4 turns into "3,999.4"*/
 function format(number,digits){
   digits=digits||0;
-  if(number< 100   )digits=2;
-  if(number<  10   )digits=3;
-  if(number<   1   )digits=4;
-  if(number<   0.1 )digits=5;
-  if(number<   0.01)digits=6;
+  let abs_number = Math.abs(number);
+  if(abs_number< 100   )digits=2;
+  if(abs_number<  10   )digits=3;
+  if(abs_number<   1   )digits=4;
+  if(abs_number<   0.1 )digits=5;
+  if(abs_number<   0.01)digits=6;
   let str=new Intl.NumberFormat('en-EN',{maximumFractionDigits:digits}).format(number);
   return str;
 }

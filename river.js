@@ -1,6 +1,5 @@
 /*
   equacions_riu.docx
-
   Estructura Taula resum de trams de riu
     [tram influent 1, codi tram influent 2, codi edar influent]+
     [wb, wt, Dt, angle, n, S, Li, UTM_X, UTM_Y]
@@ -8,12 +7,12 @@
 
 class Tram {
   constructor(wb,wt,Dt,S,n,Li){
-    this.wb = wb //amplada a llera mitjana
-    this.wt = wt //amplada màxima del canal
-    this.Dt = Dt //fondària màxima del canal
-    this.S  = S  //pendent de la llera : obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
-    this.n  = n  //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
-    this.Li = Li //longitud tram
+    this.wb = wb; //amplada a llera mitjana (m)
+    this.wt = wt; //amplada màxima del canal (m)
+    this.Dt = Dt; //fondària màxima del canal (m)
+    this.S  = S;  //pendent de la llera : obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
+    this.n  = n;  //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
+    this.Li = Li; //longitud tram (m)
 
     //extra info per quan connectem trams després de validar n=1
     /*
@@ -56,12 +55,14 @@ class Tram {
     //R_20 : velocitat de reacció a 20ºC
     //k    : (input, es com una ks)
     //T    : temperatura (ºC)
-    return Mi - R_20*this.HRTi(Di)*this.Si(Di)*Math.pow(1.041,T-20)*(Mi/this.Qi(Di))/(k+Mi/this.Qi(Di));
+    let ret_val = Mi - R_20*this.HRTi(Di)*this.Si(Di)*Math.pow(1.041,T-20)*(Mi/this.Qi(Di))/(k+Mi/this.Qi(Di));
+    return Math.max(ret_val,0);
   }
 }
 
 //tests amb valors inventats
 (function test(){
+  return;
   //constructor   (wb, wt, Dt, S,   n,      Li){
   let t = new Tram(10, 50, 10, 0.5, 0.0358, 100);
   console.log(t);

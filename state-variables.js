@@ -168,6 +168,7 @@ State_Variables.prototype.set=function(key, newValue){
 };
 
 //3. tests
+(function(){
   /* original numbers from george ekama
     inputs:
       X_BPO_non_set_inf: 301,
@@ -195,9 +196,8 @@ State_Variables.prototype.set=function(key, newValue){
       Total_VSS_set:  211.1406,
       Total_TSS_set:  245.1406
   */
-
+  //return;
   //create 2 scenarios: raw ww, settled ww
-  /*
   let sv1 = new State_Variables('raw ww');
   let sv2 = new State_Variables('settled ww');
   //1. raw ww
@@ -221,5 +221,4 @@ State_Variables.prototype.set=function(key, newValue){
   //compute scenarios
     console.log(sv1.compute_totals());
     console.log(sv2.compute_totals());
-//end
-*/
+})();

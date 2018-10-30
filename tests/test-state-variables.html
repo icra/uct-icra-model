@@ -21,8 +21,9 @@
   <script src=format.js></script>
 </head><body>
 
+<!--title-->
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px">
-  <h3>State variables + fractionation + AS</h3>
+  <h3>State variables + fractionation + PST + AS + nitrification + river</h3>
   <div>
     Source code: 
     <a href="https://github.com/icra/ecoadvisor/blob/master/state-variables.js" target=_blank>state-variables.js</a>
@@ -200,6 +201,43 @@
       </script>
     </fieldset>
   </div>
+
+  <!--river-->
+  <div id=river style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px">
+    <div>3. Riu</div><br>
+    <fieldset id=tram_1>
+      <legend>Tram 1</legend>
+      <table border=1>
+        <tbody id=inputs>
+          <tr title=""><td>wb<td><input id=wb type=number value=40     onchange="tram.wb=parseFloat(this.value);redisplay_river()"> <td class=unit>m
+          <tr title=""><td>wt<td><input id=wt type=number value=50     onchange="tram.wt=parseFloat(this.value);redisplay_river()"> <td class=unit>m
+          <tr title=""><td>Dt<td><input id=Dt type=number value=15     onchange="tram.Dt=parseFloat(this.value);redisplay_river()"> <td class=unit>m
+          <tr title=""><td>S <td><input id=S  type=number value=5      onchange="tram.S =parseFloat(this.value);redisplay_river()"> <td class=unit>&empty;
+          <tr title=""><td>n <td><input id=n  type=number value=0.0358 onchange="tram.n =parseFloat(this.value);redisplay_river()"> <td class=unit>&empty;
+          <tr title=""><td>Li<td><input id=Li type=number value=50     onchange="tram.Li=parseFloat(this.value);redisplay_river()"> <td class=unit>m
+          <tr title=""><td>Di<td><input id=Di type=number value=5      onchange="redisplay_river()"> <td class=unit>m
+        </tbody>
+        <tbody id=outputs>
+          <tr><td>&alpha; <td class=number id=angle>0 <td class=unit>rad
+          <tr><td>wi      <td class=number id=wi   >0 <td class=unit>m
+          <tr><td>Ai      <td class=number id=Ai   >0 <td class=unit>m2
+          <tr><td>wpi     <td class=number id=wpi  >0 <td class=unit>m
+          <tr><td>HRi     <td class=number id=HRi  >0 <td class=unit>m
+          <tr><td>HRTi    <td class=number id=HRTi >0 <td class=unit>d
+          <tr><td>Si      <td class=number id=Si   >0 <td class=unit>m2
+          <tr><td>Qi      <td class=number id=Qi   >0 <td class=unit>m3/d
+          <tr><td>ky      <td class=number id=ky   >0 <td class=unit>?
+          <tr><td>Ll      <td class=number id=Ll   >0 <td class=unit>m
+        </tbody>
+        <tr><td colspan=3><b>Contaminants</b>
+        <tbody id=contaminants>
+          <tr><td>R_20 <td><input id=R_20 type=number onchange=redisplay_river(); value=0.01> <td class=unit>1/d
+          <tr><td>k    <td><input id=k    type=number onchange=redisplay_river(); value=10> <td class=unit>mg/L
+          <tr><td>T    <td><input id=T    type=number onchange=redisplay_river(); value=16>  <td class=unit>ºC
+        </tbody>
+      </table>
+    </fieldset>
+  </div>
 </div>
 
 <!--app logic-->
@@ -207,6 +245,7 @@
 <script src="../primary-settler.js"></script>
 <script src="../activated-sludge.js"></script>
 <script src="../nitrification.js"></script>
+<script src="../river.js"></script>
 
 <!--user defined default scenario-->
 <script>
@@ -220,11 +259,23 @@
   sv.components.S_FSA  = 39.1;
   sv.components.S_OP   = 7.28;
   sv.components.S_NOx  = 0;
+
+  //per ara fem un sol tram de riu
+  //constructor      (wb, wt, Dt, S,   n,      Li){
+  let tram=new Tram(
+    parseFloat(document.querySelector('#river #tram_1 #inputs #wb').value),
+    parseFloat(document.querySelector('#river #tram_1 #inputs #wt').value),
+    parseFloat(document.querySelector('#river #tram_1 #inputs #Dt').value),
+    parseFloat(document.querySelector('#river #tram_1 #inputs #S').value),
+    parseFloat(document.querySelector('#river #tram_1 #inputs #n').value),
+    parseFloat(document.querySelector('#river #tram_1 #inputs #Li').value),
+  );
 </script>
 
 <!--populate page-->
 <script>
-  {//populate tables
+  //populate tables
+  (function(){
     //populate state variables table
     let inputs=document.querySelector('#inputs');
     Object.entries(sv.components).forEach(entry=>{
@@ -246,7 +297,16 @@
       newRow.insertCell(-1).innerHTML=key;
       newRow.insertCell(-1).innerHTML=value;
     });
-  }
+
+    //populate river contaminants
+    let contaminants=document.querySelector('#river #tram_1 #contaminants');
+    Object.keys(sv.components).forEach(key=>{
+      let newRow=contaminants.insertRow(-1);
+      newRow.insertCell(-1).innerHTML=key;
+      newRow.insertCell(-1).outerHTML=`<td id=${key}>`;
+      newRow.insertCell(-1).innerHTML="mg/L";
+    });
+  })();
 
   //redisplay inputs and results
   function redisplay(){
@@ -279,6 +339,32 @@
           });
         });
       }
+    });
+    //redisplay river
+    redisplay_river();
+  }
+  //redisplay river
+  function redisplay_river(){
+    //calcula angle
+    document.querySelector('#river #tram_1 #outputs #angle').innerHTML=format(tram.angle);
+    //caracteristiques en funcio de Di
+    let Di = document.querySelector('#river #tram_1 #inputs #Di').value;
+    document.querySelector('#river #tram_1 #outputs #wi'  ).innerHTML=format(tram.wi(Di));
+    document.querySelector('#river #tram_1 #outputs #Ai'  ).innerHTML=format(tram.Ai(Di));
+    document.querySelector('#river #tram_1 #outputs #wpi' ).innerHTML=format(tram.wpi(Di));
+    document.querySelector('#river #tram_1 #outputs #HRi' ).innerHTML=format(tram.HRi(Di));
+    document.querySelector('#river #tram_1 #outputs #HRTi').innerHTML=format(tram.HRTi(Di));
+    document.querySelector('#river #tram_1 #outputs #Si'  ).innerHTML=format(tram.Si(Di));
+    document.querySelector('#river #tram_1 #outputs #Qi'  ).innerHTML=format(tram.Qi(Di));
+    document.querySelector('#river #tram_1 #outputs #ky'  ).innerHTML=format(tram.ky(Di));
+    document.querySelector('#river #tram_1 #outputs #Ll'  ).innerHTML=format(tram.Ll(Di));
+    //Mf dels contaminants
+    let R_20 = parseFloat(document.querySelector('#river #tram_1 #contaminants #R_20').value);
+    let k    = parseFloat(document.querySelector('#river #tram_1 #contaminants #k').value);
+    let T    = parseFloat(document.querySelector('#river #tram_1 #contaminants #T').value);
+    Object.keys(sv.components).forEach(key=>{
+      let value = tram.Mf(Di, sv.components[key], R_20, k, T);
+      document.querySelector(`#river #tram_1 #contaminants #${key}`).innerHTML=format(value);
     });
   }
   redisplay();
