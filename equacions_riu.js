@@ -61,22 +61,24 @@ class Tram {
 }
 
 //tests amb valors inventats
-//constructor   (wb, wt, Dt, S,   n,      Li){
-let t = new Tram(10, 50, 10, 0.5, 0.0358, 100);
-console.log(t);
-console.log("angle alfa : "+t.angle);
+(function test(){
+  //constructor   (wb, wt, Dt, S,   n,      Li){
+  let t = new Tram(10, 50, 10, 0.5, 0.0358, 100);
+  console.log(t);
+  console.log("angle alfa : "+t.angle);
 
-//definim una fondària concreta Di
-let Di = 5;
-console.log("wi   (Di="+Di+"): "+t.wi(Di));
-console.log("Ai   (Di="+Di+"): "+t.Ai(Di));
-console.log("wpi  (Di="+Di+"): "+t.wpi(Di));
-console.log("HRi  (Di="+Di+"): "+t.HRi(Di));
-console.log("HRTi (Di="+Di+"): "+t.HRTi(Di));
-console.log("Si   (Di="+Di+"): "+t.Si(Di));
-console.log("Qi   (Di="+Di+"): "+t.Qi(Di));
-console.log("ky   (Di="+Di+"): "+t.ky(Di));
-console.log("Ll   (Di="+Di+"): "+t.Ll(Di));
+  //definim una fondària concreta Di
+  let Di = 5;
+  console.log("wi   (Di="+Di+"): "+t.wi(Di));
+  console.log("Ai   (Di="+Di+"): "+t.Ai(Di));
+  console.log("wpi  (Di="+Di+"): "+t.wpi(Di));
+  console.log("HRi  (Di="+Di+"): "+t.HRi(Di));
+  console.log("HRTi (Di="+Di+"): "+t.HRTi(Di));
+  console.log("Si   (Di="+Di+"): "+t.Si(Di));
+  console.log("Qi   (Di="+Di+"): "+t.Qi(Di));
+  console.log("ky   (Di="+Di+"): "+t.ky(Di));
+  console.log("Ll   (Di="+Di+"): "+t.Ll(Di));
 
-let Mi=1e5, R_20=0.05, k=0.1, T=15;
-console.log("Mf   (Di="+Di+",Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Di,Mi,R_20,k,T));
+  let Mi=1e5, R_20=0.05, k=0.1, T=15;
+  console.log("Mf   (Di="+Di+",Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Di,Mi,R_20,k,T));
+})();

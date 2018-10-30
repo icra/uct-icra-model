@@ -42,16 +42,11 @@
   </div>
 
   <!--techs-->
-  <div style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px" id=techs>
-    <div>2. Apply technologies</div><br>
+  <div id=techs style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px">
+    <div>2. Run technologies</div><br>
     <style>
-      /*apply buttons*/
-      #techs button {
-        background:lightgreen;
-      }
-      #techs fieldset {
-        margin-bottom:8px;
-      }
+      #techs button { background:lightgreen; }
+      #techs fieldset { margin-bottom:8px; }
     </style>
 
     <!--PST-->
@@ -75,7 +70,7 @@
           document.querySelector('#primary_settler').appendChild((function(){
             let div=document.createElement('div');
             div.style.fontSize='smaller';
-            div.innerHTML="Primary Settler("+Q+","+removal_BPO+","+removal_UPO+","+removal_iSS+") applied";
+            div.innerHTML="Primary Settler("+Q+","+removal_BPO+","+removal_UPO+","+removal_iSS+") calculated";
             let info=document.createElement('table');
             info.classList.add('info');
             Object.keys(results).forEach(key=>{
@@ -215,18 +210,16 @@
 
 <!--user defined default scenario-->
 <script>
-  if(typeof sv == 'undefined'){
-    var sv=new State_Variables();
-    sv.components.S_VFA  = 50;
-    sv.components.S_FBSO = 115;
-    sv.components.X_BPO  = 255;
-    sv.components.X_UPO  = 10;
-    sv.components.S_USO  = 45;
-    sv.components.X_iSS  = 15;
-    sv.components.S_FSA  = 39.1;
-    sv.components.S_OP   = 7.28;
-    sv.components.S_NOx  = 0;
-  }
+  let sv=new State_Variables();
+  sv.components.S_VFA  = 50;
+  sv.components.S_FBSO = 115;
+  sv.components.X_BPO  = 255;
+  sv.components.X_UPO  = 10;
+  sv.components.S_USO  = 45;
+  sv.components.X_iSS  = 15;
+  sv.components.S_FSA  = 39.1;
+  sv.components.S_OP   = 7.28;
+  sv.components.S_NOx  = 0;
 </script>
 
 <!--populate page-->
