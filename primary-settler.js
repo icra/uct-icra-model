@@ -2,8 +2,8 @@
   * Removal % of the particulated fractions BPO, UPO and iSS
 */
 
-//import "State_Variables" class
-//if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
+//import "State_Variables" class only in node
+if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
 
 State_Variables.prototype.primary_settler=function(Q, removal_BPO, removal_UPO, removal_iSS){
   //inputs and default values

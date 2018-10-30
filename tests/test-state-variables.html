@@ -8,7 +8,12 @@
       color: #5C5C5C;
     }
     table{ border-collapse:collapse}
-    table td.unit{font-size:smaller;}
+    th{
+      background:#eee;
+      font-weight:normal;
+      text-align:left;
+    }
+    .unit{font-size:smaller;}
     input[type=number]{
       width:70px;
       text-align:right;
@@ -23,7 +28,7 @@
 
 <!--title-->
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px">
-  <h3>State variables + fractionation + PST + AS + nitrification + river</h3>
+  <h3>State variables + fractionation + PST + AS + nitrification + river (testing GUI)</h3>
   <div>
     Source code: 
     <a href="https://github.com/icra/ecoadvisor/blob/master/state-variables.js" target=_blank>state-variables.js</a>
@@ -37,7 +42,9 @@
     <div>1. State variables, fractionation and mass ratios</div><br>
     <table border=1 style=width:100%>
       <tbody id=inputs></tbody>
+      <tr><th colspan=2>Fractionation
       <tbody id=outputs></tbody>
+      <tr><th colspan=2>Mass ratios
       <tbody id=mass_ratios></tbody>
     </table>
   </div>
@@ -71,7 +78,7 @@
           document.querySelector('#primary_settler').appendChild((function(){
             let div=document.createElement('div');
             div.style.fontSize='smaller';
-            div.innerHTML="Primary Settler("+Q+","+removal_BPO+","+removal_UPO+","+removal_iSS+") calculated";
+            div.innerHTML=`Primary Settler(Q=${Q}, removal_BPO=${removal_BPO}, removal_UPO=${removal_UPO}, removal_iSS=${removal_iSS}) calculated`;
             let info=document.createElement('table');
             info.classList.add('info');
             Object.keys(results).forEach(key=>{
@@ -206,7 +213,7 @@
   <div id=river style="border-left:1px solid #ccc;margin-left:8px;padding:0px 4px">
     <div>3. Riu</div><br>
     <fieldset id=tram_1>
-      <legend>Tram 1</legend>
+      <legend><a href="https://github.com/icra/ecoadvisor/blob/master/river.js" target=_blank>Tram 1</a></legend>
       <table border=1>
         <tbody id=inputs>
           <tr title=""><td>wb<td><input id=wb type=number value=40     onchange="tram.wb=parseFloat(this.value);redisplay_river()"> <td class=unit>m
@@ -217,6 +224,7 @@
           <tr title=""><td>Li<td><input id=Li type=number value=50     onchange="tram.Li=parseFloat(this.value);redisplay_river()"> <td class=unit>m
           <tr title=""><td>Di<td><input id=Di type=number value=5      onchange="redisplay_river()"> <td class=unit>m
         </tbody>
+        <tr><th colspan=3>Característiques calculades
         <tbody id=outputs>
           <tr><td>&alpha; <td class=number id=angle>0 <td class=unit>rad
           <tr><td>wi      <td class=number id=wi   >0 <td class=unit>m
@@ -229,7 +237,7 @@
           <tr><td>ky      <td class=number id=ky   >0 <td class=unit>?
           <tr><td>Ll      <td class=number id=Ll   >0 <td class=unit>m
         </tbody>
-        <tr><td colspan=3><b>Contaminants</b>
+        <tr><th colspan=3>Contaminants (1r ordre)
         <tbody id=contaminants>
           <tr><td>R_20 <td><input id=R_20 type=number onchange=redisplay_river(); value=0.01> <td class=unit>1/d
           <tr><td>k    <td><input id=k    type=number onchange=redisplay_river(); value=10> <td class=unit>mg/L
@@ -283,13 +291,11 @@
       let value=entry[1];
       let newRow=inputs.insertRow(-1);
       newRow.insertCell(-1).innerHTML=key;
-      newRow.insertCell(-1).innerHTML="<input id="+key+" type=number min=0 onchange=sv.components."+key+"=parseFloat(this.value);redisplay()>";
+      newRow.insertCell(-1).innerHTML="<input id="+key+" type=number min=0 onchange=sv.components."+key+"=parseFloat(this.value);redisplay()>"+
+        " <span class=unit>mg/L</span>";
     });
-    inputs.insertRow(-1).insertCell(-1).outerHTML="<td colspan=2 style=background:#ccc>";//space
 
     let mass_ratios=document.querySelector('#mass_ratios');
-    mass_ratios.insertRow(-1).insertCell(-1).outerHTML="<td colspan=2 style=background:#ccc>";//space
-
     Object.entries(sv.mass_ratios).forEach(entry=>{
       let key=entry[0];
       let value=entry[1];
@@ -304,7 +310,7 @@
       let newRow=contaminants.insertRow(-1);
       newRow.insertCell(-1).innerHTML=key;
       newRow.insertCell(-1).outerHTML=`<td id=${key}>`;
-      newRow.insertCell(-1).innerHTML="mg/L";
+      newRow.insertCell(-1).outerHTML="<td class=unit>mg/L";
     });
   })();
 

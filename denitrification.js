@@ -3,7 +3,7 @@
 */
 
 //import "State_Variables" class
-if(typeof(require)!="undefined"){var State_Variables=require("./state-variables.js");}
+if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
 
 State_Variables.prototype.denitrification=function(){
 

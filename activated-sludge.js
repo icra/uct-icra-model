@@ -13,13 +13,13 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   Rs = Rs || 15;     //days | Solids retention time
 
   //2 - page 9
-  let iSS    = this.components.X_iSS; //mg_iSS/L
-  let totals = this.compute_totals(); //object: complete fractionation inside
-  let COD    = totals.Total_COD;      //mg_COD/L
-  let BSO    = totals.COD[1].bsCOD;   //mg_COD/L
-  let USO    = totals.COD[1].usCOD;   //mg_COD/L
-  let BPO    = totals.COD[2].bpCOD;   //mg_COD/L
-  let UPO    = totals.COD[2].upCOD;   //mg_COD/L
+  let iSS  = this.components.X_iSS; //mg_iSS/L
+  let frac = this.compute_totals(); //object: complete fractionation inside
+  let COD  = frac.Total_COD;        //mg_COD/L
+  let BSO  = frac.COD[1].bsCOD;     //mg_COD/L
+  let USO  = frac.COD[1].usCOD;     //mg_COD/L
+  let BPO  = frac.COD[2].bpCOD;     //mg_COD/L
+  let UPO  = frac.COD[2].upCOD;     //mg_COD/L
 
   //fSus and fSup ratios
   let fSus = USO/COD; //g_USO/g_COD
@@ -63,13 +63,13 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let f_atOHO    = fi*f_avOHO;    //mgOHOVSS/mgTSS | fraction of active biomass in TSS
 
   //2.6 - Nitrogen - page 12
-  const fn    = 0.10;                  //g_N/g_VSS
-  let Ns      = fn*MX_V/(Rs*Q)*1000;   //mgN/L_influent | N in influent required for sludge production
-  let Nte     = totals.Total_TKN - Ns; //mg/L as N (TKN effluent)
-  let ON_FBSO = totals.ON[1].bsON;     //mg/L "Nobsi"
-  let ON_USO  = totals.ON[1].usON;     //mg/L "Nouse"
-  let ON_BPO  = totals.ON[2].bpON;     //mg/L "Nobsi"
-  let ON_UPO  = totals.ON[2].upON;     //mg/L "Noupi"
+  const fn    = 0.10;                //g_N/g_VSS
+  let Ns      = fn*MX_V/(Rs*Q)*1000; //mgN/L_influent | N in influent required for sludge production
+  let Nte     = frac.Total_TKN - Ns; //mg/L as N (TKN effluent)
+  let ON_FBSO = frac.ON[1].bsON;     //mg/L "Nobsi"
+  let ON_USO  = frac.ON[1].usON;     //mg/L "Nouse"
+  let ON_BPO  = frac.ON[2].bpON;     //mg/L "Nobsi"
+  let ON_UPO  = frac.ON[2].upON;     //mg/L "Noupi"
 
   //effluent ammonia
   let Nae               = Nte - ON_USO; //mg/L as N (ammonia)
@@ -82,30 +82,30 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let OUR = FOt*1e3/(Vp*24);                       //mg/L·h | oxygen uptake rate
 
   //2.8 - effluent Phosphorus
-  const fp = 0.025;                  //g_P/g_VSS
-  let Ps  = fp * MX_V*1000/(Q*Rs);   //mg_P/l | P required for sludge production
-  let Pti = totals.Total_TP;         //mg/L   | total P influent
-  let Pte = Pti - Ps;                //mg/L   | total P effluent
-  let Pse = Pte - totals.OP[1].usOP; //mg/L   | total inorganic soluble P effluent
+  const fp = 0.025;                //g_P/g_VSS
+  let Ps  = fp * MX_V*1000/(Q*Rs); //mg_P/l | P required for sludge production
+  let Pti = frac.Total_TP;         //mg/L   | total P influent
+  let Pte = Pti - Ps;              //mg/L   | total P effluent
+  let Pse = Pte - frac.OP[1].usOP; //mg/L   | total inorganic soluble P effluent
 
   //2.9 - COD Balance
-  let Suse              = totals.COD[1].usCOD;                  //mg/L as O | USO influent concentration
+  let Suse              = frac.COD[1].usCOD;                    //mg/L as O | USO influent concentration
   let FSe               = (Q-Qw)*Suse/1000;                     //kg/d as O | USO effluent flux
   let FSw               = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O | COD wastage flux
   let FSout             = FSe + FOc + FSw;                      //kg/d as O | total COD out flux
   let COD_balance_error = Math.abs(1 - FSti/FSout);             //unitless  | COD balance
 
   //2.10 - N balance
-  let FNti = Q*totals.Total_TKN/1000;                                                  //kg/d     | total TKN influent flux
+  let FNti = Q*frac.Total_TKN/1000;                                                    //kg/d     | total TKN influent flux
   let FNte = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000 + (Q-Qw)*(ON_USO + Nae)/1000; //kg/d     | total TKN out flux
   let N_balance_error = Math.abs(1 - FNti/FNte);                                       //unitless | TKN balance
 
   //2.11 - P balance
-  let FPti = Q*totals.Total_TP/1000;                               //kg/d     | total TP influent flux
+  let FPti = Q*frac.Total_TP/1000;                                 //kg/d     | total TP influent flux
   let FPte = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000 + (Q-Qw)*Pte/1000; //kg/d     | total TP out flux
   let P_balance_error = Math.abs(1 - FPti/FPte);                   //unitless | P balance
 
-  //console.log(totals);
+  //console.log(frac);
   return {
     //balances
     COD_balance_error,

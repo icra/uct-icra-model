@@ -18,14 +18,14 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   fxt = fxt || 0.39;   //ratio | current unaerated sludge mass fraction
 
   //compute influent fractionation
-  let totals     = this.compute_totals();
+  let frac = this.compute_totals();
 
   //compute activated sludge without nitrification
   let AS_results = this.activated_sludge(Q,T,Vp,Rs);
 
   //get necessary variables from activated_sludge
-  let Nti   = totals.Total_TKN;      //mg/L | total TKN influent
-  let Nouse = totals.ON[1].usON;     //mg/L | total N_USO_influent = N_USO_effluent
+  let Nti   = frac.Total_TKN;        //mg/L | total TKN influent
+  let Nouse = frac.ON[1].usON;       //mg/L | total N_USO_influent = N_USO_effluent
   let MX_T  = AS_results.MX_T.value; //kg   | total sludge produced
   let Ns    = AS_results.Ns.value;   //mg/L | N required from sludge production
 
