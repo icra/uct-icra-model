@@ -6,37 +6,40 @@
 */
 
 class Tram {
-  constructor(wb,wt,Dt,S,n,Li){
-    this.wb = wb; //amplada a llera mitjana (m)
-    this.wt = wt; //amplada màxima del canal (m)
-    this.Dt = Dt; //fondària màxima del canal (m)
-    this.S  = S;  //pendent de la llera : obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
-    this.n  = n;  //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
-    this.Li = Li; //longitud tram (m)
-
-    //extra info per quan connectem trams després de validar n=1
-    /*
-    this.coordenades = {start:[1,1], end:[2,2]};
-    this.id     = "identificador";
-    this.id_in1 = "indentificador influent 1";
-    this.id_in2 = "indentificador influent 2";
-    this.id_wtp = null; //indentificador EDAR que aboca al tram 
+  constructor(wb,wt,xxx,S,n,Li){
+    //inputs
+    this.wb  = wb;  //amplada a llera mitjana (m)
+    this.wt  = wt;  //amplada a bankful mitjana (m)
+    this.xxx = xxx; //distància entre llera i bankfull mitjana (m)
+    this.S   = S;   //pendent de la llera: obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
+    this.n   = n;   //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
+    this.Li  = Li;  //longitud tram (m)
+    /* 
+      inputs addicionals per quan connectem trams després de validar n=1
+      this.coordenades = {start:[1,1], end:[2,2]};
+      this.id     = "identificador";
+      this.id_in1 = "indentificador influent 1";
+      this.id_in2 = "indentificador influent 2";
+      this.id_wtp = null; //indentificador EDAR que aboca al tram 
     */
   }
 
-  //calcula angle "alfa" entre la llera i el màxim del canal
-  get angle(){return Math.acos(this.Dt/Math.sqrt(Math.pow((this.wt-this.wb)/2,2)+Math.pow(this.Dt,2)));}
+  //calcula angle "alfa" entre la llera i el màxim del canal (bankfull) (radiants)
+  get angle(){return Math.asin((this.wt-this.wb)/(2*this.xxx));}
+
+  //calcula fondària màxima (m)
+  get Dt(){return this.xxx*Math.cos(this.angle);}
 
   //en funció de la fondària (Di), tenim wi, Ai, wpi, HRi i Qi
-  wi (Di){ return this.wb + 2*Di*Math.tan(this.angle); } //amplada de la llera inundada
-  Ai (Di){ return Di*(this.wb+Di*Math.tan(this.angle));} //area transversal inundada
-  wpi(Di){ return this.wb + 2*Di/Math.cos(this.angle); } //perímetre humit inundat
-  HRi(Di){ return this.Ai(Di)/this.wpi(Di);            } //radi hidràulic
+  wi (Di){return this.wb + 2*Di*Math.tan(this.angle); } //m  | amplada de la llera inundada
+  Ai (Di){return Di*(this.wb+Di*Math.tan(this.angle));} //m2 | area transversal inundada
+  wpi(Di){return this.wb + 2*Di/Math.cos(this.angle); } //m  | perímetre humit inundat
+  HRi(Di){return this.Ai(Di)/this.wpi(Di);            } //m  | radi hidràulic
 
   //Amb n determinat podem estimar wi, Ai, wpi, HRi i Qi en funció de Di. 
-  HRTi(Di){ return this.Li*this.Ai(Di)/this.Qi(Di); } //el temps mig de residència de l'aigua HRTi
-  Si  (Di){ return this.Li*this.wpi(Di);            } //la superfície inundada en el tram d'interès
-  Qi  (Di){ return (1/this.n) * Math.pow(this.HRi(Di), 2/3) * Math.sqrt(this.S); }
+  Qi  (Di){ return (1/this.n)*Math.pow(this.HRi(Di),2/3)*Math.sqrt(this.S);} //m3/s | cabal
+  HRTi(Di){ return this.Li*this.Ai(Di)/this.Qi(Di)/60; }                     //min  | el temps mig de residència de l'aigua HRTi
+  Si  (Di){ return this.Li*this.wpi(Di);            }                        //m2   | la superfície inundada en el tram d'interès
 
   /*Per a fer un seguiment, s’hauria de mirar estat químic i ecològic al 
     final del tram fluvial, així com al final de tram de barreja lateral, punt a 
@@ -52,8 +55,8 @@ class Tram {
   //massa o càrrega al final del tram fluvial
   Mf(Di,Mi,R_20,k,T){
     //Mi   : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram
-    //R_20 : velocitat de reacció a 20ºC
-    //k    : (input, es com una ks)
+    //R_20 : velocitat de reacció a 20ºC (g/m2·min)
+    //k    : (input, es com una ks) (g/m3)
     //T    : temperatura (ºC)
     let ret_val = Mi - R_20*this.HRTi(Di)*this.Si(Di)*Math.pow(1.041,T-20)*(Mi/this.Qi(Di))/(k+Mi/this.Qi(Di));
     return Math.max(ret_val,0);
@@ -63,23 +66,23 @@ class Tram {
 //tests amb valors inventats
 (function test(){
   return;
-  //constructor   (wb, wt, Dt, S,   n,      Li){
-  let t = new Tram(10, 50, 10, 0.5, 0.0358, 100);
+  //constructor   (wb, wt, xxx,     S,      n,   Li)
+  let t = new Tram( 3,  6,   2, 0.005, 0.0358, 1000);
   console.log(t);
-  console.log("angle alfa : "+t.angle);
+  console.log("angle alfa   : "+t.angle);
+  console.log("Dt           : "+t.Dt);
 
   //definim una fondària concreta Di
-  let Di = 5;
+  let Di = 1.2;
   console.log("wi   (Di="+Di+"): "+t.wi(Di));
   console.log("Ai   (Di="+Di+"): "+t.Ai(Di));
   console.log("wpi  (Di="+Di+"): "+t.wpi(Di));
   console.log("HRi  (Di="+Di+"): "+t.HRi(Di));
+  console.log("Qi   (Di="+Di+"): "+t.Qi(Di));
   console.log("HRTi (Di="+Di+"): "+t.HRTi(Di));
   console.log("Si   (Di="+Di+"): "+t.Si(Di));
-  console.log("Qi   (Di="+Di+"): "+t.Qi(Di));
-  console.log("ky   (Di="+Di+"): "+t.ky(Di));
-  console.log("Ll   (Di="+Di+"): "+t.Ll(Di));
-
-  let Mi=1e5, R_20=0.05, k=0.1, T=15;
-  console.log("Mf   (Di="+Di+",Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Di,Mi,R_20,k,T));
+  //console.log("ky   (Di="+Di+"): "+t.ky(Di));
+  //console.log("Ll   (Di="+Di+"): "+t.Ll(Di));
+  //let Mi=1e5, R_20=0.05, k=0.1, T=15;
+  //console.log("Mf   (Di="+Di+",Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Di,Mi,R_20,k,T));
 })();

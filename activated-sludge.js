@@ -3,7 +3,7 @@
 */
 
 //import "State_Variables" class only in node
-if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
+if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
 
 State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   //inputs and default values
@@ -165,7 +165,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 };
 
 /* test */
-(function(){
+(function test(){
   return;
   let sv               = new State_Variables();
   sv.components.S_VFA  = 50;

@@ -2,11 +2,10 @@
   STATE VARIABLES AND MASS RATIOS ENCAPSULATION
   summary of this file:
     1. class definition (data structure)
-    2. class methods (functions, prototypes)
+    2. class methods (prototypes)
     3. tests
 */
 
-//1. class definition
 class State_Variables{
   constructor(name){
     this.name=name||"wastewater";
@@ -45,9 +44,13 @@ class State_Variables{
 //export for nodejs
 if(typeof module != "undefined"){module.exports=State_Variables;}
 
-//2. class methods
+/*
+  METHODS:
+  each removal technology is implemented in its own file (e.g. nitrification.js)
+  technologies are: primary-settler, activated-sludge, nitrification, denitrification, chemical_P_removal
+*/
 
-//2.1. compute total: COD, C, TKN, TP, VSS, TSS
+//compute total COD, TOC, TKN, TP, TSS and fractionation
 State_Variables.prototype.compute_totals=function(){
   //TOTALS: COD, TC, TKN, TP, VSS, TSS
     let Total_COD =
@@ -160,15 +163,16 @@ State_Variables.prototype.compute_totals=function(){
   return totals;
 };
 
-//2.2 set a single component value
+//set the value of a single state variable, for example -> sv.set("S_VFA",10);
 State_Variables.prototype.set=function(key, newValue){
   if(!this.components[key])       throw 'key not found';
   if(typeof newValue != 'number') throw 'newValue is not a number';
   this.components[key]=newValue;
 };
 
-//3. tests
-(function(){
+/* test */
+(function test(){
+  return;
   /* original numbers from george ekama
     inputs:
       X_BPO_non_set_inf: 301,
@@ -196,11 +200,9 @@ State_Variables.prototype.set=function(key, newValue){
       Total_VSS_set:  211.1406,
       Total_TSS_set:  245.1406
   */
-  //return;
   //create 2 scenarios: raw ww, settled ww
-  let sv1 = new State_Variables('raw ww');
-  let sv2 = new State_Variables('settled ww');
   //1. raw ww
+    let sv1 = new State_Variables('raw ww');
     sv1.set("X_BPO", 707);
     sv1.set("X_UPO", 150);
     sv1.set("X_iSS", 100);
@@ -209,16 +211,16 @@ State_Variables.prototype.set=function(key, newValue){
     sv1.set("S_USO", 58);
     sv1.set("S_FSA", 59.6);
     sv1.set("S_OP",  14.15);
-  //2. settled ww
-    sv2.set('X_BPO',  301);
-    sv2.set('X_UPO',  20);
-    sv2.set('X_iSS',  34);
-    sv2.set('S_VFA',  50);
-    sv2.set('S_FBSO', 186);
-    sv2.set('S_USO',  58);
-    sv2.set('S_FSA',  59.6);
-    sv2.set('S_OP',   14.15);
-  //compute scenarios
     console.log(sv1.compute_totals());
+  //2. settled ww
+    let sv2 = new State_Variables('settled ww');
+    sv2.set('X_BPO', 301);
+    sv2.set('X_UPO', 20);
+    sv2.set('X_iSS', 34);
+    sv2.set('S_VFA', 50);
+    sv2.set('S_FBSO',186);
+    sv2.set('S_USO', 58);
+    sv2.set('S_FSA', 59.6);
+    sv2.set('S_OP',  14.15);
     console.log(sv2.compute_totals());
 })();
