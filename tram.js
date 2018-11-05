@@ -7,19 +7,26 @@
 
 class Tram {
   constructor(wb,wt,xxx,S,n,Li){
-    //inputs
-    this.wb  = wb;  //amplada a llera mitjana (m)
-    this.wt  = wt;  //amplada a bankful mitjana (m)
-    this.xxx = xxx; //distància entre llera i bankfull mitjana (m)
-    this.S   = S;   //pendent de la llera: obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
-    this.n   = n;   //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
-    this.Li  = Li;  //longitud tram (m)
+    //inputs i default values
+    this.wb  = wb  || 3;      //amplada a llera mitjana (m)
+    this.wt  = wt  || 6;      //amplada a bankful mitjana (m)
+    this.xxx = xxx || 2;      //distància entre llera i bankfull mitjana (m)
+    this.S   = S   || 0.005;  //pendent de la llera: obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
+    this.n   = n   || 0.0358; //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
+    this.Li  = Li  || 1000;   //longitud tram (m)
+
+    //variables d'estat (S_VFA, S_FBSO, etc)
+    this.state_variables = new State_Variables('river');
+
+    //trams connectats upstream
+    this.pares = { 
+      in1:null; //<Tram>
+      in2:null; //<Tram>
+    };
+
     /* 
       inputs addicionals per quan connectem trams després de validar n=1
       this.coordenades = {start:[1,1], end:[2,2]};
-      this.id     = "identificador";
-      this.id_in1 = "indentificador influent 1";
-      this.id_in2 = "indentificador influent 2";
       this.id_wtp = null; //indentificador EDAR que aboca al tram 
     */
   }
@@ -65,9 +72,10 @@ class Tram {
 
 //tests amb valors inventats
 (function test(){
-  return;
-  //constructor   (wb, wt, xxx,     S,      n,   Li)
-  let t = new Tram( 3,  6,   2, 0.005, 0.0358, 1000);
+  return;//debug
+
+  // constructor(wb, wt, xxx,     S,      n,   Li)
+  let t=new Tram( 3,  6,   2, 0.005, 0.0358, 1000);
   console.log(t);
   console.log("angle alfa   : "+t.angle);
   console.log("Dt           : "+t.Dt);

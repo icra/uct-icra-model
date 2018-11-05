@@ -38,137 +38,138 @@ class State_Variables{
       /*USO*/ f_CV_USO  : 1.4930, f_C_USO  : 0.498, f_N_USO  : 0.0366, f_P_USO  : 0.0000,
       /*--------------------------------------------------------------------------------*/
     };
-  }
+  };
+
+  /*
+    each removal technology will be a method inside state variables, implemented in its own file (e.g. nitrification.js)
+    as "State_Variables.prototype.technology_name=function(){}"
+    technologies are: primary-settler, activated-sludge, nitrification, denitrification, chemical_P_removal
+  */
+
+  //compute total COD, TOC, TKN, TP, TSS and fractionation
+  compute_totals(){
+    //TOTALS: COD, TC, TKN, TP, VSS, TSS
+      let Total_COD =
+        this.components.S_VFA  +
+        this.components.S_FBSO +
+        this.components.S_USO  +
+        this.components.X_BPO  +
+        this.components.X_UPO  ;
+      let Total_TC = 
+        this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
+        this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
+        this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
+        this.mass_ratios.f_C_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
+        this.mass_ratios.f_C_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
+      let Total_TKN = 
+        this.components.S_FSA + 
+        this.mass_ratios.f_N_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
+        this.mass_ratios.f_N_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
+        this.mass_ratios.f_N_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
+        this.mass_ratios.f_N_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
+        this.mass_ratios.f_N_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
+      let Total_TP = 
+        this.components.S_OP +
+        this.mass_ratios.f_P_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
+        this.mass_ratios.f_P_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
+        this.mass_ratios.f_P_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
+        this.mass_ratios.f_P_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
+        this.mass_ratios.f_P_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
+      let Total_VSS =
+        this.components.X_BPO / this.mass_ratios.f_CV_BPO + 
+        this.components.X_UPO / this.mass_ratios.f_CV_UPO ;
+      let Total_TSS = Total_VSS + this.components.X_iSS;
+    //COD
+      let bsCOD = this.components.S_VFA + this.components.S_FBSO;
+      let usCOD = this.components.S_USO;
+      let bpCOD = this.components.X_BPO;
+      let upCOD = this.components.X_UPO;
+      let bCOD = bsCOD + bpCOD;
+      let uCOD = usCOD + upCOD;
+      let sCOD = bsCOD + usCOD;
+      let pCOD = bpCOD + upCOD;
+      let COD=[
+        {COD:Total_COD, bCOD,  uCOD},
+        {sCOD,          bsCOD, usCOD},
+        {pCOD,          bpCOD, upCOD},
+      ];
+    //Organic Carbon
+      let bsOC = 
+        this.mass_ratios.f_C_VFA  /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
+        this.mass_ratios.f_C_FBSO /this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
+      let usOC = this.mass_ratios.f_C_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
+      let bpOC = this.mass_ratios.f_C_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
+      let upOC = this.mass_ratios.f_C_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
+      let bOC = bsOC + bpOC;
+      let uOC = usOC + upOC;
+      let sOC = bsOC + usOC;
+      let pOC = bpOC + upOC;
+      let TOC=[
+        {TOC:sOC+pOC, bOC,  uOC},
+        {sOC,         bsOC, usOC},
+        {pOC,         bpOC, upOC},
+      ];
+    //Organic Nitrogen
+      let bsON = 
+        this.mass_ratios.f_N_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
+        this.mass_ratios.f_N_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
+      let usON = this.mass_ratios.f_N_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
+      let bpON = this.mass_ratios.f_N_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
+      let upON = this.mass_ratios.f_N_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
+      let bON = bsON + bpON;
+      let uON = usON + upON;
+      let sON = bsON + usON;
+      let pON = bpON + upON;
+      let ON=[
+        { ON:sON+pON, bON,  uON},
+        {sON,         bsON, usON},
+        {pON,         bpON, upON},
+      ];
+    //Organic Phosphorus
+      let bsOP = 
+        this.mass_ratios.f_P_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
+        this.mass_ratios.f_P_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
+      let usOP = this.mass_ratios.f_P_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
+      let bpOP = this.mass_ratios.f_P_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
+      let upOP = this.mass_ratios.f_P_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
+      let bOP = bsOP + bpOP;
+      let uOP = usOP + upOP;
+      let sOP = bsOP + usOP;
+      let pOP = bpOP + upOP;
+      let OP=[
+        {OP:sOP+pOP,  bOP,  uOP},
+        {sOP,        bsOP, usOP},
+        {pOP,        bpOP, upOP},
+      ];
+    //VSS
+      let bVSS = this.components.X_BPO / this.mass_ratios.f_CV_BPO;
+      let uVSS = this.components.X_UPO / this.mass_ratios.f_CV_UPO;
+      let VSS=[
+        {VSS:Total_VSS, bVSS, uVSS },
+      ];
+    //RESULTS (in g/m3)
+    let totals={
+      Total_COD, COD,
+      Total_TC,  TOC,
+      Total_TKN, ON,
+      Total_TP,  OP,
+      Total_TSS, VSS,
+    };
+    //console.log(totals);console.log('\n'); //debug
+    return totals;
+  };
+
+  //set the value of a single state variable, for example -> sv.set("S_VFA",10);
+  set(key, newValue){
+    if(!this.components[key])       throw 'key not found';
+    if(typeof newValue != 'number') throw 'newValue is not a number';
+    this.components[key]=newValue;
+    this.modified = new Date();
+  };
 }
 
 //export for nodejs
 if(typeof module != "undefined"){module.exports=State_Variables;}
-
-/*
-  METHODS:
-  each removal technology is implemented in its own file (e.g. nitrification.js)
-  technologies are: primary-settler, activated-sludge, nitrification, denitrification, chemical_P_removal
-*/
-
-//compute total COD, TOC, TKN, TP, TSS and fractionation
-State_Variables.prototype.compute_totals=function(){
-  //TOTALS: COD, TC, TKN, TP, VSS, TSS
-    let Total_COD =
-      this.components.S_VFA  +
-      this.components.S_FBSO +
-      this.components.S_USO  +
-      this.components.X_BPO  +
-      this.components.X_UPO  ;
-    let Total_TC = 
-      this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
-      this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
-      this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
-      this.mass_ratios.f_C_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
-      this.mass_ratios.f_C_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
-    let Total_TKN = 
-      this.components.S_FSA + 
-      this.mass_ratios.f_N_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
-      this.mass_ratios.f_N_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
-      this.mass_ratios.f_N_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
-      this.mass_ratios.f_N_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
-      this.mass_ratios.f_N_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
-    let Total_TP = 
-      this.components.S_OP +
-      this.mass_ratios.f_P_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
-      this.mass_ratios.f_P_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
-      this.mass_ratios.f_P_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
-      this.mass_ratios.f_P_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
-      this.mass_ratios.f_P_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
-    let Total_VSS =
-      this.components.X_BPO / this.mass_ratios.f_CV_BPO + 
-      this.components.X_UPO / this.mass_ratios.f_CV_UPO ;
-    let Total_TSS = Total_VSS + this.components.X_iSS;
-  //COD
-    let bsCOD = this.components.S_VFA + this.components.S_FBSO;
-    let usCOD = this.components.S_USO;
-    let bpCOD = this.components.X_BPO;
-    let upCOD = this.components.X_UPO;
-    let bCOD = bsCOD + bpCOD;
-    let uCOD = usCOD + upCOD;
-    let sCOD = bsCOD + usCOD;
-    let pCOD = bpCOD + upCOD;
-    let COD=[
-      {COD:Total_COD, bCOD,  uCOD},
-      {sCOD,          bsCOD, usCOD},
-      {pCOD,          bpCOD, upCOD},
-    ];
-  //Organic Carbon
-    let bsOC = 
-      this.mass_ratios.f_C_VFA  /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
-      this.mass_ratios.f_C_FBSO /this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
-    let usOC = this.mass_ratios.f_C_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
-    let bpOC = this.mass_ratios.f_C_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
-    let upOC = this.mass_ratios.f_C_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
-    let bOC = bsOC + bpOC;
-    let uOC = usOC + upOC;
-    let sOC = bsOC + usOC;
-    let pOC = bpOC + upOC;
-    let TOC=[
-      {TOC:sOC+pOC, bOC,  uOC},
-      {sOC,         bsOC, usOC},
-      {pOC,         bpOC, upOC},
-    ];
-  //Organic Nitrogen
-    let bsON = 
-      this.mass_ratios.f_N_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
-      this.mass_ratios.f_N_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
-    let usON = this.mass_ratios.f_N_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
-    let bpON = this.mass_ratios.f_N_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
-    let upON = this.mass_ratios.f_N_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
-    let bON = bsON + bpON;
-    let uON = usON + upON;
-    let sON = bsON + usON;
-    let pON = bpON + upON;
-    let ON=[
-      { ON:sON+pON, bON,  uON},
-      {sON,         bsON, usON},
-      {pON,         bpON, upON},
-    ];
-  //Organic Phosphorus
-    let bsOP = 
-      this.mass_ratios.f_P_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
-      this.mass_ratios.f_P_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
-    let usOP = this.mass_ratios.f_P_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
-    let bpOP = this.mass_ratios.f_P_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
-    let upOP = this.mass_ratios.f_P_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
-    let bOP = bsOP + bpOP;
-    let uOP = usOP + upOP;
-    let sOP = bsOP + usOP;
-    let pOP = bpOP + upOP;
-    let OP=[
-      {OP:sOP+pOP,  bOP,  uOP},
-      {sOP,        bsOP, usOP},
-      {pOP,        bpOP, upOP},
-    ];
-  //VSS
-    let bVSS = this.components.X_BPO / this.mass_ratios.f_CV_BPO;
-    let uVSS = this.components.X_UPO / this.mass_ratios.f_CV_UPO;
-    let VSS=[
-      {VSS:Total_VSS, bVSS, uVSS },
-    ];
-  //RESULTS (in g/m3)
-  let totals={
-    Total_COD, COD,
-    Total_TC,  TOC,
-    Total_TKN, ON,
-    Total_TP,  OP,
-    Total_TSS, VSS,
-  };
-  //console.log(totals);console.log('\n'); //debug
-  return totals;
-};
-
-//set the value of a single state variable, for example -> sv.set("S_VFA",10);
-State_Variables.prototype.set=function(key, newValue){
-  if(!this.components[key])       throw 'key not found';
-  if(typeof newValue != 'number') throw 'newValue is not a number';
-  this.components[key]=newValue;
-};
 
 /* test */
 (function test(){
