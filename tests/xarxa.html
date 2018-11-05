@@ -1,0 +1,122 @@
+<!doctype html><html><head>
+  <meta charset=utf8>
+  <title>Xarxa de trams de riu exemple</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
+    body {
+      font-family: 'Roboto', verdana;
+      color: #5C5C5C;
+    }
+    table{ border-collapse:collapse}
+    input[type=number]{
+      width:70px;
+      text-align:right;
+    }
+    .unit   {font-size:smaller;}
+    fieldset { border-width:1px; }
+
+    .number {text-align:right;}
+
+    #xarxa td div { 
+      display:flex;
+      justify-content:center;
+    } 
+    #xarxa td div table {
+      font-size:small;
+      border:1px solid #ccc;
+      margin:auto;
+      margin-top:0;
+    }
+  </style>
+</head><body>
+<div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Xarxa exemple (sense degradació)</h3></div>
+
+<!--xarxa--><div>
+  <table id=xarxa border=1>
+    <tr><td id=t1><td id=t2><td id=t3><td id=t4>
+    <tr><td colspan=2 id=t5><td colspan=2 id=t6>
+    <tr><td colspan=4 id=t7>
+  </table>
+</div>
+
+<!--app logic-->
+<script src="format.js"></script>
+<script src="../state-variables.js"></script>
+<script src="../tram.js"></script>
+<script src="../xarxa.js"></script>
+
+<!--user-defined-scenario-->
+<script>
+  /*
+    exemple xarxa de trams
+    t1--+
+        |--> t5--+
+    t2--+        |
+                 |--> t7
+    t3--+        |
+        |--> t6--+
+    t4--+
+
+  */
+  let xarxa = new Xarxa();
+  //test amb 4 arrels
+  let t1 = new Tram();
+  let t2 = new Tram();
+  let t3 = new Tram();
+  let t4 = new Tram();
+  let t5 = new Tram(); t5.pares={in1:t1, in2:t2};
+  let t6 = new Tram(); t6.pares={in1:t3, in2:t4};
+  let t7 = new Tram(); t7.pares={in1:t5, in2:t6};
+  xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
+  xarxa.soluciona();
+  let trams = {t1,t2,t3,t4,t5,t6,t7}; //connecta amb gui
+</script>
+
+<!--gui-->
+<script>
+  //enllaça amb el gui
+  function redisplay(){
+    Object.entries(trams).forEach(entry=>{
+      let key = entry[0]; //string
+      let val = entry[1]; //Tram
+
+      let td = document.querySelector(`#${key}`);
+      td.innerHTML=`<div style=text-align:center>${key}</div>`;
+
+      //nova taula state-variables
+      let table=document.createElement('table');
+      Object.entries(val.state_variables.components).forEach(entry=>{
+        let key = entry[0]; //string
+        let val = entry[1]; //number
+        let newRow = table.insertRow(-1);
+        newRow.insertCell(-1).innerHTML=key;
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(val)+"</td>";
+      });
+
+      //nova taula tram de riu
+      let table2=document.createElement('table');
+      Object.entries({
+        wb  : val.wb ,
+        wt  : val.wt ,
+        xxx : val.xxx,
+        S   : val.S  ,
+        n   : val.n  ,
+        Li  : val.Li ,
+        Di  : val.Di
+      }).forEach(entry=>{
+        let key = entry[0]; //string
+        let val = entry[1]; //number
+        let newRow = table2.insertRow(-1);
+        newRow.insertCell(-1).innerHTML=key;
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(val)+"</td>";
+      });
+
+      //append elements
+      let div=document.createElement('div');
+      td.appendChild(div);
+      div.appendChild(table2);
+      div.appendChild(table);
+    });
+  };
+  redisplay();
+</script>

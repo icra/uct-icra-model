@@ -1,9 +1,6 @@
-/**
-  * Removal % of the particulated fractions BPO, UPO and iSS
+/*
+  Removal % of the particulated fractions BPO, UPO and iSS
 */
-
-//import "State_Variables" class only in node
-if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
 
 State_Variables.prototype.primary_settler=function(Q, removal_BPO, removal_UPO, removal_iSS){
   //inputs and default values
@@ -17,7 +14,7 @@ State_Variables.prototype.primary_settler=function(Q, removal_BPO, removal_UPO, 
   let UPO_removed = this.components.X_UPO*removal_UPO/100; //mg/L
   let iSS_removed = this.components.X_iSS*removal_iSS/100; //mg/L
 
-  //subtract the removed organics from the state variables TBD
+  //subtract the removed organics from the state variables TODO
   //this.components.X_BPO -= BPO_removed; //mg/L
   //this.components.X_UPO -= UPO_removed; //mg/L
   //this.components.X_iSS -= iSS_removed; //mg/L
@@ -29,6 +26,9 @@ State_Variables.prototype.primary_settler=function(Q, removal_BPO, removal_UPO, 
     iSS_removed:{value:Q*iSS_removed/1000, unit:"kg/d", descr:"Mass of iSS removed by PST"},
   };
 };
+
+//import "State_Variables" class only in node
+if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
 
 //test
 (function test(){

@@ -1,5 +1,6 @@
-/**
-  * AS implementation from G. Ekama hand notes
+/*
+  AS implementation
+  G. Ekama handwritten notes
 */
 
 //import "State_Variables" class only in node
@@ -164,7 +165,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   };
 };
 
-/* test */
+/*test*/
 (function test(){
   return;
   let sv               = new State_Variables();

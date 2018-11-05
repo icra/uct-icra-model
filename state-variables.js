@@ -161,17 +161,17 @@ class State_Variables{
 
   //set the value of a single state variable, for example -> sv.set("S_VFA",10);
   set(key, newValue){
-    if(!this.components[key])       throw 'key not found';
-    if(typeof newValue != 'number') throw 'newValue is not a number';
+    if(this.components[key]===undefined) throw 'key '+key+' not found';
+    if(typeof newValue != 'number')      throw 'newValue is not a number';
     this.components[key]=newValue;
     this.modified = new Date();
   };
 }
 
-//export for nodejs
-if(typeof module != "undefined"){module.exports=State_Variables;}
+//node export
+if(typeof document == "undefined"){module.exports=State_Variables;}
 
-/* test */
+/*test*/
 (function test(){
   return;
   /* original numbers from george ekama

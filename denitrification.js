@@ -1,13 +1,9 @@
-/**
-  * Denitrification implementation from G. Ekama hand notes
+/*
+  Denitrification implementation from G. Ekama hand notes
 */
 
-//import "State_Variables" class
-if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
-
 State_Variables.prototype.denitrification=function(){
-
-  /* inputs */
+  /* inputs and default values*/
   Q  = Q  || 24875; //m3/d | Flowrate
   T  = T  || 16;    //ºC   | Temperature
   Rs = Rs || 15;    //days | Solids retention time
@@ -37,7 +33,11 @@ State_Variables.prototype.denitrification=function(){
   }
 };
 
+//import "State_Variables" class
+if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
+
 /*test*/
+(function test(){
   let sv = new State_Variables('reactor');
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
@@ -49,3 +49,4 @@ State_Variables.prototype.denitrification=function(){
   sv.components.S_OP   = 7.28;
   sv.components.S_NOx  = 0;
   console.log(sv.denitrification());
+})();

@@ -1,12 +1,6 @@
-/**
-  * Nitrification implementation from G. Ekama hand notes
+/*
+  Nitrification implementation from G. Ekama hand notes
 */
-
-//import "State_Variables" class only in node
-if(typeof document == "undefined"){
-  State_Variables=require("./state-variables.js");
-  require("./activated-sludge.js");
-}
 
 State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   //inputs and default values
@@ -81,6 +75,12 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
     FOn_fxm      :{value:FOn_fxm,      unit:"kg/d as O", descr:"Oxygen demand if fxt = fxm"},
   }
 };
+
+//node imports
+if(typeof document == "undefined"){
+  State_Variables=require("./state-variables.js");
+  require("./activated-sludge.js");
+}
 
 /*test */
 (function test(){
