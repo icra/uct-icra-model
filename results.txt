@@ -1,0 +1,155 @@
+Escenari exemple: 7 trams i una EDAR al tram 5
+Resum inputs & outputs
+==============================================
+
+=== ESQUEMA ===
+
+             EDAR
+    t1--+     |
+        |--> t5--+
+    t2--+        |
+                  +--> t7
+    t3--+        |
+        |--> t6--+
+    t4--+
+
+== INPUTS RIU ==
+
+  A tots els trams:
+    wb  = 3;      //amplada a llera mitjana (m)
+    wt  = 6;      //amplada a bankful mitjana (m)
+    xxx = 2;      //distància entre llera i bankfull mitjana (m)
+    S   = 0.005;  //pendent de la llera: obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
+    n   = 0.0358; //coeficient de manning (n) el valor 0.0358 és la mitjana europea (Verzano et al)
+    Li  = 1000;   //longitud tram (m)
+    Di  = 1.2;    //fondària concreta (m)
+
+=== INPUTS VARIABLES D'ESTAT ===
+
+  Variables d'estat -> S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA,  S_OP,  S_NOx
+            tram1   -> 1,     0,      0,     0,     0,     0,     0,      0,     0
+            tram2   -> 1,     0,      0,     0,     0,     0,     0,      0,     0
+            tram3   -> 0,     0,      0,     0,     0,     0,     0,      0,     0
+            tram4   -> 0,     0,      0,     0,     0,     0,     0,      0,     0
+            tram5   -> 0,     0,      0,     0,     0,     0,     0,      0,     0
+            tram6   -> 0,     0,      0,     0,     0,     0,     0,      0,     0
+            tram7   -> 0,     0,      0,     0,     0,     0,     0,      0,     0
+            edar    -> 50,    186,    707,   150,   58,    100,   59.6,   14.15, 0);
+
+=== INPUTS EDAR ===
+
+  primary_settler (Q=25000, fw=0.005, removal_BPO=0, removal_UPO=0, removal_iSS=0);
+  activated_sludge(Q=24875, T=16, Vp=8473, Rs=15);
+  nitrification   (Q=24875, T=16, Vp=8473, Rs=15, SF=1.25, fxt=0.39);
+
+=== RESULTATS INFLUENT EDAR (TOTALS + FRACCIONAMENT) ===
+   
+{ Total_COD: 1151,
+  Total_TC: 383.4338653867864,
+  Total_TKN: 92.22202967527113,
+  Total_TP: 21.570057350285982,
+  Total_TSS: 665.4982813603522,
+
+  COD: [ { COD: 1151, bCOD: 943,  uCOD: 208 },
+         { sCOD: 294, bsCOD: 236, usCOD: 58 },
+         { pCOD: 857, bpCOD: 707, upCOD: 150 } ],
+  TOC: [ { TOC: 383.43386538678635, bOC: 311.62303175534043,  uOC: 71.81083363144596 },
+         { sOC: 99.79006293037085,  bsOC: 80.44378027799308,  usOC: 19.346282652377763 },
+         { pOC: 283.64380245641553, bpOC: 231.17925147734735, upOC: 52.4645509790682 } ],
+  ON: [ { ON: 32.62202967527113,   bON: 21.071902749391953,  uON: 11.550126925879177 },
+        { sON: 7.499581709951604,  bsON: 6.077746478873239,  usON: 1.4218352310783655 },
+        { pON: 25.122447965319523, bpON: 14.994156270518713, upON: 10.128291694800811 } ],
+  OP: [ { OP: 7.4200573502859815,  bOP: 4.887984426585779,   uOP: 2.532072923700203 },
+        { sOP: 1.5456338028169014, bsOP: 1.5456338028169014, usOP: 0 },
+        { pOP: 5.87442354746908,   bpOP: 3.342350623768877,  upOP: 2.532072923700203 } ],
+  VSS: [ { VSS: 565.4982813603522, bVSS: 464.21536441234406, uVSS: 101.2829169480081 } ] }
+
+=== RESULTATS EQUACIONS RIU ===
+
+  A tots els trams:
+    { angle: { value: 0.848062078981481,   unit: 'rad',  descr: 'Angle entre la llera i el màxim del canal (bankful)' },
+      Dt:    { value: 1.3228756555322954,  unit: 'm',    descr: 'Fondària màxima' },
+      wi:    { value: 5.721344205666436,   unit: 'm',    descr: 'Amplada de la llera inundada' },
+      Ai:    { value: 5.232806523399862,   unit: 'm2',   descr: 'Àrea transversal inundada' },
+      wpi:   { value: 6.6284589408885815,  unit: 'm',    descr: 'Perímetre humit inundat' },
+      HRi:   { value: 0.7894454156034005,  unit: 'm',    descr: 'Radi hidràulic' },
+      Qi:    { value: 1.6871358230243272,  unit: 'm3/s', descr: 'Cabal' },
+      HRTi:  { value: 51.69319557232045,   unit: 'min',  descr: 'Temps mig de residència de l\'aigua' },
+      Si:    { value: 6628.458940888581,   unit: 'm2',   descr: 'Superfície inundada' },
+      ky:    { value: 0.17467977558950548, unit: '?',    descr: 'Coeficient de dispersió lateral' },
+      Ll:    { value: 30.20917752115205,   unit: 'm',    descr: 'Longitud del tram de barreja lateral' } }
+
+=== PRIMARY SETTLER RESULTS ===
+
+{ Qw:          { value: 125,   unit: 'm3/d', descr: 'Wastage flowrate' },
+  Qe:          { value: 24875, unit: 'm3/d', descr: 'Primary effluent flowrate' },
+  BPO_removed: { value: 0,     unit: 'kg/d', descr: 'Mass of BPO removed by PST' },
+  UPO_removed: { value: 0,     unit: 'kg/d', descr: 'Mass of UPO removed by PST' },
+  iSS_removed: { value: 0,     unit: 'kg/d', descr: 'Mass of iSS removed by PST' } }
+
+=== ACTIVATED SLUDGE RESULTS ===
+
+{ COD_balance_error: 0,
+  N_balance_error: 0,
+  Nae_balance_error: 0,
+  P_balance_error: 0,
+
+  Qw:      { value: 564.8666666666667,   unit: 'm3/d',          descr: 'Wastage flowrate' },
+  Qe:      { value: 24310.133333333335,  unit: 'm3/d',          descr: 'Effluent flowrate' },
+  fSus:    { value: 0.05039096437880104, unit: 'g_USO/g_COD',   descr: 'USO/COD ratio' },
+  fSup:    { value: 0.13032145960034752, unit: 'g_UPO/g_COD',   descr: 'UPO/COD ratio' },
+  FSti:    { value: 28631.125,           unit: 'kg/d_as_O',     descr: 'Flux COD influent' },
+  FSout:   { value: 28631.124999999993,  unit: 'kg/d_as_O',     descr: 'Flux COD out (effluent + FOc + wastage)' },
+  FSbi:    { value: 23457.124999999996,  unit: 'kg/d_as_O',     descr: 'Flux biodegradable COD influent' },
+  FSe:     { value: 1409.9877333333334,  unit: 'kg/d_as_O',     descr: 'Flux COD effluent' },
+  FSw:     { value: 9860.544891675536,   unit: 'kg/d_as_O',     descr: 'Flux COD wastage' },
+  FNti:    { value: 2294.0229881723694,  unit: 'kg/d_as_N',     descr: 'Flux TKN influent' },
+  FNte:    { value: 2294.0229881723694,  unit: 'kg/d_as_N',     descr: 'Flux TKN effluent' },
+  Ns:      { value: 26.67702489492396,   unit: 'mg/L_as_N',     descr: 'N required for sludge production' },
+  Nte:     { value: 65.54500478034717,   unit: 'mg/L_as_N',     descr: 'TKN concentration effluent' },
+  Nae:     { value: 64.12316954926881,   unit: 'mg/L_as_N',     descr: 'FSA (ammonia, NH4) concentration effluent' },
+  FPti:    { value: 536.5551765883638,   unit: 'kg/d_as_P',     descr: 'Flux TP influent' },
+  FPte:    { value: 536.5551765883638,   unit: 'kg/d_as_P',     descr: 'Flux TP effluent' },
+  Ps:      { value: 6.669256223730991,   unit: 'mg/L_as_P',     descr: 'P required for sludge production' },
+  Pte:     { value: 14.900801126554992,  unit: 'mg/L_as_P',     descr: 'TP concentration effluent' },
+  Pse:     { value: 14.900801126554992,  unit: 'mg/L_as_P',     descr: 'Inorganic Soluble P concentration effluent' },
+  HRT:     { value: 8.174954773869347,   unit: 'hour',          descr: 'Hydraulic Retention Time' },
+  bHT:     { value: 0.2140670098044708,  unit: '1/d',           descr: 'OHO Growth rate corrected by temperature' },
+  FXti:    { value: 2519.4125590817016,  unit: 'kg_VSS/d',      descr: 'Flux UPO in VSS influent' },
+  FiSS:    { value: 2487.5,              unit: 'kg_iSS/d',      descr: 'Flux iSS influent' },
+  X_BH:    { value: 1.6029427094624502,  unit: 'g_VSS·d/g_COD', descr: 'Biomass production rate' },
+  MX_BH:   { value: 37600.42750369937,   unit: 'kg_VSS',        descr: 'Biomass produced VSS' },
+  MX_EH:   { value: 24147.033249260123,  unit: 'kg_VSS',        descr: 'Endogenoous residue VSS' },
+  MX_I:    { value: 37791.18838622553,   unit: 'kg_VSS',        descr: 'Unbiodegradable organics VSS' },
+  MX_V:    { value: 99538.64913918503,   unit: 'kg_VSS',        descr: 'Volatile Suspended Solids' },
+  MX_IO:   { value: 42952.564125554905,  unit: 'kg_iSS',        descr: 'Inert Solids (influent+biomass)' },
+  MX_T:    { value: 142491.21326473993,  unit: 'kg_TSS',        descr: 'Total Suspended Solids' },
+  fi:      { value: 0.698559910176695,   unit: 'g_VSS/g_TSS',   descr: 'VSS/TSS ratio' },
+  X_V:     { value: 11.747745679120149,  unit: 'kg_VSS/m3',     descr: 'VSS concentration at SST' },
+  X_T:     { value: 16.81709114419213,   unit: 'kg_TSS/m3',     descr: 'TSS concentration at SST' },
+  f_avOHO: { value: 0.3777470141384242,  unit: 'g_OHO/g_VSS',   descr: 'Active fraction of the sludge (VSS)' },
+  f_atOHO: { value: 0.26387892026605236, unit: 'g_OHO/g_TSS',   descr: 'Active fraction of the sludge (TSS)' },
+  FOc:     { value: 17360.592374991127,  unit: 'kg/d_as_O',     descr: 'Carbonaceous Oxygen Demand' },
+  FOn:     { value: 7289.441760398942,   unit: 'kg/d_as_O',     descr: 'Nitrogenous Oxygen Demand' },
+  FOt:     { value: 24650.03413539007,   unit: 'kg/d_as_O',     descr: 'Total Oxygen Demand' },
+  OUR:     { value: 121.21854781556154,  unit: 'mg/L·h_as_O',   descr: 'Oxygen Uptake Rate' } }
+
+=== NITRIFICATION RESULTS ===
+
+{ µAmT:         { value: 0.28293943941389665, unit: '1/d',       descr: 'Growth rate corrected by temperature' },
+  KnT:          { value: 0.6287543098086592,  unit: 'mg/L',      descr: 'Kinetic constant corrected by temperature' },
+  bAT:          { value: 0.0356778349674118,  unit: '1/d',       descr: 'Growth rate corrected by temperature' },
+  fxm:          { value: 0.5478515568292501,  unit: 'ratio',     descr: 'Maximum design unaerated sludge mass fraction' },
+  MX_unaer_fxt: { value: 55571.57317324857,   unit: 'kg TSS',    descr: 'Current uneaerated sludge mass (fxt < fxm)' },
+  Nae_fxt:      { value: 0.9160266029317715,  unit: 'mg/L as N', descr: 'Effluent ammonia concentration (fxt < fxm)' },
+  Nte_fxt:      { value: 2.337861834010137,   unit: 'mg/L as N', descr: 'Effluent TKN concentration (fxt < fxm)' },
+  Nc_fxt:       { value: 63.20714294633704,   unit: 'mg/L as N', descr: 'Nitrification capacity (fxt < fxm)' },
+  FOn_fxt:      { value: 7185.309001210911,   unit: 'kg/d as O', descr: 'Oxygen demand (fxt < fxm)' } }
+
+=== RIU RESULTS ===
+  
+  Trams:       1  2  3  4   5  6   7
+  S_VFA inici: 1, 1, 1, 0,  0, 0,  0
+  S_VFA final: 1, 1, 0, 0, 52, 1, 53
+
+  Xarxa calculada (3 iteracions)

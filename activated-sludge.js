@@ -3,15 +3,15 @@
   G. Ekama handwritten notes
 */
 
-//import "State_Variables" class only in node
+//node imports
 if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
 
 State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   //inputs and default values
-  Q  = Q  || 24875;  //m3/d | Flowrate
-  T  = T  || 16;     //ºC   | Temperature
-  Vp = Vp || 8473.3; //m3   | Volume
-  Rs = Rs || 15;     //days | Solids retention time
+  Q  = isNaN(Q ) ? 24875  : Q ; //m3/d | Flowrate
+  T  = isNaN(T ) ? 16     : T ; //ºC   | Temperature
+  Vp = isNaN(Vp) ? 8473.3 : Vp; //m3   | Volume
+  Rs = isNaN(Rs) ? 15     : Rs; //days | Solids retention time
 
   //2 - page 9
   let iSS  = this.components.X_iSS; //mg_iSS/L
@@ -91,14 +91,14 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //2.9 - COD Balance
   let Suse              = frac.COD[1].usCOD;                    //mg/L as O | USO influent concentration
-  let FSe               = (Q-Qw)*Suse/1000;                     //kg/d as O | USO effluent flux
+  let FSe               = Qe*Suse/1000;                     //kg/d as O | USO effluent flux
   let FSw               = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O | COD wastage flux
   let FSout             = FSe + FOc + FSw;                      //kg/d as O | total COD out flux
   let COD_balance_error = Math.abs(1 - FSti/FSout);             //unitless  | COD balance
 
   //2.10 - N balance
   let FNti = Q*frac.Total_TKN/1000;                                                    //kg/d     | total TKN influent flux
-  let FNte = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000 + (Q-Qw)*(ON_USO + Nae)/1000; //kg/d     | total TKN out flux
+  let FNte = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000 + Qe*(ON_USO + Nae)/1000; //kg/d     | total TKN out flux
   let N_balance_error = Math.abs(1 - FNti/FNte);                                       //unitless | TKN balance
 
   //2.11 - P balance
@@ -113,6 +113,10 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
     N_balance_error,
     Nae_balance_error,
     P_balance_error,
+
+    //flowrates
+    Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
+    Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
 
     //COD
     fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio"},
@@ -138,8 +142,6 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
     Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Inorganic Soluble P concentration effluent"},
 
     //VSS
-    Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
-    Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
     HRT     :{value:HRT,        unit:"hour",          descr:"Hydraulic Retention Time"},
     bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
     FXti    :{value:FXti,       unit:"kg_VSS/d",      descr:"Flux UPO in VSS influent"},
@@ -168,7 +170,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 /*test*/
 (function test(){
   return;
-  let sv               = new State_Variables();
+  let sv = new State_Variables();
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;
   sv.components.X_BPO  = 255;

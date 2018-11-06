@@ -2,17 +2,25 @@
   Removal % of the particulated fractions BPO, UPO and iSS
 */
 
-State_Variables.prototype.primary_settler=function(Q, removal_BPO, removal_UPO, removal_iSS){
-  //inputs and default values
-  Q           = Q           || 25000*0.005;   //m3/d
-  removal_BPO = removal_BPO || 100*(406/707); //%
-  removal_UPO = removal_UPO || 100*(130/150); //%
-  removal_iSS = removal_iSS || 100*(66/100);  //%
+//node imports
+if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
 
-  //calculate the concentration of particulated organics removed
-  let BPO_removed = this.components.X_BPO*removal_BPO/100; //mg/L
-  let UPO_removed = this.components.X_UPO*removal_UPO/100; //mg/L
-  let iSS_removed = this.components.X_iSS*removal_iSS/100; //mg/L
+State_Variables.prototype.primary_settler=function(Q, fw, removal_BPO, removal_UPO, removal_iSS){
+  //inputs and default values
+  Q           = isNaN(Q          ) ? 25000         : Q          ; //m3/d
+  fw          = isNaN(fw         ) ? 0.005         : fw         ; //fraction of Q that goes to wastage  
+  removal_BPO = isNaN(removal_BPO) ? 100*(406/707) : removal_BPO; //%
+  removal_UPO = isNaN(removal_UPO) ? 100*(130/150) : removal_UPO; //%
+  removal_iSS = isNaN(removal_iSS) ? 100*(66/100)  : removal_iSS; //%
+
+  //calculate wastage and primary effluent flowrates
+  let Qw = fw * Q;  //m3/d
+  let Qe = Q  - Qw; //m3/d
+
+  //calculate PO (particulated organics) eliminated (kg/d)
+  let BPO_removed = Q*this.components.X_BPO/1000*removal_BPO/100; //kg/d
+  let UPO_removed = Q*this.components.X_UPO/1000*removal_UPO/100; //kg/d
+  let iSS_removed = Q*this.components.X_iSS/1000*removal_iSS/100; //kg/d
 
   //subtract the removed organics from the state variables TODO
   //this.components.X_BPO -= BPO_removed; //mg/L
@@ -21,14 +29,13 @@ State_Variables.prototype.primary_settler=function(Q, removal_BPO, removal_UPO, 
 
   //end
   return {
-    BPO_removed:{value:Q*BPO_removed/1000, unit:"kg/d", descr:"Mass of BPO removed by PST"},
-    UPO_removed:{value:Q*UPO_removed/1000, unit:"kg/d", descr:"Mass of UPO removed by PST"},
-    iSS_removed:{value:Q*iSS_removed/1000, unit:"kg/d", descr:"Mass of iSS removed by PST"},
+    Qw:         {value:Qw,          unit:"m3/d", descr:"Wastage flowrate"},
+    Qe:         {value:Qe,          unit:"m3/d", descr:"Primary effluent flowrate"},
+    BPO_removed:{value:BPO_removed, unit:"kg/d", descr:"Mass of BPO removed by PST"},
+    UPO_removed:{value:UPO_removed, unit:"kg/d", descr:"Mass of UPO removed by PST"},
+    iSS_removed:{value:iSS_removed, unit:"kg/d", descr:"Mass of iSS removed by PST"},
   };
 };
-
-//import "State_Variables" class only in node
-if(typeof document == "undefined"){ State_Variables=require("./state-variables.js"); }
 
 //test
 (function test(){

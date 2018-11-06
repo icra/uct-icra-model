@@ -17,12 +17,15 @@ class Xarxa {
   //soluciona la xarxa
   soluciona(verbose){
     verbose=verbose||false; //mostrar resultats a la pantalla
-    
+
     //mira si hi ha trams
     if(this.trams.length==0){throw 'la xarxa no té trams de riu'}
 
     //afegeix la propietat "calculat=false" a cada tram
     this.trams.forEach(t=>t.calculat=false);
+
+    //verbose: mostra el S_VFA inicial
+    if(verbose) console.log("S_VFA inici: "+this.trams.map(t=>t.state_variables.components.S_VFA));
 
     /*ARRELS*/
     //busca els trams inicials (no tenen pares: "arrels")
@@ -46,8 +49,10 @@ class Xarxa {
     while(true){
       //si la la xarxa ja està calculada, acaba
       if(this.trams.filter(t=>t.calculat).length==this.trams.length){
-        console.log("Xarxa calculada ("+iteracions.fetes+" iteracions)");
-        if(verbose) console.log(this.trams.map(t=>t.state_variables.components.S_VFA)); //mostra S_VFA per cada tram
+        if(verbose){
+          console.log("S_VFA final: "+this.trams.map(t=>t.state_variables.components.S_VFA));
+          console.log("Xarxa calculada ("+iteracions.fetes+" iteracions)");
+        }
         break;
       }
 
@@ -59,8 +64,15 @@ class Xarxa {
 
       //calcula contaminants
       Object.keys(tram_actual.state_variables.components).forEach(key=>{
+        //massa inicial de contaminant: la dels pares + la del tram pròpia
         let valor_inici = tram_actual.pares.map(p=>p.state_variables.components[key]).reduce((p,c)=>p+c);
-        //sintaxi:               Tram.Mf(Mi,         R_20,k,T)
+
+        //si hi desemboca alguna EDAR, suma variables d'estat
+        if(tram_actual.wwtp){
+          valor_inici += tram_actual.wwtp.components[key];
+        }
+
+        //Massa final. Sintaxi:  Tram.Mf(Mi,         R_20,k,T)
         let valor_final = tram_actual.Mf(valor_inici,   0,0,0);
         tram_actual.state_variables.set(key, valor_final);
       });
@@ -81,7 +93,7 @@ if(typeof document == "undefined"){
 
 /*test: exemples xarxes de trams*/
 (function test(){
-  //return;
+  return;
   //2 exemples de xarxes
   {/* Exemple 1:
     t1--+
@@ -93,7 +105,7 @@ if(typeof document == "undefined"){
     t4--+
     */
     let xarxa = new Xarxa();
-    let t1 = new Tram(); t1.id="1";
+    let t1 = new Tram();
     let t2 = new Tram();
     let t3 = new Tram();
     let t4 = new Tram();

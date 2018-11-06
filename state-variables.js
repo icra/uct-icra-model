@@ -7,20 +7,19 @@
 */
 
 class State_Variables{
-  constructor(name){
+  constructor(name, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx){
     this.name=name||"wastewater";
-    this.created  = new Date(),
-    this.modified = new Date(), //used in set
-    this.components={ //components and default values (inputs)
-      S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
-      S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable
-      X_BPO  : 707,   // biodegradable   particulate organics (BPO)
-      X_UPO  : 150,   // unbiodegradable particulate organics (UPO)
-      S_USO  : 58,    // unbiodegradable soluble     organics (USO)
-      X_iSS  : 100,   // inorganic inert suspended solids (sand)
-      S_FSA  : 59.6,  // inorganic free saline ammonia (NH4)
-      S_OP   : 14.15, // inorganic orthophosphate (PO4)
-      S_NOx  : 0,     // (not part of TKN) inorganic nitrite and nitrate (NO2 + NO3)
+    this.components={ 
+      //inputs and default values
+      S_VFA  : isNaN(S_VFA ) ? 50    : S_VFA , // biodegradable   soluble     organics (BSO) volatile fatty acids
+      S_FBSO : isNaN(S_FBSO) ? 186   : S_FBSO, // biodegradable   soluble     organics (BSO) fermentable
+      X_BPO  : isNaN(X_BPO ) ? 707   : X_BPO , // biodegradable   particulate organics (BPO)
+      X_UPO  : isNaN(X_UPO ) ? 150   : X_UPO , // unbiodegradable particulate organics (UPO)
+      S_USO  : isNaN(S_USO ) ? 58    : S_USO , // unbiodegradable soluble     organics (USO)
+      X_iSS  : isNaN(X_iSS ) ? 100   : X_iSS , // inorganic inert suspended solids (sand)
+      S_FSA  : isNaN(S_FSA ) ? 59.6  : S_FSA , // inorganic free saline ammonia (NH4)
+      S_OP   : isNaN(S_OP  ) ? 14.15 : S_OP  , // inorganic orthophosphate (PO4)
+      S_NOx  : isNaN(S_NOx ) ? 0     : S_NOx , // (NOT PART OF TKN) inorganic nitrite and nitrate (NO2 + NO3)
     };
     this.mass_ratios={
       /* mass ratios for COD, C, N, P vs:
@@ -164,7 +163,6 @@ class State_Variables{
     if(this.components[key]===undefined) throw 'key '+key+' not found';
     if(typeof newValue != 'number')      throw 'newValue is not a number';
     this.components[key]=newValue;
-    this.modified = new Date();
   };
 }
 

@@ -2,11 +2,14 @@
   Denitrification implementation from G. Ekama hand notes
 */
 
-State_Variables.prototype.denitrification=function(){
+//node imports
+if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
+
+State_Variables.prototype.denitrification=function(Q,T,Rs){
   /* inputs and default values*/
-  Q  = Q  || 24875; //m3/d | Flowrate
-  T  = T  || 16;    //ºC   | Temperature
-  Rs = Rs || 15;    //days | Solids retention time
+  Q  = isNaN(Q ) ? 24875 : Q ; //m3/d | Flowrate
+  T  = isNaN(T ) ? 16    : T ; //ºC   | Temperature
+  Rs = isNaN(Rs) ? 15    : Rs; //days | Solids retention time
 
   //denitrification starts at page 19
 
@@ -20,7 +23,7 @@ State_Variables.prototype.denitrification=function(){
   const K3 = K3_20*Math.pow(1.029,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
   const K4 = K4_20*Math.pow(1.029,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
 
-  let fSb_s = bsCOD/bCOD; //TODO
+  //let fSb_s = bsCOD/bCOD; //TODO
 
   //Denitrification potential
   //minimum primary anoxic sludge mass fraction
@@ -33,11 +36,9 @@ State_Variables.prototype.denitrification=function(){
   }
 };
 
-//import "State_Variables" class
-if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
-
 /*test*/
 (function test(){
+  return;
   let sv = new State_Variables('reactor');
   sv.components.S_VFA  = 50;
   sv.components.S_FBSO = 115;

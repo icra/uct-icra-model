@@ -2,14 +2,20 @@
   Nitrification implementation from G. Ekama hand notes
 */
 
+//node imports
+if(typeof document == "undefined"){
+  State_Variables=require("./state-variables.js");
+  require("./activated-sludge.js");
+}
+
 State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   //inputs and default values
-  Q   = Q   || 24875;  //m3/d | Flowrate
-  T   = T   || 16;     //ºC   | Temperature
-  Vp  = Vp  || 8473.3; //m3   | Volume
-  Rs  = Rs  || 15;     //days | Solids retention time
-  SF  = SF  || 1.25;   //safety factor | Design choice. Moves the sludge age.
-  fxt = fxt || 0.39;   //ratio | current unaerated sludge mass fraction
+  Q   = isNaN(Q  ) ? 24875  : Q   ; //m3/d | Flowrate
+  T   = isNaN(T  ) ? 16     : T   ; //ºC   | Temperature
+  Vp  = isNaN(Vp ) ? 8473.3 : Vp  ; //m3   | Volume
+  Rs  = isNaN(Rs ) ? 15     : Rs  ; //days | Solids retention time
+  SF  = isNaN(SF ) ? 1.25   : SF  ; //safety factor | Design choice. Moves the sludge age.
+  fxt = isNaN(fxt) ? 0.39   : fxt ; //ratio | current unaerated sludge mass fraction
 
   //compute influent fractionation
   let frac = this.compute_totals();
@@ -57,30 +63,34 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   let FOn_fxt = 4.57*Q*Nc_fxt/1000; //kg/d as O | O demand if fxt <  fxm
   let FOn_fxm = 4.57*Q*Nc_fxm/1000; //kg/d as O | O demand if fxt == fxm
 
-  //results
-  return {
+  //nitrification results
+  let results={
     µAmT         :{value:µAmT,         unit:"1/d",       descr:"Growth rate corrected by temperature"},
     KnT          :{value:KnT,          unit:"mg/L",      descr:"Kinetic constant corrected by temperature"},
     bAT          :{value:bAT,          unit:"1/d",       descr:"Growth rate corrected by temperature"},
     fxm          :{value:fxm,          unit:"ratio",     descr:"Maximum design unaerated sludge mass fraction"},
-    MX_unaer_fxt :{value:MX_unaer_fxt, unit:"kg TSS",    descr:"Current uneaerated sludge mass"},
-    MX_unaer_fxm :{value:MX_unaer_fxm, unit:"kg TSS",    descr:"Maximum design uneaerated sludge mass"},
-    Nae_fxt      :{value:Nae_fxt,      unit:"mg/L as N", descr:"Effluent ammonia concentration if fxt < fxm"},
-    Nae_fxm      :{value:Nae_fxm,      unit:"mg/L as N", descr:"Effluent ammonia concentration if fxt = fxm"},
-    Nte_fxt      :{value:Nte_fxt,      unit:"mg/L as N", descr:"Effluent TKN concentration if fxt < fxm"},
-    Nte_fxm      :{value:Nte_fxm,      unit:"mg/L as N", descr:"Effluent TKN concentration if fxt = fxm"},
-    Nc_fxt       :{value:Nc_fxt,       unit:"mg/L as N", descr:"Nitrification capacity if fxt < fxm"},
-    Nc_fxm       :{value:Nc_fxm,       unit:"mg/L as N", descr:"Nitrification capacity if fxt = fxm"},
-    FOn_fxt      :{value:FOn_fxt,      unit:"kg/d as O", descr:"Oxygen demand if fxt < fxm"},
-    FOn_fxm      :{value:FOn_fxm,      unit:"kg/d as O", descr:"Oxygen demand if fxt = fxm"},
-  }
-};
+    MX_unaer_fxt :{value:MX_unaer_fxt, unit:"kg TSS",    descr:"Current uneaerated sludge mass        (fxt < fxm)"},
+    //MX_unaer_fxm :{value:MX_unaer_fxm, unit:"kg TSS",    descr:"Maximum design uneaerated sludge mass (fxt = fxm)"},
+    Nae_fxt      :{value:Nae_fxt,      unit:"mg/L as N", descr:"Effluent ammonia concentration        (fxt < fxm)"},
+    //Nae_fxm      :{value:Nae_fxm,      unit:"mg/L as N", descr:"Effluent ammonia concentration        (fxt = fxm)"},
+    Nte_fxt      :{value:Nte_fxt,      unit:"mg/L as N", descr:"Effluent TKN concentration            (fxt < fxm)"},
+    //Nte_fxm      :{value:Nte_fxm,      unit:"mg/L as N", descr:"Effluent TKN concentration            (fxt = fxm)"},
+    Nc_fxt       :{value:Nc_fxt,       unit:"mg/L as N", descr:"Nitrification capacity                (fxt < fxm)"},
+    //Nc_fxm       :{value:Nc_fxm,       unit:"mg/L as N", descr:"Nitrification capacity                (fxt = fxm)"},
+    FOn_fxt      :{value:FOn_fxt,      unit:"kg/d as O", descr:"Oxygen demand                         (fxt < fxm)"},
+    //FOn_fxm      :{value:FOn_fxm,      unit:"kg/d as O", descr:"Oxygen demand                         (fxt = fxm)"},
+  };
 
-//node imports
-if(typeof document == "undefined"){
-  State_Variables=require("./state-variables.js");
-  require("./activated-sludge.js");
-}
+  /*activated sludge results also
+    Object.entries(AS_results).forEach(entry=>{
+      let key=entry[0];
+      let val=entry[1];
+      results[key]=val;
+    });
+  */
+
+  return results;
+};
 
 /*test */
 (function test(){

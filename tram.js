@@ -29,7 +29,7 @@ class Tram {
     this.state_variables = new State_Variables('tram');
 
     //EDAR que aboca al tram 
-    this.wwtp = null;
+    this.wwtp = null; //<State_Variables>
   }
 
   /*Resultats*/
@@ -93,27 +93,19 @@ if(typeof document == "undefined"){
   module.exports=Tram;
 }
 
-//tests amb valors Vicenç Acuña (vacuna@icra.cat)
+//test valors Vicenç Acuña (vacuna@icra.cat)
 (function test(){
-  return;
-
+  //return;
   //sintaxi Tram(wb, wt, xxx,     S,      n,   Li,  Di)
   let t=new Tram( 3,  6,   2, 0.005, 0.0358, 1000, 1.2);
-  //console.log(t.resultats);
-
+  console.log(t.resultats);
+  return;
   Object.entries(t.state_variables.components).forEach(entry=>{
     let R_20=0, k=0, T=0;
-
     let key=entry[0];
     let Mi =entry[1];
     Mi *= t.Qi; //g/s
     let Mf = t.Mf(Mi, R_20, k, T);  //g/s
-
     console.log("Mf["+key+"] (Mi="+Mi+"): "+Mf+" (g/s)");
   });
-
-
 })();
-
-/*
-*/

@@ -61,7 +61,8 @@
     <fieldset id=primary_settler>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/primary-settler.js" target=_blank>Primary settler</a></legend>
       <table border=1>
-        <tr><td>Q          <td><input id=Q           type=number value=125>    <td class=unit>m<sup>3</sup>/d
+        <tr><td>Q          <td><input id=Q           type=number value=25000>  <td class=unit>m<sup>3</sup>/d
+        <tr><td>fw         <td><input id=fw          type=number value=0.005>  <td class=unit>&empty;
         <tr><td>removal BPO<td><input id=removal_BPO type=number value=57.4257><td class=unit>%
         <tr><td>removal UPO<td><input id=removal_UPO type=number value=86.6667><td class=unit>%
         <tr><td>removal iSS<td><input id=removal_iSS type=number value=66>     <td class=unit>%
@@ -70,15 +71,16 @@
       <script>
         function run_pst(){
           let Q           = parseFloat(document.querySelector('#primary_settler #Q').value);
+          let fw          = parseFloat(document.querySelector('#primary_settler #fw').value);
           let removal_BPO = parseFloat(document.querySelector('#primary_settler #removal_BPO').value);
           let removal_UPO = parseFloat(document.querySelector('#primary_settler #removal_UPO').value);
           let removal_iSS = parseFloat(document.querySelector('#primary_settler #removal_iSS').value);
-          let results = sv.primary_settler(Q, removal_BPO, removal_UPO, removal_iSS);
+          let results = sv.primary_settler(Q, fw, removal_BPO, removal_UPO, removal_iSS);
           redisplay();
           document.querySelector('#primary_settler').appendChild((function(){
             let div=document.createElement('div');
             div.style.fontSize='smaller';
-            div.innerHTML=`Primary Settler(Q=${Q}, removal_BPO=${removal_BPO}, removal_UPO=${removal_UPO}, removal_iSS=${removal_iSS}) calculated`;
+            div.innerHTML=`Primary Settler(Q=${Q}, fw=${fw}, removal_BPO=${removal_BPO}, removal_UPO=${removal_UPO}, removal_iSS=${removal_iSS}) calculated`;
             let info=document.createElement('table');
             info.classList.add('info');
             Object.keys(results).forEach(key=>{
