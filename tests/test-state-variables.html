@@ -350,29 +350,28 @@
     //redisplay river
     redisplay_river();
   }
+
   //redisplay river
   function redisplay_river(){
-    //calcula angle
-    document.querySelector('#river #tram_1 #outputs #angle').innerHTML=format(tram.angle);
-    document.querySelector('#river #tram_1 #outputs #Dt'   ).innerHTML=format(tram.Dt);
-    document.querySelector('#river #tram_1 #outputs #wi'   ).innerHTML=format(tram.wi);
-    document.querySelector('#river #tram_1 #outputs #Ai'   ).innerHTML=format(tram.Ai);
-    document.querySelector('#river #tram_1 #outputs #wpi'  ).innerHTML=format(tram.wpi);
-    document.querySelector('#river #tram_1 #outputs #HRi'  ).innerHTML=format(tram.HRi);
-    document.querySelector('#river #tram_1 #outputs #Qi'   ).innerHTML=format(tram.Qi);
-    document.querySelector('#river #tram_1 #outputs #HRTi' ).innerHTML=format(tram.HRTi);
-    document.querySelector('#river #tram_1 #outputs #Si'   ).innerHTML=format(tram.Si);
-    document.querySelector('#river #tram_1 #outputs #ky'   ).innerHTML=format(tram.ky);
-    document.querySelector('#river #tram_1 #outputs #Ll'   ).innerHTML=format(tram.Ll);
+    Object.entries(tram.resultats).forEach(entry=>{
+      let key=entry[0];
+      let obj=entry[1];
+      let cell=document.querySelector(`#river #tram_1 #outputs #${key}`);
+      cell.innerHTML=format(obj.value);
+      if(!cell.parentNode.getAttribute('title')){cell.parentNode.setAttribute('title',obj.descr);}
+    });
+
     //Mf dels contaminants
     let R_20 = parseFloat(document.querySelector('#river #tram_1 #contaminants #R_20').value);
     let k    = parseFloat(document.querySelector('#river #tram_1 #contaminants #k').value);
     let T    = parseFloat(document.querySelector('#river #tram_1 #contaminants #T').value);
     Object.keys(sv.components).forEach(key=>{
+      let cell  = document.querySelector(`#river #tram_1 #contaminants #${key}`);
       let value = tram.Mf(sv.components[key], R_20, k, T);
-      document.querySelector(`#river #tram_1 #contaminants #${key}`).innerHTML=format(value);
+      cell.innerHTML=format(value);
     });
   }
+
   redisplay();
 
   //focus the first input element you find

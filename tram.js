@@ -17,9 +17,7 @@ class Tram {
     this.Di  = Di  || 1.2;    //fondària concreta (m)
 
     //trams connectats upstream (pares). Definits per l'usuari.
-    this.pares = [ 
-      //array <Tram>
-    ];
+    this.pares=[ /*array <Tram>*/ ];
 
     //coordenades per dibuixar els trams
     this.coordenades={inici:[0,0], final:[0,0]};
