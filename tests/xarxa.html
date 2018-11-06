@@ -33,7 +33,7 @@
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Xarxa exemple (sense degradació)</h3></div>
 
 <!--xarxa--><div>
-  <table id=xarxa border=1>
+  <table id=xarxa border=1 style=margin:auto>
     <tr><td id=t1><td id=t2><td id=t3><td id=t4>
     <tr><td colspan=2 id=t5><td colspan=2 id=t6>
     <tr><td colspan=4 id=t7>
@@ -65,12 +65,12 @@
   let t2 = new Tram();
   let t3 = new Tram();
   let t4 = new Tram();
-  let t5 = new Tram(); t5.pares={in1:t1, in2:t2};
-  let t6 = new Tram(); t6.pares={in1:t3, in2:t4};
-  let t7 = new Tram(); t7.pares={in1:t5, in2:t6};
+  let t5 = new Tram(); t5.pares=[t1, t2];
+  let t6 = new Tram(); t6.pares=[t3, t4];
+  let t7 = new Tram(); t7.pares=[t5, t6];
   xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
   xarxa.soluciona();
-  let trams = {t1,t2,t3,t4,t5,t6,t7}; //connecta amb gui
+  let trams={t1,t2,t3,t4,t5,t6,t7};//connecta amb gui
 </script>
 
 <!--gui-->
@@ -81,6 +81,7 @@
       let key = entry[0]; //string
       let val = entry[1]; //Tram
 
+      //cela per cada tram
       let td = document.querySelector(`#${key}`);
       td.innerHTML=`<div style=text-align:center>${key}</div>`;
 
@@ -96,20 +97,12 @@
 
       //nova taula tram de riu
       let table2=document.createElement('table');
-      Object.entries({
-        wb  : val.wb ,
-        wt  : val.wt ,
-        xxx : val.xxx,
-        S   : val.S  ,
-        n   : val.n  ,
-        Li  : val.Li ,
-        Di  : val.Di
-      }).forEach(entry=>{
+      Object.entries(val.resultats).forEach(entry=>{
         let key = entry[0]; //string
-        let val = entry[1]; //number
+        let val = entry[1]; //object {value,unit,descr}
         let newRow = table2.insertRow(-1);
         newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).outerHTML="<td class=number>"+format(val)+"</td>";
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
       });
 
       //append elements

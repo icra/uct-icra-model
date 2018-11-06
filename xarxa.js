@@ -1,5 +1,12 @@
 /*
- * Xarxa de trams de riu
+  Xarxa de trams de riu
+    Mail Anna:
+    A la BD es desen les connexions en aquest format:
+    [
+      {"id":"WWTP65-WWTP66", "id0":"WWTP65", "id1":"WWTP66"},
+      {"id":"WWTP64-WWTP66", "id0":"WWTP64", "id1":"WWTP66"},
+      {"id":"WWTP66-WWTP63", "id0":"WWTP66", "id1":"WWTP63"},
+    ]
 */
 
 class Xarxa {
@@ -17,7 +24,7 @@ class Xarxa {
 
     /*ARRELS*/
     //busca els trams inicials (no tenen pares: "arrels")
-    let arrels=this.trams.filter(tram=>(tram.pares.in1===null && tram.pares.in2===null));
+    let arrels=this.trams.filter(tram=>tram.pares.length==0);
     if(arrels.length==0){throw 'la xarxa no té arrels'}
     //calcula contaminants arrels al final del tram
     arrels.forEach(t=>{
@@ -39,16 +46,14 @@ class Xarxa {
         //console.log(this.trams.map(t=>t.state_variables.components));
         break;
       }
-      //troba el següent tram a calcular                          condicions:
+      //troba el següent tram a calcular          condicions:
       var tram_actual=this.trams
-        .filter(t=>!t.calculat)                                   //que sigui no calculat
-        .filter(t=>(t.pares.in1 && t.pares.in2))                  //que tingui pares
-        .find(t=>(t.pares.in1.calculat && t.pares.in2.calculat)); //que tingui pares calculats
+        .filter(t=>!t.calculat)                   //que sigui no calculat
+        .filter(t=>t.pares.length)                //que tingui pares
+        .find(t=>(t.pares.every(p=>p.calculat))); //que tingui tots els pares calculats
       //calcula contaminants
       Object.keys(tram_actual.state_variables.components).forEach(key=>{
-        let mare = tram_actual.pares.in1;
-        let pare = tram_actual.pares.in2;
-        let valor_inici = pare.state_variables.components[key]+mare.state_variables.components[key];
+        let valor_inici = tram_actual.pares.map(p=>p.state_variables.components[key]).reduce((p,c)=>p+c);
         //sintaxi:               Tram.Mf(Mi,         R_20,k,T)
         let valor_final = tram_actual.Mf(valor_inici,   0,0,0);
         tram_actual.state_variables.set(key, valor_final);
@@ -66,7 +71,7 @@ if(typeof document == "undefined"){
 
 /*test*/
 (function test(){
-  return;
+  //return;
   /*
     exemple xarxa de trams
 
@@ -85,9 +90,9 @@ if(typeof document == "undefined"){
   let t2 = new Tram();
   let t3 = new Tram();
   let t4 = new Tram();
-  let t5 = new Tram(); t5.pares={in1:t1, in2:t2};
-  let t6 = new Tram(); t6.pares={in1:t3, in2:t4};
-  let t7 = new Tram(); t7.pares={in1:t5, in2:t6};
+  let t5 = new Tram(); t5.pares=[t1, t2];
+  let t6 = new Tram(); t6.pares=[t3, t4];
+  let t7 = new Tram(); t7.pares=[t5, t6];
   xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
   xarxa.soluciona();
 })();

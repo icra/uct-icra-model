@@ -16,11 +16,10 @@ class Tram {
     this.Li  = Li  || 1000;   //longitud tram (m)
     this.Di  = Di  || 1.2;    //fondària concreta (m)
 
-    //trams connectats upstream (pares)
-    this.pares = { 
-      in1:null, //<Tram>
-      in2:null, //<Tram>
-    };
+    //trams connectats upstream (pares). Definits per l'usuari.
+    this.pares = [ 
+      //array <Tram>
+    ];
 
     //coordenades per dibuixar els trams
     this.coordenades={inici:[0,0], final:[0,0]};
@@ -32,33 +31,45 @@ class Tram {
     this.wwtp = null;
   }
 
-  //calcula angle "alfa" entre la llera i el màxim del canal (bankfull) (radiants)
-  get angle(){return Math.asin((this.wt-this.wb)/(2*this.xxx));}
+  /*Resultats*/
+    //calcula angle "alfa" entre la llera i el màxim del canal (bankfull) (radiants)
+    get angle(){return Math.asin((this.wt-this.wb)/(2*this.xxx));}
+    //calcula fondària màxima (m)
+    get Dt(){return this.xxx*Math.cos(this.angle);}
+    //en funció de la fondària (Di), tenim wi, Ai, wpi, HRi i Qi
+    get wi() {return this.wb + 2*this.Di*Math.tan(this.angle); }      //m  | amplada de la llera inundada
+    get Ai() {return this.Di*(this.wb+this.Di*Math.tan(this.angle));} //m2 | area transversal inundada
+    get wpi(){return this.wb + 2*this.Di/Math.cos(this.angle); }      //m  | perímetre humit inundat
+    get HRi(){return this.Ai/this.wpi;                         }      //m  | radi hidràulic
+    //Amb n determinat podem estimar wi, Ai, wpi, HRi i Qi en funció de Di. 
+    get Qi()  {return (1/this.n)*Math.pow(this.HRi,2/3)*Math.sqrt(this.S);} //m3/s | cabal
+    get HRTi(){return this.Li*this.Ai/this.Qi/60;                         } //min  | el temps mig de residència de l'aigua HRTi
+    get Si()  {return this.Li*this.wpi;                                   } //m2   | la superfície inundada en el tram d'interès
+    /*Per a fer un seguiment, s’hauria de mirar estat químic i ecològic al 
+      final del tram fluvial, així com al final de tram de barreja lateral, punt a 
+      partir del qual la química de l’aigua és resultat de la barreja de la 
+      química dels trams fluvials i EDAR influents. La longitud del tram de barreja 
+      lateral (Ll) es determina a partir de paràmetres hidràulics, amplada (wi), 
+      coeficient de dispersió lateral (ky) i velocitat mitjana (u). El coeficient de 
+      dispersió lateral es calcula a partir de la fondària (Di), la força de la 
+      gravetat (g), i la pendent de la llera fluvial (S): */
+    get ky(){return 0.6*this.Di*Math.sqrt(9.81*this.S*this.Di)};      //coeficient de dispersió lateral (ky)
+    get Ll(){return Math.pow(this.wi,2)*this.Qi/this.Ai/(2*this.ky);} //longitud del tram de barreja lateral (Ll)
 
-  //calcula fondària màxima (m)
-  get Dt(){return this.xxx*Math.cos(this.angle);}
-
-  //en funció de la fondària (Di), tenim wi, Ai, wpi, HRi i Qi
-  get wi() {return this.wb + 2*this.Di*Math.tan(this.angle); }      //m  | amplada de la llera inundada
-  get Ai() {return this.Di*(this.wb+this.Di*Math.tan(this.angle));} //m2 | area transversal inundada
-  get wpi(){return this.wb + 2*this.Di/Math.cos(this.angle); }      //m  | perímetre humit inundat
-  get HRi(){return this.Ai/this.wpi;                         }      //m  | radi hidràulic
-
-  //Amb n determinat podem estimar wi, Ai, wpi, HRi i Qi en funció de Di. 
-  get Qi()  {return (1/this.n)*Math.pow(this.HRi,2/3)*Math.sqrt(this.S);} //m3/s | cabal
-  get HRTi(){return this.Li*this.Ai/this.Qi/60;                         } //min  | el temps mig de residència de l'aigua HRTi
-  get Si()  {return this.Li*this.wpi;                                   } //m2   | la superfície inundada en el tram d'interès
-
-  /*Per a fer un seguiment, s’hauria de mirar estat químic i ecològic al 
-    final del tram fluvial, així com al final de tram de barreja lateral, punt a 
-    partir del qual la química de l’aigua és resultat de la barreja de la 
-    química dels trams fluvials i EDAR influents. La longitud del tram de barreja 
-    lateral (Ll) es determina a partir de paràmetres hidràulics, amplada (wi), 
-    coeficient de dispersió lateral (ky) i velocitat mitjana (u). El coeficient de 
-    dispersió lateral es calcula a partir de la fondària (Di), la força de la 
-    gravetat (g), i la pendent de la llera fluvial (S): */
-  get ky(){return 0.6*this.Di*Math.sqrt(9.81*this.S*this.Di)};      //coeficient de dispersió lateral (ky)
-  get Ll(){return Math.pow(this.wi,2)*this.Qi/this.Ai/(2*this.ky);} //longitud del tram de barreja lateral (Ll)
+  //empaqueta els resultats
+  get resultats(){return {
+    angle:{value:this.angle, unit:"rad",  descr:"Angle &alpha; entre la llera i el màxim del canal (bankful)"},
+    Dt   :{value:this.Dt,    unit:"m",    descr:"Fondària màxima"},
+    wi   :{value:this.wi,    unit:"m",    descr:"Amplada de la llera inundada"},
+    Ai   :{value:this.Ai,    unit:"m2",   descr:"Àrea transversal inundada"},
+    wpi  :{value:this.wpi,   unit:"m",    descr:"Perímetre humit inundat"},
+    HRi  :{value:this.HRi,   unit:"m",    descr:"Radi hidràulic"},
+    Qi   :{value:this.Qi,    unit:"m3/s", descr:"Cabal"},
+    HRTi :{value:this.HRTi,  unit:"min",  descr:"Temps mig de residència de l'aigua"},
+    Si   :{value:this.Si,    unit:"m2",   descr:"Superfície inundada"},
+    ky   :{value:this.ky,    unit:"?",    descr:"Coeficient de dispersió lateral"},
+    Ll   :{value:this.Ll,    unit:"m",    descr:"Longitud del tram de barreja lateral"},
+  }}
 
   //massa o càrrega al final del tram fluvial
   Mf(Mi,R_20,k,T){
@@ -84,17 +95,7 @@ if(typeof document == "undefined"){
   return;
   //sintaxi Tram(wb, wt, xxx,     S,      n,   Li,  Di)
   let t=new Tram( 3,  6,   2, 0.005, 0.0358, 1000, 1.2);
-  console.log("angle alfa : "+t.angle);
-  console.log("Dt         : "+t.Dt);
-  console.log("wi         : "+t.wi);
-  console.log("Ai         : "+t.Ai);
-  console.log("wpi        : "+t.wpi);
-  console.log("HRi        : "+t.HRi);
-  console.log("Qi         : "+t.Qi);
-  console.log("HRTi       : "+t.HRTi);
-  console.log("Si         : "+t.Si);
-  console.log("ky         : "+t.ky);
-  console.log("Ll         : "+t.Ll);
+  console.log(t.resultats);
   let Mi=1000, R_20=0.0001, k=100, T=15;
-  console.log("Mf   (Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Mi,R_20,k,T));
+  console.log("Mf (Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Mi,R_20,k,T));
 })();
