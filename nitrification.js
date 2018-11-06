@@ -31,7 +31,7 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   const Kn  = 1.0;                      //mg/L as N at 20ºC
   let KnT   = Kn*Math.pow(1.123,T-20);  //mg/L as N corrected by temperature
   const bA  = 0.04;                     //1/d at 20ºC
-  const bAT = bA*Math.pow(1.029,T-20);  //1/d | growth rate corrected by temperature
+  let bAT   = bA*Math.pow(1.029,T-20);  //1/d | growth rate corrected by temperature
 
   //page 17
   let fxm = 1 - SF*(bAT+1/Rs)/µAmT; //maximum design unaerated sludge mass fraction

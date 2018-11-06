@@ -64,7 +64,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let f_atOHO    = fi*f_avOHO;    //mgOHOVSS/mgTSS | fraction of active biomass in TSS
 
   //2.6 - Nitrogen - page 12
-  const fn    = 0.10;                //g_N/g_VSS
+  const fn    = this.mass_ratios.f_N_UPO; //0.10 gN/gVSS
   let Ns      = fn*MX_V/(Rs*Q)*1000; //mgN/L_influent | N in influent required for sludge production
   let Nte     = frac.Total_TKN - Ns; //mg/L as N (TKN effluent)
   let ON_FBSO = frac.ON[1].bsON;     //mg/L "Nobsi"
@@ -83,7 +83,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let OUR = FOt*1e3/(Vp*24);                       //mg/L·h | oxygen uptake rate
 
   //2.8 - effluent Phosphorus
-  const fp = 0.025;                //g_P/g_VSS
+  const fp = this.mass_ratios.f_P_UPO; //0.025 gP/gVSS
   let Ps  = fp * MX_V*1000/(Q*Rs); //mg_P/l | P required for sludge production
   let Pti = frac.Total_TP;         //mg/L   | total P influent
   let Pte = Pti - Ps;              //mg/L   | total P effluent
