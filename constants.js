@@ -1,4 +1,6 @@
-/*Constants*/
+/*
+  Kinetic constants
+*/
 
 //Activated sludge
   const bH     = 0.24; //1/d | growth rate at 20ºC (standard)
