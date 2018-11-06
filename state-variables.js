@@ -9,8 +9,8 @@
 class State_Variables{
   constructor(name){
     this.name=name||"wastewater";
-    this.created  = new Date(), /*future*/
-    this.modified = new Date(), /*future*/
+    this.created  = new Date(),
+    this.modified = new Date(), //used in set
     this.components={ //components and default values (inputs)
       S_VFA  : 50,    // biodegradable   soluble     organics (BSO) volatile fatty acids
       S_FBSO : 186,   // biodegradable   soluble     organics (BSO) fermentable

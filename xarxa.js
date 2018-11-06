@@ -82,7 +82,7 @@ if(typeof document == "undefined"){
 /*test: exemples xarxes de trams*/
 (function test(){
   //return;
-
+  //2 exemples de xarxes
   {/* Exemple 1:
     t1--+
         |--> t5--+
@@ -93,7 +93,7 @@ if(typeof document == "undefined"){
     t4--+
     */
     let xarxa = new Xarxa();
-    let t1 = new Tram();
+    let t1 = new Tram(); t1.id="1";
     let t2 = new Tram();
     let t3 = new Tram();
     let t4 = new Tram();

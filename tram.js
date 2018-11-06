@@ -16,8 +16,11 @@ class Tram {
     this.Li  = Li  || 1000;   //longitud tram (m)
     this.Di  = Di  || 1.2;    //fondària concreta (m)
 
+    //id per la base de dades
+    this.id="1";
+
     //trams connectats upstream (pares). Definits per l'usuari.
-    this.pares=[ /*array <Tram>*/ ];
+    this.pares=[]; /*array <Tram>*/
 
     //coordenades per dibuixar els trams
     this.coordenades={inici:[0,0], final:[0,0]};
@@ -70,8 +73,10 @@ class Tram {
   }}
 
   //massa o càrrega al final del tram fluvial
+  //exemple: Tram.Mf();
+  //TBD (unitat de Mi i Mf?)
   Mf(Mi,R_20,k,T){
-    //Mi   : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram
+    //Mi   : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram 
     //R_20 : velocitat de reacció a 20ºC (g/m2·min)
     //k    : (input, es com una ks) (g/m3)
     //T    : temperatura (ºC)
@@ -90,10 +95,25 @@ if(typeof document == "undefined"){
 
 //tests amb valors Vicenç Acuña (vacuna@icra.cat)
 (function test(){
-  return;
+  //return;
+
   //sintaxi Tram(wb, wt, xxx,     S,      n,   Li,  Di)
   let t=new Tram( 3,  6,   2, 0.005, 0.0358, 1000, 1.2);
-  console.log(t.resultats);
-  let Mi=1000, R_20=0.0001, k=100, T=15;
-  console.log("Mf (Mi="+Mi+",R_20="+R_20+",k="+k+",T="+T+"): "+t.Mf(Mi,R_20,k,T));
+  //console.log(t.resultats);
+
+  Object.entries(t.state_variables.components).forEach(entry=>{
+    let R_20=0, k=0, T=0;
+
+    let key=entry[0];
+    let Mi =entry[1];
+    Mi *= t.Qi; //g/s
+    let Mf = t.Mf(Mi, R_20, k, T);  //g/s
+
+    console.log("Mf["+key+"] (Mi="+Mi+"): "+Mf+" (g/s)");
+  });
+
+
 })();
+
+/*
+*/
