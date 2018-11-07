@@ -14,17 +14,17 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   Rs = isNaN(Rs) ? 15     : Rs; //days | Solids retention time
 
   //2 - page 9
-  let iSS  = this.components.X_iSS; //mg_iSS/L
+  let iSS  = this.components.X_iSS; //mg_iSS/L influent
   let frac = this.compute_totals(); //object: complete fractionation inside
-  let COD  = frac.Total_COD;        //mg_COD/L
-  let BSO  = frac.COD[1].bsCOD;     //mg_COD/L
-  let USO  = frac.COD[1].usCOD;     //mg_COD/L
-  let BPO  = frac.COD[2].bpCOD;     //mg_COD/L
-  let UPO  = frac.COD[2].upCOD;     //mg_COD/L
+  let COD  = frac.Total_COD;        //mg_COD/L influent
+  let BSO  = frac.COD[1].bsCOD;     //mg_COD/L influent
+  let USO  = frac.COD[1].usCOD;     //mg_COD/L influent
+  let BPO  = frac.COD[2].bpCOD;     //mg_COD/L influent
+  let UPO  = frac.COD[2].upCOD;     //mg_COD/L influent
 
   //fSus and fSup ratios
-  let fSus = USO/COD; //g_USO/g_COD
-  let fSup = UPO/COD; //g_UPO/g_COD
+  let fSus = USO/COD; //g_USO/g_COD influent
+  let fSup = UPO/COD; //g_UPO/g_COD influent
 
   //2.1 - mass fluxes (kg/d)
   const fCV = this.mass_ratios.f_CV_UPO; //1.481
@@ -39,7 +39,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //page 10
   const YH     = 0.45;                    //gVSS/gCOD
-  let X_BH     = (YH*Rs)/(1+bHT*Rs);      //g_VSS*d/g_COD
+  let X_BH     = (YH*Rs)/(1+bHT*Rs);      //g_VSS*d/g_COD | biomass production rate
   let MX_BH    = FSbi * X_BH;             //kg_VSS   | biomass produced
   const fH     = 0.20;                    //         | tabled value
   let MX_EH    = fH * bHT * Rs * MX_BH;   //kg_VSS   | endogenous respiration OHOs
@@ -106,7 +106,65 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let FPte = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000 + (Q-Qw)*Pte/1000; //kg/d     | total TP out flux
   let P_balance_error = Math.abs(1 - FPti/FPte);                   //unitless | P balance
 
-  //console.log(frac);
+  //RESULTS (categories) TBD
+  let results = {
+    influent:{
+      fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio"},
+      fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio"}, 
+      FSti    :{value:FSti,       unit:"kg/d_as_O",     descr:"Flux COD influent"},
+      FSbi    :{value:FSbi,       unit:"kg/d_as_O",     descr:"Flux biodegradable COD influent"},
+      FNti    :{value:FNti,       unit:"kg/d_as_N",     descr:"Flux TKN influent"},
+      FPti    :{value:FPti,       unit:"kg/d_as_P",     descr:"Flux TP influent"},
+      FXti    :{value:FXti,       unit:"kg_VSS/d",      descr:"Flux UPO in VSS influent"},
+      FiSS    :{value:FiSS,       unit:"kg_iSS/d",      descr:"Flux iSS influent"},
+    },
+    effluent:{
+      Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
+      FSe     :{value:FSe,        unit:"kg/d_as_O",     descr:"Flux COD effluent"},
+      FNte    :{value:FNte,       unit:"kg/d_as_N",     descr:"Flux TKN effluent"},
+      Nte     :{value:Nte,        unit:"mg/L_as_N",     descr:"TKN concentration effluent"},
+      Nae     :{value:Nae,        unit:"mg/L_as_N",     descr:"FSA (ammonia, NH4) concentration effluent"},
+      FPte    :{value:FPte,       unit:"kg/d_as_P",     descr:"Flux TP effluent"},
+      Pte     :{value:Pte,        unit:"mg/L_as_P",     descr:"TP concentration effluent"},
+      Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Inorganic Soluble P concentration effluent"},
+    },
+    sludge:{
+      Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
+      FSw     :{value:FSw,        unit:"kg/d_as_O",     descr:"Flux COD wastage"},
+    },
+    process:{
+      FSout   :{value:FSout,      unit:"kg/d_as_O",     descr:"Flux COD out (effluent + FOc + wastage)"},
+      Ns      :{value:Ns,         unit:"mg/L_as_N",     descr:"N required for sludge production"},
+      Ps      :{value:Ps,         unit:"mg/L_as_P",     descr:"P required for sludge production"},
+      HRT     :{value:HRT,        unit:"hour",          descr:"Hydraulic Retention Time"},
+      bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
+      X_BH    :{value:X_BH,       unit:"g_VSS·d/g_COD", descr:"Biomass production rate"},
+      MX_BH   :{value:MX_BH,      unit:"kg_VSS",        descr:"Biomass produced VSS"},
+      MX_EH   :{value:MX_EH,      unit:"kg_VSS",        descr:"Endogenoous residue VSS"},
+      MX_I    :{value:MX_I,       unit:"kg_VSS",        descr:"Unbiodegradable organics VSS"},
+      MX_V    :{value:MX_V,       unit:"kg_VSS",        descr:"Volatile Suspended Solids"},
+      MX_IO   :{value:MX_IO,      unit:"kg_iSS",        descr:"Inert Solids (influent+biomass)"},
+      MX_T    :{value:MX_T,       unit:"kg_TSS",        descr:"Total Suspended Solids"},
+      fi      :{value:fi,         unit:"g_VSS/g_TSS",   descr:"VSS/TSS ratio"},
+      X_V     :{value:MLSS_X_VSS, unit:"kg_VSS/m3",     descr:"VSS concentration at SST"},
+      X_T     :{value:MLSS_X_TSS, unit:"kg_TSS/m3",     descr:"TSS concentration at SST"},
+      f_avOHO :{value:f_avOHO,    unit:"g_OHO/g_VSS",   descr:"Active fraction of the sludge (VSS)"},
+      f_atOHO :{value:f_atOHO,    unit:"g_OHO/g_TSS",   descr:"Active fraction of the sludge (TSS)"},
+      FOc     :{value:FOc,        unit:"kg/d_as_O",     descr:"Carbonaceous Oxygen Demand"},
+      FOn     :{value:FOn,        unit:"kg/d_as_O",     descr:"Nitrogenous Oxygen Demand"},
+      FOt     :{value:FOt,        unit:"kg/d_as_O",     descr:"Total Oxygen Demand"},
+      OUR     :{value:OUR,        unit:"mg/L·h_as_O",   descr:"Oxygen Uptake Rate"},
+    },
+    balances:{
+      COD_balance_error,
+      N_balance_error,
+      Nae_balance_error,
+      P_balance_error,
+    },
+  };
+  Object.values(results).forEach(category=>{Object.values(category).forEach(obj=>{delete obj.unit;delete obj.value;});});
+  console.log(results);
+
   return {
     //balances
     COD_balance_error,
@@ -170,15 +228,6 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 /*test*/
 (function test(){
   return;
-  let sv = new State_Variables();
-  sv.components.S_VFA  = 50;
-  sv.components.S_FBSO = 115;
-  sv.components.X_BPO  = 255;
-  sv.components.X_UPO  = 10;
-  sv.components.S_USO  = 45;
-  sv.components.X_iSS  = 15;
-  sv.components.S_FSA  = 39.1;
-  sv.components.S_OP   = 7.28;
-  sv.components.S_NOx  = 0;
+  let sv = new State_Variables('test AS',50,115,255,10,45,15,39.1,7.28,0);
   console.log(sv.activated_sludge());
 })();

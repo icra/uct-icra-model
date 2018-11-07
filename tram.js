@@ -6,17 +6,17 @@
 */
 
 class Tram {
-  constructor(wb,wt,xxx,S,n,Li,Di){
+  constructor(wb,wt,Db,S,n,Li,Di){
     //inputs i default values
-    this.wb  = wb  || 3;      //amplada a llera mitjana (m)
-    this.wt  = wt  || 6;      //amplada a bankful mitjana (m)
-    this.xxx = xxx || 2;      //distància entre llera i bankfull mitjana (m)
-    this.S   = S   || 0.005;  //pendent de la llera: obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
-    this.n   = n   || 0.0358; //el coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
-    this.Li  = Li  || 1000;   //longitud tram (m)
-    this.Di  = Di  || 1.2;    //fondària concreta (m)
+    this.wb = isNaN(wb) ? 3      : wb; //amplada a llera mitjana (m)
+    this.wt = isNaN(wt) ? 6      : wt; //amplada a bankful mitjana (m)
+    this.Db = isNaN(Db) ? 2      : Db; //distància entre llera i bankfull mitjana (m)
+    this.S  = isNaN(S ) ? 0.005  : S ; //pendent de la llera: obtingut amb resolució mínima de 30m de pixel, i estimant la pendent per un tram d'1 km
+    this.n  = isNaN(n ) ? 0.0358 : n ; //coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
+    this.Li = isNaN(Li) ? 1000   : Li; //longitud tram (m)
+    this.Di = isNaN(Di) ? 1.2    : Di; //fondària concreta (m)
 
-    //id per la base de dades
+    //id per la base de dades TBD
     this.id="1";
 
     //trams connectats upstream (pares). Definits per l'usuari.
@@ -34,9 +34,9 @@ class Tram {
 
   /*Resultats*/
     //calcula angle "alfa" entre la llera i el màxim del canal (bankfull) (radiants)
-    get angle(){return Math.asin((this.wt-this.wb)/(2*this.xxx));}
+    get angle(){return Math.asin((this.wt-this.wb)/(2*this.Db));}
     //calcula fondària màxima (m)
-    get Dt(){return this.xxx*Math.cos(this.angle);}
+    get Dt(){return this.Db*Math.cos(this.angle);}
     //en funció de la fondària (Di), tenim wi, Ai, wpi, HRi i Qi
     get wi() {return this.wb + 2*this.Di*Math.tan(this.angle); }      //m  | amplada de la llera inundada
     get Ai() {return this.Di*(this.wb+this.Di*Math.tan(this.angle));} //m2 | area transversal inundada
@@ -73,16 +73,13 @@ class Tram {
   }}
 
   //massa o càrrega al final del tram fluvial
-  //exemple: Tram.Mf();
-  //TBD (unitat de Mi i Mf?)
   Mf(Mi,R_20,k,T){
-    //Mi   : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram 
+    //Mi   : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram (kg)
     //R_20 : velocitat de reacció a 20ºC (g/m2·min)
     //k    : (input, es com una ks) (g/m3)
     //T    : temperatura (ºC)
     if(Mi==0) return 0;
     let Mf = Mi - R_20*this.HRTi*this.Si*Math.pow(1.041,T-20)*(Mi/this.Qi)/(k+Mi/this.Qi);
-    //console.log(Mf);
     return Math.max(Mf,0);
   }
 }
@@ -95,17 +92,16 @@ if(typeof document == "undefined"){
 
 //test valors Vicenç Acuña (vacuna@icra.cat)
 (function test(){
-  //return;
-  //sintaxi Tram(wb, wt, xxx,     S,      n,   Li,  Di)
+  return;
+  //sintaxi Tram(wb, wt,  Db,     S,      n,   Li,  Di)
   let t=new Tram( 3,  6,   2, 0.005, 0.0358, 1000, 1.2);
   console.log(t.resultats);
-  return;
+  //recorre variables d'estat
   Object.entries(t.state_variables.components).forEach(entry=>{
-    let R_20=0, k=0, T=0;
     let key=entry[0];
-    let Mi =entry[1];
+    let Mi =entry[1]; //g/m3
     Mi *= t.Qi; //g/s
-    let Mf = t.Mf(Mi, R_20, k, T);  //g/s
-    console.log("Mf["+key+"] (Mi="+Mi+"): "+Mf+" (g/s)");
+    let Mf = t.Mf(Mi, R_20=0, k=0, T=0);  //g/s
+    console.log(`Mf[${key}] (Mi=${Mi}): ${Mf} (g/s)`);
   });
 })();

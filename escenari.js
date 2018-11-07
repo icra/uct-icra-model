@@ -47,10 +47,13 @@ t7.state_variables = new State_Variables('t7', 0,     0,      0,     0,     0,  
 t5.wwtp            = new State_Variables('t5', 50,    186,    707,   150,   58,    100,   59.6,   14.15, 0);
 
 //EDAR processos: PST+AS+NITRI
-console.log(t5.wwtp.compute_totals());
-let resultats_pst = t5.wwtp.primary_settler (Q=25000, fw=0.005, removal_BPO=0, removal_UPO=0, removal_iSS=0);
-let resultats_as  = t5.wwtp.activated_sludge(Q=24875, T=16, Vp=8473, Rs=15);
-let resultats_nit = t5.wwtp.nitrification   (Q=24875, T=16, Vp=8473, Rs=15, SF=1.25, fxt=0.39);
+let influent_totals = t5.wwtp.compute_totals(); //COD, TOC, TKN, TP, TSS
+let resultats_pst   = t5.wwtp.primary_settler (Q=25000, fw=0.005, removal_BPO=0, removal_UPO=0, removal_iSS=0);
+let resultats_as    = t5.wwtp.activated_sludge(Q=24875, T=16, Vp=8473, Rs=15);
+let resultats_nit   = t5.wwtp.nitrification   (Q=24875, T=16, Vp=8473, Rs=15, SF=1.25, fxt=0.39);
+
+//mostra fraccionament entrada
+console.log(influent_totals);
 
 //mostra resultats processos
 console.log("=== Primary settler results ===");

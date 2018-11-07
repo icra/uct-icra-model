@@ -27,10 +27,10 @@ State_Variables.prototype.primary_settler=function(Q, fw, removal_BPO, removal_U
   //this.components.X_UPO -= UPO_removed; //mg/L
   //this.components.X_iSS -= iSS_removed; //mg/L
 
-  //end
-  return {
-    Qw:         {value:Qw,          unit:"m3/d", descr:"Wastage flowrate"},
+  //results
+  return{
     Qe:         {value:Qe,          unit:"m3/d", descr:"Primary effluent flowrate"},
+    Qw:         {value:Qw,          unit:"m3/d", descr:"Wastage flowrate"},
     BPO_removed:{value:BPO_removed, unit:"kg/d", descr:"Mass of BPO removed by PST"},
     UPO_removed:{value:UPO_removed, unit:"kg/d", descr:"Mass of UPO removed by PST"},
     iSS_removed:{value:iSS_removed, unit:"kg/d", descr:"Mass of iSS removed by PST"},
@@ -40,6 +40,6 @@ State_Variables.prototype.primary_settler=function(Q, fw, removal_BPO, removal_U
 //test
 (function test(){
   return;
-  let sv=new State_Variables('reactor');
+  let sv=new State_Variables();
   console.log(sv.primary_settler());
 })();

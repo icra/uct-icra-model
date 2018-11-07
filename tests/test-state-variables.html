@@ -220,7 +220,7 @@
         <tbody id=inputs>
           <tr title=""><td>wb <td><input id=wb  type=number value=3      onchange="tram[this.id]=parseFloat(this.value);redisplay_river()"> <td class=unit>m
           <tr title=""><td>wt <td><input id=wt  type=number value=6      onchange="tram[this.id]=parseFloat(this.value);redisplay_river()"> <td class=unit>m
-          <tr title=""><td>xxx<td><input id=xxx type=number value=2      onchange="tram[this.id]=parseFloat(this.value);redisplay_river()"> <td class=unit>m
+          <tr title=""><td>Db <td><input id=Db  type=number value=2      onchange="tram[this.id]=parseFloat(this.value);redisplay_river()"> <td class=unit>m
           <tr title=""><td>S  <td><input id=S   type=number value=0.005  onchange="tram[this.id]=parseFloat(this.value);redisplay_river()"> <td class=unit>m/m
           <tr title=""><td>n  <td><input id=n   type=number value=0.0358 onchange="tram[this.id]=parseFloat(this.value);redisplay_river()"> <td class=unit>s/m<sup>1/3</sup>
           <tr title=""><td>Li <td><input id=Li  type=number value=1000   onchange="tram[this.id]=parseFloat(this.value);redisplay_river()"> <td class=unit>m
@@ -276,7 +276,7 @@
   let tram=new Tram(
     parseFloat(document.querySelector('#river #tram_1 #inputs #wb').value),
     parseFloat(document.querySelector('#river #tram_1 #inputs #wt').value),
-    parseFloat(document.querySelector('#river #tram_1 #inputs #xxx').value),
+    parseFloat(document.querySelector('#river #tram_1 #inputs #Db').value),
     parseFloat(document.querySelector('#river #tram_1 #inputs #S').value),
     parseFloat(document.querySelector('#river #tram_1 #inputs #n').value),
     parseFloat(document.querySelector('#river #tram_1 #inputs #Li').value),
