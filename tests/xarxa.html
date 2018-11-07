@@ -33,7 +33,7 @@
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Xarxa exemple (sense degradació)</h3></div>
 
 <!--xarxa--><div>
-  <table id=xarxa border=1 style=margin:auto>
+  <table id=xarxa border=1>
     <tr><td id=t1><td id=t2><td id=t3><td id=t4>
     <tr><td colspan=2 id=t5><td colspan=2 id=t6>
     <tr><td colspan=4 id=t7>
@@ -85,8 +85,12 @@
       let td = document.querySelector(`#${key}`);
       td.innerHTML=`<div style=text-align:center>${key}</div>`;
 
+      let div=document.createElement('div');
+      td.appendChild(div);
+
       //nova taula state-variables
       let table=document.createElement('table');
+      div.appendChild(table);
       Object.entries(val.state_variables.components).forEach(entry=>{
         let key = entry[0]; //string
         let val = entry[1]; //number
@@ -95,8 +99,10 @@
         newRow.insertCell(-1).outerHTML="<td class=number>"+format(val)+"</td>";
       });
 
+      return;
       //nova taula tram de riu
       let table2=document.createElement('table');
+      div.appendChild(table2);
       Object.entries(val.resultats).forEach(entry=>{
         let key = entry[0]; //string
         let val = entry[1]; //object {value,unit,descr}
@@ -104,12 +110,6 @@
         newRow.insertCell(-1).innerHTML=key;
         newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
       });
-
-      //append elements
-      let div=document.createElement('div');
-      td.appendChild(div);
-      div.appendChild(table2);
-      div.appendChild(table);
     });
   };
   redisplay();
