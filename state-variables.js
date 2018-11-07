@@ -54,7 +54,7 @@ class State_Variables{
         this.components.S_USO  +
         this.components.X_BPO  +
         this.components.X_UPO  ;
-      let Total_TC = 
+      let Total_TOC = 
         this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
         this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
         this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
@@ -149,12 +149,12 @@ class State_Variables{
     //RESULTS (in g/m3)
     let totals={
       Total_COD, COD,
-      Total_TC,  TOC,
+      Total_TOC, TOC,
       Total_TKN, ON,
       Total_TP,  OP,
       Total_TSS, VSS,
     };
-    //console.log(totals);console.log('\n'); //debug
+    //console.log(totals);
     return totals;
   };
 
@@ -172,6 +172,29 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
 /*test*/
 (function test(){
   return;
+  //create 2 scenarios: raw ww, settled ww
+  //1. raw ww
+    let raw = new State_Variables('raw ww');
+    raw.set("X_BPO", 707);
+    raw.set("X_UPO", 150);
+    raw.set("X_iSS", 100);
+    raw.set("S_VFA", 50);
+    raw.set("S_FBSO",186);
+    raw.set("S_USO", 58);
+    raw.set("S_FSA", 59.6);
+    raw.set("S_OP",  14.15);
+    console.log(raw.compute_totals());
+  //2. settled ww (=primary settler effluent)
+    let set = new State_Variables('settled ww');
+    set.set('X_BPO', 301);
+    set.set('X_UPO', 20);
+    set.set('X_iSS', 34);
+    set.set('S_VFA', 50);
+    set.set('S_FBSO',186);
+    set.set('S_USO', 58);
+    set.set('S_FSA', 59.6);
+    set.set('S_OP',  14.15);
+    console.log(set.compute_totals());
   /* original numbers from george ekama
     inputs:
       X_BPO_non_set_inf: 301,
@@ -199,27 +222,4 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
       Total_VSS_set:  211.1406,
       Total_TSS_set:  245.1406
   */
-  //create 2 scenarios: raw ww, settled ww
-  //1. raw ww
-    let sv1 = new State_Variables('raw ww');
-    sv1.set("X_BPO", 707);
-    sv1.set("X_UPO", 150);
-    sv1.set("X_iSS", 100);
-    sv1.set("S_VFA", 50);
-    sv1.set("S_FBSO",186);
-    sv1.set("S_USO", 58);
-    sv1.set("S_FSA", 59.6);
-    sv1.set("S_OP",  14.15);
-    console.log(sv1.compute_totals());
-  //2. settled ww
-    let sv2 = new State_Variables('settled ww');
-    sv2.set('X_BPO', 301);
-    sv2.set('X_UPO', 20);
-    sv2.set('X_iSS', 34);
-    sv2.set('S_VFA', 50);
-    sv2.set('S_FBSO',186);
-    sv2.set('S_USO', 58);
-    sv2.set('S_FSA', 59.6);
-    sv2.set('S_OP',  14.15);
-    console.log(sv2.compute_totals());
 })();

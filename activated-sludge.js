@@ -163,7 +163,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
     },
   };
   Object.values(results).forEach(category=>{Object.values(category).forEach(obj=>{delete obj.unit;delete obj.value;});});
-  console.log(results);
+  //console.log(results);
 
   return {
     //balances

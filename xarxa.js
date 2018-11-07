@@ -16,28 +16,28 @@ class Xarxa {
 
   //soluciona la xarxa
   soluciona(verbose){
+    //inputs i default values
     verbose=verbose||false; //mostrar resultats a la pantalla
 
-    //mira si hi ha trams
+    //mira si hi ha trams a la xarxa
     if(this.trams.length==0){throw 'la xarxa no té trams de riu'}
 
-    //afegeix la propietat "calculat=false" a cada tram
+    //afegeix propietat "calculat=false" a tots els trams
     this.trams.forEach(t=>t.calculat=false);
 
-    //verbose: mostra el S_VFA inicial
+    //verbose: mostra S_VFA inicial
     if(verbose) console.log("S_VFA inici: "+this.trams.map(t=>t.state_variables.components.S_VFA));
 
     /*ARRELS*/
-    //busca els trams inicials (no tenen pares: "arrels")
+    //busca els trams inicials (no tenen pares)
     let arrels=this.trams.filter(t=>t.pares.length==0);
     if(arrels.length==0){throw 'la xarxa no té arrels'}
 
     //calcula contaminants arrels al final del tram
     arrels.forEach(t=>{
       Object.keys(t.state_variables.components).forEach(key=>{
-        let valor_inici = t.state_variables.components[key];
-        //sintaxi:     Tram.Mf(Mi,         R_20, k, T)
-        let valor_final = t.Mf(valor_inici,   0, 0, 0);
+        let valor_inici = t.Qi*t.state_variables.components[key]; //"Mi" (g/s) massa inicial
+        let valor_final = t.Mf(valor_inici, R_20=0, k=0, T=0);    //"Mf" (g/s) massa final (aplica degradació)
         t.state_variables.set(key, valor_final);
       });
       t.calculat=true;
@@ -53,6 +53,8 @@ class Xarxa {
           console.log("S_VFA final: "+this.trams.map(t=>t.state_variables.components.S_VFA));
           console.log("Xarxa calculada ("+iteracions.fetes+" iteracions)");
         }
+        //esborra propietat "calculat" a tots els trams
+        this.trams.forEach(t=>{delete t.calculat});
         break;
       }
 
@@ -64,12 +66,12 @@ class Xarxa {
 
       //calcula contaminants
       Object.keys(tram_actual.state_variables.components).forEach(key=>{
-        //massa inicial de contaminant: la dels pares + la del tram pròpia
-        let valor_inici = tram_actual.pares.map(p=>p.state_variables.components[key]).reduce((p,c)=>p+c);
+        //massa inicial = Q*concentració; pares + wwtp
+        let valor_inici = tram_actual.pares.map(p=>p.state_variables.components[key]).reduce((p,c)=>p+c); //g/s
 
-        //si hi desemboca alguna EDAR, suma variables d'estat
+        //si hi ha wwtp:
         if(tram_actual.wwtp){
-          valor_inici += tram_actual.wwtp.components[key];
+          valor_inici += tram_actual.Qi*tram_actual.wwtp.components[key];
         }
 
         //Massa final. Sintaxi:  Tram.Mf(Mi,         R_20,k,T)
