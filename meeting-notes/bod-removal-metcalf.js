@@ -36,7 +36,7 @@ State_Variables.prototype.bod_removal=function(BOD,Q,T,SRT,V,zb,Pr,Df,DO){
   const E      = 0.35;  //oxygen transfer efficiency
 
   //fractions at the influent
-  let totals = this.compute_totals(); //object | includes: COD, TC, TKN, TP, VSS, TSS
+  let totals = this.totals;           //object | includes: COD, TC, TKN, TP, VSS, TSS
   let COD    = totals.Total_COD;      //g/m3
   let VSS    = totals.VSS[0].VSS;     //g/m3
   let TSS    = totals.Total_TSS;      //g/m3

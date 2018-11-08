@@ -15,7 +15,7 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //2 - page 9
   let iSS  = this.components.X_iSS; //mg_iSS/L influent
-  let frac = this.compute_totals(); //object: complete fractionation inside
+  let frac = this.totals;           //object: complete fractionation inside
   let COD  = frac.Total_COD;        //mg_COD/L influent
   let BSO  = frac.COD[1].bsCOD;     //mg_COD/L influent
   let USO  = frac.COD[1].usCOD;     //mg_COD/L influent
@@ -91,44 +91,60 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //2.9 - COD Balance
   let Suse              = frac.COD[1].usCOD;                    //mg/L as O | USO influent concentration
-  let FSe               = Qe*Suse/1000;                     //kg/d as O | USO effluent flux
+  let FSe               = Qe*Suse/1000;                         //kg/d as O | USO effluent flux
   let FSw               = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O | COD wastage flux
   let FSout             = FSe + FOc + FSw;                      //kg/d as O | total COD out flux
-  let COD_balance_error = Math.abs(1 - FSti/FSout);             //unitless  | COD balance
+  let COD_balance_error = Math.abs(1 - FSti/FSout);             //COD balance
 
   //2.10 - N balance
-  let FNti = Q*frac.Total_TKN/1000;                                                    //kg/d     | total TKN influent flux
-  let FNte = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000 + Qe*(ON_USO + Nae)/1000; //kg/d     | total TKN out flux
-  let N_balance_error = Math.abs(1 - FNti/FNte);                                       //unitless | TKN balance
+  let FNti  = Q*frac.Total_TKN/1000;                       //kg/d as N | total TKN influent
+  let FNw   = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000; //kg/d as N | total TKN wastage
+  let FNte  = Qe*(ON_USO + Nae)/1000;                      //kg/d as N | total TKN effluent
+  let FNout = FNw + FNte                                   //kg/d as N | total TKN out
+  let N_balance_error = Math.abs(1 - FNti/FNout);          //TKN balance
 
   //2.11 - P balance
-  let FPti = Q*frac.Total_TP/1000;                                 //kg/d     | total TP influent flux
-  let FPte = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000 + (Q-Qw)*Pte/1000; //kg/d     | total TP out flux
-  let P_balance_error = Math.abs(1 - FPti/FPte);                   //unitless | P balance
+  let FPti  = Q*frac.Total_TP/1000;               //kg/d as P | total TP influent
+  let FPw   = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000; //kg/d as P | total TP wastage
+  let FPte  = Qe*Pte/1000;                        //kg/d as P | total TP effluent
+  let FPout = FPw + FPte;                         //kg/d as P | total TP out
+  let P_balance_error = Math.abs(1 - FPti/FPout); //P balance
+
+  //modificar les variables d'estat TODO
 
   //RESULTS (categories) TBD
   let results = {
     influent:{
-      fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio"},
-      fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio"}, 
-      FSti    :{value:FSti,       unit:"kg/d_as_O",     descr:"Flux COD influent"},
-      FSbi    :{value:FSbi,       unit:"kg/d_as_O",     descr:"Flux biodegradable COD influent"},
-      FNti    :{value:FNti,       unit:"kg/d_as_N",     descr:"Flux TKN influent"},
-      FPti    :{value:FPti,       unit:"kg/d_as_P",     descr:"Flux TP influent"},
-      FXti    :{value:FXti,       unit:"kg_VSS/d",      descr:"Flux UPO in VSS influent"},
-      FiSS    :{value:FiSS,       unit:"kg_iSS/d",      descr:"Flux iSS influent"},
+      fluxes:{
+        FSti    :{value:FSti,       unit:"kg/d_as_O",     descr:"Flux COD influent"},
+        FSbi    :{value:FSbi,       unit:"kg/d_as_O",     descr:"Flux biodegradable COD influent"},
+        FNti    :{value:FNti,       unit:"kg/d_as_N",     descr:"Flux TKN influent"},
+        FPti    :{value:FPti,       unit:"kg/d_as_P",     descr:"Flux TP influent"},
+        FXti    :{value:FXti,       unit:"kg_VSS/d",      descr:"Flux UPO in VSS influent"},
+        FiSS    :{value:FiSS,       unit:"kg_iSS/d",      descr:"Flux iSS influent"},
+      },
+      concentrations:{
+      },
+      other:{
+        fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio"},
+        fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio"}, 
+      },
+
     },
     effluent:{
       Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
+
       FSe     :{value:FSe,        unit:"kg/d_as_O",     descr:"Flux COD effluent"},
+
       FNte    :{value:FNte,       unit:"kg/d_as_N",     descr:"Flux TKN effluent"},
       Nte     :{value:Nte,        unit:"mg/L_as_N",     descr:"TKN concentration effluent"},
       Nae     :{value:Nae,        unit:"mg/L_as_N",     descr:"FSA (ammonia, NH4) concentration effluent"},
+
       FPte    :{value:FPte,       unit:"kg/d_as_P",     descr:"Flux TP effluent"},
       Pte     :{value:Pte,        unit:"mg/L_as_P",     descr:"TP concentration effluent"},
       Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Inorganic Soluble P concentration effluent"},
     },
-    sludge:{
+    wastage:{
       Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
       FSw     :{value:FSw,        unit:"kg/d_as_O",     descr:"Flux COD wastage"},
     },
@@ -162,8 +178,9 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
       P_balance_error,
     },
   };
+
   Object.values(results).forEach(category=>{Object.values(category).forEach(obj=>{delete obj.unit;delete obj.value;});});
-  //console.log(results);
+  console.log(results);
 
   return {
     //balances

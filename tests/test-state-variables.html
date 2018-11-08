@@ -289,9 +289,7 @@
   (function(){
     //populate state variables table
     let inputs=document.querySelector('#inputs');
-    Object.entries(sv.components).forEach(entry=>{
-      let key=entry[0];
-      let value=entry[1];
+    Object.keys(sv.components).forEach(key=>{
       let newRow=inputs.insertRow(-1);
       newRow.insertCell(-1).innerHTML=key;
       newRow.insertCell(-1).innerHTML="<input id="+key+" type=number min=0 onchange=sv.components."+key+"=parseFloat(this.value);redisplay()>"+
@@ -299,9 +297,7 @@
     });
 
     let mass_ratios=document.querySelector('#mass_ratios');
-    Object.entries(sv.mass_ratios).forEach(entry=>{
-      let key=entry[0];
-      let value=entry[1];
+    Object.entries(sv.mass_ratios).forEach(([key,value])=>{
       let newRow=mass_ratios.insertRow(-1);
       newRow.insertCell(-1).innerHTML=key;
       newRow.insertCell(-1).innerHTML=value;
@@ -328,7 +324,7 @@
     //redisplay outputs
     let outputs = document.querySelector('#outputs');
     outputs.innerHTML="";
-    let results = sv.compute_totals();
+    let results = sv.totals;
     Object.keys(results).forEach(key=>{
       let newRow=outputs.insertRow(-1);
       let value = results[key];
@@ -355,9 +351,7 @@
 
   //redisplay river
   function redisplay_river(){
-    Object.entries(tram.resultats).forEach(entry=>{
-      let key=entry[0];
-      let obj=entry[1];
+    Object.entries(tram.resultats).forEach(([key,obj])=>{
       let cell=document.querySelector(`#river #tram_1 #outputs #${key}`);
       cell.innerHTML=format(obj.value);
       if(!cell.parentNode.getAttribute('title')){cell.parentNode.setAttribute('title',obj.descr);}

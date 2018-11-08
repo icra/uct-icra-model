@@ -17,13 +17,13 @@
 
     .number {text-align:right;}
 
-    #xarxa td div { 
+    #xarxa td > div { 
       display:flex;
       justify-content:center;
     } 
-    #xarxa td div table {
+    #xarxa td > div table {
       font-size:small;
-      border:1px solid #ccc;
+      /*border:1px solid #ccc;*/
       margin:auto;
       margin-top:0;
     }
@@ -69,7 +69,7 @@
   let t6 = new Tram(); t6.pares=[t3, t4];
   let t7 = new Tram(); t7.pares=[t5, t6];
   xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
-  xarxa.soluciona();
+  xarxa.soluciona(true);
   let trams={t1,t2,t3,t4,t5,t6,t7};//connecta amb gui
 </script>
 
@@ -77,38 +77,34 @@
 <script>
   //enllaça amb el gui
   function redisplay(){
-    Object.entries(trams).forEach(entry=>{
-      let key = entry[0]; //string
-      let val = entry[1]; //Tram
 
+    Object.entries(trams).forEach(([key,t])=>{
       //cela per cada tram
       let td = document.querySelector(`#${key}`);
-      td.innerHTML=`<div style=text-align:center>${key}</div>`;
+      td.innerHTML=`<div style=text-align:center><span>Q<sub>${key}</sub></span>=${format(t.Qi)}</div>`;
 
-      let div=document.createElement('div');
-      td.appendChild(div);
+      //div per cada
+      let div=document.createElement('div');td.appendChild(div);
 
       //nova taula state-variables
-      let table=document.createElement('table');
-      div.appendChild(table);
-      Object.entries(val.state_variables.components).forEach(entry=>{
-        let key = entry[0]; //string
-        let val = entry[1]; //number
-        let newRow = table.insertRow(-1);
-        newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).outerHTML="<td class=number>"+format(val)+"</td>";
-      });
+      let table=document.createElement('table');div.appendChild(table);
 
+      let newRow=table.insertRow(-1)
+      Object.entries(t.state_variables.components).forEach(([key,val])=>{
+        if(key!='S_VFA')return;
+        let newRow = table.insertRow(-1);
+        newRow.insertCell(-1).innerHTML=key+": ";
+        newRow.insertCell(-1).outerHTML="<td class=number>["+format(val)+"],</td>";
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(t.Qi*val)+"</td>";
+      });
       return;
+
       //nova taula tram de riu
-      let table2=document.createElement('table');
-      div.appendChild(table2);
-      Object.entries(val.resultats).forEach(entry=>{
-        let key = entry[0]; //string
-        let val = entry[1]; //object {value,unit,descr}
+      let table2=document.createElement('table');div.appendChild(table2);
+      Object.entries(val.resultats).filter(e=>{e[0]=="Qi"}).forEach(([key,obj])=>{
         let newRow = table2.insertRow(-1);
         newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(obj.value)+"</td>";
       });
     });
   };

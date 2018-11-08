@@ -57,7 +57,7 @@
   function populate(){
     //populate inputs
     let inputs=document.querySelector('tbody#inputs');inputs.innerHTML="";
-    //populate outputs with 'compute_totals' calls
+    //populate outputs with the 'totals' calls
     let outputs=document.querySelector('tbody#outputs');outputs.innerHTML="";
 
     if(svs.length==0)return;
@@ -85,9 +85,8 @@
     });
 
     //inputs
-    Object.entries(svs[0].components).forEach(entry=>{
+    Object.keys(svs[0].components).forEach(key=>{
       let newRow=inputs.insertRow(-1);
-      let key=entry[0];
       svs.forEach((sv,i)=>{
         newRow.insertCell(-1).innerHTML=key;
         newRow.insertCell(-1).innerHTML="<input tabindex="+i+" type=number min=0 onchange=svs["+i+"].components."+key+"=parseFloat(this.value);redisplay("+i+"); value="+sv.components[key]+">";
@@ -96,7 +95,7 @@
 
     //outputs
     let results=[];
-    svs.forEach(sv=>{results.push(sv.compute_totals());});
+    svs.forEach(sv=>{results.push(sv.totals);});
     let newRow=outputs.insertRow(-1);
     results.forEach((result,i)=>{
       let newCell=newRow.insertCell(-1);newCell.colSpan=2;
@@ -124,10 +123,10 @@
     });
   }
 
-  //redisplay values only (call 'compute_totals' for the nth sv)
+  //redisplay values only (call 'totals' for the nth sv)
   function redisplay(n){
     let outputs=document.querySelector('tbody#outputs');
-    let result=svs[n].compute_totals();
+    let result=svs[n].totals;
     Object.keys(result).forEach(key=>{
       let value=result[key];
       if(typeof(value)=='number'){

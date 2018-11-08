@@ -11,15 +11,15 @@ class State_Variables{
     this.name=name||"wastewater";
     this.components={ 
       //inputs and default values
-      S_VFA  : isNaN(S_VFA ) ? 50    : S_VFA , // biodegradable   soluble     organics (BSO) volatile fatty acids
-      S_FBSO : isNaN(S_FBSO) ? 186   : S_FBSO, // biodegradable   soluble     organics (BSO) fermentable
-      X_BPO  : isNaN(X_BPO ) ? 707   : X_BPO , // biodegradable   particulate organics (BPO)
-      X_UPO  : isNaN(X_UPO ) ? 150   : X_UPO , // unbiodegradable particulate organics (UPO)
-      S_USO  : isNaN(S_USO ) ? 58    : S_USO , // unbiodegradable soluble     organics (USO)
-      X_iSS  : isNaN(X_iSS ) ? 100   : X_iSS , // inorganic inert suspended solids (sand)
-      S_FSA  : isNaN(S_FSA ) ? 59.6  : S_FSA , // inorganic free saline ammonia (NH4)
-      S_OP   : isNaN(S_OP  ) ? 14.15 : S_OP  , // inorganic orthophosphate (PO4)
-      S_NOx  : isNaN(S_NOx ) ? 0     : S_NOx , // (NOT PART OF TKN) inorganic nitrite and nitrate (NO2 + NO3)
+      S_VFA : isNaN(S_VFA ) ? 50    : S_VFA , // biodegradable   soluble     organics (BSO) volatile fatty acids
+      S_FBSO: isNaN(S_FBSO) ? 186   : S_FBSO, // biodegradable   soluble     organics (BSO) fermentable
+      X_BPO : isNaN(X_BPO ) ? 707   : X_BPO , // biodegradable   particulate organics (BPO)
+      X_UPO : isNaN(X_UPO ) ? 150   : X_UPO , // unbiodegradable particulate organics (UPO)
+      S_USO : isNaN(S_USO ) ? 58    : S_USO , // unbiodegradable soluble     organics (USO)
+      X_iSS : isNaN(X_iSS ) ? 100   : X_iSS , // inorganic inert suspended solids (sand)
+      S_FSA : isNaN(S_FSA ) ? 59.6  : S_FSA , // inorganic free saline ammonia (NH4)
+      S_OP  : isNaN(S_OP  ) ? 14.15 : S_OP  , // inorganic orthophosphate (PO4)
+      S_NOx : isNaN(S_NOx ) ? 0     : S_NOx , // (NOT PART OF TKN) inorganic nitrite and nitrate (NO2 + NO3)
     };
     this.mass_ratios={
       /* mass ratios for COD, C, N, P vs:
@@ -46,7 +46,7 @@ class State_Variables{
   */
 
   //compute total COD, TOC, TKN, TP, TSS and fractionation
-  compute_totals(){
+  get totals(){
     //TOTALS: COD, TC, TKN, TP, VSS, TSS
       let Total_COD =
         this.components.S_VFA  +
@@ -148,15 +148,29 @@ class State_Variables{
       ];
     //RESULTS (in g/m3)
     let totals={
-      Total_COD, COD,
-      Total_TOC, TOC,
-      Total_TKN, ON,
-      Total_TP,  OP,
-      Total_TSS, VSS,
+      Total_COD, 
+      Total_TOC, 
+      Total_TKN, 
+      Total_TP,  
+      Total_TSS, 
+      COD,
+      TOC,
+      ON,
+      OP,
+      VSS,
     };
     //console.log(totals);
     return totals;
   };
+
+  //convert state variables to fluxes (kg/d)
+  fluxes(Q){
+    let rv={};
+    Object.entries(this.components).forEach(([key,value])=>{
+      rv[key] = Q*value;
+    });
+    return rv;
+  }
 
   //set the value of a single state variable, for example -> sv.set("S_VFA",10);
   set(key, newValue){
@@ -172,6 +186,10 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
 /*test*/
 (function test(){
   return;
+  let sv = new State_Variables();
+  console.log(sv.components);
+  console.log(sv.fluxes(1000));
+  return;
   //create 2 scenarios: raw ww, settled ww
   //1. raw ww
     let raw = new State_Variables('raw ww');
@@ -183,7 +201,7 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
     raw.set("S_USO", 58);
     raw.set("S_FSA", 59.6);
     raw.set("S_OP",  14.15);
-    console.log(raw.compute_totals());
+    console.log(raw.totals);
   //2. settled ww (=primary settler effluent)
     let set = new State_Variables('settled ww');
     set.set('X_BPO', 301);
@@ -194,7 +212,7 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
     set.set('S_USO', 58);
     set.set('S_FSA', 59.6);
     set.set('S_OP',  14.15);
-    console.log(set.compute_totals());
+    console.log(set.totals);
   /* original numbers from george ekama
     inputs:
       X_BPO_non_set_inf: 301,

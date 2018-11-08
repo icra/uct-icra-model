@@ -16,20 +16,19 @@ class Tram {
     this.Li = isNaN(Li) ? 1000   : Li; //longitud tram (m)
     this.Di = isNaN(Di) ? 1.2    : Di; //fondària concreta (m)
 
-    //id per la base de dades TBD
-    this.id="1";
-
     //trams connectats upstream (pares). Definits per l'usuari.
     this.pares=[]; /*array <Tram>*/
-
-    //coordenades per dibuixar els trams
-    this.coordenades={inici:[0,0], final:[0,0]};
 
     //variables d'estat (S_VFA, S_FBSO, etc)
     this.state_variables = new State_Variables('tram');
 
     //EDAR que aboca al tram 
     this.wwtp = null; //<State_Variables>
+
+    //id per la base de dades TBD
+    this.id="1";
+    //coordenades per dibuixar els trams
+    this.coordenades={inici:[0,0], final:[0,0]};
   }
 
   /*Resultats*/
@@ -70,18 +69,21 @@ class Tram {
     Si   :{value:this.Si,    unit:"m2",   descr:"Superfície inundada"},
     ky   :{value:this.ky,    unit:"?",    descr:"Coeficient de dispersió lateral"},
     Ll   :{value:this.Ll,    unit:"m",    descr:"Longitud del tram de barreja lateral"},
-  }}
+  }};
 
   //massa o càrrega al final del tram fluvial
   Mf(Mi,R_20,k,T){
-    //Mi   : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram (kg)
-    //R_20 : velocitat de reacció a 20ºC (g/m2·min)
-    //k    : (input, es com una ks) (g/m3)
-    //T    : temperatura (ºC)
+    //Mi  : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram (kg)
+    //R_20: velocitat de reacció a 20ºC (g/m2·min)
+    //k   : (input, es com una ks) (g/m3)
+    //T   : temperatura (ºC)
     if(Mi==0) return 0;
-    let Mf = Mi - R_20*this.HRTi*this.Si*Math.pow(1.041,T-20)*(Mi/this.Qi)/(k+Mi/this.Qi);
+    let Mf=Mi - R_20*this.HRTi*this.Si*Math.pow(1.041,T-20)*(Mi/this.Qi)/(k+Mi/this.Qi);
     return Math.max(Mf,0);
-  }
+  };
+
+  //convertir concentracions (g/m3) a fluxos (g/s)
+  get fluxes(){return this.state_variables.fluxes(this.Qi);}
 }
 
 //node imports and exports
@@ -95,13 +97,13 @@ if(typeof document == "undefined"){
   return;
   //sintaxi Tram(wb, wt,  Db,     S,      n,   Li,  Di)
   let t=new Tram( 3,  6,   2, 0.005, 0.0358, 1000, 1.2);
-  console.log(t.resultats);
-  //recorre variables d'estat
-  Object.entries(t.state_variables.components).forEach(entry=>{
-    let key=entry[0];
-    let Mi =entry[1]; //g/m3
-    Mi *= t.Qi; //g/s
-    let Mf = t.Mf(Mi, R_20=0, k=0, T=0);  //g/s
+  //console.log(t.fluxes);
+  //console.log(t.state_variables.components);
+  //console.log(t.resultats);
+  //return;
+  //recorre variables d'estat (fluxes màssics) i calcula massa final
+  Object.entries(t.fluxes).forEach(([key,Mi])=>{
+    let Mf = t.Mf(Mi, R_20=0, k=0, T=0); //g/s
     console.log(`Mf[${key}] (Mi=${Mi}): ${Mf} (g/s)`);
   });
 })();

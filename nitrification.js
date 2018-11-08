@@ -18,7 +18,7 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   fxt = isNaN(fxt) ? 0.39   : fxt ; //ratio | current unaerated sludge mass fraction
 
   //compute influent fractionation
-  let frac = this.compute_totals();
+  let frac = this.totals;
 
   //compute activated sludge without nitrification
   let AS_results = this.activated_sludge(Q,T,Vp,Rs);
@@ -63,6 +63,8 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   let FOn_fxt = 4.57*Q*Nc_fxt/1000; //kg/d as O | O demand if fxt <  fxm
   let FOn_fxm = 4.57*Q*Nc_fxm/1000; //kg/d as O | O demand if fxt == fxm
 
+  //modificar les variables d'estat TODO
+
   //nitrification results
   let results={
     µAmT         :{value:µAmT,         unit:"1/d",       descr:"Growth rate corrected by temperature"},
@@ -82,9 +84,7 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
   };
 
   /*activated sludge results also
-    Object.entries(AS_results).forEach(entry=>{
-      let key=entry[0];
-      let val=entry[1];
+    Object.entries(AS_results).forEach(([key,val])=>{
       results[key]=val;
     });
   */
