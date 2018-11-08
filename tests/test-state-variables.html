@@ -80,7 +80,7 @@
           document.querySelector('#primary_settler').appendChild((function(){
             let div=document.createElement('div');
             div.style.fontSize='smaller';
-            div.innerHTML=`Primary Settler(Q=${Q}, fw=${fw}, removal_BPO=${removal_BPO}, removal_UPO=${removal_UPO}, removal_iSS=${removal_iSS}) calculated`;
+            div.innerHTML=`Primary Settler(Q=${Q}, fw=${fw}, removal_BPO=${removal_BPO}, removal_UPO=${removal_UPO}, removal_iSS=${removal_iSS}) calculated<br>`;
             let info=document.createElement('table');
             info.classList.add('info');
             Object.keys(results).forEach(key=>{
@@ -96,7 +96,9 @@
                 newRow.insertCell(-1).innerHTML="<small>"+results[key].descr+"<small>";
               }
             });
-            let info_btn=document.createElement('button'); info_btn.style.display='block'; info_btn.style.background="lightblue";
+            let info_btn=document.createElement('button'); 
+            info_btn.style.display='block'; 
+            info_btn.style.background="lightblue";
             info_btn.innerHTML="Show/Hide Results";
             info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
             div.appendChild(info_btn);
@@ -127,28 +129,33 @@
           let results = sv.activated_sludge(Q, T, Vp, Rs);
           redisplay();
           document.querySelector('#activated_sludge').appendChild((function(){
-            let div=document.createElement('div');
-            div.style.fontSize='smaller';
-            div.innerHTML="activated_sludge(Q="+Q+", T="+T+", Vp="+Vp+", Rs="+Rs+") calculated";
-            let info=document.createElement('table');
-            info.classList.add('info');
-            Object.keys(results).forEach(key=>{
-              let newRow=info.insertRow(-1);
-              newRow.insertCell(-1).innerHTML=key;
-              if(typeof results[key] == 'number'){
-                let fvalue = format(100*results[key]);
-                let color = parseFloat(fvalue) < 0.1 ? "green":"red";
-                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
-              }else{
-                newRow.insertCell(-1).outerHTML="<td class=number>"+format(results[key].value)+"</td>";
-                newRow.insertCell(-1).innerHTML=results[key].unit.prettifyUnit();
-                newRow.insertCell(-1).innerHTML="<small>"+results[key].descr+"<small>";
-              }
+            let div=document.createElement('div');div.style.fontSize='smaller';
+            div.innerHTML="activated_sludge(Q="+Q+", T="+T+", Vp="+Vp+", Rs="+Rs+") calculated<br>";
+            let info=document.createElement('table');info.classList.add('info');
+            Object.keys(results).forEach(category=>{
+              Object.entries(results[category]).forEach(([key,val])=>{
+                let newRow=info.insertRow(-1);
+                newRow.insertCell(-1).innerHTML=key;
+                if(typeof val == 'number'){
+                  let fvalue = format(val);
+                  let color = parseFloat(fvalue) < 0.1 ? "green":"red";
+                  newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
+                }else{
+                  newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
+                  newRow.insertCell(-1).innerHTML=val.unit.prettifyUnit();
+                  newRow.insertCell(-1).innerHTML="<small>"+val.descr+"<small>";
+                }
+              });
             });
-            let info_btn=document.createElement('button'); info_btn.style.display='block'; info_btn.style.background="lightblue";
+            let info_btn=document.createElement('button'); info_btn.style.background="lightblue";
             info_btn.innerHTML="Show/Hide Results";
             info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
             div.appendChild(info_btn);
+            div.appendChild((function(){
+              let btn = document.createElement('button');btn.style.background='red';btn.innerHTML="X";
+              btn.onclick=function(){div.parentNode.removeChild(div)};
+              return btn;
+            })());
             div.appendChild(info);
             return div;
           })());
@@ -260,18 +267,7 @@
 
 <!--user defined default scenario-->
 <script>
-  let sv=new State_Variables();
-  sv.components.S_VFA  = 50;
-  sv.components.S_FBSO = 115;
-  sv.components.X_BPO  = 255;
-  sv.components.X_UPO  = 10;
-  sv.components.S_USO  = 45;
-  sv.components.X_iSS  = 15;
-  sv.components.S_FSA  = 39.1;
-  sv.components.S_OP   = 7.28;
-  sv.components.S_NOx  = 0;
-
-  //per ara fem un sol tram de riu
+  let sv=new State_Variables("name",50,115,255,10,45,15,39.1,7.28,0);
   //constructor      (wb, wt, Dt, S,   n,      Li){
   let tram=new Tram(
     parseFloat(document.querySelector('#river #tram_1 #inputs #wb').value),
@@ -367,9 +363,8 @@
       cell.innerHTML=format(value);
     });
   }
-
   redisplay();
 
-  //focus the first input element you find
+  //first input element focus
   document.querySelector("input[type=number]").focus();
 </script>

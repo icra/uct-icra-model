@@ -38,16 +38,16 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let bHT  = bH*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
 
   //page 10
-  const YH     = 0.45;                    //gVSS/gCOD
-  let X_BH     = (YH*Rs)/(1+bHT*Rs);      //g_VSS*d/g_COD | biomass production rate
-  let MX_BH    = FSbi * X_BH;             //kg_VSS   | biomass produced
-  const fH     = 0.20;                    //         | tabled value
-  let MX_EH    = fH * bHT * Rs * MX_BH;   //kg_VSS   | endogenous respiration OHOs
-  let MX_I     = FXti * Rs;               //kg_VSS   | unbiodegradable particulate organics
-  let MX_V     = MX_BH + MX_EH + MX_I;    //kg_VSS   | total VSS
-  const f_iOHO = 0.15;                    //g_iSS/gX | fraction of inert solids in biomass
-  let MX_IO    = FiSS*Rs + f_iOHO*MX_BH;  //kg_iSS   | total inert solids
-  let MX_T     = MX_V + MX_IO;            //kg_TSS   | total TSS
+  const YH     = 0.45;                   //gVSS/gCOD
+  let X_BH     = (YH*Rs)/(1+bHT*Rs);     //g_VSS*d/g_COD | biomass production rate
+  let MX_BH    = FSbi * X_BH;            //kg_VSS   | biomass produced
+  const fH     = 0.20;                   //         | tabled value
+  let MX_EH    = fH * bHT * Rs * MX_BH;  //kg_VSS   | endogenous respiration OHOs
+  let MX_I     = FXti * Rs;              //kg_VSS   | unbiodegradable particulate organics
+  let MX_V     = MX_BH + MX_EH + MX_I;   //kg_VSS   | total VSS
+  const f_iOHO = 0.15;                   //g_iSS/gX | fraction of inert solids in biomass
+  let MX_IO    = FiSS*Rs + f_iOHO*MX_BH; //kg_iSS   | total inert solids
+  let MX_T     = MX_V + MX_IO;           //kg_TSS   | total TSS
 
   //2.3 - page 11
   let MLSS_X_TSS = MX_T/Vp; //kg/m3 | total solids concentration in the SST
@@ -107,80 +107,13 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   let FPti  = Q*frac.Total_TP/1000;               //kg/d as P | total TP influent
   let FPw   = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000; //kg/d as P | total TP wastage
   let FPte  = Qe*Pte/1000;                        //kg/d as P | total TP effluent
-  let FPout = FPw + FPte;                         //kg/d as P | total TP out
+  let FPout = FPw + FPte;                        //kg/d as P | total TP out
   let P_balance_error = Math.abs(1 - FPti/FPout); //P balance
 
-  //modificar les variables d'estat TODO
-
-  //RESULTS (categories) TBD
-  let results = {
-    influent:{
-      fluxes:{
-        FSti    :{value:FSti,       unit:"kg/d_as_O",     descr:"Flux COD influent"},
-        FSbi    :{value:FSbi,       unit:"kg/d_as_O",     descr:"Flux biodegradable COD influent"},
-        FNti    :{value:FNti,       unit:"kg/d_as_N",     descr:"Flux TKN influent"},
-        FPti    :{value:FPti,       unit:"kg/d_as_P",     descr:"Flux TP influent"},
-        FXti    :{value:FXti,       unit:"kg_VSS/d",      descr:"Flux UPO in VSS influent"},
-        FiSS    :{value:FiSS,       unit:"kg_iSS/d",      descr:"Flux iSS influent"},
-      },
-      concentrations:{
-      },
-      other:{
-        fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio"},
-        fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio"}, 
-      },
-
-    },
-    effluent:{
-      Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
-
-      FSe     :{value:FSe,        unit:"kg/d_as_O",     descr:"Flux COD effluent"},
-
-      FNte    :{value:FNte,       unit:"kg/d_as_N",     descr:"Flux TKN effluent"},
-      Nte     :{value:Nte,        unit:"mg/L_as_N",     descr:"TKN concentration effluent"},
-      Nae     :{value:Nae,        unit:"mg/L_as_N",     descr:"FSA (ammonia, NH4) concentration effluent"},
-
-      FPte    :{value:FPte,       unit:"kg/d_as_P",     descr:"Flux TP effluent"},
-      Pte     :{value:Pte,        unit:"mg/L_as_P",     descr:"TP concentration effluent"},
-      Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Inorganic Soluble P concentration effluent"},
-    },
-    wastage:{
-      Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
-      FSw     :{value:FSw,        unit:"kg/d_as_O",     descr:"Flux COD wastage"},
-    },
-    process:{
-      FSout   :{value:FSout,      unit:"kg/d_as_O",     descr:"Flux COD out (effluent + FOc + wastage)"},
-      Ns      :{value:Ns,         unit:"mg/L_as_N",     descr:"N required for sludge production"},
-      Ps      :{value:Ps,         unit:"mg/L_as_P",     descr:"P required for sludge production"},
-      HRT     :{value:HRT,        unit:"hour",          descr:"Hydraulic Retention Time"},
-      bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
-      X_BH    :{value:X_BH,       unit:"g_VSS·d/g_COD", descr:"Biomass production rate"},
-      MX_BH   :{value:MX_BH,      unit:"kg_VSS",        descr:"Biomass produced VSS"},
-      MX_EH   :{value:MX_EH,      unit:"kg_VSS",        descr:"Endogenoous residue VSS"},
-      MX_I    :{value:MX_I,       unit:"kg_VSS",        descr:"Unbiodegradable organics VSS"},
-      MX_V    :{value:MX_V,       unit:"kg_VSS",        descr:"Volatile Suspended Solids"},
-      MX_IO   :{value:MX_IO,      unit:"kg_iSS",        descr:"Inert Solids (influent+biomass)"},
-      MX_T    :{value:MX_T,       unit:"kg_TSS",        descr:"Total Suspended Solids"},
-      fi      :{value:fi,         unit:"g_VSS/g_TSS",   descr:"VSS/TSS ratio"},
-      X_V     :{value:MLSS_X_VSS, unit:"kg_VSS/m3",     descr:"VSS concentration at SST"},
-      X_T     :{value:MLSS_X_TSS, unit:"kg_TSS/m3",     descr:"TSS concentration at SST"},
-      f_avOHO :{value:f_avOHO,    unit:"g_OHO/g_VSS",   descr:"Active fraction of the sludge (VSS)"},
-      f_atOHO :{value:f_atOHO,    unit:"g_OHO/g_TSS",   descr:"Active fraction of the sludge (TSS)"},
-      FOc     :{value:FOc,        unit:"kg/d_as_O",     descr:"Carbonaceous Oxygen Demand"},
-      FOn     :{value:FOn,        unit:"kg/d_as_O",     descr:"Nitrogenous Oxygen Demand"},
-      FOt     :{value:FOt,        unit:"kg/d_as_O",     descr:"Total Oxygen Demand"},
-      OUR     :{value:OUR,        unit:"mg/L·h_as_O",   descr:"Oxygen Uptake Rate"},
-    },
-    balances:{
-      COD_balance_error,
-      N_balance_error,
-      Nae_balance_error,
-      P_balance_error,
-    },
-  };
-
-  Object.values(results).forEach(category=>{Object.values(category).forEach(obj=>{delete obj.unit;delete obj.value;});});
-  console.log(results);
+  //TBD: create 3 new state variables (output streams: effluent, wastage, air)
+  let effluent = new State_Variables(Qe,0,0,0,0,0,0,0,0,0);
+  let wastage  = new State_Variables(Qw,0,0,0,0,0,0,0,0,0);
+  let air      = new State_Variables( 0,0,0,0,0,0,0,0,0,0);
 
   return {
     //balances
@@ -190,8 +123,8 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
     P_balance_error,
 
     //flowrates
-    Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
     Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
+    Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
 
     //COD
     fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio"},
@@ -244,7 +177,9 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
 /*test*/
 (function test(){
+  let sv = new State_Variables(24.875,50,115,255,10,45,15,39.1,7.28,0);
+  console.log(sv.fluxes);
+  console.log(sv.totals);
   return;
-  let sv = new State_Variables('test AS',50,115,255,10,45,15,39.1,7.28,0);
   console.log(sv.activated_sludge());
 })();

@@ -39,7 +39,8 @@ State_Variables.prototype.primary_settler=function(Q, fw, removal_BPO, removal_U
 
 //test
 (function test(){
-  return;
-  let sv=new State_Variables();
+  let sv=new State_Variables(25000);
+  console.log(sv.totals);
+  console.log(sv.fluxes);
   console.log(sv.primary_settler());
 })();

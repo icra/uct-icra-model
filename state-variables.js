@@ -1,25 +1,37 @@
 /* 
   STATE VARIABLES AND MASS RATIOS ENCAPSULATION
-  summary of this file:
+
+  Each removal technology will be a method inside state variables, implemented in its own file (e.g. nitrification.js)
+  as "State_Variables.prototype.technology_name=function(){}"
+  technologies are: primary-settler, activated-sludge, nitrification, denitrification, chemical-P-removal
+
+  A State_Variables oject represents an arrow in a WWTP model, for example:
+
+  Qi → [PST] → [AS] → [nitrification] → Qe
+         ↓      ↓            ↓
+         Qw     Qw           Qw
+
+  Summary of this file:
     1. class definition (data structure)
     2. class methods (prototypes)
     3. tests
 */
 
 class State_Variables{
-  constructor(name, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx){
-    this.name=name||"wastewater";
+  constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx){
+    //inputs and default values
+    this.Q = Q||25000; //m3/d | flowrate 
+    this.name="stream";
     this.components={ 
-      //inputs and default values
-      S_VFA : isNaN(S_VFA ) ? 50    : S_VFA , // biodegradable   soluble     organics (BSO) volatile fatty acids
-      S_FBSO: isNaN(S_FBSO) ? 186   : S_FBSO, // biodegradable   soluble     organics (BSO) fermentable
-      X_BPO : isNaN(X_BPO ) ? 707   : X_BPO , // biodegradable   particulate organics (BPO)
-      X_UPO : isNaN(X_UPO ) ? 150   : X_UPO , // unbiodegradable particulate organics (UPO)
-      S_USO : isNaN(S_USO ) ? 58    : S_USO , // unbiodegradable soluble     organics (USO)
-      X_iSS : isNaN(X_iSS ) ? 100   : X_iSS , // inorganic inert suspended solids (sand)
-      S_FSA : isNaN(S_FSA ) ? 59.6  : S_FSA , // inorganic free saline ammonia (NH4)
-      S_OP  : isNaN(S_OP  ) ? 14.15 : S_OP  , // inorganic orthophosphate (PO4)
-      S_NOx : isNaN(S_NOx ) ? 0     : S_NOx , // (NOT PART OF TKN) inorganic nitrite and nitrate (NO2 + NO3)
+      S_VFA : isNaN(S_VFA ) ? 50    : S_VFA , //mg/L | biodegradable   soluble     organics (BSO) volatile fatty acids
+      S_FBSO: isNaN(S_FBSO) ? 115   : S_FBSO, //mg/L | biodegradable   soluble     organics (BSO) fermentable
+      X_BPO : isNaN(X_BPO ) ? 440   : X_BPO , //mg/L | biodegradable   particulate organics (BPO)
+      X_UPO : isNaN(X_UPO ) ? 100   : X_UPO , //mg/L | unbiodegradable particulate organics (UPO)
+      S_USO : isNaN(S_USO ) ? 45    : S_USO , //mg/L | unbiodegradable soluble     organics (USO)
+      X_iSS : isNaN(X_iSS ) ? 60    : X_iSS , //mg/L | inorganic inert suspended solids (sand)
+      S_FSA : isNaN(S_FSA ) ? 39.1  : S_FSA , //mg/L | inorganic free saline ammonia (NH4)
+      S_OP  : isNaN(S_OP  ) ? 7.28  : S_OP  , //mg/L | inorganic orthophosphate (PO4)
+      S_NOx : isNaN(S_NOx ) ? 0     : S_NOx , //mg/L | (NOT PART OF TKN) inorganic nitrite and nitrate (NO2 + NO3)
     };
     this.mass_ratios={
       /* mass ratios for COD, C, N, P vs:
@@ -39,15 +51,9 @@ class State_Variables{
     };
   };
 
-  /*
-    each removal technology will be a method inside state variables, implemented in its own file (e.g. nitrification.js)
-    as "State_Variables.prototype.technology_name=function(){}"
-    technologies are: primary-settler, activated-sludge, nitrification, denitrification, chemical_P_removal
-  */
-
   //compute total COD, TOC, TKN, TP, TSS and fractionation
   get totals(){
-    //TOTALS: COD, TC, TKN, TP, VSS, TSS
+    //<TOTALS> COD, TC, TKN, TP, VSS, TSS
       let Total_COD =
         this.components.S_VFA  +
         this.components.S_FBSO +
@@ -78,6 +84,8 @@ class State_Variables{
         this.components.X_BPO / this.mass_ratios.f_CV_BPO + 
         this.components.X_UPO / this.mass_ratios.f_CV_UPO ;
       let Total_TSS = Total_VSS + this.components.X_iSS;
+    //</TOTALS>
+
     //COD
       let bsCOD = this.components.S_VFA + this.components.S_FBSO;
       let usCOD = this.components.S_USO;
@@ -87,11 +95,18 @@ class State_Variables{
       let uCOD = usCOD + upCOD;
       let sCOD = bsCOD + usCOD;
       let pCOD = bpCOD + upCOD;
-      let COD=[
-        {COD:Total_COD, bCOD,  uCOD},
-        {sCOD,          bsCOD, usCOD},
-        {pCOD,          bpCOD, upCOD},
-      ];
+      let COD={
+        total:{conc:Total_COD, flux:this.Q*Total_COD},
+        bsCOD:{conc:bsCOD,     flux:this.Q*bsCOD},
+        usCOD:{conc:usCOD,     flux:this.Q*usCOD},
+        bpCOD:{conc:bpCOD,     flux:this.Q*bpCOD},
+        upCOD:{conc:upCOD,     flux:this.Q*upCOD},
+        bCOD :{conc:bCOD,      flux:this.Q*bCOD},
+        uCOD :{conc:uCOD,      flux:this.Q*uCOD},
+        sCOD :{conc:sCOD,      flux:this.Q*sCOD},
+        pCOD :{conc:pCOD,      flux:this.Q*pCOD},
+      };
+
     //Organic Carbon
       let bsOC = 
         this.mass_ratios.f_C_VFA  /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
@@ -103,11 +118,18 @@ class State_Variables{
       let uOC = usOC + upOC;
       let sOC = bsOC + usOC;
       let pOC = bpOC + upOC;
-      let TOC=[
-        {TOC:sOC+pOC, bOC,  uOC},
-        {sOC,         bsOC, usOC},
-        {pOC,         bpOC, upOC},
-      ];
+      let TOC = {
+        total:{conc:Total_TOC, flux:this.Q*Total_TOC},
+        bsOC :{conc:bsOC,      flux:this.Q*bsOC},
+        usOC :{conc:usOC,      flux:this.Q*usOC},
+        bpOC :{conc:bpOC,      flux:this.Q*bpOC},
+        upOC :{conc:upOC,      flux:this.Q*upOC},
+        bOC  :{conc:bOC,       flux:this.Q*bOC},
+        uOC  :{conc:uOC,       flux:this.Q*uOC},
+        sOC  :{conc:sOC,       flux:this.Q*sOC},
+        pOC  :{conc:pOC,       flux:this.Q*pOC},
+      };
+
     //Organic Nitrogen
       let bsON = 
         this.mass_ratios.f_N_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
@@ -119,11 +141,22 @@ class State_Variables{
       let uON = usON + upON;
       let sON = bsON + usON;
       let pON = bpON + upON;
-      let ON=[
-        { ON:sON+pON, bON,  uON},
-        {sON,         bsON, usON},
-        {pON,         bpON, upON},
-      ];
+      let TKN = {
+        total:{conc:Total_TKN, flux:this.Q*Total_TKN},
+        FSA  :{conc:this.components.S_FSA,flux:this.Q*this.components.S_FSA},
+        organic:{
+          total:{conc:sON+pON,   flux:this.Q*(sON+pON)},
+          bsON :{conc:bsON,      flux:this.Q*bsON},
+          usON :{conc:usON,      flux:this.Q*usON},
+          bpON :{conc:bpON,      flux:this.Q*bpON},
+          upON :{conc:upON,      flux:this.Q*upON},
+          bON  :{conc:bON,       flux:this.Q*bON},
+          uON  :{conc:uON,       flux:this.Q*uON},
+          sON  :{conc:sON,       flux:this.Q*sON},
+          pON  :{conc:pON,       flux:this.Q*pON},
+        },
+      };
+
     //Organic Phosphorus
       let bsOP = 
         this.mass_ratios.f_P_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
@@ -135,42 +168,39 @@ class State_Variables{
       let uOP = usOP + upOP;
       let sOP = bsOP + usOP;
       let pOP = bpOP + upOP;
-      let OP=[
-        {OP:sOP+pOP,  bOP,  uOP},
-        {sOP,        bsOP, usOP},
-        {pOP,        bpOP, upOP},
-      ];
-    //VSS
+      let TP = {
+        total:{conc:Total_TP, flux:this.Q*Total_TP},
+        OP  :{conc:this.components.S_OP,flux:this.Q*this.components.S_OP},
+        organic:{
+          total:{conc:sOP+pOP,   flux:this.Q*(sOP+pOP)},
+          bsOP :{conc:bsOP,      flux:this.Q*bsOP},
+          usOP :{conc:usOP,      flux:this.Q*usOP},
+          bpOP :{conc:bpOP,      flux:this.Q*bpOP},
+          upOP :{conc:upOP,      flux:this.Q*upOP},
+          bOP  :{conc:bOP,       flux:this.Q*bOP},
+          uOP  :{conc:uOP,       flux:this.Q*uOP},
+          sOP  :{conc:sOP,       flux:this.Q*sOP},
+          pOP  :{conc:pOP,       flux:this.Q*pOP},
+        },
+      };
+
+    //TSS
       let bVSS = this.components.X_BPO / this.mass_ratios.f_CV_BPO;
       let uVSS = this.components.X_UPO / this.mass_ratios.f_CV_UPO;
-      let VSS=[
-        {VSS:Total_VSS, bVSS, uVSS },
-      ];
+      let TSS={
+        total:{conc:Total_TSS,  flux:this.Q*Total_TSS},
+        iSS  :{conc:this.components.X_iSS, flux:this.Q*this.components.X_iSS},
+        VSS  :{
+          total:{conc:Total_VSS, flux:this.Q*Total_VSS},
+          bVSS :{conc:bVSS,      flux:this.Q*bVSS},
+          uVSS :{conc:uVSS,      flux:this.Q*uVSS},
+        },
+      };
     //RESULTS (in g/m3)
-    let totals={
-      Total_COD, 
-      Total_TOC, 
-      Total_TKN, 
-      Total_TP,  
-      Total_TSS, 
-      COD,
-      TOC,
-      ON,
-      OP,
-      VSS,
-    };
+    let totals={COD, TOC, TKN, TP, TSS};
     //console.log(totals);
     return totals;
   };
-
-  //convert state variables to fluxes (kg/d)
-  fluxes(Q){
-    let rv={};
-    Object.entries(this.components).forEach(([key,value])=>{
-      rv[key] = Q*value;
-    });
-    return rv;
-  }
 
   //set the value of a single state variable, for example -> sv.set("S_VFA",10);
   set(key, newValue){
@@ -185,14 +215,13 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
 
 /*test*/
 (function test(){
-  return;
-  let sv = new State_Variables();
+  let sv = new State_Variables(25);
   console.log(sv.components);
-  console.log(sv.fluxes(1000));
+  console.log(sv.totals);
   return;
   //create 2 scenarios: raw ww, settled ww
   //1. raw ww
-    let raw = new State_Variables('raw ww');
+    let raw = new State_Variables();
     raw.set("X_BPO", 707);
     raw.set("X_UPO", 150);
     raw.set("X_iSS", 100);
@@ -203,7 +232,7 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
     raw.set("S_OP",  14.15);
     console.log(raw.totals);
   //2. settled ww (=primary settler effluent)
-    let set = new State_Variables('settled ww');
+    let set = new State_Variables();
     set.set('X_BPO', 301);
     set.set('X_UPO', 20);
     set.set('X_iSS', 34);

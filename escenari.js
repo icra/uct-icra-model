@@ -31,7 +31,7 @@ let t5 = new Tram() ; t5.pares=[t1,t2] ; xarxa.trams.push(t5);
 let t6 = new Tram() ; t6.pares=[t3,t4] ; xarxa.trams.push(t6);
 let t7 = new Tram() ; t7.pares=[t5,t6] ; xarxa.trams.push(t7);
 
-//Variables d'estat inicials | sintaxi: new(nom,S_VFA,S_FBSO,X_BPO,X_UPO,S_USO,X_iSS,S_FSA,S_OP,S_NOx)
+//Variables estat inicials | sintaxi: new(nom,S_VFA,S_FBSO,X_BPO,X_UPO,S_USO,X_iSS,S_FSA,S_OP,S_NOx)
 t1.state_variables = new State_Variables('t1', 1, 0, 0, 0, 0, 0, 0, 0, 0);
 t2.state_variables = new State_Variables('t2', 1, 0, 0, 0, 0, 0, 0, 0, 0);
 t3.state_variables = new State_Variables('t3', 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -40,10 +40,10 @@ t5.state_variables = new State_Variables('t5', 0, 0, 0, 0, 0, 0, 0, 0, 0);
 t6.state_variables = new State_Variables('t6', 0, 0, 0, 0, 0, 0, 0, 0, 0);
 t7.state_variables = new State_Variables('t7', 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-//Afegeix una EDAR al tram 5 (variables d'estat influent)
+//Afegeix EDAR al tram 5 (variables estat influent)
 t5.wwtp = new State_Variables('edar t5', 50, 186, 707, 150, 58, 100, 59.6, 14.15, 0);
 
-//Aplica configuració EDAR: PST+AS+NITRI
+//Configuració EDAR: PST+AS+NITRI
 let influent_totals = t5.wwtp.totals; //COD, TOC, TKN, TP, TSS
 let results_pst     = t5.wwtp.primary_settler (Q=25000, fw=0.005, removal_BPO=0, removal_UPO=0, removal_iSS=0);
 let results_as      = t5.wwtp.activated_sludge(Q=24875, T=16, Vp=8473, Rs=15);
@@ -52,6 +52,7 @@ let results_nit     = t5.wwtp.nitrification   (Q=24875, T=16, Vp=8473, Rs=15, SF
 //Mostra fraccionament entrada
 console.log("=== Influent totals ===");
 console.log(influent_totals);
+
 //Mostra resultats processos
 console.log("=== Primary settler results ===");
 console.log(results_pst);

@@ -69,7 +69,6 @@ class Xarxa {
 
       //calcula contaminants
       Object.keys(tram_actual.state_variables.components).forEach(key=>{
-
         //massa inicial = massa dels pares
         let Mi = tram_actual.pares.map(p=>p.fluxes[key]).reduce((p,c)=>p+c); //g/s
 
