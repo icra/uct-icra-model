@@ -8,14 +8,16 @@ if(typeof document == "undefined"){
   require("./activated-sludge.js");
 }
 
-State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
+State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt){
   //inputs and default values
-  Q   = isNaN(Q  ) ? 24875  : Q   ; //m3/d | Flowrate
   T   = isNaN(T  ) ? 16     : T   ; //ºC   | Temperature
   Vp  = isNaN(Vp ) ? 8473.3 : Vp  ; //m3   | Volume
   Rs  = isNaN(Rs ) ? 15     : Rs  ; //days | Solids retention time
   SF  = isNaN(SF ) ? 1.25   : SF  ; //safety factor | Design choice. Moves the sludge age.
   fxt = isNaN(fxt) ? 0.39   : fxt ; //ratio | current unaerated sludge mass fraction
+
+  //flowrate
+  let Q = this.Q*1000; //m3/d
 
   //compute influent fractionation
   let frac = this.totals;
@@ -25,7 +27,7 @@ State_Variables.prototype.nitrification=function(Q, T, Vp, Rs, SF, fxt){
 
   //get necessary variables from activated_sludge
   let Nti   = frac.Total_TKN;        //mg/L | total TKN influent
-  let Nouse = frac.ON[1].usON;       //mg/L | total N_USO_influent = N_USO_effluent
+  let Nouse = frac.ON.usON;          //mg/L | total N_USO_influent = N_USO_effluent
   let MX_T  = AS_results.MX_T.value; //kg   | total sludge produced
   let Ns    = AS_results.Ns.value;   //mg/L | N required from sludge production
 

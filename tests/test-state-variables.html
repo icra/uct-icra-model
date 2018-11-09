@@ -42,7 +42,7 @@
     <div>1. State variables, fractionation and mass ratios</div><br>
     <table border=1 style=width:100%>
       <tbody id=inputs></tbody>
-      <tr><th colspan=2>Fractionation
+      <tr><th colspan=2>Fractionation (mg/L, kg/d)
       <tbody id=outputs></tbody>
       <tr><th colspan=2>Mass ratios
       <tbody id=mass_ratios></tbody>
@@ -61,7 +61,6 @@
     <fieldset id=primary_settler>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/primary-settler.js" target=_blank>Primary settler</a></legend>
       <table border=1>
-        <tr><td>Q          <td><input id=Q           type=number value=25000>  <td class=unit>m<sup>3</sup>/d
         <tr><td>fw         <td><input id=fw          type=number value=0.005>  <td class=unit>&empty;
         <tr><td>removal BPO<td><input id=removal_BPO type=number value=57.4257><td class=unit>%
         <tr><td>removal UPO<td><input id=removal_UPO type=number value=86.6667><td class=unit>%
@@ -70,12 +69,11 @@
       <button onclick="run_pst();">Run</button>
       <script>
         function run_pst(){
-          let Q           = parseFloat(document.querySelector('#primary_settler #Q').value);
           let fw          = parseFloat(document.querySelector('#primary_settler #fw').value);
           let removal_BPO = parseFloat(document.querySelector('#primary_settler #removal_BPO').value);
           let removal_UPO = parseFloat(document.querySelector('#primary_settler #removal_UPO').value);
           let removal_iSS = parseFloat(document.querySelector('#primary_settler #removal_iSS').value);
-          let results = sv.primary_settler(Q, fw, removal_BPO, removal_UPO, removal_iSS);
+          let results = sv.primary_settler(fw, removal_BPO, removal_UPO, removal_iSS);
           redisplay();
           document.querySelector('#primary_settler').appendChild((function(){
             let div=document.createElement('div');
@@ -126,36 +124,29 @@
           let T  = parseFloat(document.querySelector('#activated_sludge #T' ).value);
           let Vp = parseFloat(document.querySelector('#activated_sludge #Vp').value);
           let Rs = parseFloat(document.querySelector('#activated_sludge #Rs').value);
-          let results = sv.activated_sludge(Q, T, Vp, Rs);
+          let results = sv.activated_sludge(T, Vp, Rs);
           redisplay();
           document.querySelector('#activated_sludge').appendChild((function(){
             let div=document.createElement('div');div.style.fontSize='smaller';
             div.innerHTML="activated_sludge(Q="+Q+", T="+T+", Vp="+Vp+", Rs="+Rs+") calculated<br>";
             let info=document.createElement('table');info.classList.add('info');
-            Object.keys(results).forEach(category=>{
-              Object.entries(results[category]).forEach(([key,val])=>{
-                let newRow=info.insertRow(-1);
-                newRow.insertCell(-1).innerHTML=key;
-                if(typeof val == 'number'){
-                  let fvalue = format(val);
-                  let color = parseFloat(fvalue) < 0.1 ? "green":"red";
-                  newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
-                }else{
-                  newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
-                  newRow.insertCell(-1).innerHTML=val.unit.prettifyUnit();
-                  newRow.insertCell(-1).innerHTML="<small>"+val.descr+"<small>";
-                }
-              });
+            Object.entries(results).forEach(([key,val])=>{
+              let newRow=info.insertRow(-1);
+              newRow.insertCell(-1).innerHTML=key;
+              if(typeof val == 'number'){
+                let fvalue = format(val);
+                let color = Math.abs(100-val) > 0.5 ? "red":"green";
+                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
+              }else{
+                newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
+                newRow.insertCell(-1).innerHTML=val.unit.prettifyUnit();
+                newRow.insertCell(-1).innerHTML="<small>"+val.descr+"<small>";
+              }
             });
             let info_btn=document.createElement('button'); info_btn.style.background="lightblue";
             info_btn.innerHTML="Show/Hide Results";
             info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
             div.appendChild(info_btn);
-            div.appendChild((function(){
-              let btn = document.createElement('button');btn.style.background='red';btn.innerHTML="X";
-              btn.onclick=function(){div.parentNode.removeChild(div)};
-              return btn;
-            })());
             div.appendChild(info);
             return div;
           })());
@@ -267,7 +258,7 @@
 
 <!--user defined default scenario-->
 <script>
-  let sv=new State_Variables("name",50,115,255,10,45,15,39.1,7.28,0);
+  let sv=new State_Variables(25,50,115,255,10,45,15,39.1,7.28,0);
   //constructor      (wb, wt, Dt, S,   n,      Li){
   let tram=new Tram(
     parseFloat(document.querySelector('#river #tram_1 #inputs #wb').value),
@@ -285,6 +276,14 @@
   (function(){
     //populate state variables table
     let inputs=document.querySelector('#inputs');
+
+    //add flowrate
+    { let newRow=inputs.insertRow(-1);
+      newRow.insertCell(-1).innerHTML="Q";
+      newRow.insertCell(-1).innerHTML="<input id=Q type=number min=0 onchange=sv.Q=parseFloat(this.value);redisplay()>"+
+        " <span class=unit>ML/d</span>";
+    }
+    //add components
     Object.keys(sv.components).forEach(key=>{
       let newRow=inputs.insertRow(-1);
       newRow.insertCell(-1).innerHTML=key;
@@ -312,6 +311,7 @@
   //redisplay inputs and results
   function redisplay(){
     //redisplay inputs
+    document.getElementById("Q").value=sv.Q;
     Object.keys(sv.components).forEach(key=>{
       let value=sv.components[key];
       document.getElementById(key).value=value;
@@ -321,25 +321,19 @@
     let outputs = document.querySelector('#outputs');
     outputs.innerHTML="";
     let results = sv.totals;
-    Object.keys(results).forEach(key=>{
+    let fluxes  = sv.fluxes.totals;
+    Object.entries(results).forEach(([key,obj])=>{
       let newRow=outputs.insertRow(-1);
-      let value = results[key];
-      if(typeof(value)=='number'){
-        newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).innerHTML=format(value);
-      }else{
-        newRow.insertCell(-1).innerHTML=key;
-        let newCell=newRow.insertCell(-1);
-        let table=document.createElement('table');table.style.width="100%";table.setAttribute('border',1);
-        newCell.appendChild(table);
-        Object.keys(results[key]).forEach(k=>{
-          let nr=table.insertRow(-1);
-          Object.keys(results[key][k]).forEach(kk=>{
-            let value=results[key][k][kk];
-            nr.insertCell(-1).innerHTML=kk+": <small>"+format(value)+"</small>";
-          });
-        });
-      }
+      newRow.insertCell(-1).innerHTML=key;
+      let newCell=newRow.insertCell(-1);
+      let table=document.createElement('table');table.style.width="100%";table.setAttribute('border',1);table.style.fontSize='smaller';
+      newCell.appendChild(table);
+      Object.entries(obj).forEach(([key2,val])=>{
+        let newRow=table.insertRow(-1);
+        newRow.insertCell(-1).innerHTML=key2;
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(val);
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(fluxes[key][key2]);
+      });
     });
     //redisplay river
     redisplay_river();

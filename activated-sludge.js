@@ -1,37 +1,38 @@
 /*
-  AS implementation
-  G. Ekama handwritten notes
+  AS implementation from G. Ekama handwritten notes
+
+    Qi → [Activated Sludge] → Qe
+                ↓
+                Qw
 */
 
 //node imports
 if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
 
-State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
+State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   //inputs and default values
-  Q  = isNaN(Q ) ? 24875  : Q ; //m3/d | Flowrate
   T  = isNaN(T ) ? 16     : T ; //ºC   | Temperature
   Vp = isNaN(Vp) ? 8473.3 : Vp; //m3   | Volume
-  Rs = isNaN(Rs) ? 15     : Rs; //days | Solids retention time
+  Rs = isNaN(Rs) ? 15     : Rs; //days | Solids Retention Time
+
+  //flowrate: convert from ML/d to m3/d
+  let Q = this.Q*1000; //m3/d
 
   //2 - page 9
-  let iSS  = this.components.X_iSS; //mg_iSS/L influent
-  let frac = this.totals;           //object: complete fractionation inside
-  let COD  = frac.Total_COD;        //mg_COD/L influent
-  let BSO  = frac.COD[1].bsCOD;     //mg_COD/L influent
-  let USO  = frac.COD[1].usCOD;     //mg_COD/L influent
-  let BPO  = frac.COD[2].bpCOD;     //mg_COD/L influent
-  let UPO  = frac.COD[2].upCOD;     //mg_COD/L influent
+  let frac = this.totals;           //object: fractionation (COD,TOC,TKN,TP,TSS)
+  let COD  = frac.COD.total;        //mg_COD/L influent
 
   //fSus and fSup ratios
-  let fSus = USO/COD; //g_USO/g_COD influent
-  let fSup = UPO/COD; //g_UPO/g_COD influent
+  let fSus = frac.COD.usCOD/COD; //g_USO/g_COD influent
+  let fSup = frac.COD.upCOD/COD; //g_UPO/g_COD influent
 
-  //2.1 - mass fluxes (kg/d)
-  const fCV = this.mass_ratios.f_CV_UPO; //1.481
-  let FSti  = Q*COD/1000;                //kg_COD/d  | total COD influent
-  let FSbi  = FSti*(1-fSus-fSup);        //kg_bCOD/d | biodegradable COD (VFA+FBSO) influent
-  let FXti  = FSti*fSup/fCV;             //kg_VSS/d  | UPO in VSS influent
-  let FiSS  = Q*iSS/1000;                //kg_iSS/d  | iSS flux influent
+  //2.1 - influent mass fluxes (kg/d)
+  let fluxes = this.fluxes;               //object: all mass fluxes. structure: {components, totals}
+  const fCV  = this.mass_ratios.f_CV_UPO; //1.481 gUPO/gVSS
+  let FSti   = fluxes.totals.COD.total;   //kg_COD/d  | total COD influent
+  let FSbi   = fluxes.totals.COD.bCOD;    //kg_bCOD/d | biodegradable COD (VFA+FBSO+BPO) influent
+  let FXti   = fluxes.totals.TSS.uVSS;    //kg_VSS/d  | UPO in VSS influent
+  let FiSS   = fluxes.totals.TSS.iSS;     //kg_iSS/d  | iSS flux influent
 
   //2.2 - kinetics
   const bH = 0.24;                    //1/d | growth rate at 20ºC (standard)
@@ -66,15 +67,15 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
   //2.6 - Nitrogen - page 12
   const fn    = this.mass_ratios.f_N_UPO; //0.10 gN/gVSS
   let Ns      = fn*MX_V/(Rs*Q)*1000; //mgN/L_influent | N in influent required for sludge production
-  let Nte     = frac.Total_TKN - Ns; //mg/L as N (TKN effluent)
-  let ON_FBSO = frac.ON[1].bsON;     //mg/L "Nobsi"
-  let ON_USO  = frac.ON[1].usON;     //mg/L "Nouse"
-  let ON_BPO  = frac.ON[2].bpON;     //mg/L "Nobsi"
-  let ON_UPO  = frac.ON[2].upON;     //mg/L "Noupi"
+  let Nte     = frac.TKN.total - Ns; //mg/L as N (TKN effluent)
+  let ON_FBSO = frac.TKN.bsON;       //mg/L "Nobsi" influent
+  let ON_USO  = frac.TKN.usON;       //mg/L "Nouse" influent
+  let ON_BPO  = frac.TKN.bpON;       //mg/L "Nobsi" influent
+  let ON_UPO  = frac.TKN.upON;       //mg/L "Noupi" influent
 
   //effluent ammonia
-  let Nae               = Nte - ON_USO; //mg/L as N (ammonia)
-  let Nae_balance_error = Math.abs(1 - Nae/(this.components.S_FSA + ON_FBSO + ON_BPO - (Ns - ON_UPO))); //unitless
+  let Nae         = Nte - ON_USO; //mg/L as N (ammonia)
+  let Nae_balance = 100*Nae/(this.components.S_FSA + ON_FBSO + ON_BPO - (Ns - ON_UPO)); //percentage
 
   //2.7 - oxygen demand - page 13
   let FOc = FSbi*((1-fCV*YH)+fCV*(1-fH)*bHT*X_BH); //kg_O/d | carbonaceous oxygen demand
@@ -84,76 +85,68 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
 
   //2.8 - effluent Phosphorus
   const fp = this.mass_ratios.f_P_UPO; //0.025 gP/gVSS
-  let Ps  = fp * MX_V*1000/(Q*Rs); //mg_P/l | P required for sludge production
-  let Pti = frac.Total_TP;         //mg/L   | total P influent
-  let Pte = Pti - Ps;              //mg/L   | total P effluent
-  let Pse = Pte - frac.OP[1].usOP; //mg/L   | total inorganic soluble P effluent
+  let Ps  = fp*MX_V/(Rs*Q)*1000;       //mg_P/l | P required for sludge production
+  let Pti = frac.TP.total;             //mg/L   | total P influent
+  let Pte = Pti - Ps;                  //mg/L   | total P effluent
+  let Pse = Pte - frac.TP.usOP;        //mg/L   | total inorganic soluble P effluent
 
   //2.9 - COD Balance
-  let Suse              = frac.COD[1].usCOD;                    //mg/L as O | USO influent concentration
-  let FSe               = Qe*Suse/1000;                         //kg/d as O | USO effluent flux
-  let FSw               = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O | COD wastage flux
-  let FSout             = FSe + FOc + FSw;                      //kg/d as O | total COD out flux
-  let COD_balance_error = Math.abs(1 - FSti/FSout);             //COD balance
+    let Suse        = frac.COD.usCOD;                       //mg/L as O | USO influent == effluent
+    let FSe         = Qe*Suse/1000;                         //kg/d as O | USO effluent flux
+    let FSw         = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O | COD wastage flux
+    let FSout       = FSe + FOc + FSw;                      //kg/d as O | total COD out flux
+    let COD_balance = 100*FSti/FSout;                       //percentage
 
   //2.10 - N balance
-  let FNti  = Q*frac.Total_TKN/1000;                       //kg/d as N | total TKN influent
-  let FNw   = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000; //kg/d as N | total TKN wastage
-  let FNte  = Qe*(ON_USO + Nae)/1000;                      //kg/d as N | total TKN effluent
-  let FNout = FNw + FNte                                   //kg/d as N | total TKN out
-  let N_balance_error = Math.abs(1 - FNti/FNout);          //TKN balance
+    let FNti      = fluxes.totals.TKN.total;                     //kg/d as N | total TKN influent
+    let FNw       = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000; //kg/d as N | total TKN wastage
+    let FNte      = Qe*(ON_USO + Nae)/1000;                      //kg/d as N | total TKN effluent
+    let FNout     = FNw + FNte                                   //kg/d as N | total TKN out
+    let N_balance = 100*FNti/FNout;                              //percentage
 
   //2.11 - P balance
-  let FPti  = Q*frac.Total_TP/1000;               //kg/d as P | total TP influent
-  let FPw   = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000; //kg/d as P | total TP wastage
-  let FPte  = Qe*Pte/1000;                        //kg/d as P | total TP effluent
-  let FPout = FPw + FPte;                        //kg/d as P | total TP out
-  let P_balance_error = Math.abs(1 - FPti/FPout); //P balance
+    let FPti      = fluxes.totals.TP.total;             //kg/d as P | total TP influent
+    let FPw       = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000; //kg/d as P | total TP wastage
+    let FPte      = Qe*Pte/1000;                        //kg/d as P | total TP effluent
+    let FPout     = FPw + FPte;                         //kg/d as P | total TP out
+    let P_balance = 100*FPti/FPout;                     //P balance
+  //AS end
 
-  //TBD: create 3 new state variables (output streams: effluent, wastage, air)
-  let effluent = new State_Variables(Qe,0,0,0,0,0,0,0,0,0);
-  let wastage  = new State_Variables(Qw,0,0,0,0,0,0,0,0,0);
-  let air      = new State_Variables( 0,0,0,0,0,0,0,0,0,0);
+  //activated sludge
+  let BPO_eff = 0; //mg/L | BPO concentration in the effluent TODO
+  let BPO_was = 0; //mg/L | BPO concentration in the wastage  TODO
+  let UPO_eff = 0; //mg/L | UPO concentration in the effluent TODO
+  let UPO_was = 0; //mg/L | UPO concentration in the wastage  TODO
+  let iSS_eff = 0; //mg/L | iSS concentration in the effluent TODO
+  let iSS_was = 0; //mg/L | iSS concentration in the wastage  TODO
 
-  return {
+  //create 2 new state variables (effluent, wastage) TODO
+  //syntax ------------->constructor(Q,  VFA, FBSO,     BPO,     UPO,  USO,     iSS, FSA, PO4, NOx)
+  let effluent = new State_Variables(Qe,   0,    0, BPO_eff, UPO_eff, Suse, iSS_eff, Nae, Pse,   0);
+  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse,   0);
+
+  //return {effluent, wastage, process_variables};
+  let process_variables={
     //balances
-    COD_balance_error,
-    N_balance_error,
-    Nae_balance_error,
-    P_balance_error,
+    COD_balance, N_balance, Nae_balance, P_balance,
 
-    //flowrates
-    Qe      :{value:Qe,         unit:"m3/d",          descr:"Effluent flowrate"},
-    Qw      :{value:Qw,         unit:"m3/d",          descr:"Wastage flowrate"},
+    //effluent things
+    FNte    :{value:FNte,       unit:"kg/d_as_N",     descr:"Flux TKN effluent"},
+    Nte     :{value:Nte,        unit:"mg/L_as_N",     descr:"TKN concentration effluent"},
+    FPte    :{value:FPte,       unit:"kg/d_as_P",     descr:"Flux TP effluent"},
+    Pte     :{value:Pte,        unit:"mg/L_as_P",     descr:"TP concentration effluent"},
 
-    //COD
-    fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio"},
-    fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio"}, 
-    FSti    :{value:FSti,       unit:"kg/d_as_O",     descr:"Flux COD influent"},
-    FSout   :{value:FSout,      unit:"kg/d_as_O",     descr:"Flux COD out (effluent + FOc + wastage)"},
-    FSbi    :{value:FSbi,       unit:"kg/d_as_O",     descr:"Flux biodegradable COD influent"},
-    FSe     :{value:FSe,        unit:"kg/d_as_O",     descr:"Flux COD effluent"},
+    //wastage
     FSw     :{value:FSw,        unit:"kg/d_as_O",     descr:"Flux COD wastage"},
 
-    //Nitrogen
-    FNti    :{value:FNti,       unit:"kg/d_as_N",     descr:"Flux TKN influent"},
-    FNte    :{value:FNte,       unit:"kg/d_as_N",     descr:"Flux TKN effluent"},
+    //process
+    fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio (influent)"},
+    fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio (influent)"}, 
+    FSout   :{value:FSout,      unit:"kg/d_as_O",     descr:"Flux COD out (effluent + FOc + wastage)"},
     Ns      :{value:Ns,         unit:"mg/L_as_N",     descr:"N required for sludge production"},
-    Nte     :{value:Nte,        unit:"mg/L_as_N",     descr:"TKN concentration effluent"},
-    Nae     :{value:Nae,        unit:"mg/L_as_N",     descr:"FSA (ammonia, NH4) concentration effluent"},
-
-    //Phosphorus
-    FPti    :{value:FPti,       unit:"kg/d_as_P",     descr:"Flux TP influent"},
-    FPte    :{value:FPte,       unit:"kg/d_as_P",     descr:"Flux TP effluent"},
     Ps      :{value:Ps,         unit:"mg/L_as_P",     descr:"P required for sludge production"},
-    Pte     :{value:Pte,        unit:"mg/L_as_P",     descr:"TP concentration effluent"},
-    Pse     :{value:Pse,        unit:"mg/L_as_P",     descr:"Inorganic Soluble P concentration effluent"},
-
-    //VSS
     HRT     :{value:HRT,        unit:"hour",          descr:"Hydraulic Retention Time"},
     bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
-    FXti    :{value:FXti,       unit:"kg_VSS/d",      descr:"Flux UPO in VSS influent"},
-    FiSS    :{value:FiSS,       unit:"kg_iSS/d",      descr:"Flux iSS influent"},
     X_BH    :{value:X_BH,       unit:"g_VSS·d/g_COD", descr:"Biomass production rate"},
     MX_BH   :{value:MX_BH,      unit:"kg_VSS",        descr:"Biomass produced VSS"},
     MX_EH   :{value:MX_EH,      unit:"kg_VSS",        descr:"Endogenoous residue VSS"},
@@ -166,20 +159,21 @@ State_Variables.prototype.activated_sludge=function(Q, T, Vp, Rs){
     X_T     :{value:MLSS_X_TSS, unit:"kg_TSS/m3",     descr:"TSS concentration at SST"},
     f_avOHO :{value:f_avOHO,    unit:"g_OHO/g_VSS",   descr:"Active fraction of the sludge (VSS)"},
     f_atOHO :{value:f_atOHO,    unit:"g_OHO/g_TSS",   descr:"Active fraction of the sludge (TSS)"},
-
-    //Oxygen demand
     FOc     :{value:FOc,        unit:"kg/d_as_O",     descr:"Carbonaceous Oxygen Demand"},
     FOn     :{value:FOn,        unit:"kg/d_as_O",     descr:"Nitrogenous Oxygen Demand"},
     FOt     :{value:FOt,        unit:"kg/d_as_O",     descr:"Total Oxygen Demand"},
     OUR     :{value:OUR,        unit:"mg/L·h_as_O",   descr:"Oxygen Uptake Rate"},
   };
+
+  return {effluent, wastage, process_variables};
 };
 
 /*test*/
 (function test(){
   let sv = new State_Variables(24.875,50,115,255,10,45,15,39.1,7.28,0);
-  console.log(sv.fluxes);
-  console.log(sv.totals);
+  //console.log(sv.totals);
+  //console.log(sv.fluxes);
+  let as = sv.activated_sludge();
+  console.log(as.process_variables);
   return;
-  console.log(sv.activated_sludge());
 })();

@@ -9,7 +9,8 @@
     }
 
     table{ border-collapse:collapse}
-    table td.unit{font-size:smaller;}
+    .unit{font-size:smaller;}
+    .number{text-align:right;}
 
     input[type=number]{
       width:70px;
@@ -23,12 +24,16 @@
 </head><body>
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px">
   <h3>
-    State variables - steps editor
-    <button onclick=add_step()>Add step</button>
+    State variables editor
+    <button onclick=add_flow()>Add flow</button>
     <script>
-      function add_step(){
-        let sv = new State_Variables("new step");
-        Object.keys(sv.components).forEach(key=>{sv.components[key]=0;}); //init to 0 all ww components
+      function add_flow(){
+        let sv = new State_Variables();
+        sv.name="New flow";
+        if(svs.length){
+          sv.Q = svs[svs.length-1].Q;
+          Object.keys(sv.components).forEach(key=>{ sv.components[key]=svs[svs.length-1].components[key]; }); 
+        }
         svs.push(sv);
         populate();
       }
@@ -39,12 +44,11 @@
   </div>
 </div>
 
-<small>Note: all units are in mg/L</small><br><br>
-
 <!--state variables-->
 <div>
   <table id=state-variables border=1>
     <tbody id=inputs></tbody>
+    <tr><td colspan=10><small><code>Concentration (mg/L) and mass fluxes (kg/d)</code><small>
     <tbody id=outputs></tbody>
   </table>
 </div>
@@ -52,6 +56,7 @@
 <!--app logic-->
 <script src="format.js"></script>
 <script src="../state-variables.js"></script>
+<script src="../primary-settler.js"></script>
 <script>
   //create and populate all tables
   function populate(){
@@ -59,10 +64,10 @@
     let inputs=document.querySelector('tbody#inputs');inputs.innerHTML="";
     //populate outputs with the 'totals' calls
     let outputs=document.querySelector('tbody#outputs');outputs.innerHTML="";
-
+    //reset
     if(svs.length==0)return;
 
-    //sv name
+    //sv name cell
     let nameRow=inputs.insertRow(-1);
     svs.forEach((sv,i)=>{
       var nameCell=nameRow.insertCell(-1);
@@ -85,40 +90,38 @@
     });
 
     //inputs
+    //flowrate
+    {
+      let newRow=inputs.insertRow(-1);
+      svs.forEach((sv,i)=>{
+        newRow.insertCell(-1).innerHTML="Q";
+        newRow.insertCell(-1).innerHTML="<input tabindex="+i+" type=number min=0 onchange=svs["+i+"].Q=parseFloat(this.value);redisplay("+i+"); value="+sv.Q+"> <span class=unit>ML/d</span>";
+      });
+    }
+    //components
     Object.keys(svs[0].components).forEach(key=>{
       let newRow=inputs.insertRow(-1);
       svs.forEach((sv,i)=>{
         newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).innerHTML="<input tabindex="+i+" type=number min=0 onchange=svs["+i+"].components."+key+"=parseFloat(this.value);redisplay("+i+"); value="+sv.components[key]+">";
+        newRow.insertCell(-1).innerHTML="<input tabindex="+i+" type=number min=0 onchange=svs["+i+"].components."+key+"=parseFloat(this.value);redisplay("+i+"); value="+sv.components[key]+"> <span class=unit>mg/L</span>";
       });
     });
 
-    //outputs
-    let results=[];
-    svs.forEach(sv=>{results.push(sv.totals);});
-    let newRow=outputs.insertRow(-1);
-    results.forEach((result,i)=>{
-      let newCell=newRow.insertCell(-1);newCell.colSpan=2;
-      let table=document.createElement('table');table.style.width="100%";
-      table.setAttribute('index',i);
-      newCell.appendChild(table);
-      Object.keys(result).forEach(key=>{
-        let value  = result[key];
-        let newRow = table.insertRow(-1);
-        if(typeof(value)=='number'){
-          newRow.insertCell(-1).outerHTML="<td colspan=2>"+key+": <small><span key="+key+">"+format(value)+"</span></small>";
-        }else{
-          let newCell=newRow.insertCell(-1);
-          let table=document.createElement('table');table.style.width="100%";table.setAttribute('border',1);table.style.fontSize='smaller';
-          newCell.appendChild(table);
-          Object.keys(result[key]).forEach(k=>{
-            let nr=table.insertRow(-1);
-            Object.keys(result[key][k]).forEach(kk=>{
-              let value=result[key][k][kk];
-              nr.insertCell(-1).innerHTML=kk+": <span key="+kk+">"+format(value)+"</span>";
-            });
-          });
-        }
+    //totals and fluxes
+    Object.entries(svs[0].totals).forEach(([key,obj])=>{
+      let newRow=outputs.insertRow(-1);
+      newRow.insertCell(-1).innerHTML=key; //COD
+      svs.forEach((sv,i)=>{
+        let newCell=newRow.insertCell(-1);
+        if(i)newCell.colSpan=2;
+        let table=document.createElement('table');table.style.width="100%";table.setAttribute('border',1);table.style.fontSize='smaller';
+        newCell.appendChild(table);
+        Object.entries(obj).forEach(([key2,val])=>{
+          let newRow=table.insertRow(-1);
+          newRow.insertCell(-1).innerHTML=key2; //bsCOD
+          newRow.insertCell(-1).outerHTML=`<td index=${i} conc key=${key} key2=${key2} class=number>${format(sv.totals[key][key2])}</td>`;
+          newRow.insertCell(-1).outerHTML=`<td index=${i} flux key=${key} key2=${key2} class=number>${format(sv.fluxes.totals[key][key2])}</td>`;
+        });
       });
     });
   }
@@ -126,19 +129,13 @@
   //redisplay values only (call 'totals' for the nth sv)
   function redisplay(n){
     let outputs=document.querySelector('tbody#outputs');
-    let result=svs[n].totals;
-    Object.keys(result).forEach(key=>{
-      let value=result[key];
-      if(typeof(value)=='number'){
-        document.querySelector('table[index="'+n+'"] span[key='+key+']').innerHTML=format(value);
-      }else{
-        Object.keys(result[key]).forEach(k=>{
-          Object.keys(result[key][k]).forEach(kk=>{
-            let value=result[key][k][kk];
-            document.querySelector('table[index="'+n+'"] span[key='+kk+']').innerHTML=format(value);
-          });
-        });
-      }
+    let totals = svs[n].totals;
+    let fluxes = svs[n].fluxes.totals;
+    Object.keys(totals).forEach(key=>{
+      Object.keys(totals[key]).forEach(key2=>{
+        document.querySelector(`td[index='${n}'][conc][key=${key}][key2=${key2}]`).innerHTML=format(totals[key][key2]);
+        document.querySelector(`td[index='${n}'][flux][key=${key}][key2=${key2}]`).innerHTML=format(fluxes[key][key2]);
+      });
     });
   }
 </script>
@@ -149,18 +146,9 @@
     initialize state variables
     create an example with with 3 scenarios: raw ww, sludge and settled ww
   */
-  let sv = new State_Variables("Settled wastewater");
-    sv.components.S_VFA  = 50;
-    sv.components.S_FBSO = 115;
-    sv.components.X_BPO  = 255;
-    sv.components.X_UPO  = 10;
-    sv.components.S_USO  = 45;
-    sv.components.X_iSS  = 15;
-    sv.components.S_FSA  = 39.1;
-    sv.components.S_OP   = 7.28;
-    sv.components.S_NOx  = 0;
-
-  //svs means 'state variables' array
-  let svs=[ sv, ];
+  let sv1 = new State_Variables(25,     50, 115, 440,     100, 45,   60, 39.1, 7.28, 0); sv1.name="Raw WW";
+  let sv2 = new State_Variables(24.875, 50, 115, 255,      10, 45,   15, 39.1, 7.28, 0); sv2.name="Settled WW";
+  let sv3 = new State_Variables(0.125,  50, 115, 37255, 18010, 45, 9015, 39.1, 7.28, 0); sv3.name="Primary Sludge";
+  let svs=[sv1, sv2, sv3];
   populate();
 </script>
