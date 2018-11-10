@@ -32,6 +32,11 @@
 <!--title-->
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Xarxa exemple (sense degradació)</h3></div>
 
+<!--botó soluciona-->
+<div style=margin-bottom:5px>
+  <button onclick="xarxa.soluciona();redisplay()">Soluciona xarxa</button>
+</div>
+
 <!--xarxa--><div>
   <table id=xarxa border=1>
     <tr><td id=t1><td id=t2><td id=t3><td id=t4>
@@ -49,16 +54,16 @@
 <!--user-defined-scenario-->
 <script>
   /*
-    exemple xarxa de trams
-    t1--+
-        |--> t5--+
-    t2--+        |
-                 |--> t7
-    t3--+        |
-        |--> t6--+
-    t4--+
-
+      exemple xarxa de trams
+      t1--+
+          |--> t5--+
+      t2--+        |
+                  |--> t7
+      t3--+        |
+          |--> t6--+
+      t4--+
   */
+
   //test amb 4 arrels
   let xarxa = new Xarxa();
   let t1 = new Tram(); t1.state_variables.Q = 10; t1.state_variables.set('S_VFA',1);
@@ -69,7 +74,7 @@
   let t6 = new Tram(); t6.pares=[t3,t4];
   let t7 = new Tram(); t7.pares=[t5,t6];
   xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
-  xarxa.soluciona(verbose=true);
+  //xarxa.soluciona(verbose=true);
   let trams={t1,t2,t3,t4,t5,t6,t7};//connecta amb gui
 </script>
 
@@ -93,9 +98,10 @@
         if(key!='S_VFA')return;
         let newRow = table.insertRow(-1);
         newRow.insertCell(-1).innerHTML=key+": ";
-        newRow.insertCell(-1).outerHTML="<td class=number>["+format(val)+"],</td>";
-        newRow.insertCell(-1).outerHTML="<td class=number>"+format(t.state_variables.fluxes.components[key])+"</td>";
+        newRow.insertCell(-1).outerHTML="<td class=number>["+format(val)+", </td>";
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(t.state_variables.fluxes.components[key])+"]</td>";
       });
+
       return;
 
       //nova taula tram de riu
@@ -107,5 +113,6 @@
       });
     });
   };
+
   redisplay();
 </script>

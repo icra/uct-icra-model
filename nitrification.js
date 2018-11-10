@@ -1,5 +1,6 @@
 /*
   Nitrification implementation from G. Ekama hand notes
+  STATUS: not finished
 */
 
 //node imports
@@ -17,7 +18,7 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt){
   fxt = isNaN(fxt) ? 0.39   : fxt ; //ratio | current unaerated sludge mass fraction
 
   //flowrate
-  let Q = this.Q*1000; //m3/d
+  let Q = this.Q*1000; //m3/d (converted from ML/d)
 
   //compute influent fractionation
   let frac = this.totals;

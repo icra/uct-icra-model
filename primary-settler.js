@@ -11,10 +11,10 @@ if(typeof document == "undefined"){ State_Variables = require("./state-variables
 
 State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO, removal_iSS){
   //inputs and default values
-  fw          = isNaN(fw) ? 0.005 : fw; //fraction of Q that goes to wastage  
-  removal_BPO = isNaN(removal_BPO) ? 100-100*24.875*255/(25*440) : removal_BPO; //%
-  removal_UPO = isNaN(removal_UPO) ? 100-100*24.875* 10/(25*100) : removal_UPO; //%
-  removal_iSS = isNaN(removal_iSS) ? 100-100*24.875* 15/(25* 60) : removal_iSS; //%
+  fw          = isNaN(fw)          ? 0.005                       : fw;          //fraction of Q that goes to wastage  
+  removal_BPO = isNaN(removal_BPO) ? 100-100*24.875*255/(25*440) : removal_BPO; //% | removal of the component X_BPO
+  removal_UPO = isNaN(removal_UPO) ? 100-100*24.875* 10/(25*100) : removal_UPO; //% | removal of the component X_UPO
+  removal_iSS = isNaN(removal_iSS) ? 100-100*24.875* 15/(25* 60) : removal_iSS; //% | removal of the component X_iSS
 
   //convert percentages to rate
   removal_BPO /= 100;
@@ -23,8 +23,8 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
 
   //calculate wastage and primary effluent flowrates
   let Qi = this.Q;
-  let Qw = fw * Qi; //m3/d
-  let Qe = Qi - Qw; //m3/d
+  let Qw = fw * Qi; //ML/d
+  let Qe = Qi - Qw; //ML/d
 
   //calculate PO (particulated organics) wastage and effluent
   let X_BPO_i = this.components.X_BPO; //mg/L influent
@@ -60,15 +60,16 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   */
   //calculate mass flux sludge produced (kg TSS)
   //it has to be the same value as wastage.fluxes.totals.TSS.total
-  let BPO_removed = wastage.fluxes.components.X_BPO/this.mass_ratios.f_CV_BPO; //kg VSS
-  let UPO_removed = wastage.fluxes.components.X_UPO/this.mass_ratios.f_CV_UPO; //kg VSS
-  let iSS_removed = wastage.fluxes.components.X_iSS;                           //kg iSS
-  let primary_sludge = BPO_removed + UPO_removed + iSS_removed;          //kg TSS
-  //console.log(primary_sludge);
-  //console.log(wastage.fluxes.totals.TSS.total);
+  //let BPO_removed = wastage.fluxes.components.X_BPO/this.mass_ratios.f_CV_BPO; //kg VSS
+  //let UPO_removed = wastage.fluxes.components.X_UPO/this.mass_ratios.f_CV_UPO; //kg VSS
+  //let iSS_removed = wastage.fluxes.components.X_iSS;                           //kg iSS
+  //let primary_sludge = BPO_removed + UPO_removed + iSS_removed;                //kg TSS
+  let primary_sludge = wastage.fluxes.totals.TSS.total;
+
+  //pack desired process variables
   let process_variables={
-    Qe:             {value:Qe, unit:"ML/d", descr:"Effluent flowrate"},
-    Qw:             {value:Qw, unit:"ML/d", descr:"Wastage flowrate"},
+    //Qe:             {value:Qe, unit:"ML/d", descr:"Effluent flowrate"},
+    //Qw:             {value:Qw, unit:"ML/d", descr:"Wastage flowrate"},
     primary_sludge: {value:primary_sludge, unit:"kg/d", descr:"Primary sludge production"},
   };
 
@@ -79,7 +80,10 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
 //test
 (function test(){
   return;
-  let inf = new State_Variables();
-  let pst = inf.primary_settler();
-  console.log(pst.wastage.totals); //table page 8
+  let inf = new State_Variables(); //use default values
+  let pst = inf.primary_settler(); //use default values
+  console.log(inf.summary);
+  console.log(pst.process_variables);
+  console.log(pst.effluent.summary);
+  console.log(pst.wastage.summary); //table page 8
 })();

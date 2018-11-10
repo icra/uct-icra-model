@@ -19,15 +19,15 @@ class Tram {
     //trams connectats upstream (pares). Definits per l'usuari.
     this.pares=[]; /*array <Tram>*/
 
-    //variables d'estat (S_VFA, S_FBSO, etc)
+    //State Variables(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx){
     this.state_variables = new State_Variables(0,0,0,0,0,0,0,0,0,0);
 
-    //EDAR que aboca al tram 
+    //EDAR que aboca al tram (per defecte no n'hi ha)
     this.wwtp = null; //<State_Variables>
 
-    //id per la base de dades TBD
+    //ALTRES (pel frontend, discutir amb Anna) TBD
+    //id per la base de dades
     this.id="1";
-
     //coordenades per dibuixar els trams
     this.coordenades={inici:[0,0], final:[0,0]};
   }
@@ -58,7 +58,7 @@ class Tram {
     get Ll(){return Math.pow(this.wi,2)*this.Qi/this.Ai/(2*this.ky);} //longitud del tram de barreja lateral (Ll)
 
   //empaqueta els resultats
-  get resultats(){return {
+  get resultats(){return{
     angle:{value:this.angle, unit:"rad",  descr:"Angle &alpha; entre la llera i el màxim del canal (bankful)"},
     Dt   :{value:this.Dt,    unit:"m",    descr:"Fondària màxima"},
     wi   :{value:this.wi,    unit:"m",    descr:"Amplada de la llera inundada"},
@@ -72,7 +72,8 @@ class Tram {
     Ll   :{value:this.Ll,    unit:"m",    descr:"Longitud del tram de barreja lateral"},
   }};
 
-  //massa o càrrega al final del tram fluvial
+  //massa o càrrega al final del tram fluvial degut a la degradació
+  //en un futur es reemplaçarà per un model més complet
   Mf(Mi,R_20,k,T){
     //Mi  : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram (kg)
     //R_20: velocitat de reacció a 20ºC (g/m2·min)
@@ -93,15 +94,15 @@ if(typeof document == "undefined"){
 //test valors Vicenç Acuña (vacuna@icra.cat)
 (function test(){
   return;
-  //sintaxi Tram(wb, wt,  Db,     S,      n,   Li,  Di)
-  let t=new Tram( 3,  6,   2, 0.005, 0.0358, 1000, 1.2);
-  //console.log(t.resultats);
-  //return;
+  //sintaxi:  Tram(wb, wt, Db, S,     n,      Li,   Di)
+  let t = new Tram(3,  6,  2,  0.005, 0.0358, 1000, 1.2);
+  console.log(t.resultats);
+  return;
   //recorre variables d'estat (fluxes màssics) i calcula massa final
   t.state_variables.Q = 25;
   t.state_variables.set('S_VFA',10);
   Object.entries(t.state_variables.fluxes.components).forEach(([key,Mi])=>{
-    let Mf = t.Mf(Mi, 0, 0, 0); //g/s
+    let Mf=t.Mf(Mi, 0, 0, 0); //g/s
     console.log(`Mf[${key}] (Mi=${Mi}): ${Mf} (g/s)`);
   });
 })();

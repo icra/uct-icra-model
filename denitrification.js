@@ -1,5 +1,6 @@
 /*
   Denitrification implementation from G. Ekama hand notes
+  STATUS: not finished
 */
 
 //node imports

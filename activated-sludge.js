@@ -19,8 +19,8 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   let Q = this.Q*1000; //m3/d
 
   //2 - page 9
-  let frac = this.totals;           //object: fractionation (COD,TOC,TKN,TP,TSS)
-  let COD  = frac.COD.total;        //mg_COD/L influent
+  let frac = this.totals;    //object: fractionation (COD,TOC,TKN,TP,TSS)
+  let COD  = frac.COD.total; //mg_COD/L influent
 
   //fSus and fSup ratios
   let fSus = frac.COD.usCOD/COD; //g_USO/g_COD influent
@@ -55,8 +55,8 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   let HRT        = Vp/Q*24; //hours | hydraulic retention time
 
   //2.4 - page 12
-  let Qw = Vp/Rs;  //m3/day | wastage flow
-  let Qe = Q - Qw; //m3/day | effluent flow
+  let Qw = (Vp/Rs)/1000; //ML/day | wastage flow
+  let Qe = Q/1000 - Qw;  //ML/day | effluent flow
 
   //2.5 
   let fi         = MX_V/MX_T;     //VSS/TSS ratio
@@ -91,23 +91,23 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   let Pse = Pte - frac.TP.usOP;        //mg/L   | total inorganic soluble P effluent
 
   //2.9 - COD Balance
-    let Suse        = frac.COD.usCOD;                       //mg/L as O | USO influent == effluent
-    let FSe         = Qe*Suse/1000;                         //kg/d as O | USO effluent flux
-    let FSw         = Qw*(Suse + fCV*MLSS_X_VSS*1000)/1000; //kg/d as O | COD wastage flux
-    let FSout       = FSe + FOc + FSw;                      //kg/d as O | total COD out flux
-    let COD_balance = 100*FSti/FSout;                       //percentage
+    let Suse        = frac.COD.usCOD;                  //mg/L as O | USO influent == effluent
+    let FSe         = Qe*Suse;                         //kg/d as O | USO effluent flux
+    let FSw         = Qw*(Suse + fCV*MLSS_X_VSS*1000); //kg/d as O | COD wastage flux
+    let FSout       = FSe + FOc + FSw;                 //kg/d as O | total COD out flux
+    let COD_balance = 100*FSti/FSout;                  //percentage
 
   //2.10 - N balance
-    let FNti      = fluxes.totals.TKN.total;                     //kg/d as N | total TKN influent
-    let FNw       = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae)/1000; //kg/d as N | total TKN wastage
-    let FNte      = Qe*(ON_USO + Nae)/1000;                      //kg/d as N | total TKN effluent
-    let FNout     = FNw + FNte                                   //kg/d as N | total TKN out
-    let N_balance = 100*FNti/FNout;                              //percentage
+    let FNti      = fluxes.totals.TKN.total;                //kg/d as N | total TKN influent
+    let FNw       = Qw*(fn*MLSS_X_VSS*1000 + ON_USO + Nae); //kg/d as N | total TKN wastage
+    let FNte      = Qe*(ON_USO + Nae);                      //kg/d as N | total TKN effluent
+    let FNout     = FNw + FNte                              //kg/d as N | total TKN out
+    let N_balance = 100*FNti/FNout;                         //percentage
 
   //2.11 - P balance
-    let FPti      = fluxes.totals.TP.total;             //kg/d as P | total TP influent
-    let FPw       = Qw*(fp*MLSS_X_VSS*1000 + Pte)/1000; //kg/d as P | total TP wastage
-    let FPte      = Qe*Pte/1000;                        //kg/d as P | total TP effluent
+    let FPti      = fluxes.totals.TP.total;        //kg/d as P | total TP influent
+    let FPw       = Qw*(fp*MLSS_X_VSS*1000 + Pte); //kg/d as P | total TP wastage
+    let FPte      = Qe*Pte;                        //kg/d as P | total TP effluent
     let FPout     = FPw + FPte;                         //kg/d as P | total TP out
     let P_balance = 100*FPti/FPout;                     //P balance
   //AS end
@@ -122,13 +122,13 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
 
   //create 2 new state variables (effluent, wastage) TODO
   //syntax ------------->constructor(Q,  VFA, FBSO,     BPO,     UPO,  USO,     iSS, FSA, PO4, NOx)
-  let effluent = new State_Variables(Qe/1000,   0,    0, BPO_eff, UPO_eff, Suse, iSS_eff, Nae, Pse,   0);
-  let wastage  = new State_Variables(Qw/1000,   0,    0, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse,   0);
+  let effluent = new State_Variables(Qe,   0,    0, BPO_eff, UPO_eff, Suse, iSS_eff, Nae, Pse,   0);
+  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse,   0);
 
   //return {effluent, wastage, process_variables};
   let process_variables={
     //balances
-    //COD_balance, N_balance, Nae_balance, P_balance,
+    COD_balance, N_balance, Nae_balance, P_balance,
     fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio (influent)"},
     fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio (influent)"}, 
     Ns      :{value:Ns,         unit:"mg/L_as_N",     descr:"N required for sludge production"},

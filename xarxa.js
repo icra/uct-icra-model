@@ -27,8 +27,8 @@ class Xarxa {
 
     //verbose: mostra cabals i S_VFA inicial
     if(verbose){
-      console.log("Cabals inici (ML/d): "+this.trams.map(t=>t.state_variables.Q));
-      console.log("S_VFA  inici (kg/d): "+this.trams.map(t=>t.state_variables.fluxes.components.S_VFA));
+      console.log("Cabals inici (ML/d): "+this.trams.map((t,i)=>`${t.state_variables.Q}`));
+      console.log("S_VFA  inici (kg/d): "+this.trams.map((t,i)=>`${t.state_variables.fluxes.components.S_VFA}`));
     }
 
     /*ARRELS*/
@@ -56,8 +56,8 @@ class Xarxa {
       //si la la xarxa ja està calculada, acaba
       if(this.trams.filter(t=>t.calculat).length==this.trams.length){
         if(verbose){
-          console.log("Cabals final (ML/d): "+this.trams.map(t=>t.state_variables.Q));
-          console.log("S_VFA  final (kg/d): "+this.trams.map(t=>t.state_variables.fluxes.components.S_VFA));
+          console.log("Cabals final (ML/d): "+this.trams.map((t,i)=>`${t.state_variables.Q}`));
+          console.log("S_VFA  final (kg/d): "+this.trams.map((t,i)=>`${t.state_variables.fluxes.components.S_VFA}`));
           console.log("[!] Xarxa calculada ("+iteracions.fetes+" iteracions)");
         }
         //esborra propietat "calculat" a tots els trams
