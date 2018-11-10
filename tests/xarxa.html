@@ -59,17 +59,17 @@
     t4--+
 
   */
-  let xarxa = new Xarxa();
   //test amb 4 arrels
-  let t1 = new Tram();
-  let t2 = new Tram();
-  let t3 = new Tram();
-  let t4 = new Tram();
-  let t5 = new Tram(); t5.pares=[t1, t2];
-  let t6 = new Tram(); t6.pares=[t3, t4];
-  let t7 = new Tram(); t7.pares=[t5, t6];
+  let xarxa = new Xarxa();
+  let t1 = new Tram(); t1.state_variables.Q = 10; t1.state_variables.set('S_VFA',1);
+  let t2 = new Tram(); t2.state_variables.Q = 10;
+  let t3 = new Tram(); t3.state_variables.Q = 10;
+  let t4 = new Tram(); t4.state_variables.Q = 10;
+  let t5 = new Tram(); t5.pares=[t1,t2];
+  let t6 = new Tram(); t6.pares=[t3,t4];
+  let t7 = new Tram(); t7.pares=[t5,t6];
   xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
-  xarxa.soluciona(true);
+  xarxa.soluciona(verbose=true);
   let trams={t1,t2,t3,t4,t5,t6,t7};//connecta amb gui
 </script>
 
@@ -77,16 +77,15 @@
 <script>
   //enllaça amb el gui
   function redisplay(){
-
     Object.entries(trams).forEach(([key,t])=>{
       //cela per cada tram
       let td = document.querySelector(`#${key}`);
-      td.innerHTML=`<div style=text-align:center><span>Q<sub>${key}</sub></span>=${format(t.Qi)}</div>`;
+      td.innerHTML=`<div style=text-align:center><span>Q<sub>${key}</sub></span>=${format(t.state_variables.Q)}</div>`;
 
-      //div per cada
+      //div per cada tram
       let div=document.createElement('div');td.appendChild(div);
 
-      //nova taula state-variables
+      //taula state-variables
       let table=document.createElement('table');div.appendChild(table);
 
       let newRow=table.insertRow(-1)
@@ -95,7 +94,7 @@
         let newRow = table.insertRow(-1);
         newRow.insertCell(-1).innerHTML=key+": ";
         newRow.insertCell(-1).outerHTML="<td class=number>["+format(val)+"],</td>";
-        newRow.insertCell(-1).outerHTML="<td class=number>"+format(t.Qi*val)+"</td>";
+        newRow.insertCell(-1).outerHTML="<td class=number>"+format(t.state_variables.fluxes.components[key])+"</td>";
       });
       return;
 

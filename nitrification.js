@@ -23,13 +23,13 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt){
   let frac = this.totals;
 
   //compute activated sludge without nitrification
-  let AS_results = this.activated_sludge(Q,T,Vp,Rs);
+  let as_results = this.activated_sludge(T,Vp,Rs);
 
   //get necessary variables from activated_sludge
-  let Nti   = frac.Total_TKN;        //mg/L | total TKN influent
-  let Nouse = frac.ON.usON;          //mg/L | total N_USO_influent = N_USO_effluent
-  let MX_T  = AS_results.MX_T.value; //kg   | total sludge produced
-  let Ns    = AS_results.Ns.value;   //mg/L | N required from sludge production
+  let Nti   = frac.TKN.total;        //mg/L | total TKN influent
+  let Nouse = frac.TKN.usON;         //mg/L | total N_USO_influent = N_USO_effluent
+  let MX_T  = as_results.process_variables.MX_T.value; //kg   | total sludge produced
+  let Ns    = as_results.process_variables.Ns.value;   //mg/L | N required from sludge production
 
   //nitrification starts at page 17
 
@@ -65,10 +65,13 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt){
   let FOn_fxt = 4.57*Q*Nc_fxt/1000; //kg/d as O | O demand if fxt <  fxm
   let FOn_fxm = 4.57*Q*Nc_fxm/1000; //kg/d as O | O demand if fxt == fxm
 
-  //modificar les variables d'estat TODO
+  //create new state variables for effluent and wastage TODO
+  //constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx){
+  let effluent = new State_Variables(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+  let wastage  = new State_Variables(0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
-  //nitrification results
-  let results={
+  //nitrification process variables
+  let process_variables={
     µAmT         :{value:µAmT,         unit:"1/d",       descr:"Growth rate corrected by temperature"},
     KnT          :{value:KnT,          unit:"mg/L",      descr:"Kinetic constant corrected by temperature"},
     bAT          :{value:bAT,          unit:"1/d",       descr:"Growth rate corrected by temperature"},
@@ -85,27 +88,37 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt){
     //FOn_fxm      :{value:FOn_fxm,      unit:"kg/d as O", descr:"Oxygen demand                         (fxt = fxm)"},
   };
 
-  /*activated sludge results also
-    Object.entries(AS_results).forEach(([key,val])=>{
-      results[key]=val;
-    });
-  */
+  /*add AS process_variables below*/
+  [
+    'fSus',
+    'fSup',
+    'Ns',
+    'Ps',
+    'HRT',
+    'bHT',
+    'X_BH',
+    'MX_BH',
+    'MX_EH',
+    'MX_I',
+    'MX_V',
+    'MX_IO',
+    'MX_T',
+    'fi',
+    'X_V',
+    'X_T',
+    'f_avOHO',
+    'f_atOHO',
+  ].forEach(key=>{
+    process_variables[key]=as_results.process_variables[key];
+  });
 
-  return results;
+  return {process_variables, effluent, wastage};
 };
 
 /*test */
 (function test(){
   return;
-  let sv = new State_Variables();
-  sv.components.S_VFA  = 50;
-  sv.components.S_FBSO = 115;
-  sv.components.X_BPO  = 255;
-  sv.components.X_UPO  = 10;
-  sv.components.S_USO  = 45;
-  sv.components.X_iSS  = 15;
-  sv.components.S_FSA  = 39.1;
-  sv.components.S_OP   = 7.28;
-  sv.components.S_NOx  = 0;
-  console.log(sv.nitrification());
+  let sv = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0);
+  let nitri = sv.nitrification();
+  console.log(nitri.process_variables);
 })();

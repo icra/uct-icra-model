@@ -25,8 +25,11 @@ class Xarxa {
     //afegeix propietat "calculat=false" a tots els trams
     this.trams.forEach(t=>t.calculat=false);
 
-    //verbose: mostra S_VFA inicial
-    if(verbose) console.log("S_VFA inici (flux): "+this.trams.map(t=>t.fluxes.S_VFA));
+    //verbose: mostra cabals i S_VFA inicial
+    if(verbose){
+      console.log("Cabals inici (ML/d): "+this.trams.map(t=>t.state_variables.Q));
+      console.log("S_VFA  inici (kg/d): "+this.trams.map(t=>t.state_variables.fluxes.components.S_VFA));
+    }
 
     /*ARRELS*/
     //busca trams inicials (no tenen pares)
@@ -35,10 +38,10 @@ class Xarxa {
 
     //calcula contaminants arrels (Mf)
     arrels.forEach(a=>{
-      Object.entries(a.fluxes).forEach(([key,val])=>{
-        let Mi = val;               //g/s | massa inicial
+      Object.entries(a.state_variables.fluxes.components).forEach(([key,Mi])=>{
         let Mf = a.Mf(Mi, 0, 0, 0); //g/s | massa final (aplica degradació)
-        let conc_final = Mf/a.Qi;   //g/m3
+        if(a.state_variables.Q==0) throw "El cabal de l'arrel és zero";
+        let conc_final = Mf/a.state_variables.Q; //g/m3
         a.state_variables.set(key, conc_final);
       });
       a.calculat=true;
@@ -53,8 +56,9 @@ class Xarxa {
       //si la la xarxa ja està calculada, acaba
       if(this.trams.filter(t=>t.calculat).length==this.trams.length){
         if(verbose){
-          console.log("S_VFA final (flux): "+this.trams.map(t=>t.fluxes.S_VFA));
-          console.log("Xarxa calculada ("+iteracions.fetes+" iteracions)");
+          console.log("Cabals final (ML/d): "+this.trams.map(t=>t.state_variables.Q));
+          console.log("S_VFA  final (kg/d): "+this.trams.map(t=>t.state_variables.fluxes.components.S_VFA));
+          console.log("[!] Xarxa calculada ("+iteracions.fetes+" iteracions)");
         }
         //esborra propietat "calculat" a tots els trams
         this.trams.forEach(t=>{delete t.calculat});
@@ -69,17 +73,23 @@ class Xarxa {
 
       //calcula contaminants
       Object.keys(tram_actual.state_variables.components).forEach(key=>{
-        //massa inicial = massa dels pares
-        let Mi = tram_actual.pares.map(p=>p.fluxes[key]).reduce((p,c)=>p+c); //g/s
+
+        //massa inicial = suma els fluxes dels dels pares
+        let Mi = tram_actual.pares.map(p=>p.state_variables.fluxes.components[key]).reduce((p,c)=>p+c); //g/s
+
+        //suma els cabals dels pares
+        tram_actual.state_variables.Q = 
+        tram_actual.state_variables.Q = tram_actual.pares.map(p=>p.state_variables.Q).reduce((p,c)=>p+c); //g/s
 
         //si hi ha una wwtp:
         if(tram_actual.wwtp){
-          Mi += tram_actual.wwtp.fluxes(tram_actual.Qi)[key];
+          Mi += tram_actual.wwtp.fluxes.components[key];
         }
 
         //Massa final.  Tram.Mf(Mi, R_20,k,T)
         let Mf = tram_actual.Mf(Mi, 0,   0,0);
-        tram_actual.state_variables.set(key, Mf/tram_actual.Qi);
+        if(tram_actual.state_variables.Q==0) throw "El cabal del tram de riu és zero";
+        tram_actual.state_variables.set(key, Mf/tram_actual.state_variables.Q);
       });
       tram_actual.calculat=true;
 
@@ -110,34 +120,15 @@ if(typeof document == "undefined"){
     t4--+
     */
     let xarxa = new Xarxa();
-    let t1 = new Tram();
-    let t2 = new Tram();
-    let t3 = new Tram();
-    let t4 = new Tram();
+    let t1 = new Tram(); t1.state_variables.Q = 10; t1.state_variables.set('S_VFA',1);
+    let t2 = new Tram(); t2.state_variables.Q = 10;
+    let t3 = new Tram(); t3.state_variables.Q = 10;
+    let t4 = new Tram(); t4.state_variables.Q = 10;
     let t5 = new Tram(); t5.pares=[t1,t2];
     let t6 = new Tram(); t6.pares=[t3,t4];
     let t7 = new Tram(); t7.pares=[t5,t6];
     xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
     xarxa.soluciona(verbose=true);
   }
-  {/* Exemple 2:
-    t1--+
-        |
-    t2--+--> t5--+ 
-        |        |
-    t3--+        +--> t6 --> t7
-                 |
-    t4-----------+ 
-    */
-    let xarxa = new Xarxa();
-    let t1 = new Tram();
-    let t2 = new Tram();
-    let t3 = new Tram();
-    let t4 = new Tram();
-    let t5 = new Tram(); t5.pares=[t1,t2,t3];
-    let t6 = new Tram(); t6.pares=[t4,t5];
-    let t7 = new Tram(); t7.pares=[t6];
-    xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
-    xarxa.soluciona(verbose=true);
-  }
+  return;
 })();

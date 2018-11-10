@@ -57,14 +57,44 @@
       #techs fieldset { margin-bottom:8px; }
     </style>
 
+    <script>
+      function print_proces_variables(id, message, results){
+        document.getElementById(id).appendChild((function(){
+          let div=document.createElement('div');div.style.fontSize='smaller';
+          div.innerHTML=message+'<br>';
+          let info=document.createElement('table');info.classList.add('info');
+          Object.entries(results).forEach(([key,val])=>{
+            let newRow=info.insertRow(-1);
+            newRow.insertCell(-1).innerHTML=key;
+            if(typeof val == 'number'){
+              let fvalue = format(val);
+              let color = Math.abs(100-val) > 0.5 ? "red":"green";
+              newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+" %</td>";
+            }else{
+              newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
+              newRow.insertCell(-1).innerHTML="<small>"+val.unit.prettifyUnit()+"</small>";
+              newRow.insertCell(-1).innerHTML="<small>"+val.descr+"<small>";
+            }
+          });
+          let info_btn=document.createElement('button'); info_btn.style.background="lightblue";
+          info_btn.innerHTML="Show/Hide Results";
+          info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
+          div.appendChild(info_btn);
+          div.appendChild(info);
+          return div;
+        })());
+        document.querySelectorAll('#'+id+' table.info').forEach(t=>{t.style.display='none';});
+      }
+    </script>
+
     <!--PST-->
     <fieldset id=primary_settler>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/primary-settler.js" target=_blank>Primary settler</a></legend>
       <table border=1>
-        <tr><td>fw         <td><input id=fw          type=number value=0.005>  <td class=unit>&empty;
-        <tr><td>removal BPO<td><input id=removal_BPO type=number value=57.4257><td class=unit>%
-        <tr><td>removal UPO<td><input id=removal_UPO type=number value=86.6667><td class=unit>%
-        <tr><td>removal iSS<td><input id=removal_iSS type=number value=66>     <td class=unit>%
+        <tr><td>fw         <td><input id=fw          type=number min=0 value=0.005>  <td class=unit>&empty;
+        <tr><td>removal BPO<td><input id=removal_BPO type=number min=0 value=57.4257><td class=unit>%
+        <tr><td>removal UPO<td><input id=removal_UPO type=number min=0 value=86.6667><td class=unit>%
+        <tr><td>removal iSS<td><input id=removal_iSS type=number min=0 value=66>     <td class=unit>%
       </table>
       <button onclick="run_pst();">Run</button>
       <script>
@@ -73,37 +103,13 @@
           let removal_BPO = parseFloat(document.querySelector('#primary_settler #removal_BPO').value);
           let removal_UPO = parseFloat(document.querySelector('#primary_settler #removal_UPO').value);
           let removal_iSS = parseFloat(document.querySelector('#primary_settler #removal_iSS').value);
-          let results = sv.primary_settler(fw, removal_BPO, removal_UPO, removal_iSS);
+          let pst = sv.primary_settler(fw, removal_BPO, removal_UPO, removal_iSS);
           redisplay();
-          document.querySelector('#primary_settler').appendChild((function(){
-            let div=document.createElement('div');
-            div.style.fontSize='smaller';
-            div.innerHTML=`Primary Settler(Q=${Q}, fw=${fw}, removal_BPO=${removal_BPO}, removal_UPO=${removal_UPO}, removal_iSS=${removal_iSS}) calculated<br>`;
-            let info=document.createElement('table');
-            info.classList.add('info');
-            Object.keys(results).forEach(key=>{
-              let newRow=info.insertRow(-1);
-              newRow.insertCell(-1).innerHTML=key;
-              if(typeof results[key] == 'number'){
-                let fvalue = format(100*results[key]);
-                let color = parseFloat(fvalue) < 0.1 ? "green":"red";
-                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
-              }else{
-                newRow.insertCell(-1).outerHTML="<td class=number>"+format(results[key].value)+"</td>";
-                newRow.insertCell(-1).innerHTML=results[key].unit.prettifyUnit();
-                newRow.insertCell(-1).innerHTML="<small>"+results[key].descr+"<small>";
-              }
-            });
-            let info_btn=document.createElement('button'); 
-            info_btn.style.display='block'; 
-            info_btn.style.background="lightblue";
-            info_btn.innerHTML="Show/Hide Results";
-            info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
-            div.appendChild(info_btn);
-            div.appendChild(info);
-            return div;
-          })());
-          document.querySelectorAll('#primary_settler table.info').forEach(t=>{t.style.display='none';});
+          print_proces_variables(
+            'primary_settler',
+            `primary_settler(${fw}, ${removal_BPO}, ${removal_UPO}, ${removal_iSS}) calculated`,
+            pst.process_variables
+          );
         }
       </script>
     </fieldset>
@@ -112,45 +118,23 @@
     <fieldset id=activated_sludge>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/activated-sludge.js" target=_blank>Activated Sludge</a></legend>
       <table border=1>
-        <tr><td>Q  <td><input id=Q  type=number value=24875>  <td class=unit>m<sup>3</sup>/d
-        <tr><td>T  <td><input id=T  type=number value=16>     <td class=unit>ºC
-        <tr><td>Vp <td><input id=Vp type=number value=8473.3> <td class=unit>m<sup>3</sup>
-        <tr><td>Rs <td><input id=Rs type=number value=15>     <td class=unit>d
+        <tr><td>T  <td><input id=T  type=number min=-273 value=16>     <td class=unit>ºC
+        <tr><td>Vp <td><input id=Vp type=number min=0    value=8473.3> <td class=unit>m<sup>3</sup>
+        <tr><td>Rs <td><input id=Rs type=number min=0    value=15>     <td class=unit>d
       </table>
       <button onclick="run_AS();">Run</button>
       <script>
         function run_AS(){
-          let Q  = parseFloat(document.querySelector('#activated_sludge #Q' ).value);
           let T  = parseFloat(document.querySelector('#activated_sludge #T' ).value);
           let Vp = parseFloat(document.querySelector('#activated_sludge #Vp').value);
           let Rs = parseFloat(document.querySelector('#activated_sludge #Rs').value);
-          let results = sv.activated_sludge(T, Vp, Rs);
+          let as = sv.activated_sludge(T, Vp, Rs);
           redisplay();
-          document.querySelector('#activated_sludge').appendChild((function(){
-            let div=document.createElement('div');div.style.fontSize='smaller';
-            div.innerHTML="activated_sludge(Q="+Q+", T="+T+", Vp="+Vp+", Rs="+Rs+") calculated<br>";
-            let info=document.createElement('table');info.classList.add('info');
-            Object.entries(results).forEach(([key,val])=>{
-              let newRow=info.insertRow(-1);
-              newRow.insertCell(-1).innerHTML=key;
-              if(typeof val == 'number'){
-                let fvalue = format(val);
-                let color = Math.abs(100-val) > 0.5 ? "red":"green";
-                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
-              }else{
-                newRow.insertCell(-1).outerHTML="<td class=number>"+format(val.value)+"</td>";
-                newRow.insertCell(-1).innerHTML=val.unit.prettifyUnit();
-                newRow.insertCell(-1).innerHTML="<small>"+val.descr+"<small>";
-              }
-            });
-            let info_btn=document.createElement('button'); info_btn.style.background="lightblue";
-            info_btn.innerHTML="Show/Hide Results";
-            info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
-            div.appendChild(info_btn);
-            div.appendChild(info);
-            return div;
-          })());
-          document.querySelectorAll('#activated_sludge table.info').forEach(t=>{t.style.display='none';});
+          print_proces_variables(
+            'activated_sludge',
+            `activated_sludge(${T}, ${Vp}, ${Rs}) calculated`,
+            as.process_variables
+          );
         }
       </script>
     </fieldset>
@@ -159,7 +143,6 @@
     <fieldset id=nitrification>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/nitrification.js" target=_blank>Activated Sludge + Nitrification</a></legend>
       <table border=1>
-        <tr><td>Q   <td><input id=Q   type=number value=24875>  <td class=unit>m<sup>3</sup>/d
         <tr><td>T   <td><input id=T   type=number value=16>     <td class=unit>ºC
         <tr><td>Vp  <td><input id=Vp  type=number value=8473.3> <td class=unit>m<sup>3</sup>
         <tr><td>Rs  <td><input id=Rs  type=number value=15>     <td class=unit>d
@@ -169,41 +152,18 @@
       <button onclick="run_nitri();">Run</button>
       <script>
         function run_nitri(){
-          let Q   = parseFloat(document.querySelector('#nitrification #Q' ).value);
           let T   = parseFloat(document.querySelector('#nitrification #T' ).value);
           let Vp  = parseFloat(document.querySelector('#nitrification #Vp').value);
           let Rs  = parseFloat(document.querySelector('#nitrification #Rs').value);
           let SF  = parseFloat(document.querySelector('#nitrification #SF').value);
           let fxt = parseFloat(document.querySelector('#nitrification #fxt').value);
-          let results = sv.nitrification(Q, T, Vp, Rs, SF, fxt);
+          let nitri = sv.nitrification(T, Vp, Rs, SF, fxt);
           redisplay();
-          document.querySelector('#nitrification').appendChild((function(){
-            let div=document.createElement('div');
-            div.style.fontSize='smaller';
-            div.innerHTML="nitrification(Q="+Q+", T="+T+", Vp="+Vp+", Rs="+Rs+", SF="+SF+", fxt="+fxt+") calculated";
-            let info=document.createElement('table');
-            info.classList.add('info');
-            Object.keys(results).forEach(key=>{
-              let newRow=info.insertRow(-1);
-              newRow.insertCell(-1).innerHTML=key;
-              if(typeof results[key] == 'number'){
-                let fvalue = format(100*results[key]);
-                let color = parseFloat(fvalue) < 0.1 ? "green":"red";
-                newRow.insertCell(-1).outerHTML="<td class=number style=color:white;background:"+color+";>"+fvalue+"</td>";
-              }else{
-                newRow.insertCell(-1).outerHTML="<td class=number>"+format(results[key].value)+"</td>";
-                newRow.insertCell(-1).innerHTML=results[key].unit.prettifyUnit();
-                newRow.insertCell(-1).innerHTML="<small>"+results[key].descr+"<small>";
-              }
-            });
-            let info_btn=document.createElement('button'); info_btn.style.display='block'; info_btn.style.background="lightblue";
-            info_btn.innerHTML="Show/Hide Results";
-            info_btn.onclick=function(){ info.style.display=info.style.display=='none'?'':'none'; };
-            div.appendChild(info_btn);
-            div.appendChild(info);
-            return div;
-          })());
-          document.querySelectorAll('#nitrification table.info').forEach(t=>{t.style.display='none';});
+          print_proces_variables(
+            'nitrification',
+            `nitrification(${T}, ${Vp}, ${Rs}, ${SF}, ${fxt}) calculated`,
+            nitri.process_variables
+          );
         }
       </script>
     </fieldset>

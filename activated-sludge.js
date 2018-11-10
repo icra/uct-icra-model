@@ -128,21 +128,9 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   //return {effluent, wastage, process_variables};
   let process_variables={
     //balances
-    COD_balance, N_balance, Nae_balance, P_balance,
-
-    //effluent things
-    FNte    :{value:FNte,       unit:"kg/d_as_N",     descr:"Flux TKN effluent"},
-    Nte     :{value:Nte,        unit:"mg/L_as_N",     descr:"TKN concentration effluent"},
-    FPte    :{value:FPte,       unit:"kg/d_as_P",     descr:"Flux TP effluent"},
-    Pte     :{value:Pte,        unit:"mg/L_as_P",     descr:"TP concentration effluent"},
-
-    //wastage
-    FSw     :{value:FSw,        unit:"kg/d_as_O",     descr:"Flux COD wastage"},
-
-    //process
+    //COD_balance, N_balance, Nae_balance, P_balance,
     fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio (influent)"},
     fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio (influent)"}, 
-    FSout   :{value:FSout,      unit:"kg/d_as_O",     descr:"Flux COD out (effluent + FOc + wastage)"},
     Ns      :{value:Ns,         unit:"mg/L_as_N",     descr:"N required for sludge production"},
     Ps      :{value:Ps,         unit:"mg/L_as_P",     descr:"P required for sludge production"},
     HRT     :{value:HRT,        unit:"hour",          descr:"Hydraulic Retention Time"},
@@ -155,8 +143,8 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
     MX_IO   :{value:MX_IO,      unit:"kg_iSS",        descr:"Inert Solids (influent+biomass)"},
     MX_T    :{value:MX_T,       unit:"kg_TSS",        descr:"Total Suspended Solids"},
     fi      :{value:fi,         unit:"g_VSS/g_TSS",   descr:"VSS/TSS ratio"},
-    X_V     :{value:MLSS_X_VSS, unit:"kg_VSS/m3",     descr:"VSS concentration at SST"},
-    X_T     :{value:MLSS_X_TSS, unit:"kg_TSS/m3",     descr:"TSS concentration at SST"},
+    X_V     :{value:MLSS_X_VSS, unit:"kg_VSS/m3",     descr:"VSS concentration in SST"},
+    X_T     :{value:MLSS_X_TSS, unit:"kg_TSS/m3",     descr:"TSS concentration in SST"},
     f_avOHO :{value:f_avOHO,    unit:"g_OHO/g_VSS",   descr:"Active fraction of the sludge (VSS)"},
     f_atOHO :{value:f_atOHO,    unit:"g_OHO/g_TSS",   descr:"Active fraction of the sludge (TSS)"},
     FOc     :{value:FOc,        unit:"kg/d_as_O",     descr:"Carbonaceous Oxygen Demand"},
@@ -170,10 +158,10 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
 
 /*test*/
 (function test(){
+  return;
   let sv = new State_Variables(24.875,50,115,255,10,45,15,39.1,7.28,0);
   //console.log(sv.totals);
   //console.log(sv.fluxes);
   let as = sv.activated_sludge();
   console.log(as.process_variables);
-  return;
 })();

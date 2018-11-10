@@ -57,18 +57,23 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
     console.log("=== EFFLUENT FLUXES");          console.log(effluent.fluxes.totals);
     console.log("=== WASTAGE  CONCENTRATIONS");  console.log(wastage.totals);
     console.log("=== WASTAGE  FLUXES");          console.log(wastage.fluxes.totals);
-    //calculate mass flux sludge produced (kg TSS)
-    //it has to be the same value as wastage.fluxes.totals.TSS.total
-    let BPO_removed = wastage.fluxes.components.X_BPO/this.mass_ratios.f_CV_BPO; //kg VSS
-    let UPO_removed = wastage.fluxes.components.X_UPO/this.mass_ratios.f_CV_UPO; //kg VSS
-    let iSS_removed = wastage.fluxes.components.X_iSS;                           //kg iSS
-    let total_primary_sludge = BPO_removed + UPO_removed + iSS_removed;          //kg TSS
-    console.log(total_primary_sludge);
-    console.log(wastage.fluxes.totals.TSS.total);
   */
+  //calculate mass flux sludge produced (kg TSS)
+  //it has to be the same value as wastage.fluxes.totals.TSS.total
+  let BPO_removed = wastage.fluxes.components.X_BPO/this.mass_ratios.f_CV_BPO; //kg VSS
+  let UPO_removed = wastage.fluxes.components.X_UPO/this.mass_ratios.f_CV_UPO; //kg VSS
+  let iSS_removed = wastage.fluxes.components.X_iSS;                           //kg iSS
+  let primary_sludge = BPO_removed + UPO_removed + iSS_removed;          //kg TSS
+  //console.log(primary_sludge);
+  //console.log(wastage.fluxes.totals.TSS.total);
+  let process_variables={
+    Qe:             {value:Qe, unit:"ML/d", descr:"Effluent flowrate"},
+    Qw:             {value:Qw, unit:"ML/d", descr:"Wastage flowrate"},
+    primary_sludge: {value:primary_sludge, unit:"kg/d", descr:"Primary sludge production"},
+  };
 
   //results
-  return {effluent, wastage};
+  return {process_variables, effluent, wastage};
 };
 
 //test
