@@ -192,6 +192,24 @@ class State_Variables {
 
     return {components, totals};
   }
+
+  //get reduced table (concentrations and fluxes combined)
+  get summary(){
+    let totals = this.totals;
+    let fluxes = this.fluxes.totals;
+    return {
+      Q: this.Q,
+      COD: [totals.COD.total, fluxes.COD.total],
+      TKN: [totals.TKN.total, fluxes.TKN.total],
+      FSA: [totals.TKN.FSA,   fluxes.TKN.FSA],
+      TP:  [totals.TP.total,  fluxes.TP.total],
+      PO4: [totals.TP.PO4,    fluxes.TP.PO4],
+      TOC: [totals.TOC.total, fluxes.TOC.total],
+      TSS: [totals.TSS.total, fluxes.TSS.total],
+      iSS: [totals.TSS.iSS,   fluxes.TSS.iSS],
+      VSS: [totals.TSS.VSS,   fluxes.TSS.VSS],
+    }
+  }
 }
 
 //node export
@@ -201,15 +219,15 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
 (function test(){
   return;
   let s = new State_Variables(25);
-  console.log("=== Components (mg/L) ==="); console.log(s.components);
-  console.log("=== Totals (mg/L) ===");     console.log(s.totals);
-  console.log("=== Fluxes (kg/d) ===");     console.log(s.fluxes);
-  return;
+  //console.log("=== Components (mg/L) ==="); console.log(s.components);
+  //console.log("=== Totals (mg/L) ===");     console.log(s.totals);
+  //console.log("=== Fluxes (kg/d) ===");     console.log(s.fluxes);
+  //console.log("=== Summary ===");           console.log(s.summary);
   //create 2 manual scenarios: (1) raw ww, (2) settled ww
   //syntax ------> constructor( Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA,  S_OP, S_NOx)
   let sv = new State_Variables(25,    50,    186,     0,     0,    58,     0,  59.6, 14.15,     0);
-  sv.set("X_BPO", 707); sv.set("X_UPO", 150); sv.set("X_iSS", 100); console.log(sv.totals);
-  sv.set('X_BPO', 301); sv.set('X_UPO', 20);  sv.set('X_iSS', 34);  console.log(sv.totals);
+  sv.set("X_BPO", 707); sv.set("X_UPO", 150); sv.set("X_iSS", 100); console.log(sv.summary);
+  sv.set('X_BPO', 301); sv.set('X_UPO', 20);  sv.set('X_iSS', 34);  console.log(sv.summary);
   /* calculations from george ekama
     inputs:
       S_VFA_inf:         50,

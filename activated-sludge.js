@@ -122,8 +122,8 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
 
   //create 2 new state variables (effluent, wastage) TODO
   //syntax ------------->constructor(Q,  VFA, FBSO,     BPO,     UPO,  USO,     iSS, FSA, PO4, NOx)
-  let effluent = new State_Variables(Qe,   0,    0, BPO_eff, UPO_eff, Suse, iSS_eff, Nae, Pse,   0);
-  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse,   0);
+  let effluent = new State_Variables(Qe/1000,   0,    0, BPO_eff, UPO_eff, Suse, iSS_eff, Nae, Pse,   0);
+  let wastage  = new State_Variables(Qw/1000,   0,    0, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse,   0);
 
   //return {effluent, wastage, process_variables};
   let process_variables={
@@ -137,7 +137,7 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
     bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
     X_BH    :{value:X_BH,       unit:"g_VSS·d/g_COD", descr:"Biomass production rate"},
     MX_BH   :{value:MX_BH,      unit:"kg_VSS",        descr:"Biomass produced VSS"},
-    MX_EH   :{value:MX_EH,      unit:"kg_VSS",        descr:"Endogenoous residue VSS"},
+    MX_EH   :{value:MX_EH,      unit:"kg_VSS",        descr:"Endogenous residue VSS"},
     MX_I    :{value:MX_I,       unit:"kg_VSS",        descr:"Unbiodegradable organics VSS"},
     MX_V    :{value:MX_V,       unit:"kg_VSS",        descr:"Volatile Suspended Solids"},
     MX_IO   :{value:MX_IO,      unit:"kg_iSS",        descr:"Inert Solids (influent+biomass)"},
