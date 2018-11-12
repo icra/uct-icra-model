@@ -13,9 +13,10 @@
   const f_iOHO = 0.15;    //g_iSS/gX  | fraction of inert solids in biomass
 
 //Nitrification
-  const µAm       = 0.45;  //1/d   | growth rate at 20ºC
-  const theta_µAm = 1.123; //unit? | µAm correction factor
-  const Kn        = 1.0;   //mg/L as N at 20ºC
-  const theta_Kn  = 1.123; //unit? | Kn correction factor
-  const bA        = 0.04;  //1/d at 20ºC
-  const theta_bA  = 1.029; //unit? | bA correction factor
+  const µAm       = 0.45;  //1/d    | growth rate at 20ºC
+  const theta_µAm = 1.123; //unit?  | µAm correction factor
+  const Kn        = 1.0;   //mg/L   | as N at 20ºC
+  const theta_Kn  = 1.123; //unit?  | Kn correction factor
+  const bA        = 0.04;  //1/d    | at 20ºC
+  const theta_bA  = 1.029; //unit?  | bA correction factor
+  const K_O       = 0;     //mgDO/L | nitrifier O sensitivity constant 

@@ -54,6 +54,8 @@ class State_Variables {
       /*BPO*/ f_CV_BPO  : 1.5230, f_C_BPO  : 0.498, f_N_BPO  : 0.0323, f_P_BPO  : 0.0072,
       /*UPO*/ f_CV_UPO  : 1.4810, f_C_UPO  : 0.518, f_N_UPO  : 0.1000, f_P_UPO  : 0.0250,
       /*USO*/ f_CV_USO  : 1.4930, f_C_USO  : 0.498, f_N_USO  : 0.0366, f_P_USO  : 0.0000,
+      /*OHO*/ f_CV_OHO  : 1.4810, f_C_OHO  : 0.518, f_N_OHO  : 0.1000, f_P_OHO  : 0.0250, 
+      /*PAO*/ f_CV_PAO  : 1.4810, f_C_PAO  : 0.518, f_N_PAO  : 0.1000, f_P_PAO  : 0.0250, 
       /*--------------------------------------------------------------------------------*/
     };
   };
