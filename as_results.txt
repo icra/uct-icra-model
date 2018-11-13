@@ -1,0 +1,62 @@
+Activated Sludge
+----------------
+
+Influent Q: 24.87 ML/d
+Effluent Q: 24.31 ML/d
+Wastage  Q:  0.56 ML/d
+
+COD_balance: 100, N_balance: 100, Nae_balance: 100, P_balance: 100
+
+COD:  [  475.0,     11815.625],
+COD:  [  45.0,      1093.955],
+COD:  [  5428.5,    3066.490],
+TKN:  [  50.000,    1244.849],
+TKN:  [  41.998,    1020.985],
+TKN:  [  176.567,   99.740],
+FSA:  [  39.100,    972.612],
+FSA:  [  40.895,    994.167],
+FSA:  [  40.895,    23.101],
+TP:   [  9.600,     239.047],
+TP:   [  7.598,     184.720],
+TP:   [  38.400,    21.692],
+PO4:  [  7.300,     181.090],
+PO4:  [  7.598,     184.720],
+PO4:  [  7.598,     4.292],
+TOC:  [  158.800,   3949.725],
+TOC:  [  15.010,    364.895],
+TOC:  [  1785.372,  1008.533],
+TSS:  [  189.200,   4705.974],
+TSS:  [  0.000,     0.000],
+TSS:  [  4499.996,  2541.987],
+iSS:  [  15.000,    373.125],
+iSS:  [  0.000,     0.000],
+iSS:  [  956.992,   540.592],
+VSS:  [  174.200,   4332.849]
+VSS:  [  0.000,     0.000]
+VSS:  [  3543.003,  2001.395]
+
+Process variables
+-----------------
+fSus     0.09473 'g_USO/g_COD',   "USO/COD ratio (influent)"
+fSup     0.02105 'g_UPO/g_COD',   "UPO/COD ratio (influent)"
+Ns       8.04581 'mg/L_as_N',     "N required for sludge production"
+Ps       2.01145 'mg/L_as_P',     "P required for sludge production"
+HRT      8.17524 'hour',          "Hydraulic Retention Time"
+bHT      0.21406 '1/d',           "OHO Growth rate corrected by temperature"
+X_BH     1.60294 'g_VSS·d/g_COD', "Biomass production rate"
+MX_BH    16746.7 'kg_VSS',        "Biomass produced VSS"
+MX_EH    10754.7 'kg_VSS',        "Endogenous residue VSS"
+MX_I     2519.41 'kg_VSS',        "Unbiodegradable organics VSS"
+MX_V     30020.9 'kg_VSS',        "Volatile Suspended Solids"
+MX_IO    8108.88 'kg_iSS',        "Inert Solids (influent+biomass)"
+MX_T     38129.8 'kg_TSS',        "Total Suspended Solids"
+fi       0.78733 'g_VSS/g_TSS',   "VSS/TSS ratio"
+X_V      3.54300 'kg_VSS/m3',     "VSS concentration in SST"
+X_T      4.49999 'kg_TSS/m3',     "TSS concentration in SST"
+f_avOHO  0.55783 'g_OHO/g_VSS',   "Active fraction of the sludge (VSS)"
+f_atOHO  0.43920 'g_OHO/g_TSS',   "Active fraction of the sludge (TSS)"
+FOc      7732.18 'kg/d_as_O',     "Carbonaceous Oxygen Demand"
+FOn      4648.91 'kg/d_as_O',     "Nitrogenous Oxygen Demand"
+FOt      12381.1 'kg/d_as_O',     "Total Oxygen Demand"
+OUR      60.8829 'mg/L·h_as_O',   "Oxygen Uptake Rate"
+
