@@ -1,6 +1,5 @@
 /*
-  Nitrification implementation from G. Ekama hand notes
-  STATUS: not finished TODO
+  AS + Nitrification implementation from G. Ekama notes
 */
 
 //import files
@@ -18,20 +17,20 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt, DO){
   fxt = isNaN(fxt) ? 0.39   : fxt ; //ratio | current unaerated sludge mass fraction
   DO  = isNaN(DO)  ? 2.0    : DO  ; //mg/L  | DO in the aerobic reactor
 
-  //flowrate
-  let Q = this.Q*1000; //m3/d (converted from ML/d)
-
   //compute influent fractionation
   let frac = this.totals;
 
   //compute activated sludge without nitrification
-  let as_results = this.activated_sludge(T,Vp,Rs);
+  let as = this.activated_sludge(T,Vp,Rs,RAS);
+
+  //flowrate
+  let Q = this.Q; //ML/d
 
   //get necessary variables from activated_sludge
-  let Nti   = frac.TKN.total;                          //mg/L | total TKN influent
-  let Nouse = frac.TKN.usON;                           //mg/L | total N_USO_influent = N_USO_effluent
-  let MX_T  = as_results.process_variables.MX_T.value; //kg   | total sludge produced
-  let Ns    = as_results.process_variables.Ns.value;   //mg/L | N required from sludge production
+  let Nti   = frac.TKN.total;                  //mg/L | total TKN influent
+  let Nouse = frac.TKN.usON;                   //mg/L | total N_USO_influent = N_USO_effluent
+  let MX_T  = as.process_variables.MX_T.value; //kg   | total sludge produced
+  let Ns    = as.process_variables.Ns.value;   //mg/L | N required from sludge production
 
   //nitrification starts at page 17
 
@@ -39,7 +38,9 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt, DO){
   const µAm  = 0.45;                     //1/d    | growth rate at 20ºC (maximum specific growth rate)
   let µAmT   = µAm*Math.pow(1.123,T-20); //1/d    | growth rate corrected by temperature
   const K_O = 0.0;                       //mgDO/L | nitrifier Oxygen sensitivity constant 
-  let µAmO  = DO/(DO+K_O)*µAmT;          //1/d    | growth rate corrected by temperature and DO
+  let µAmO  = µAmT*DO/(DO+K_O);          //1/d    | growth rate corrected by temperature and DO
+  //add pH effect to µA here TBD
+
   const Kn = 1.0;                        //mg/L as N at 20ºC (half saturation coefficient)
   let KnT  = Kn*Math.pow(1.123,T-20);    //mg/L as N corrected by temperature
   const bA = 0.04;                       //1/d at 20ºC (endogenous respiration rate)
@@ -69,8 +70,8 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt, DO){
   let Nc_fxm = Nti - Ns - Nte_fxm; //mg/L as N | Nitrification capacity if fxt == fxm
 
   //oxygen demand
-  let FOn_fxt = 4.57*Q*Nc_fxt/1000; //kg/d as O | O demand if fxt <  fxm
-  let FOn_fxm = 4.57*Q*Nc_fxm/1000; //kg/d as O | O demand if fxt == fxm
+  let FOn_fxt = 4.57*Q*Nc_fxt; //kg/d as O | O demand if fxt <  fxm
+  let FOn_fxm = 4.57*Q*Nc_fxm; //kg/d as O | O demand if fxt == fxm
 
   //create new state variables for effluent and wastage TODO
   //constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx){

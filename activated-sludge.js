@@ -1,18 +1,19 @@
 /*
-  AS implementation from G. Ekama handwritten notes
+  AS+SST implementation from G. Ekama handwritten notes
 
-    Qi → [Activated Sludge] → Qe
-           ↓      ↓                
-           Qw     Qw (SST)
+    Qi → [Activated Sludge + SST] → Qe
+                    ↓ 
+                    Qw
 */
 //import files
 if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
 
-State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
+State_Variables.prototype.activated_sludge=function(T, Vp, Rs, RAS){
   //inputs and default values
-  T  = isNaN(T ) ? 16     : T ; //ºC   | Temperature
-  Vp = isNaN(Vp) ? 8473.3 : Vp; //m3   | Volume
-  Rs = isNaN(Rs) ? 15     : Rs; //days | Solids Retention Time
+  T   = isNaN(T )  ? 16     : T ;  //ºC   | Temperature
+  Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume
+  Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
+  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -38,7 +39,7 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
 
   //page 10
   const YH     = 0.45;                   //gVSS/gCOD
-  let f_XBH    = (YH*Rs)/(1+bHT*Rs);     //g_VSS*d/g_COD | biomass production rate
+  let f_XBH    = (YH*Rs)/(1+bHT*Rs);     //g_VSS·d/g_COD | biomass production rate
   let MX_BH    = FSbi * f_XBH;           //kg_VSS        | biomass produced
   const fH     = 0.20;                   //              | tabled value
   let MX_EH    = fH * bHT * Rs * MX_BH;  //kg_VSS        | endogenous residue OHOs
@@ -57,10 +58,11 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   let X_T  = MX_T/Vp;  //kgTSS/m3 | TSS
 
   //2.3 - page 11
-  let HRT = Vp/(Q*1000)*24; //hours | hydraulic retention time
+  let HRT = Vp/(Q*1000)*24; //hours | nominal hydraulic retention time
 
   //2.4 - page 12
   let Qw = (Vp/Rs)/1000; //ML/day | wastage flow
+
   let Qe = Q - Qw;       //ML/day | effluent flow
 
   //2.5 
@@ -92,7 +94,7 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   let FOc = FSbi*((1-fCV_OHO*YH)+fCV_OHO*(1-fH)*bHT*f_XBH); //kg_O/d | carbonaceous oxygen demand
   let FOn = 4.57*Q*Nae;                                     //kg_O/d | nitrogenous oxygen demand
   let FOt = FOc + FOn;                                      //kg_O/d | total oxygen demand
-  let OUR = FOt*1e3/(Vp*24);                                //mg/L·h | oxygen uptake rate
+  let OUR = FOt/(Vp*24)*1000;                               //mg/L·h | oxygen uptake rate
 
   //2.8 - effluent Phosphorus
   let Ps  = (f_P_OHO*(MX_BH+MX_EH) + f_P_UPO*MX_I)/(Rs*Q);  //mg/L | P required for sludge production
@@ -141,14 +143,25 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
   let effluent = new State_Variables(Qe, 0,   0,    0,       0,       Suse, 0,       Nae, Pse, 0  );
   let wastage  = new State_Variables(Qw, 0,   0,    BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, 0  );
 
-  //return {effluent, wastage, process_variables};
+  //Secondary Settler (SST) and recycle flow state variables
+  let SST=(function(){
+    let f       = (1+RAS)/RAS;        //ø     | concentrating factor
+    let Qr      = Q*RAS;              //ML/d  | recycle flowrate
+    let X_RAS   = f*X_T;              //kg/m3 | TSS concentration
+    let Qw      = (1/f)*(Vp/Rs)/1000; //ML/d  | ask george TODO
+    return {f,Qr,X_RAS,Qw}
+  })();
+  //recycle flow state variables:  (Q,      VFA, FBSO, BPO,           UPO,           USO,  iSS,           FSA, PO4, NOx)
+  let recycle = new State_Variables(SST.Qr, 0,   0,    SST.f*BPO_was, SST.f*UPO_was, Suse, SST.f*iSS_was, Nae, Pse,   0);
+
+  //process_variables
   let process_variables={
     COD_balance, N_balance, Nae_balance, P_balance,
     fSus    :{value:fSus,       unit:"g_USO/g_COD",   descr:"USO/COD ratio (influent)"},
     fSup    :{value:fSup,       unit:"g_UPO/g_COD",   descr:"UPO/COD ratio (influent)"}, 
     Ns      :{value:Ns,         unit:"mg/L_as_N",     descr:"N required for sludge production"},
     Ps      :{value:Ps,         unit:"mg/L_as_P",     descr:"P required for sludge production"},
-    HRT     :{value:HRT,        unit:"hour",          descr:"Hydraulic Retention Time"},
+    HRT     :{value:HRT,        unit:"hour",          descr:"Nominal Hydraulic Retention Time"},
     bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
     f_XBH   :{value:f_XBH,      unit:"g_VSS·d/g_COD", descr:"Biomass production rate"},
     MX_BH   :{value:MX_BH,      unit:"kg_VSS",        descr:"Biomass produced VSS"},
@@ -166,19 +179,25 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs){
     FOn     :{value:FOn,        unit:"kg/d_as_O",     descr:"Nitrogenous Oxygen Demand"},
     FOt     :{value:FOt,        unit:"kg/d_as_O",     descr:"Total Oxygen Demand"},
     OUR     :{value:OUR,        unit:"mg/L·h_as_O",   descr:"Oxygen Uptake Rate"},
+    f       :{value:SST.f,      unit:"ø",             descr:"SST concentrating factor"},
+    Qr      :{value:SST.Qr,     unit:"ML/d",          descr:"SST recycle flowrate"},
+    X_RAS   :{value:SST.X_RAS,  unit:"kg/m3",         descr:"SST recycle flow TSS concentration"},
   };
+  Object.entries(process_variables).forEach(([key,value])=>{delete value.descr;}); //debugging: remove description 
+
   return {effluent, wastage, process_variables};
 };
 
 /*test*/
 (function test(){
-  return;
+  //return;
   let sv = new State_Variables(24.875,50,115,255,10,45,15,39.1,7.28,0);
   let as = sv.activated_sludge(16, 8473.3, 15);
+  console.log("=== AS summary");       console.log(as.process_variables);
+  return
   //console.log("=== Influent"); console.log(sv.summary);
   console.log("=== Effluent SV");      console.log(as.effluent.components);
   console.log("=== Effluent summary"); console.log(as.effluent.summary);
   console.log("=== Wastage SV");       console.log(as.wastage.components);
   console.log("=== Wastage summary");  console.log(as.wastage.summary);
-  console.log("=== AS summary");       console.log(as.process_variables);
 })();

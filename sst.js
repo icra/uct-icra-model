@@ -1,26 +1,21 @@
 
-function sst(RAS){
-  //inputs and default values
-  RAS = isNaN(RAS) ? 1.0 : RAS; //underflow recycle ratio
-
+//SST module
+function sst(){
+  //example inputs
+  let RAS = 1.0;   //underflow recycle ratio
   let Q   = 25;    //ML/d
-  let X_T = 4.5;   //kg/m3
   let Rs  = 15;    //d
   let Vp  = 8473.3 //m3
+  let X_T = 4.5;   //kg/m3
 
-  //calculate
-  let Q_RAS = Q*RAS;                  //ML/d
-  let f     = (1+RAS)/RAS;            //concentrating factor
-  let X_RAS = f*X_T;                  //kg/m3
-  let Qw    = (X_T*Vp/Rs)/X_RAS/1000; //ML/d
+  //equations
+  let f     = (1+RAS)/RAS;              //concentrating factor
+  let Qr    = Q*RAS;                    //ML/d
+  let X_RAS = f*X_T;                    //kg/m3
+  let Qw    = (X_T/X_RAS)*(Vp/Rs)/1000; //ML/d
 
-  //new state variables
-  //syntax ---------> constructor(Q,  VFA, FBSO, BPO,       UPO,       USO,  iSS,       FSA, PO4, NOx)
-  //let sst   = new State_Variables(Qw, 0,   0,    f*BPO_was, f*UPO_was, Suse, f*iSS_was, Nae, Pse,   0);
-
-  console.log(Qw);
-  return Qw;
-
+  //return
+  return {f, Qr, X_RAS, Qw};
 }
 
-sst();
+console.log(sst());

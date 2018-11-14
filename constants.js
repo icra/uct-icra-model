@@ -8,7 +8,7 @@
 //Activated sludge
   const bH       = 0.24;  //1/d       | growth rate at 20ºC (standard)
   const theta_bH = 1.029; //unit?     | bH correction factor
-  const YH     = 0.45;    //gVSS/gCOD | name?
+  const YH     = 0.45;    //gVSS/gCOD |
   const fH     = 0.20;    //unit?     | tabled value
   const f_iOHO = 0.15;    //g_iSS/gX  | fraction of inert solids in biomass
 
