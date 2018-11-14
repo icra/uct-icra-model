@@ -219,6 +219,22 @@ class State_Variables {
       VSS: [totals.TSS.VSS,   fluxes.TSS.VSS],
     }
   }
+
+  //combine 2 state variables: return a new SV object with the sum
+  combine(sv){
+    let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0);
+    //new flowrate
+    let Q = this.Q + sv.Q;
+    new_sv.Q = Q;
+    //new concentrations: sum fluxes and divide by new Q
+    Object.keys(this.components).forEach(key=>{
+      let mass=0;
+      mass += this.Q * this.components[key];
+      mass += sv.Q   * sv.components[key];
+      new_sv.set(key,mass/Q);
+    });
+    return new_sv;
+  }
 }
 
 //node export
@@ -226,36 +242,40 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
 
 /*test*/
 (function test(){
-  return;
-  {//test 1
+  return 
+  {//combine 2 state variables and check summary
+    let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2);
+    let s2 = new State_Variables(10,1,1,1,1,1,1,1,1,1);
+    let s3 = s1.combine(s2);
+    console.log(s1.summary);
+    console.log(s2.summary);
+    console.log(s3.summary);
+    console.log(s3.components);
+  };return;
+  {//check totals and fluxes
     let s = new State_Variables(25);
     console.log("=== Components (mg/L) ===");  console.log(s.components);
     console.log("=== Totals (mg/L) ===");      console.log(s.totals);
     console.log("=== Fluxes (kg/d) ===");      console.log(s.fluxes);
-    console.log("=== Summary [mgL, kg/d]==="); console.log(s.summary);
-  }
-
-  return;
-  {//test 2
-    /* example from george ekama
-        [inputs]                    [outputs]
-        S_VFA_inf:         50,      Total_COD_raw:  1151,
-        S_FBSO_inf:        186,     Total_C_raw:    383.4286,
-        S_USO_inf:         58,      Total_TKN_raw:  90.0039,
-        S_FSA_inf:         59.6,    Total_TP_raw:   20.0795,
-        S_OP_inf:          14.15,   Total_VSS_raw:  565.4983,
-        X_BPO_non_set_inf: 301,     Total_TSS_raw:  665.4983,
-        X_BPO_set_inf:     406,     Total_COD_set:  615,
-        X_UPO_non_set_inf: 20,      Total_C_set:    205.2029,
-        X_UPO_set_inf:     130,     Total_TKN_set:  71.8958,
-        X_iSS_raw_inf:     100,     Total_TP_set:   16.4455,
-        X_iSS_set_inf:     34,      Total_VSS_set:  211.1406,
-                                    Total_TSS_set:  245.1406 */
-
+  };return;
+  {//example from george ekama (raw ww + set ww)
+    // [inputs]                    [outputs]
+    // S_VFA_inf:         50,      Total_COD_raw:  1151,
+    // S_FBSO_inf:        186,     Total_C_raw:    383.4286,
+    // S_USO_inf:         58,      Total_TKN_raw:  90.0039,
+    // S_FSA_inf:         59.6,    Total_TP_raw:   20.0795,
+    // S_OP_inf:          14.15,   Total_VSS_raw:  565.4983,
+    // X_BPO_non_set_inf: 301,     Total_TSS_raw:  665.4983,
+    // X_BPO_set_inf:     406,     Total_COD_set:  615,
+    // X_UPO_non_set_inf: 20,      Total_C_set:    205.2029,
+    // X_UPO_set_inf:     130,     Total_TKN_set:  71.8958,
+    // X_iSS_raw_inf:     100,     Total_TP_set:   16.4455,
+    // X_iSS_set_inf:     34,      Total_VSS_set:  211.1406,
+    //                             Total_TSS_set:  245.1406 */
     //create 2 manual scenarios: (1) raw ww, (2) settled ww
     //syntax ------> constructor(Q,  S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA,  S_OP,  S_NOx)
     let sv = new State_Variables(25, 50,    186,    0,     0,     58,    0,     59.6,   14.15, 0);
     sv.set("X_BPO", 707); sv.set("X_UPO", 150); sv.set("X_iSS", 100); console.log(sv.summary);
     sv.set('X_BPO', 301); sv.set('X_UPO', 20);  sv.set('X_iSS', 34);  console.log(sv.summary);
-  }
+  };
 })();
