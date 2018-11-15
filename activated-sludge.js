@@ -14,7 +14,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume
   Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
-
+  waste_from = waste_from || 'reactor'; //"reactor" or "sst";
   /** wastage option 'waste_from':
     * waste from reactor:  || waste from sst:
     * ---------------------++---------------------
@@ -22,8 +22,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
     *      |               ||            |
     *      v Qw            ||            v Qw
     * ---------------------++---------------------*/
-
-  waste_from = waste_from || 'reactor'; //"reactor" or "sst";
   if(['reactor','sst'].indexOf(waste_from)==-1)throw 'The input "waste_from" must be equal to "reactor" or "sst"';
 
   //flowrate
@@ -202,7 +200,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
     Qw      :{value:Qw,         unit:"ML/d",          descr:"Wastage flowrate (wasted from "+waste_from+")"},
     Qe      :{value:Qe,         unit:"ML/d",          descr:"Effluent flowrate"},
   };
-  //Object.entries(process_variables).forEach(([key,value])=>{delete value.descr;}); //debugging: remove description 
 
   return {effluent, wastage, process_variables, balances};
 };
@@ -217,12 +214,12 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   console.log("=== Influent");             console.log(inf.summary);
   console.log("=== AS process variables"); console.log(as_rea.process_variables);
   ////=== balances
-  //console.log("=== AS balances (waste from reactor)");          console.log(as_rea.balances);
-  //console.log("=== AS balances (waste from sst)");              console.log(as_sst.balances);
+  console.log("=== AS balances (waste from reactor)");          console.log(as_rea.balances);
+  console.log("=== AS balances (waste from sst)");              console.log(as_sst.balances);
   ////=== wastage
-  //console.log("=== Wastage summary (waste from reactor)");      console.log(as_rea.wastage.summary);
-  //console.log("=== Wastage summary (waste from sst)");          console.log(as_sst.wastage.summary);
+  console.log("=== Wastage summary (waste from reactor)");      console.log(as_rea.wastage.summary);
+  console.log("=== Wastage summary (waste from sst)");          console.log(as_sst.wastage.summary);
   ////=== effluent
-  //console.log("=== Effluent summary (waste from reactor)");     console.log(as_rea.effluent.summary);
-  //console.log("=== Effluent summary (waste from sst)");         console.log(as_sst.effluent.summary);
+  console.log("=== Effluent summary (waste from reactor)");     console.log(as_rea.effluent.summary);
+  console.log("=== Effluent summary (waste from sst)");         console.log(as_sst.effluent.summary);
 })();

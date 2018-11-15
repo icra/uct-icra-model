@@ -16,7 +16,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,SF,fxt,D
   Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   waste_from = waste_from || 'reactor'; //"reactor" or "sst";
-  if(['reactor','sst'].indexOf(waste_from)==-1)throw 'The input "waste_from" must be equal to "reactor" or "sst"';
+  if(['reactor','sst'].indexOf(waste_from)==-1) throw 'The input "waste_from" must be equal to "reactor" or "sst"';
 
   //nitrification inputs
   SF  = isNaN(SF ) ? 1.25   : SF ; //safety factor | Design choice. Moves the sludge age.
