@@ -136,7 +136,7 @@
           redisplay();
           print_proces_variables(
             'activated_sludge',
-            `activated_sludge(${T}, ${Vp}, ${Rs}, ${RAS}, ${waste_from}) calculated`,
+            `activated_sludge(${T}, ${Vp}, ${Rs}, ${RAS}, "${waste_from}") calculated`,
             as.process_variables
           );
         }
@@ -147,11 +147,14 @@
     <fieldset id=nitrification>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/nitrification.js" target=_blank>Activated Sludge + Nitrification</a></legend>
       <table border=1>
-        <tr><td>T   <td><input id=T   type=number value=16>     <td class=unit>ºC
-        <tr><td>Vp  <td><input id=Vp  type=number value=8473.3> <td class=unit>m<sup>3</sup>
-        <tr><td>Rs  <td><input id=Rs  type=number value=15>     <td class=unit>d
-        <tr><td>SF  <td><input id=SF  type=number value=1.25>   <td class=unit>&empty;
-        <tr><td>fxt <td><input id=fxt type=number value=0.39>   <td class=unit>ratio
+        <tr><td>T   <td><input id=T   type=number value=16>    <td class=unit>ºC
+        <tr><td>Vp  <td><input id=Vp  type=number value=8473.3><td class=unit>m<sup>3</sup>
+        <tr><td>Rs  <td><input id=Rs  type=number value=15>    <td class=unit>d
+        <tr><td>RAS <td><input id=RAS type=number min=0 value=1.0><td class=unit>&empty;
+        <tr><td>Waste from <td colspan=2><select id=waste_from><option>reactor<option>sst</select>
+        <tr><td>SF  <td><input id=SF  type=number value=1.25><td class=unit>&empty;
+        <tr><td>fxt <td><input id=fxt type=number value=0.39><td class=unit>ratio
+        <tr><td>DO  <td><input id=DO  type=number value=2.0> <td class=unit>mg/L as O
       </table>
       <button onclick="run_nitri();">Run</button>
       <script>
@@ -159,13 +162,16 @@
           let T   = parseFloat(document.querySelector('#nitrification #T' ).value);
           let Vp  = parseFloat(document.querySelector('#nitrification #Vp').value);
           let Rs  = parseFloat(document.querySelector('#nitrification #Rs').value);
+          let RAS = parseFloat(document.querySelector('#nitrification #RAS').value);
+          let waste_from = document.querySelector('#nitrification #waste_from').value;
           let SF  = parseFloat(document.querySelector('#nitrification #SF').value);
           let fxt = parseFloat(document.querySelector('#nitrification #fxt').value);
-          let nitri = sv.nitrification(T, Vp, Rs, SF, fxt);
+          let DO  = parseFloat(document.querySelector('#nitrification #DO').value);
+          let nitri=sv.nitrification(T,Vp,Rs,RAS,waste_from,SF,fxt,DO);
           redisplay();
           print_proces_variables(
             'nitrification',
-            `nitrification(${T}, ${Vp}, ${Rs}, ${SF}, ${fxt}) calculated`,
+            `nitrirication(${T}, ${Vp}, ${Rs}, ${RAS}, "${waste_from}", ${SF}, ${fxt}, ${DO}) calculated`,
             nitri.process_variables
           );
         }
@@ -222,8 +228,9 @@
 
 <!--user defined default scenario-->
 <script>
-  let sv=new State_Variables(25,50,115,255,10,45,15,39.1,7.28,0);
-  //constructor      (wb, wt, Dt, S,   n,      Li){
+  //-----new-State_Variables(Q,      S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx)
+  let sv=new State_Variables(24.875, 50,    115,    255,   10,    45,    15,    39.1,  7.28, 0    );
+  //new Tram(wb, wt, Db, S, n, Li,Di)
   let tram=new Tram(
     parseFloat(document.querySelector('#river #tram_1 #inputs #wb').value),
     parseFloat(document.querySelector('#river #tram_1 #inputs #wt').value),
@@ -231,6 +238,7 @@
     parseFloat(document.querySelector('#river #tram_1 #inputs #S').value),
     parseFloat(document.querySelector('#river #tram_1 #inputs #n').value),
     parseFloat(document.querySelector('#river #tram_1 #inputs #Li').value),
+    parseFloat(document.querySelector('#river #tram_1 #inputs #Di').value),
   );
 </script>
 

@@ -1,5 +1,5 @@
 /*
-  AS+SST implementation from G. Ekama handwritten notes
+  AS + SST implementation from G. Ekama notes
 
     Qi → [Activated Sludge + SST] → Qe
                     ↓ 
@@ -15,14 +15,14 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   waste_from = waste_from || 'reactor'; //"reactor" or "sst";
-  /** wastage option 'waste_from':
+  /** option 'waste_from':
     * waste from reactor:  || waste from sst:
     * ---------------------++---------------------
     * Q-->[AS]->[SST]-->Qe || Q-->[AS]->[SST]-->Qe
     *      |               ||            |
     *      v Qw            ||            v Qw
-    * ---------------------++---------------------*/
-  if(['reactor','sst'].indexOf(waste_from)==-1)throw 'The input "waste_from" must be equal to "reactor" or "sst"';
+  *** ---------------------++---------------------*/
+  if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -47,9 +47,9 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let bHT  = bH*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
 
   //page 10
-  const YH     = 0.45;                   //gVSS/gCOD
-  let f_XBH    = (YH*Rs)/(1+bHT*Rs);     //g_VSS·d/g_COD | biomass production rate
-  let MX_BH    = FSbi * f_XBH;           //kg_VSS        | biomass produced
+  const YH     = 0.45;                   //gVSS/gCOD     | yield coefficient (does not change with temperature)
+  let f_XBH    = (YH*Rs)/(1+bHT*Rs);     //g_VSS·d/g_COD | OHO biomass production rate
+  let MX_BH    = FSbi * f_XBH;           //kg_VSS        | OHO biomass produced
   const fH     = 0.20;                   //              | tabled value
   let MX_EH    = fH * bHT * Rs * MX_BH;  //kg_VSS        | endogenous residue OHOs
   let MX_I     = FXti * Rs;              //kg_VSS        | unbiodegradable particulate organics
@@ -58,7 +58,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let MX_IO    = FiSS*Rs + f_iOHO*MX_BH; //kg_iSS        | inert solids
   let MX_T     = MX_V + MX_IO;           //kg_TSS        | TSS
 
-  //calculate concentrations
+  //biomass concentrations
   let X_BH = MX_BH/Vp; //kgVSS/m3 | live biomass concentration
   let X_EH = MX_EH/Vp; //kgVSS/m3 | endogenous residue OHOs
   let X_I  = MX_I/Vp;  //kgVSS/m3 | UPOs
@@ -66,7 +66,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let X_IO = MX_IO/Vp; //kgiSS/m3 | inert solids
   let X_T  = MX_T/Vp;  //kgTSS/m3 | TSS
 
-  //Secondary Settler (SST) and recycle flow state variables
+  //secondary Settler (SST) and recycle flow state variables
   let SST=(function(RAS){
     let f       = (1+RAS)/RAS;    //ø     | concentrating factor
     let X_RAS   = f*X_T;          //kg/m3 | TSS concentration
@@ -83,8 +83,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
     if     (waste_from=='reactor') return (Vp/Rs)/1000;
     else if(waste_from=='sst')     return SST.Qw;
     else                           throw {waste_from};
-  })();                  //ML/day | wastage flow
-  let Qe = Q - Qw;       //ML/day | effluent flow
+  })();            //ML/day | wastage flow
+  let Qe = Q - Qw; //ML/day | effluent flow
 
   //BPO, UPO, iSS concentrating factor
   let f = waste_from=='sst' ? SST.f : 1;
@@ -178,9 +178,9 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
     Ps      :{value:Ps,         unit:"mg/L_as_P",     descr:"P required for sludge production"},
     HRT     :{value:HRT,        unit:"hour",          descr:"Nominal Hydraulic Retention Time"},
     bHT     :{value:bHT,        unit:"1/d",           descr:"OHO Growth rate corrected by temperature"},
-    f_XBH   :{value:f_XBH,      unit:"g_VSS·d/g_COD", descr:"Biomass production rate"},
-    MX_BH   :{value:MX_BH,      unit:"kg_VSS",        descr:"Biomass produced VSS"},
-    MX_EH   :{value:MX_EH,      unit:"kg_VSS",        descr:"Endogenous residue VSS"},
+    f_XBH   :{value:f_XBH,      unit:"g_VSS·d/g_COD", descr:"OHO Biomass production rate"},
+    MX_BH   :{value:MX_BH,      unit:"kg_VSS",        descr:"OHO Biomass produced VSS"},
+    MX_EH   :{value:MX_EH,      unit:"kg_VSS",        descr:"OHO Endogenous residue VSS"},
     MX_I    :{value:MX_I,       unit:"kg_VSS",        descr:"Unbiodegradable organics VSS"},
     MX_V    :{value:MX_V,       unit:"kg_VSS",        descr:"Volatile Suspended Solids"},
     MX_IO   :{value:MX_IO,      unit:"kg_iSS",        descr:"Inert Solids (influent+biomass)"},

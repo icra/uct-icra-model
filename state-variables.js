@@ -54,8 +54,9 @@ class State_Variables {
       /*BPO*/ f_CV_BPO  : 1.5230, f_C_BPO  : 0.498, f_N_BPO  : 0.0323, f_P_BPO  : 0.0072,
       /*UPO*/ f_CV_UPO  : 1.4810, f_C_UPO  : 0.518, f_N_UPO  : 0.1000, f_P_UPO  : 0.0250,
       /*USO*/ f_CV_USO  : 1.4930, f_C_USO  : 0.498, f_N_USO  : 0.0366, f_P_USO  : 0.0000,
-      /*OHO*/ f_CV_OHO  : 1.4810, f_C_OHO  : 0.518, f_N_OHO  : 0.1000, f_P_OHO  : 0.0250, 
-      /*PAO*/ f_CV_PAO  : 1.4810, f_C_PAO  : 0.518, f_N_PAO  : 0.1000, f_P_PAO  : 0.0250, 
+      /*OHO*/ f_CV_OHO  : 1.4810, f_C_OHO  : 0.518, f_N_OHO  : 0.1000, f_P_OHO  : 0.0250, //ordinary heterotrophic organisms
+      /*ANO*/ f_CV_ANO  : 1.4810, f_C_ANO  : 0.518, f_N_ANO  : 0.1000, f_P_ANO  : 0.0250, //ammonia oxidizing organisms
+      /*PAO*/ f_CV_PAO  : 1.4810, f_C_PAO  : 0.518, f_N_PAO  : 0.1000, f_P_PAO  : 0.0250, //phosphate accumulating organisms
       /*--------------------------------------------------------------------------------*/
     };
   };
@@ -205,18 +206,19 @@ class State_Variables {
   //get reduced table (concentrations and fluxes combined)
   get summary(){
     let totals = this.totals;
-    let fluxes = this.fluxes.totals;
+    let fluxes = this.fluxes;
     return {
       Q: this.Q,
-      COD: [totals.COD.total, fluxes.COD.total],
-      TKN: [totals.TKN.total, fluxes.TKN.total],
-      FSA: [totals.TKN.FSA,   fluxes.TKN.FSA],
-      TP:  [totals.TP.total,  fluxes.TP.total],
-      PO4: [totals.TP.PO4,    fluxes.TP.PO4],
-      TOC: [totals.TOC.total, fluxes.TOC.total],
-      TSS: [totals.TSS.total, fluxes.TSS.total],
-      iSS: [totals.TSS.iSS,   fluxes.TSS.iSS],
-      VSS: [totals.TSS.VSS,   fluxes.TSS.VSS],
+      COD: [totals.COD.total,      fluxes.totals.COD.total],
+      TKN: [totals.TKN.total,      fluxes.totals.TKN.total],
+      FSA: [totals.TKN.FSA,        fluxes.totals.TKN.FSA],
+      NOx: [this.components.S_NOx, fluxes.components.S_NOx],
+      TP:  [totals.TP.total,       fluxes.totals.TP.total],
+      PO4: [totals.TP.PO4,         fluxes.totals.TP.PO4],
+      TOC: [totals.TOC.total,      fluxes.totals.TOC.total],
+      TSS: [totals.TSS.total,      fluxes.totals.TSS.total],
+      iSS: [totals.TSS.iSS,        fluxes.totals.TSS.iSS],
+      VSS: [totals.TSS.VSS,        fluxes.totals.TSS.VSS],
     }
   }
 
@@ -242,7 +244,7 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
 
 /*test*/
 (function test(){
-  return 
+  return;
   {//combine 2 state variables and check summary
     let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2);
     let s2 = new State_Variables(10,1,1,1,1,1,1,1,1,1);

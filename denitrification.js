@@ -9,20 +9,29 @@ if(typeof document == "undefined"){
   require("./nitrification.js");
 }
 
-State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,SF,fxt,DO){
+State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,SF,fxt,DO){
   /*inputs and default values*/
   //as inputs
   T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
   Vp  = isNaN(Vp ) ? 8473.3 : Vp ; //m3   | Volume
   Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
+  waste_from = waste_from || 'reactor'; //"reactor" or "sst";
+  if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
+
   //nitrification inputs
-  SF  = isNaN(SF ) ? 1.25   : SF ; //safety factor | Design choice. Moves the sludge age.
-  fxt = isNaN(fxt) ? 0.39   : fxt; //ratio | current unaerated sludge mass fraction
-  DO  = isNaN(DO)  ? 2.0    : DO ; //mg/L  | DO in the aerobic reactor
+  SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
+  fxt = isNaN(fxt) ? 0.39 : fxt; //ratio | current unaerated sludge mass fraction
+  DO  = isNaN(DO)  ? 2.0  : DO ; //mg/L  | DO in the aerobic reactor
+
+  //denitrification inputs
+  IR = isNaN(IR) ? 5.4 : IR; //internal recirculation ratio
 
   //compute AS+Nit results
-  let nit_results = this.nitrification(T,Vp,Rs,RAS,SF,fxt,DO); //object
+  let nit = this.nitrification(T,Vp,Rs,RAS,waste_from,SF,fxt,DO); //object
+
+  //flowrate
+  let Q = this.Q; //ML/d
 
   //denitrification starts at page 19
   //3.2 - denitrification kinetics
@@ -50,6 +59,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,SF,fxt,DO){
   let Dp1BPO  = K2T*fxt*Sbi*f_XBH;         //mgNO3-N/L | influent
   let Dp1     = Dp1RBSO + Dp1BPO;          //mgNO3-N/L | influent
 
+  //calculate a optimal
   //minimum primary anoxic sludge mass fraction
   //denitrification influence on reactor volume and oxygen demand
 
