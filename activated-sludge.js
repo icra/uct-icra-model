@@ -209,7 +209,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
 
 /*test*/
 (function test(){
-  //return;
+  return;
   //influent vs AS wasting from {reactor, sst}
   let inf = new State_Variables(24.875,50,115,255,10,45,15,39.1,7.28,0); //influent
   let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor'); //AS wasting from the reactor
