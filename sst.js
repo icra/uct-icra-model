@@ -1,7 +1,7 @@
 //SST standalone module
 function sst(){
   //example inputs
-  let RAS = 1.0;   //underflow recycle ratio
+  let RAS = 0.75;  //underflow recycle ratio
   let Q   = 25;    //ML/d
   let Rs  = 15;    //d
   let Vp  = 8473.3 //m3
@@ -17,3 +17,8 @@ function sst(){
   console.log({f, Qr, X_RAS, Qw});
 }
 sst();
+
+{ f: 2.3333333333333335,
+  Qr: 18.75,
+  X_RAS: 10.5,
+  Qw: 0.24209428571428568 }

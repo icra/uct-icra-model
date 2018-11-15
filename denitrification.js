@@ -4,17 +4,25 @@
 */
 
 //node imports
-if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
+if(typeof document == "undefined"){
+  State_Variables=require("./state-variables.js");
+  require("./nitrification.js");
+}
 
-State_Variables.prototype.denitrification=function(T,Rs,fxt){
-  /* inputs and default values*/
-  Q   = isNaN(Q  ) ? 24875 :Q  ; //m3/d  | Flowrate
-  T   = isNaN(T  ) ? 16    :T  ; //ºC    | Temperature
-  Rs  = isNaN(Rs ) ? 15    :Rs ; //days  | Solids retention time
-  fxt = isNaN(fxt) ? 0.39  :fxt; //ratio | current unaerated sludge mass fraction
+State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,SF,fxt,DO){
+  /*inputs and default values*/
+  //as inputs
+  T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
+  Vp  = isNaN(Vp ) ? 8473.3 : Vp ; //m3   | Volume
+  Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
+  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
+  //nitrification inputs
+  SF  = isNaN(SF ) ? 1.25   : SF ; //safety factor | Design choice. Moves the sludge age.
+  fxt = isNaN(fxt) ? 0.39   : fxt; //ratio | current unaerated sludge mass fraction
+  DO  = isNaN(DO)  ? 2.0    : DO ; //mg/L  | DO in the aerobic reactor
 
   //compute AS+Nit results
-  let nit_results = this.nitrification(T,Vp,Rs,SF,fxt,DO);
+  let nit_results = this.nitrification(T,Vp,Rs,RAS,SF,fxt,DO); //object
 
   //denitrification starts at page 19
   //3.2 - denitrification kinetics
@@ -28,18 +36,19 @@ State_Variables.prototype.denitrification=function(T,Rs,fxt){
   const K4T   = K4_20*Math.pow(1.029,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
 
   //3.2
-  let frac = this.totals;    //object
-  let Sbi  = frac.COD.bCOD;  //mg/L
-  let Sbsi = frac.COD.bsCOD; //mg/L
-  let fSb_s = Sbsi/Sbi;      //ratio
+  let frac  = this.totals;    //object
+  let Sbi   = frac.COD.bCOD;  //mg/L
+  let Sbsi  = frac.COD.bsCOD; //mg/L
+  let fSb_s = Sbsi/Sbi;       //ratio
 
   //Denitrification potential
-  const fCV = this.mass_ratios.f_CV_UPO; //1.481 gUPO/gVSS
-  const YH  = 0.45;                      //gVSS/gCOD
+  const fCV = this.mass_ratios.f_CV_UPO;                 //1.481 gUPO/gVSS
+  const YH  = 0.45;                                      //gVSS/gCOD
+  let f_XBH = nit_results.process_variables.f_XBH.value; //1/d | YH*Rs/(1+bHT)
 
   let Dp1RBSO = fSb_s*Sbi*(1-fCV*YH)/2.86; //mgNO3-N/L | influent
-  let Dp1BPO  = K2T*fxt*Sbi;               //mgNO3-N/L | influent
-  let Dp1 = Dp1RBSO + Dp1BPO;
+  let Dp1BPO  = K2T*fxt*Sbi*f_XBH;         //mgNO3-N/L | influent
+  let Dp1     = Dp1RBSO + Dp1BPO;          //mgNO3-N/L | influent
 
   //minimum primary anoxic sludge mass fraction
   //denitrification influence on reactor volume and oxygen demand

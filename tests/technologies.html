@@ -118,21 +118,25 @@
     <fieldset id=activated_sludge>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/activated-sludge.js" target=_blank>Activated Sludge</a></legend>
       <table border=1>
-        <tr><td>T  <td><input id=T  type=number min=-273 value=16>     <td class=unit>ºC
-        <tr><td>Vp <td><input id=Vp type=number min=0    value=8473.3> <td class=unit>m<sup>3</sup>
-        <tr><td>Rs <td><input id=Rs type=number min=0    value=15>     <td class=unit>d
+        <tr><td>T   <td><input id=T   type=number min=-273 value=16>     <td class=unit>ºC
+        <tr><td>Vp  <td><input id=Vp  type=number min=0    value=8473.3> <td class=unit>m<sup>3</sup>
+        <tr><td>Rs  <td><input id=Rs  type=number min=0    value=15>     <td class=unit>d
+        <tr><td>RAS <td><input id=RAS type=number min=0    value=1.0>    <td class=unit>&empty;
+        <tr><td>Waste from <td colspan=2><select id=waste_from><option>reactor<option>sst</select>
       </table>
       <button onclick="run_AS();">Run</button>
       <script>
         function run_AS(){
-          let T  = parseFloat(document.querySelector('#activated_sludge #T' ).value);
-          let Vp = parseFloat(document.querySelector('#activated_sludge #Vp').value);
-          let Rs = parseFloat(document.querySelector('#activated_sludge #Rs').value);
-          let as = sv.activated_sludge(T, Vp, Rs);
+          let T          = parseFloat(document.querySelector('#activated_sludge #T'  ).value);
+          let Vp         = parseFloat(document.querySelector('#activated_sludge #Vp' ).value);
+          let Rs         = parseFloat(document.querySelector('#activated_sludge #Rs' ).value);
+          let RAS        = parseFloat(document.querySelector('#activated_sludge #RAS').value);
+          let waste_from = document.querySelector('#activated_sludge #waste_from').value;
+          let as = sv.activated_sludge(T,Vp,Rs,RAS,waste_from);
           redisplay();
           print_proces_variables(
             'activated_sludge',
-            `activated_sludge(${T}, ${Vp}, ${Rs}) calculated`,
+            `activated_sludge(${T}, ${Vp}, ${Rs}, ${RAS}, ${waste_from}) calculated`,
             as.process_variables
           );
         }

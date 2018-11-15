@@ -8,16 +8,22 @@ if(typeof document == "undefined"){
   require("./activated-sludge.js");
 }
 
-State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt, DO){
-  //inputs and default values
-  T   = isNaN(T  ) ? 16     : T   ; //ºC   | Temperature
-  Vp  = isNaN(Vp ) ? 8473.3 : Vp  ; //m3   | Volume
-  Rs  = isNaN(Rs ) ? 15     : Rs  ; //days | Solids retention time
-  SF  = isNaN(SF ) ? 1.25   : SF  ; //safety factor | Design choice. Moves the sludge age.
-  fxt = isNaN(fxt) ? 0.39   : fxt ; //ratio | current unaerated sludge mass fraction
-  DO  = isNaN(DO)  ? 2.0    : DO  ; //mg/L  | DO in the aerobic reactor
+State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,SF,fxt,DO){
+  /*inputs and default values*/
+  //as inputs
+  T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
+  Vp  = isNaN(Vp ) ? 8473.3 : Vp ; //m3   | Volume
+  Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
+  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
+  waste_from = waste_from || 'reactor'; //"reactor" or "sst";
+  if(['reactor','sst'].indexOf(waste_from)==-1)throw 'The input "waste_from" must be equal to "reactor" or "sst"';
 
-  //compute influent fractionation
+  //nitrification inputs
+  SF  = isNaN(SF ) ? 1.25   : SF ; //safety factor | Design choice. Moves the sludge age.
+  fxt = isNaN(fxt) ? 0.39   : fxt; //ratio | current unaerated sludge mass fraction
+  DO  = isNaN(DO ) ? 2.0    : DO ; //mg/L  | DO in the aerobic reactor
+
+  //influent fractionation
   let frac = this.totals;
 
   //compute activated sludge without nitrification
@@ -37,14 +43,14 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt, DO){
   //3 - nitrification kinetics
   const µAm  = 0.45;                     //1/d    | growth rate at 20ºC (maximum specific growth rate)
   let µAmT   = µAm*Math.pow(1.123,T-20); //1/d    | growth rate corrected by temperature
-  const K_O = 0.0;                       //mgDO/L | nitrifier Oxygen sensitivity constant 
-  let µAmO  = µAmT*DO/(DO+K_O);          //1/d    | growth rate corrected by temperature and DO
+  const K_O  = 0.0;                      //mgDO/L | nitrifier Oxygen sensitivity constant 
+  let µAmO   = µAmT*DO/(DO+K_O);         //1/d    | growth rate corrected by temperature and DO
   //add pH effect to µA here TBD
 
-  const Kn = 1.0;                        //mg/L as N at 20ºC (half saturation coefficient)
-  let KnT  = Kn*Math.pow(1.123,T-20);    //mg/L as N corrected by temperature
-  const bA = 0.04;                       //1/d at 20ºC (endogenous respiration rate)
-  let bAT  = bA*Math.pow(1.029,T-20);    //1/d | growth rate corrected by temperature
+  const Kn = 1.0;                     //mg/L as N at 20ºC (half saturation coefficient)
+  let KnT  = Kn*Math.pow(1.123,T-20); //mg/L as N corrected by temperature
+  const bA = 0.04;                    //1/d at 20ºC (endogenous respiration rate)
+  let bAT  = bA*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
 
   //page 17
   let fxm = 1 - SF*(bAT+1/Rs)/µAmO; //maximum design unaerated sludge mass fraction
@@ -59,7 +65,7 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt, DO){
 
   //effluent ammonia nitrification
   let Nae_fxt = KnT*(bAT + 1/Rs)/( µAmO*(1-fxt) - bAT - 1/Rs); //mg/L as N | effluent ammonia concentration if fxt <  fxm
-  let Nae_fxm = KnT/(SF-1);                                       //mg/L as N | effluent ammonia concentration if fxt == fxm
+  let Nae_fxm = KnT/(SF-1);                                    //mg/L as N | effluent ammonia concentration if fxt == fxm
 
   //effluent TKN nitrification -- page 18
   let Nte_fxt = Nae_fxt + Nouse; //mg/L as N | effluent TKN concentration if fxt <  fxm
@@ -98,32 +104,8 @@ State_Variables.prototype.nitrification=function(T, Vp, Rs, SF, fxt, DO){
     //FOn_fxm      :{value:FOn_fxm,      unit:"kg/d as O", descr:"Oxygen demand                         (fxt = fxm)"},
   };
 
-  /*add AS process_variables below
-  [
-    'fSus',
-    'fSup',
-    'Ns',
-    'Ps',
-    'HRT',
-    'bHT',
-    'X_BH',
-    'MX_BH',
-    'MX_EH',
-    'MX_I',
-    'MX_V',
-    'MX_IO',
-    'MX_T',
-    'fi',
-    'X_V',
-    'X_T',
-    'f_avOHO',
-    'f_atOHO',
-  ].forEach(key=>{
-    process_variables[key]=as_results.process_variables[key];
-  });
-  */
-
-  return {process_variables, effluent, wastage};
+  let as_process_variables = as.process_variables;
+  return {as_process_variables, process_variables, effluent, wastage};
 };
 
 /*test */
