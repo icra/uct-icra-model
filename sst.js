@@ -1,5 +1,4 @@
-
-//SST module
+//SST standalone module
 function sst(){
   //example inputs
   let RAS = 1.0;   //underflow recycle ratio
@@ -9,13 +8,12 @@ function sst(){
   let X_T = 4.5;   //kg/m3
 
   //equations
-  let f     = (1+RAS)/RAS;              //concentrating factor
-  let Qr    = Q*RAS;                    //ML/d
-  let X_RAS = f*X_T;                    //kg/m3
-  let Qw    = (X_T/X_RAS)*(Vp/Rs)/1000; //ML/d
+  let f     = (1+RAS)/RAS;    //concentrating factor
+  let Qr    = Q*RAS;          //ML/d
+  let X_RAS = f*X_T;          //kg/m3
+  let Qw    = (Vp/Rs)/f/1000; //ML/d
 
   //return
-  return {f, Qr, X_RAS, Qw};
+  console.log({f, Qr, X_RAS, Qw});
 }
-
-console.log(sst());
+sst();

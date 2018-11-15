@@ -144,13 +144,13 @@ State_Variables.prototype.activated_sludge=function(T, Vp, Rs, RAS){
   let wastage  = new State_Variables(Qw, 0,   0,    BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, 0  );
 
   //Secondary Settler (SST) and recycle flow state variables
-  let SST=(function(){
-    let f       = (1+RAS)/RAS;        //ø     | concentrating factor
-    let Qr      = Q*RAS;              //ML/d  | recycle flowrate
-    let X_RAS   = f*X_T;              //kg/m3 | TSS concentration
-    let Qw      = (1/f)*(Vp/Rs)/1000; //ML/d  | ask george TODO
-    return {f,Qr,X_RAS,Qw}
-  })();
+  let SST=(function(RAS){
+    let f       = (1+RAS)/RAS;    //ø     | concentrating factor
+    let Qr      = Q*RAS;          //ML/d  | recycle flowrate
+    let X_RAS   = f*X_T;          //kg/m3 | TSS concentration
+    let Qw      = (Vp/Rs)/f/1000; //ML/d  | ask george TODO
+    return {f,Qr,X_RAS,Qw};
+  })(RAS);
   //recycle flow state variables:  (Q,      VFA, FBSO, BPO,           UPO,           USO,  iSS,           FSA, PO4, NOx)
   let recycle = new State_Variables(SST.Qr, 0,   0,    SST.f*BPO_was, SST.f*UPO_was, Suse, SST.f*iSS_was, Nae, Pse,   0);
 

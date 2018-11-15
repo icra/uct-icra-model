@@ -38,7 +38,7 @@ State_Variables.prototype.denitrification=function(T,Rs,fxt){
   const YH  = 0.45;                      //gVSS/gCOD
 
   let Dp1RBSO = fSb_s*Sbi*(1-fCV*YH)/2.86; //mgNO3-N/L | influent
-  let Dp1BPO  = K2T*fxt*Sbi*;
+  let Dp1BPO  = K2T*fxt*Sbi;               //mgNO3-N/L | influent
   let Dp1 = Dp1RBSO + Dp1BPO;
 
   //minimum primary anoxic sludge mass fraction
