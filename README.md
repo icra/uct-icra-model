@@ -5,11 +5,13 @@ lluís bosch (lbosch@icra.cat)
 model for ecoadvisor project coded in pure Javascript without graphical user interface.
 
 ## things done
-DO set point in nitrification
-wastage formula in AS clear
+wastage Qw in AS (waste from reactor or sst)
+DO inhibition in nitrification
+pH sensitivity in nitrification
 
-## things to discuss
-nitrification: pH sensitivity: `µAmpH -> µAm7.2 * Math.pow(2.35, pH-7.2)·K1·(Kmax-pH)/(Kmax-K2-pH)`
-finish denitrification
+## things to discuss or finish
+denitrification outputs
+chemical P removal (already discussed with George)
+mass of nitrifiers (MX-BA) add to MX-T
 add anaerobic digestion (future)
-add stoichiometry (for CO2) (future)
+add stoichiometry (for CO2(air) produced) (future)

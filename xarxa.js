@@ -102,13 +102,13 @@ class Xarxa {
 
 //node imports and exports
 if(typeof document == "undefined"){
-  Tram=require("./tram.js"); 
   module.exports=Xarxa;
 }
 
 /*test: exemples xarxes de trams*/
-(function test(){
+(function(){
   return;
+  const Tram=require("./tram.js"); 
   //2 exemples de xarxes
   {/* Exemple 1:
     t1--+

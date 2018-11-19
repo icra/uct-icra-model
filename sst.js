@@ -18,6 +18,7 @@ function sst(){
 }
 sst();
 
+//results
 { f: 2.3333333333333335,
   Qr: 18.75,
   X_RAS: 10.5,

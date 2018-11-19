@@ -14,7 +14,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume
   Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
-  waste_from = waste_from || 'reactor'; //"reactor" or "sst";
+  waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   /** option 'waste_from':
     * waste from reactor:  || waste from sst:
     * ---------------------++---------------------
@@ -194,7 +194,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
     FOn     :{value:FOn,        unit:"kg/d_as_O",     descr:"Nitrogenous Oxygen Demand"},
     FOt     :{value:FOt,        unit:"kg/d_as_O",     descr:"Total Oxygen Demand"},
     OUR     :{value:OUR,        unit:"mg/L·h_as_O",   descr:"Oxygen Uptake Rate"},
-    f       :{value:SST.f,      unit:"ø",             descr:"SST concentrating factor"},
+    f       :{value:f,          unit:"ø",             descr:"SST concentrating factor"},
     Qr      :{value:SST.Qr,     unit:"ML/d",          descr:"SST recycle flowrate"},
     X_RAS   :{value:SST.X_RAS,  unit:"kg/m3",         descr:"SST recycle flow TSS concentration"},
     Qw      :{value:Qw,         unit:"ML/d",          descr:"Wastage flowrate (wasted from "+waste_from+")"},
@@ -205,7 +205,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
 };
 
 /*test*/
-(function test(){
+(function(){
   return;
   //influent vs AS wasting from {reactor, sst}
   let inf = new State_Variables(24.875,50,115,255,10,45,15,39.1,7.28,0); //influent

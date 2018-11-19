@@ -243,7 +243,7 @@ class State_Variables {
 if(typeof document == "undefined"){module.exports=State_Variables;}
 
 /*test*/
-(function test(){
+(function(){
   return;
   {//combine 2 state variables and check summary
     let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2);

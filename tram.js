@@ -92,7 +92,7 @@ if(typeof document == "undefined"){
 }
 
 //test valors Vicenç Acuña (vacuna@icra.cat)
-(function test(){
+(function(){
   return;
   //sintaxi:  Tram(wb, wt, Db, S,     n,      Li,   Di)
   let t = new Tram(3,  6,  2,  0.005, 0.0358, 1000, 1.2);
