@@ -8,9 +8,9 @@
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
 
-    Qi → [PST] → [AS] → [nitrification] → Qe
-          ↓      ↓            ↓
-          Qw     Qw           Qw
+  Qi → [PST] → [AS] → [nitrification] → Qe
+        ↓      ↓            ↓
+        Qw     Qw           Qw
 
   Summary of this file:
     1. class data structure
