@@ -7,12 +7,11 @@
 //standalone module - pre integration phase
 function chemical_P_removal() {
   //example inputs
-  let Q                 = 3.8;     //ML/d
-  let TSS               = 220;     //mg/L
-  let TP                = 7;       //mg/L
-  let PO4               = 5;       //mg/L (Pse from activated-sludge.js)
-
-  let amount_FeCl3_solution = 321.76   //kg/d
+  let Q                     = 3.8;   //ML/d
+  let TSS                   = 220;   //mg/L
+  let TP                    = 7;     //mg/L
+  let PO4                   = 5;     //mg/L (Pse from activated-sludge.js)
+  let amount_FeCl3_solution = 321.76 //kg/d
    
   const M_Fe            = 55.845;  //g/mol (Fe molecular weight)
   const M_P             = 30.974;  //g/mol (P molecular weight)

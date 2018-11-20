@@ -2,14 +2,14 @@
   Definició d'un escenari complet: xarxa de trams de riu amb depuradores
   7 trams i una EDAR al tram 5
 
-            EDAR
-    t1--+     |
-        |--> t5--+
-    t2--+        |
-                  +--> t7
-    t3--+        |
-        |--> t6--+
-    t4--+
+          EDAR
+  t1--+     |
+      |--> t5--+
+  t2--+        |
+                +--> t7
+  t3--+        |
+      |--> t6--+
+  t4--+
 */
 
 //Carrega arxius necessaris
@@ -49,9 +49,10 @@ t5.wwtp = new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0);
   A dins hi ha 2 nous objectes <State Variables> i un objecte amb els resultats del procés amb la forma 
   {value, unit, description}
 */
-let raw = t5.wwtp;                                           //<State Variables>
-let pst = raw.primary_settler(0.005, 42.335, 90.05, 75.125); //resultat procés {effluent, wastage, process_variables}
-let as  = pst.effluent.activated_sludge(16, 8473, 15);       //resultat procés {effluent, wastage, process_variables}
+
+let raw = t5.wwtp;                                                     //<State Variables>
+let pst = raw.primary_settler(0.005, 42.335, 90.05, 75.125);           //resultat procés {effluent, wastage, process_variables}
+let as  = pst.effluent.activated_sludge(16, 8473, 15, 1.0, 'reactor'); //resultat procés {effluent, wastage, process_variables}
 
 //Mostra resultats WWTP (fent servir la propietat 'summary' dels State Variables)
 console.log("=== RAW WW ===");           console.log(raw.summary);

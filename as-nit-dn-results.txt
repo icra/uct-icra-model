@@ -1,0 +1,71 @@
+=== Input State Variables [mg/L] ==============================================
+Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx
+24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0
+
+=== Influent summary ==================+== AS+NIT+DN parameters ===============
+Q:     24.8750            [ML/d]       | T            16      ºC
+COD:  475.0000, 1815.6250 [mg/L, kg/d] | Vp           8473.3  m3             
+TKN:   50.0441, 1244.8492 [mg/L, kg/d] | Rs           15      d              
+FSA:   39.1000,  972.6125 [mg/L, kg/d] | RAS          1.0     ø          
+NOx:    0.0000,    0.0000 [mg/L, kg/d] | waste_from   "reactor"              
+TP:     9.6099,  239.0476 [mg/L, kg/d] | SF           1.25    ø          
+PO4:    7.2800,  181.0900 [mg/L, kg/d] | fxt          0.39    ø          
+TOC:  158.7829, 3949.7258 [mg/L, kg/d] | DO           2.0     mgO/L          
+TSS:  189.1848, 4705.9742 [mg/L, kg/d] | pH           7.2     pH units       
+iSS:   15.0000,  373.1250 [mg/L, kg/d] | IR           5.4     ø (=a)     
+VSS:  174.1848, 4332.8492 [mg/L, kg/d] | DO_RAS       1.0     mgO/L          
+                                       | influent_alk 250     mg/L as CaCO3  
+                                       |
+=== Effluent summary ==================+=== Wastage summary ===================
+Q:     24.3101            [ML/d]       | Q:      0.5648            [ML/d]
+COD:   45.0000, 1093.9551 [mg/L, kg/d] | COD: 5292.1883, 2989.4866 [mg/L, kg/d]
+TKN:    2.0200,   49.1074 [mg/L, kg/d] | TKN:  247.8694,  140.0181 [mg/L, kg/d]
+FSA:    0.9160,   22.2897 [mg/L, kg/d] | FSA:    0.9168,    0.5179 [mg/L, kg/d]
+NOx:    5.5618,  135.2092 [mg/L, kg/d] | NOx:    5.5618,    3.1418 [mg/L, kg/d]
+TP:     7.5985,  184.7204 [mg/L, kg/d] | TP:    67.7155,   38.2515 [mg/L, kg/d]
+PO4:    7.5985,  184.7204 [mg/L, kg/d] | PO4:    7.5985,    4.2922 [mg/L, kg/d]
+TOC:   15.0100,  364.8959 [mg/L, kg/d] | TOC: 1796.9489, 1015.0725 [mg/L, kg/d]
+TSS:    0.0000,    0.0000 [mg/L, kg/d] | TSS: 4456.3932, 2517.3571 [mg/L, kg/d]
+iSS:    0.0000,    0.0000 [mg/L, kg/d] | iSS:  956.9927,  540.5924 [mg/L, kg/d]
+VSS:    0.0000,    0.0000 [mg/L, kg/d] | VSS: 3499.4005, 1976.7647 [mg/L, kg/d]
+                                       |
+=== AS process variables ==============+==== NIT process variables ============
+fSus         0.0947 g_USO/g_COD        | µAmT             0.2829 1/d
+fSup         0.0210 g_UPO/g_COD        | µAmO             0.2829 1/d
+Ns           8.0458 mg/L_as_N          | µAm_pH           0.2828 1/d
+Ps           2.0114 mg/L_as_P          | KnT              0.6287 mg/L
+HRT          8.1752 hour               | bAT              0.0356 1/d
+bHT          0.2140 1/d                | f_XBA            0.9770 g_VSS·d/g_COD
+f_XBH        1.6029 g_VSS·d/g_COD      | fxt              0.3900 ratio
+MX_BH    16746.7439 kg_VSS             | fxm              0.5476 ratio
+MX_EH    10754.7762 kg_VSS             | Rs              15.0000 days
+MX_I      2519.4125 kg_VSS             | Rsm              7.3073 days
+MX_V     30020.9327 kg_VSS             | MX_unaer_fxt 14870.6295 kg_TSS
+MX_IO     8108.8865 kg_iSS             | Nae_fxt          0.9168 mg/L_as_N
+MX_T     38129.8193 kg_TSS             | Nte_fxt          2.0200 mg/L_as_N
+fi           0.7873 g_VSS/g_TSS        | Nc_fxt          39.9783 mg/L_as_N
+X_V          3.5430 kg_VSS/m3          | FOn_fxt       4544.6874 kg/d_as_O
+X_T          4.4999 kg_TSS/m3          | MX_BA          971.6801 kgANOVSS
+f_avOHO      0.5578 g_OHO/g_VSS        | X_BA             0.1146 kgANOVSS/m3
+f_atOHO      0.4392 g_OHO/g_TSS        |
+FOc       7732.1832 kg/d_as_O          +=== DN process variables ==============
+FOn       4648.9187 kg/d_as_O          | K1T              0.3472 mgN/mgOHOVSS
+FOt      12381.1019 kg/d_as_O          | K2T              0.0735 mgN/mgOHOVSS
+OUR         60.8829 mg/L·h_as_O        | K3T              0.0891 mgN/mgOHOVSS
+Qr          24.8750 ML/d               | K4T              0.0000 mgN/mgOHOVSS
+f_RAS        2.0000 ø                  | fSb_s            0.3928 gBSO/gBO
+X_RAS        8.9999 kg/m3              | Dp1             38.5423 mgNOx/L
+f_was        1.0000 ø                  | a                5.4000 ø (=IR)
+COD_balance  100    %                  | a_opt            5.2893 ø
+N_balance    100    %                  | NOx_min_eff      5.4844 mg/L
+Nae_balance  100    %                  | Nne              5.5618 mg/L
+P_balance    100    %                  | TNe              7.5818 mg/L
+                                       | FOd           2448.4749 kgO/d
+                                       | FOt           9828.3957 kgO/d
+                                       | OUR             79.2298 mgO/L·h
+                                       | effluent_alk    69.3947 mg/L as CaCO3
+                                       | TODi         17504.5859 kg/d
+                                       | TODe          1349.0107 kg/d
+                                       | TODw          3909.3392 kg/d
+                                       | TODout       17535.2206 kg/d
+                                       | TOD_balance    100.1750 %
