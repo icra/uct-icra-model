@@ -169,6 +169,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   //syntax ------------> constructor(Q,  VFA, FBSO, BPO,     UPO,     USO,  iSS,     FSA, PO4, NOx)
   let effluent = new State_Variables(Qe, 0,   0,    0,       0,       Suse, 0,       Nae, Pse, 0  );
   let wastage  = new State_Variables(Qw, 0,   0,    BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, 0  );
+  //TBD Vicenç claims that BSO in effluent is not 0
 
   //process_variables
   let process_variables={
@@ -218,7 +219,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
 (function(){
   return;
   //influent vs AS wasting from {reactor, sst}
-  let inf = new State_Variables(24.875,50,115,255,10,45,15,39.1,7.28,0); //influent
+  //syntax---------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
+  let inf = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0); //influent
   let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor'); //AS wasting from the reactor
   let as_sst = inf.activated_sludge(16, 8473.3, 15, 1.0, 'sst');     //AS wasting from the sst
   console.log("=== Influent");             console.log(inf.summary);

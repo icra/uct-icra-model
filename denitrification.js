@@ -167,7 +167,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
     TOD_balance  :{value:TOD_balance  ,unit:"%"             ,descr:"Total oxygen demand balance (out/in)"},
   };
 
-  //delete description (debug)
+  //hide description (debug)
   Object.values(process_variables).forEach(value=>delete value.descr);
 
   return {

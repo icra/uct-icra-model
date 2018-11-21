@@ -16,6 +16,8 @@ function chem_P_removal(Q,TSS,TP,PO4,PO4_eff,FeCl3_solution,FeCl3_unit_weight,da
     FeCl3_unit_weight  1.35  kg/L
     days               15    days
   */
+  const M_Fe = 55.845;
+  const M_P  = 30.974;  //g/mol (P molecular weight)
 
   //  Fe_P_mole_ratio = 3.3 mole/mole (Fig 6-13, page 484, see "utils.js")
   var Fe_P_mole_ratio = get_Fe_P_mole_ratio(PO4_eff);
@@ -61,7 +63,7 @@ function chem_P_removal(Q,TSS,TP,PO4,PO4_eff,FeCl3_solution,FeCl3_unit_weight,da
 
   //sludge produced in AS reactor (from G. Ekama)
   //kg/d of extra iSS produced in AS reactor
-  //var extra_iSS = 0.001*Q*(PO4-PO4_eff)*(251/M_P + (Fe_P_mole_ratio-1.6)*(106.8/M_P));
+  var extra_iSS = 0.001*Q*(PO4-PO4_eff)*(251/M_P + (Fe_P_mole_ratio-1.6)*(106.8/M_P));
   return {
     Fe_P_mole_ratio:        {value:Fe_P_mole_ratio,                           unit:"moles_Fe/moles_P",  descr:"Fe/P mole ratio"},
     Fe_III_dose:            {value:Fe_III_dose,                               unit:"mg_Fe/L",           descr:"Required ferric chloride dose"},
@@ -84,14 +86,13 @@ function chem_P_removal(Q,TSS,TP,PO4,PO4_eff,FeCl3_solution,FeCl3_unit_weight,da
     //sludge_prod:            {value:sludge_production_w_chemical_addition,     unit:"kg/d",              descr:"sludge_production_with_chemical_addition"},
     //Vs_without:             {value:Vs_without,                                unit:"m3/d",              descr:"Volume of sludge without chemical precipitation"},
     //Vs:                     {value:Vs,                                        unit:"m3/d",              descr:"Volume of sludge with chemical precipitation"},
-    //extra_iSS:              {value:extra_iSS,                                 unit:"kg/d",              descr:"Extra iSS produced in AS reactor by coprecipitation"},
+    extra_iSS:              {value:extra_iSS,                                 unit:"kg/d",              descr:"Extra iSS produced in AS reactor by coprecipitation"},
   };
 }
 
 /*test*/
 (function(){
-  var debug=false;
-  if(debug==false)return;
+  //return;
   var Q                  = 3800
   var TSS                = 220
   var TP                 = 7
@@ -103,3 +104,91 @@ function chem_P_removal(Q,TSS,TP,PO4,PO4_eff,FeCl3_solution,FeCl3_unit_weight,da
   var result = chem_P_removal(Q,TSS,TP,PO4,PO4_eff,FeCl3_solution,FeCl3_unit_weight,days);
   console.log(result);
 })();
+
+/*
+  Fig 6-13, page 484
+  for chem P removal technology
+  Fe/P mole ratio
+  "Soluble P removal by Al and Fe addition. (Adapted from Szabo et al. 2008)"
+  note: implemented only for Fe(III) addition
+*/
+function get_Fe_P_mole_ratio(PO4_eff){
+  /* Input:  Residual soluble P concentration (C_P_residual), [mg/L]
+   *  -> range: 0.01, 0.1, 1, 10 (log scale)
+   * Output: Fe to initial soluble P ratio, [mole/mole]
+   *  -> range: 0, 1, 2, 3, 4, 5 (lineal scale)
+   */
+  //console.log("FIG 6-13");
+  //console.log("--------");
+
+  //rename input to "inp"
+  var inp = PO4_eff || 0;
+
+  //min and max values are: 0.01 and 10
+  inp=Math.min(10,Math.max(0.01,inp));
+  //console.log("PO4_eff: "+inp);
+
+  var Figure=[
+    {inp:0.01,out:8.00},
+    {inp:0.02,out:4.90}, //if input is less than 0.02 is not linear
+    {inp:0.03,out:4.50},
+    {inp:0.04,out:4.20},
+    {inp:0.05,out:3.90},
+    {inp:0.06,out:3.80},
+    {inp:0.07,out:3.70},
+    {inp:0.08,out:3.50},
+    {inp:0.09,out:3.35},
+    {inp:0.10,out:3.30}, //book example has this value (0.1, 3.3)
+    {inp:0.20,out:2.60},
+    {inp:0.30,out:2.10},
+    {inp:0.40,out:2.00},
+    {inp:0.50,out:1.70},
+    {inp:0.60,out:1.50},
+    {inp:0.70,out:1.20},
+    {inp:0.80,out:1.10},
+    {inp:0.90,out:1.00},
+    {inp:1.00,out:1.00}, //if input is greater than 1, it's no more linear
+    {inp:2.00,out:0.20},
+    {inp:3.00,out:0.10},
+    {inp:4.00,out:0.10},
+    {inp:5.00,out:0.01},
+    {inp:6.00,out:0.01},
+    {inp:7.00,out:0.005},
+    {inp:8.00,out:0.001},
+    {inp:9.00,out:0.001},
+    {inp:10.0,out:0.0001},
+  ];
+
+  //do linear interpolation if value is not in table
+  if(Figure.filter(row=>{return row.inp==inp}).length==0) {
+    //console.log('value '+inp+' not in table, performing linear interpolation');
+
+    //find inputs above and below (i_above and i_below)
+    var Inps=Figure.map(row=>{return row.inp});
+
+    for(var i=1;i<Inps.length;i++){
+      if ((Inps[i-1]<inp) && (inp<Inps[i])){
+        var i_below = Inps[i-1];
+        var i_above = Inps[i];
+        break;
+      }
+    }
+
+    //find outputs above and below (o_above and o_below)
+    var percentage = (inp-i_below)/(i_above-i_below);
+    var o_below = Figure.filter(row=>{return row.inp==i_below})[0].out;
+    var o_above = Figure.filter(row=>{return row.inp==i_above})[0].out;
+    //console.log('value between '+o_below+' and '+o_above);
+    var o_inter = o_below + (o_above-o_below)*percentage;
+    //console.log("Fe/P mole ratio found: "+o_inter);
+    //console.log("--------");
+    return o_inter;
+  }
+  else{
+    //console.log('value '+inp+' is in table');
+    var out=Figure.filter(row=>{return inp==row.inp})[0].out;
+    //console.log("Fe/P mole ratio found: "+out);
+    //console.log("--------");
+    return out;
+  }
+}

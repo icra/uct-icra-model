@@ -1,10 +1,11 @@
 /*
-  All kinetic constants
+  All constants (kinetic and molecular weights)
 
   status: still not integrated to:
-    "activated-sludge.js" TODO
-    "nitrification.js" TODO
-    "denitrification.js" TODO
+    "activated-sludge.js"
+    "nitrification.js"
+    "denitrification.js"
+    "chemical-P-removal.js"
 */
 
 //Activated sludge
@@ -38,3 +39,14 @@
   const theta_K2 = 1.080; //ø                  | temperature correction factor for K2_20
   const theta_K3 = 1.029; //ø                  | temperature correction factor for K3_20
   const theta_K4 = 1.029; //ø                  | temperature correction factor for K4_20
+
+//Chemical P removal
+  const M_H         = 1.008;   //g/mol | H molecular weight
+  const M_O         = 15.999;  //g/mol | O molecular weight
+  const M_P         = 30.974;  //g/mol | P molecular weight
+  const M_Cl        = 35.45;   //g/mol | Cl molecular weight
+  const M_Fe        = 55.845;  //g/mol | Fe molecular weight
+  const M_FeCl3     = M_Fe + M_Cl*3;                                //g/mol | FeCl3 molecular weight                   (162.195)
+  const M_FeH2PO4OH = M_Fe*1.6 + (M_H*2+M_P+M_O*4) + (M_O+M_H)*3.8; //g/mol | Fe(1.6)(H2PO4)(OH)(3.8) molecular weight (250.9646)
+  const M_FeOH3     = M_Fe + (M_O+M_H)*3;                           //g/mol | FeOH3 molecular weight                   (106.866)
+

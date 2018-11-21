@@ -7,8 +7,8 @@ Steady state model by George Ekama.
 Implemented by Lluís Bosch (lbosch@icra.cat).
 
 ## items pending/todo/discuss/finish
+- [P removal] ask george if we should consider that the Q changes when we add a volume of FeCl3
 - ask george if the HRT changes when using SST as wastage
-- denitrification outputs (units and descriptions)
 - chemical P removal (already discussed with George)
 - mass of nitrifiers (MX-BA) add to MX-T
 - fx1 and fx3 (fraction mass of unaerated sludge)
@@ -17,6 +17,7 @@ Implemented by Lluís Bosch (lbosch@icra.cat).
 - add stoichiometry (for CO2(air) produced) (future)
 
 ## items solved
-- wastage Qw in AS (waste from reactor or sst)
+- Qw wastage (waste from reactor or sst)
 - DO inhibition in nitrification
 - pH sensitivity in nitrification
+- denitrification outputs (units and descriptions)

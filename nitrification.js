@@ -147,7 +147,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
     X_BA         :{value:X_BA,         unit:"kgANOVSS/m3", descr:"Concentration of Nitrifiers"},
   };
 
-  //delete description (debug)
+  //hide description (debug)
   Object.values(process_variables).forEach(value=>delete value.descr);
 
   return {
