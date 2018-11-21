@@ -181,15 +181,15 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 
 /*test*/
 (function(){
-  //return;
+  return;
 
-  //new influent syntax-------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
+  //syntax--------------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
   let influent = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0  );
 
   //as+n+dn syntax-----------------(T,  Vp,     Rs, RAS, waste_from, SF,   fxt,  DO,  pH,  IR,  DO_RAS, influent_alk)
   let dn = influent.denitrification(16, 8473.3, 15, 1.0, 'reactor',  1.25, 0.39, 2.0, 7.2, 5.4, 1.0,    250         );
 
-  //print process variables
+  //show process variables
   console.log("=== Influent summary");           console.log(influent.summary);
   console.log("=== AS+NIT+DN effluent summary"); console.log(dn.effluent.summary);
   console.log("=== AS+NIT+DN wastage summary");  console.log(dn.wastage.summary);

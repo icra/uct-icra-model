@@ -1,10 +1,15 @@
 /* 
   STATE VARIABLES AND MASS RATIOS ENCAPSULATION
 
-  Each removal technology will be a method inside state variables,
+  Each removal technology is be a method inside state variables,
   implemented in its own file (e.g. nitrification.js)
-  as "State_Variables.prototype.technology_name=function(){}"
-  technologies are: primary-settler, activated-sludge, nitrification, denitrification, chemical-P-removal
+  as "State_Variables.prototype.technology_name=function(){implementation}"
+  technologies are: 
+    "primary-settler", 
+    "activated-sludge", 
+    "nitrification", 
+    "denitrification",
+    "chemical-P-removal"
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
 
@@ -17,12 +22,13 @@
       - Q
       - components
       - mass ratios
-    2. class methods (prototypes)
+    2. class methods
       - set
       - totals
       - fluxes
       - summary
-    3. test
+      - combine
+    3. tests
 */
 
 class State_Variables {
@@ -30,15 +36,15 @@ class State_Variables {
     //inputs and default values
     this.Q = isNaN(Q) ? 25 : Q; //ML/d | flowrate 
     this.components={ 
-      S_VFA : isNaN(S_VFA ) ? 50   : S_VFA , //mg/L | biodegradable   soluble     organics (BSO) volatile fatty acids
-      S_FBSO: isNaN(S_FBSO) ? 115  : S_FBSO, //mg/L | biodegradable   soluble     organics (BSO) fermentable
+      S_VFA : isNaN(S_VFA ) ? 50   : S_VFA , //mg/L | biodegradable   soluble     organics (BSO) (volatile fatty acids)
+      S_FBSO: isNaN(S_FBSO) ? 115  : S_FBSO, //mg/L | biodegradable   soluble     organics (BSO) (fermentable organics)
       X_BPO : isNaN(X_BPO ) ? 440  : X_BPO , //mg/L | biodegradable   particulate organics (BPO)
       X_UPO : isNaN(X_UPO ) ? 100  : X_UPO , //mg/L | unbiodegradable particulate organics (UPO)
       S_USO : isNaN(S_USO ) ? 45   : S_USO , //mg/L | unbiodegradable soluble     organics (USO)
       X_iSS : isNaN(X_iSS ) ? 60   : X_iSS , //mg/L | inorganic inert suspended solids (sand)
       S_FSA : isNaN(S_FSA ) ? 39.1 : S_FSA , //mg/L | inorganic free saline ammonia (NH4)
       S_OP  : isNaN(S_OP  ) ? 7.28 : S_OP  , //mg/L | inorganic orthophosphate (PO4)
-      S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | (NOT PART OF TKN) inorganic nitrite and nitrate (NO2 + NO3)
+      S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | inorganic nitrite and nitrate (NO2 + NO3) (not part of TKN)
     };
     this.mass_ratios={
       /* mass ratios for COD, C, N, P vs:
@@ -260,23 +266,24 @@ if(typeof document == "undefined"){module.exports=State_Variables;}
     console.log("=== Totals (mg/L) ===");      console.log(s.totals);
     console.log("=== Fluxes (kg/d) ===");      console.log(s.fluxes);
   };return;
-  {//example from george ekama (raw ww + set ww)
-    // [inputs]                    [outputs]
-    // S_VFA_inf:         50,      Total_COD_raw:  1151,
-    // S_FBSO_inf:        186,     Total_C_raw:    383.4286,
-    // S_USO_inf:         58,      Total_TKN_raw:  90.0039,
-    // S_FSA_inf:         59.6,    Total_TP_raw:   20.0795,
-    // S_OP_inf:          14.15,   Total_VSS_raw:  565.4983,
-    // X_BPO_non_set_inf: 301,     Total_TSS_raw:  665.4983,
-    // X_BPO_set_inf:     406,     Total_COD_set:  615,
-    // X_UPO_non_set_inf: 20,      Total_C_set:    205.2029,
-    // X_UPO_set_inf:     130,     Total_TKN_set:  71.8958,
-    // X_iSS_raw_inf:     100,     Total_TP_set:   16.4455,
-    // X_iSS_set_inf:     34,      Total_VSS_set:  211.1406,
-    //                             Total_TSS_set:  245.1406 */
+  {/*example from george ekama (raw ww + set ww)
+    [inputs]                    [outputs]
+    S_VFA_inf:         50,      Total_COD_raw:  1151,
+    S_FBSO_inf:        186,     Total_C_raw:    383.4286,
+    S_USO_inf:         58,      Total_TKN_raw:  90.0039,
+    S_FSA_inf:         59.6,    Total_TP_raw:   20.0795,
+    S_OP_inf:          14.15,   Total_VSS_raw:  565.4983,
+    X_BPO_non_set_inf: 301,     Total_TSS_raw:  665.4983,
+    X_BPO_set_inf:     406,     Total_COD_set:  615,
+    X_UPO_non_set_inf: 20,      Total_C_set:    205.2029,
+    X_UPO_set_inf:     130,     Total_TKN_set:  71.8958,
+    X_iSS_raw_inf:     100,     Total_TP_set:   16.4455,
+    X_iSS_set_inf:     34,      Total_VSS_set:  211.1406,
+                                Total_TSS_set:  245.1406 */
+
     //create 2 manual scenarios: (1) raw ww, (2) settled ww
-    //syntax ------> constructor(Q,  S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA,  S_OP,  S_NOx)
-    let sv = new State_Variables(25, 50,    186,    0,     0,     58,    0,     59.6,   14.15, 0);
+    //syntax--------------------(Q,  VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,    NOx)
+    let sv = new State_Variables(25, 50,  186,  0,   0,   58,  0,   59.6, 14.15, 0);
     sv.set("X_BPO", 707); sv.set("X_UPO", 150); sv.set("X_iSS", 100); console.log(sv.summary);
     sv.set('X_BPO', 301); sv.set('X_UPO', 20);  sv.set('X_iSS', 34);  console.log(sv.summary);
   };

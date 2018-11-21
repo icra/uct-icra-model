@@ -13,21 +13,22 @@ if(typeof document == "undefined"){ State_Variables = require("./state-variables
 
 State_Variables.prototype.chemical_P_removal=function(FeCl3_volume, FeCl3_solution, FeCl3_unit_weight){
   //inputs and default values
-  FeCl3_volume      = isNaN(FeCl3_volume     ) ? 6000 : FeCl3_volume     ; //L/d
-  FeCl3_solution    = isNaN(FeCl3_solution   ) ? 37   : FeCl3_solution   ; //%
-  FeCl3_unit_weight = isNaN(FeCl3_unit_weight) ? 1.35 : FeCl3_unit_weight; //kg/L
+  FeCl3_volume      = isNaN(FeCl3_volume     ) ? 6000 : FeCl3_volume     ; //L/d  | volume of FeCl3 solution added
+  FeCl3_solution    = isNaN(FeCl3_solution   ) ? 37   : FeCl3_solution   ; //%    | FeCl3 solution concentration
+  FeCl3_unit_weight = isNaN(FeCl3_unit_weight) ? 1.35 : FeCl3_unit_weight; //kg/L | FeCl3 solution density
 
-  //constants
+  //molecular weights (constants)
   const M_Fe        = 55.845;   //g/mol (Fe molecular weight)
   const M_P         = 30.974;   //g/mol (P molecular weight)
   const M_FeCl3     = 162.195;  //g/mol (FeCl3 molecular weight)
   const M_FeH2PO4OH = 250.9646; //g/mol ((Fe)(1.6)(H2PO4)(OH)(3.8) molecular weight)
   const M_FeOH3     = 106.866;  //g/mol (FeOH3 molecular weight)
 
+  //get flowrate (Q) and available P (PO4 = S_OP in state variables)
   let Q   = this.Q;               //ML/d
-  let PO4 = this.components.S_OP; //mg/L as P (calculated from "Pse" in 'activated-sludge.js')
+  let PO4 = this.components.S_OP; //mg/L as P (calculated as "Pse" in 'activated-sludge.js')
 
-  //moles of P available in PO4
+  //get moles of P available in PO4
   let moles_P = Q*PO4*1000/M_P; //moles/d of P
 
   //convert L/d of FeCl3 solution to moles of Fe
@@ -35,19 +36,19 @@ State_Variables.prototype.chemical_P_removal=function(FeCl3_volume, FeCl3_soluti
   let amount_Fe    = (M_Fe/M_FeCl3)*amount_FeCl3;                        //kg/d of dry Fe
   let moles_Fe     = amount_Fe/M_Fe*1000;                                //moles/d dry Fe
 
-  //Fe/P mole ratio
+  //get Fe/P mole ratio
   let Fe_P_mole_ratio = moles_Fe/moles_P; //mol_Fe/mol_P
 
-  //PO4 effluent and PO4 removed
+  //get PO4 effluent and PO4 removed
   let PO4_eff     = get_PO4_eff(Fe_P_mole_ratio); //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function below 'get_PO4_eff')
   PO4_eff         = Math.min(PO4, PO4_eff);       //PO4_eff cannot be higher than PO4 (i.e. volume of FeCl3 solution = 0)
   let PO4_removed = PO4 - PO4_eff;                //mg/L
 
-  //calculate extra iSS sludge produced
+  //get extra iSS sludge produced
   let extra_iSS = Q*PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
   //chemical P removal end-----------------------------------------------------------------
 
-  //add the extra iSS generated to the current ones
+  //add extra iSS to the current ones
   //TODO ask george or lluis how to deal with this new sludge
   let current_iSS = Q*this.components.X_iSS; //kg_iSS/d
   let total_iSS   = current_iSS + extra_iSS; //kg_iSS/d
@@ -64,7 +65,8 @@ State_Variables.prototype.chemical_P_removal=function(FeCl3_volume, FeCl3_soluti
     X_iSS, 
     this.components.S_FSA, 
     PO4_eff, 
-    this.components.S_NOx);
+    this.components.S_NOx,
+  );
 
   return {
     Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"mol_Fe/mol_P", descr:"Fe/P mole ratio"},
@@ -154,7 +156,7 @@ function get_PO4_eff(Fe_P_mole_ratio){
 
 /*test*/
 (function(){
-  //return;
+  return;
   //syntax---------------------(Q,  VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx)
   let inf = new State_Variables(25, 0,   0,    0,   0,   0,   40,  0,   7,  0);
   let cpr = inf.chemical_P_removal(); //use default values

@@ -161,8 +161,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
 /*test*/
 (function(){
   return;
-  //syntax---------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
-  let inf = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0  );
+  //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
+  let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  );
 
   //syntax-------------------(T   Vp      Rs  RAS  waste      SF    fxt   DO   pH)
   let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 1.25, 0.39, 2.0, 7.2);

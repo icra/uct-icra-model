@@ -1,8 +1,5 @@
 /*
   Equacions d'un tram de riu: veure "docs/riu/equacions\ riu.docx"
-  Estructura Taula resum de trams de riu
-    [tram influent 1, codi tram influent 2, codi edar influent]+
-    [wb, wt, Dt, angle, n, S, Li, UTM_X, UTM_Y]
 */
 
 class Tram {
@@ -24,12 +21,6 @@ class Tram {
 
     //EDAR que aboca al tram (per defecte no n'hi ha)
     this.wwtp = null; //<State_Variables>
-
-    //ALTRES (pel frontend, discutir amb Anna) TBD
-    //id per la base de dades
-    this.id="1";
-    //coordenades per dibuixar els trams
-    this.coordenades={inici:[0,0], final:[0,0]};
   }
 
   /*Resultats*/
@@ -97,7 +88,7 @@ if(typeof document == "undefined"){
   //sintaxi:  Tram(wb, wt, Db, S,     n,      Li,   Di)
   let t = new Tram(3,  6,  2,  0.005, 0.0358, 1000, 1.2);
   console.log(t.resultats);
-  return;
+
   //recorre variables d'estat (fluxes màssics) i calcula massa final
   t.state_variables.Q = 25;
   t.state_variables.set('S_VFA',10);
