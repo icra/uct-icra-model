@@ -24,7 +24,6 @@ State_Variables.prototype.chemical_P_removal=function(FeCl3_volume, FeCl3_soluti
   const M_FeH2PO4OH = 250.9646; //g/mol ((Fe)(1.6)(H2PO4)(OH)(3.8) molecular weight)
   const M_FeOH3     = 106.866;  //g/mol (FeOH3 molecular weight)
 
-  //TBD the addition of FeCl3 affects flowrate? how can the sum be calculated?
   let Q   = this.Q;               //ML/d
   let PO4 = this.components.S_OP; //mg/L as P (calculated from "Pse" in 'activated-sludge.js')
 
@@ -46,21 +45,41 @@ State_Variables.prototype.chemical_P_removal=function(FeCl3_volume, FeCl3_soluti
 
   //calculate extra iSS sludge produced
   let extra_iSS = Q*PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
+  //chemical P removal end-----------------------------------------------------------------
 
-  //add the extra iSS to the current ones
-  let current_iSS    = Q*this.components.X_iSS; //kg_iSS/d
-  let total_iSS      = current_iSS + extra_iSS; //kg_iSS/d
-  let total_iSS_conc = total_iSS/Q;             //mg_iSS/L
+  //add the extra iSS generated to the current ones
+  //TODO ask george or lluis how to deal with this new sludge
+  let current_iSS = Q*this.components.X_iSS; //kg_iSS/d
+  let total_iSS   = current_iSS + extra_iSS; //kg_iSS/d
+  let X_iSS       = total_iSS/Q;             //mg_iSS/L new X_iSS concentration
+
+  //new effluent TODO
+  let effluent = new State_Variables(
+    Q, 
+    this.components.S_VFA,
+    this.components.S_FBSO, 
+    this.components.X_BPO, 
+    this.components.X_UPO, 
+    this.components.S_USO, 
+    X_iSS, 
+    this.components.S_FSA, 
+    PO4_eff, 
+    this.components.S_NOx);
 
   return {
     Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"mol_Fe/mol_P", descr:"Fe/P mole ratio"},
     PO4:             {value:PO4,             unit:"mg/L_as_P",    descr:"PO4 available concentration"},
     PO4_eff:         {value:PO4_eff,         unit:"mg/L_as_P",    descr:"PO4 effluent concentration"},
     PO4_removed:     {value:PO4_removed,     unit:"mg/L_as_P",    descr:"Concentration of P removed"},
-    current_iSS:     {value:current_iSS,     unit:"kg_iSS/d",     descr:"Current iSS"},
     extra_iSS:       {value:extra_iSS,       unit:"kg_iSS/d",     descr:"iSS produced by FeCl3 coprecipitation"},
-    total_iSS:       {value:total_iSS,       unit:"kg_iSS/d",     descr:"Total iSS (=input + new)"},
   };
+
+  /* TODO
+    return {
+      process_variables,
+      effluent,
+    }
+  */
 };
 
 //get the PO4 effluent concentration from the Fe/P mole ratio

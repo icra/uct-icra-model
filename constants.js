@@ -1,7 +1,7 @@
 /*
   All constants (kinetic and molecular weights)
 
-  status: still not integrated to:
+  status: compilation phase, still not integrated to:
     "activated-sludge.js"
     "nitrification.js"
     "denitrification.js"
@@ -49,4 +49,3 @@
   const M_FeCl3     = M_Fe + M_Cl*3;                                //g/mol | FeCl3 molecular weight                   (162.195)
   const M_FeH2PO4OH = M_Fe*1.6 + (M_H*2+M_P+M_O*4) + (M_O+M_H)*3.8; //g/mol | Fe(1.6)(H2PO4)(OH)(3.8) molecular weight (250.9646)
   const M_FeOH3     = M_Fe + (M_O+M_H)*3;                           //g/mol | FeOH3 molecular weight                   (106.866)
-
