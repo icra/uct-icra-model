@@ -16,7 +16,7 @@ class Tram {
     //trams connectats upstream (pares). Definits per l'usuari.
     this.pares=[]; /*array <Tram>*/
 
-    //State Variables(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx){
+    //State Variables(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx)
     this.state_variables = new State_Variables(0,0,0,0,0,0,0,0,0,0);
 
     //EDAR que aboca al tram (per defecte no n'hi ha)

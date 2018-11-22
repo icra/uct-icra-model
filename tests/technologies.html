@@ -228,22 +228,18 @@
     <fieldset id=chemical_P_removal>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/chemical-P-removal.js" target=_blank>Chemical P removal</a></legend>
       <table border=1>
-        <tr><td>FeCl3_volume      <td><input id=FeCl3_volume      type=number min=0 value=6000 > <td class=unit>L/d
-        <tr><td>FeCl3_solution    <td><input id=FeCl3_solution    type=number min=0 value=37   > <td class=unit>%
-        <tr><td>FeCl3_unit_weight <td><input id=FeCl3_unit_weight type=number min=0 value=1.35 > <td class=unit>kg/L
+        <tr><td>mass_FeCl3 <td><input id=mass_FeCl3 type=number min=0 value=25> <td class=unit>kg/d
       </table>
       <button onclick="run_cpr();">Run</button>
       <script>
         function run_cpr(){
-          let FeCl3_volume      = parseFloat(document.querySelector('#chemical_P_removal #FeCl3_volume').value);
-          let FeCl3_solution    = parseFloat(document.querySelector('#chemical_P_removal #FeCl3_solution').value);
-          let FeCl3_unit_weight = parseFloat(document.querySelector('#chemical_P_removal #FeCl3_unit_weight').value);
-          let cpr = sv.chemical_P_removal(FeCl3_volume, FeCl3_solution, FeCl3_unit_weight);
+          let mass_FeCl3 = parseFloat(document.querySelector('#chemical_P_removal #mass_FeCl3').value);
+          let cpr = sv.chemical_P_removal(mass_FeCl3);
           redisplay();
           print_proces_variables(
             'chemical_P_removal',
-            `chemical_P_removal calculated`,
-            cpr,
+            `chemical_P_removal(${mass_FeCl3}) calculated`,
+            cpr.process_variables,
           );
         }
       </script>

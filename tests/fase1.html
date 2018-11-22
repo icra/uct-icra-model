@@ -1,0 +1,274 @@
+<!doctype html><html><head>
+  <meta charset=utf8>
+  <title>Fase 1</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
+    body {
+      font-family: 'Roboto', verdana;
+      color: #5C5C5C;
+    }
+    table{
+      border-collapse:collapse;
+      margin-bottom:5px;
+    }
+    td,th {
+      border:1px solid #ccc;
+    }
+    th{
+      background:#eee;
+      font-weight:normal;
+      text-align:left;
+    }
+    input[type=number]{
+      width:55px;
+      text-align:right;
+    }
+    .flex{ display:flex; }
+    .unit{ font-size:smaller;}
+    .number{ text-align:right; }
+  </style>
+  <!--utils-->
+  <script src=format.js></script>
+</head><body>
+
+<!--title-->
+<div style="border-bottom:1px solid #ccc;margin-bottom:4px">
+  <h3>Fase 1: Influent &rarr; plant &rarr; river</h3>
+</div>
+
+<!--main-->
+<div class=flex>
+  <!--inputs-->
+  <div id=inputs style="border-right:1px solid #ccc;padding-right:4px;margin-right:4px">
+    <div><strong>Inputs</strong></div>
+    <div><code>Influent</code></div>
+    <table id=influent><tr>
+      <td title="Flowrate"                            >Q      <br><input type=number id=Q      value=25  > <br><span class=unit>ML/d</span>
+      <td title="Volatile fatty acids"                >S_VFA  <br><input type=number id=S_VFA  value=50  > <br><span class=unit>mg/L</span>
+      <td title="Fermentable organics"                >S_FBSO <br><input type=number id=S_FBSO value=115 > <br><span class=unit>mg/L</span>
+      <td title="Biodegradable particulate organics"  >X_BPO  <br><input type=number id=X_BPO  value=440 > <br><span class=unit>mg/L</span>
+      <td title="Unbiodegradable particulate organics">X_UPO  <br><input type=number id=X_UPO  value=100 > <br><span class=unit>mg/L</span>
+      <td title="Unbiodegradable soluble organics"    >S_USO  <br><input type=number id=S_USO  value=45  > <br><span class=unit>mg/L</span>
+      <td title="Inert suspended solids"              >X_iSS  <br><input type=number id=X_iSS  value=60  > <br><span class=unit>mg/L</span>
+      <td title="Free saline ammonia"                 >S_FSA  <br><input type=number id=S_FSA  value=39.1> <br><span class=unit>mg/L</span>
+      <td title="Orthophosphate (PO4)"                >S_OP   <br><input type=number id=S_OP   value=7.28> <br><span class=unit>mg/L</span>
+      <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx  <br><input type=number id=S_NOx  value=0   > <br><span class=unit>mg/L</span>
+    </table> 
+
+    <div><code>Plant</code></div>
+    <table id=edar>
+      <tr>
+        <td><label><input type=checkbox id=pst> Primary settler</label>
+        <td>fw         <br><input type=number id=fw          value=0.005  > <span class=unit>ø</span>
+        <td>removal_BPO<br><input type=number id=removal_BPO value=42.3352> <span class=unit>%</span>
+        <td>removal_UPO<br><input type=number id=removal_UPO value=90.0500> <span class=unit>%</span>
+        <td>removal_iSS<br><input type=number id=removal_iSS value=75.1250> <span class=unit>%</span>
+      </tr>
+      <tr>
+        <td><label><input type=checkbox id=as checked=true disabled> Activated sludge</label>
+        <td>T         <br><input type=number id=T          value=16  >   <span class=unit>ºC</span>
+        <td>Vp        <br><input type=number id=Vp         value=8473.3> <span class=unit>m<sup>3</sup></span>
+        <td>Rs        <br><input type=number id=Rs         value=15  >   <span class=unit>d</span>
+        <td>RAS       <br><input type=number id=RAS        value=1.0 >   <span class=unit>ø</span>
+        <td>waste_from<br><select id=waste_from><option>reactor<option>sst</select>
+      </tr>
+      <tr>
+        <td><label><input type=checkbox id=nit> Nitrification</label>
+        <td>SF <br><input type=number id=SF  value=1.25> <span class=unit>ø</span>
+        <td>fxt<br><input type=number id=fxt value=0.39> <span class=unit>ø</span>
+        <td>DO <br><input type=number id=DO  value=2.0 > <span class=unit>mg/L</span>
+        <td>pH <br><input type=number id=pH  value=7.2 > <span class=unit>ø</span>
+      </tr>
+      <tr>
+        <td><label><input type=checkbox id=dn> Denitrification</label>
+        <td>IR          <br><input type=number id=IR           value=5.4> <span class=unit>ø</span>
+        <td>DO_RAS      <br><input type=number id=DO_RAS       value=1.0> <span class=unit>mg/L</span>
+        <td>influent_alk<br><input type=number id=influent_alk value=250> <span class=unit>mg/L CaCO<sub>3<sub></span>
+      </tr>
+      <tr>
+        <td><label><input type=checkbox id=cpr> Chemical P removal</label>
+        <td>mass_FeCl<sub>3</sub><br><input type=number id=mass_FeCl3 value=3000> <span class=unit>kg/d</span>
+      </tr>
+    </table> 
+
+    <div><code>River</code></div>
+    <table id=riu>
+      <tr>
+        <td>wb<br><input type=number id=wb value=3>      <span class=unit>m</span>
+        <td>wt<br><input type=number id=wt value=6>      <span class=unit>m</span>
+        <td>Db<br><input type=number id=Db value=2>      <span class=unit>m</span>
+        <td>S <br><input type=number id=S  value=0.005>  <span class=unit>m/m</span>
+        <td>n <br><input type=number id=n  value=0.0358> <span class=unit>s/m<sup>1/3</sup></span>
+        <td>Li<br><input type=number id=Li value=1000>   <span class=unit>m</span>
+        <td>Di<br><input type=number id=Di value=1.2>    <span class=unit>m</span>
+        <td>T <br><input type=number id=Ti value=12>     <span class=unit>ºC</span>
+      </tr>
+    </table>
+  </div>
+
+  <!--outputs-->
+  <div id=outputs>
+    <div><strong>Outputs</strong></div>
+    <div><code>Summaries</code></div>
+    <div id=summaries></div>
+    <div><code>Process variables</code></div>
+    <div id=processes>[work in progress]</div>
+  </div>
+</div>
+<button id=run style="font-size:44px;margin:5px 0px">RUN</button>
+
+<!--load backend-->
+<script src="../state-variables.js"></script>
+<script src="../primary-settler.js"></script>
+<script src="../activated-sludge.js"></script>
+<script src="../nitrification.js"></script>
+<script src="../denitrification.js"></script>
+<script src="../chemical-P-removal.js"></script>
+<script src="../tram.js"></script>
+
+<script>
+  //btn run clicat listener
+  document.querySelector('button#run').addEventListener('click',function(){
+    //nou influent
+    let influent=new State_Variables(
+      parseFloat(document.querySelector('#influent #Q').value),
+      parseFloat(document.querySelector('#influent #S_VFA').value),
+      parseFloat(document.querySelector('#influent #S_FBSO').value),
+      parseFloat(document.querySelector('#influent #X_BPO').value),
+      parseFloat(document.querySelector('#influent #X_UPO').value),
+      parseFloat(document.querySelector('#influent #S_USO').value),
+      parseFloat(document.querySelector('#influent #X_iSS').value),
+      parseFloat(document.querySelector('#influent #S_FSA').value),
+      parseFloat(document.querySelector('#influent #S_OP').value),
+      parseFloat(document.querySelector('#influent #S_NOx').value),
+    );
+
+    //get configuració edar
+    let conf = {
+      pst:document.querySelector('#edar #pst').checked,
+      nit:document.querySelector('#edar #nit').checked,
+      dn :document.querySelector('#edar #dn').checked,
+      cpr:document.querySelector('#edar #cpr').checked,
+    }
+
+    //1: crida primary settler
+    let pst;
+    if(conf.pst){
+      pst = influent.primary_settler(
+        parseFloat(document.querySelector('#edar #fw').value),
+        parseFloat(document.querySelector('#edar #removal_BPO').value),
+        parseFloat(document.querySelector('#edar #removal_UPO').value),
+        parseFloat(document.querySelector('#edar #removal_iSS').value)
+      );
+    }else{
+      pst = {
+        effluent:influent,
+        wastage:null,
+      };
+    }
+
+    //2: crida AS+NIT+DN
+    let as;
+    if(conf.dn){
+      as = pst.effluent.denitrification(
+        parseFloat(document.querySelector('#edar #T').value),
+        parseFloat(document.querySelector('#edar #Vp').value),
+        parseFloat(document.querySelector('#edar #Rs').value),
+        parseFloat(document.querySelector('#edar #RAS').value),
+        document.querySelector('#edar #waste_from').value,
+        parseFloat(document.querySelector('#edar #SF').value),
+        parseFloat(document.querySelector('#edar #fxt').value),
+        parseFloat(document.querySelector('#edar #DO').value),
+        parseFloat(document.querySelector('#edar #pH').value),
+        parseFloat(document.querySelector('#edar #IR').value),
+        parseFloat(document.querySelector('#edar #DO_RAS').value),
+        parseFloat(document.querySelector('#edar #influent_alk').value),
+      );
+    }else if(conf.nit){
+      as = pst.effluent.nitrification(
+        parseFloat(document.querySelector('#edar #T').value),
+        parseFloat(document.querySelector('#edar #Vp').value),
+        parseFloat(document.querySelector('#edar #Rs').value),
+        parseFloat(document.querySelector('#edar #RAS').value),
+        document.querySelector('#edar #waste_from').value,
+        parseFloat(document.querySelector('#edar #SF').value),
+        parseFloat(document.querySelector('#edar #fxt').value),
+        parseFloat(document.querySelector('#edar #DO').value),
+        parseFloat(document.querySelector('#edar #pH').value),
+      );
+    }else{
+      as = pst.effluent.activated_sludge(
+        parseFloat(document.querySelector('#edar #T').value),
+        parseFloat(document.querySelector('#edar #Vp').value),
+        parseFloat(document.querySelector('#edar #Rs').value),
+        parseFloat(document.querySelector('#edar #RAS').value),
+        document.querySelector('#edar #waste_from').value,
+      );
+    }
+
+    //3: aplica CPR
+    let cpr;
+    if(conf.cpr){
+      cpr = as.effluent.chemical_P_removal(
+        parseFloat(document.querySelector('#edar #mass_FeCl3').value),
+      );
+      cpr.wastage = as.wastage;
+    }else{
+      cpr = {
+        effluent:as.effluent,
+        wastage:as.wastage,
+      }
+    }
+
+    //variables d'estat per dibuixar summary
+    let svs = {
+      Influent: influent.summary,
+    };
+
+    //afegeix variables d'estat a svs
+    if(conf.pst) svs.Primary_wastage    = pst.wastage.summary;
+    if(conf.pst) svs.Primary_effluent   = pst.effluent.summary;
+                 svs.Secondary_wastage  = cpr.wastage.summary;
+                 svs.Secondary_effluent = cpr.effluent.summary;
+
+    //4: end
+    (function draw_summaries(svs){
+      if(Object.keys(svs).length==0)return;
+      let div = document.querySelector('div#summaries'); div.innerHTML="";   //buida div summaries
+      let table = document.createElement('table');div.appendChild(table);    //crea nova taula
+      let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML="";   //posa els noms de les variables d'estat
+      Object.keys(svs).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2>"+key.replace('_',' ');});
+
+      //itera les keys del primer objecte (Q,COD,TKN...)
+      Object.keys(Object.values(svs)[0]).forEach(key=>{
+        let newRow = table.insertRow(-1);
+        newRow.insertCell(-1).innerHTML=`${key} <span class=unit>${key=="Q"?"(ML/d)":"(mg/L, kg/d)"}</span>`;
+        //itera cada variable d'estat
+        Object.values(svs).forEach(sv=>{
+          if(key=="Q"){
+            newRow.insertCell(-1).outerHTML="<td class=number colspan=2>"+format(sv[key]);
+          }else{
+            newRow.insertCell(-1).outerHTML="<td class=number>"+format(sv[key][0]);
+            newRow.insertCell(-1).outerHTML="<td class=number>"+format(sv[key][1]);
+          }
+
+
+        });
+      });
+    })(svs);
+
+    //new Tram(wb, wt, Db, S, n, Li,Di)
+    let tram=new Tram(
+      parseFloat(document.querySelector('#wb').value),
+      parseFloat(document.querySelector('#wt').value),
+      parseFloat(document.querySelector('#Db').value),
+      parseFloat(document.querySelector('#S').value),
+      parseFloat(document.querySelector('#n').value),
+      parseFloat(document.querySelector('#Li').value),
+      parseFloat(document.querySelector('#Di').value),
+    );
+    //combina effluent i tram TODO
+    //soluciona tram TODO
+  });
+  document.querySelector('button#run').click();
+</script>

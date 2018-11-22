@@ -59,11 +59,10 @@ let inf = new State_Variables(25, 50,  115,  440, 100, 45,  60,  39.1, 7.28, 0);
 let pst = inf.primary_settler(0.005, 42.335,      90.05,       75.125);
 //as+n+dn syntax---------------------(T,  Vp,     Rs, RAS, waste_from, SF,   fxt,  DO,  pH,  IR,  DO_RAS, influent_alk)
 let dn = pst.effluent.denitrification(16, 8473.3, 15, 1.0, 'reactor',  1.25, 0.39, 2.0, 7.2, 5.4, 1.0,    250 );
-//cpr syntax----------------------------(FeCl3_volume, FeCl3_solution, FeCl3_unit_weight)
-let cpr = dn.effluent.chemical_P_removal(6000,         37,             1.35);
+//cpr syntax----------------------------(mass_FeCl3)
+let cpr = dn.effluent.chemical_P_removal(6000);
 //connecta la sortida al tram 5
 t5.wwtp = cpr.effluent;
 
 //Soluciona xarxa
 //console.log("=== RESOL XARXA ==="); 
-//xarxa.soluciona(verbose=true);
