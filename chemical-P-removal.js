@@ -62,9 +62,9 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
   //process variables
   let process_variables={
     Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"molFe/molP", descr:"Fe/P mole ratio"},
-    PO4i:            {value:PO4i,            unit:"mg/L_as_P",  descr:"PO4 available"},
-    PO4e:            {value:PO4e,            unit:"mg/L_as_P",  descr:"PO4 effluent"},
-    PO4_removed:     {value:PO4_removed,     unit:"mg/L_as_P",  descr:"Concentration of P removed"},
+    PO4i:            {value:PO4i,            unit:"mgP/L",      descr:"PO4 available"},
+    PO4e:            {value:PO4e,            unit:"mgP/L",      descr:"PO4 effluent"},
+    PO4_removed:     {value:PO4_removed,     unit:"mgP/L",      descr:"Concentration of P removed"},
     extra_iSS:       {value:extra_iSS,       unit:"kgiSS/d",    descr:"iSS produced by FeCl3 coprecipitation"},
   };
 
