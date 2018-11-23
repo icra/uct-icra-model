@@ -74,7 +74,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   if(fxt>fxm) throw `The mass of unaerated sludge (fxt=${fxt}) cannot be higher than fxm (${fxm})`;
 
   //minimum sludge age for nitrification (Rsm)
-  let Rsm = 1/(µAm_pH*(1-fxt) - bAT); //days
+  let Rsm = SF/(µAm_pH*(1-fxt) - bAT); //days
   if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
 
   //unaerated sludge (current and max)
@@ -117,10 +117,13 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   //ask george TODO if we should add UPO of ANOs
   //ask george TODO if we should add iSS of ANOs
 
+  //FBSO from previous step
+  let S_b = as.effluent.components.S_FBSO; //mg/L of bCOD not degraded
+
   //create output state variables (effluent, wastage)
   //syntax--------------------------(Q,  VFA, FBSO, BPO,     UPO,     USO,  iSS,     FSA,     PO4, NOx)
-  let effluent = new State_Variables(Qe, 0,   0,    0,       0,       Suse, 0,       Nae_fxt, Pse, Nc_fxt);
-  let wastage  = new State_Variables(Qw, 0,   0,    BPO_was, UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nc_fxt);
+  let effluent = new State_Variables(Qe, 0,   S_b,  0,       0,       Suse, 0,       Nae_fxt, Pse, Nc_fxt);
+  let wastage  = new State_Variables(Qw, 0,   S_b,  BPO_was, UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nc_fxt);
 
   //pack nitrification process variables
   let process_variables={
@@ -163,10 +166,10 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   return;
   //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  );
-
   //syntax-------------------(T   Vp      Rs  RAS  waste      SF    fxt   DO   pH)
   let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 1.25, 0.39, 2.0, 7.2);
-
+  console.log(nit.effluent.components);
+  //return;
   //print results
   console.log(nit.process_variables);
   console.log(nit.as_process_variables);

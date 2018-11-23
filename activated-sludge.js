@@ -50,7 +50,15 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   //page 10
   const YH     = 0.45;                   //gVSS/gCOD     | yield coefficient (does not change with temperature)
   let f_XBH    = (YH*Rs)/(1+bHT*Rs);     //g_VSS·d/g_COD | OHO biomass production rate
-  let MX_BH    = FSbi * f_XBH;           //kg_VSS        | OHO biomass produced
+
+  //Deal with bCOD not degraded (FBSO)
+  const k_v20 = 100.07;                    //TODO it should be 0.07 when done (current value makes it that FBSO is degraded to ~0 mg/L at the effluent) 
+  let k_vT  = k_v20*Math.pow(1.035, T-20); //L/(mgVSS·d)
+  let S_b   = 1/(f_XBH*k_vT);              //mgCOD/L
+  let FdSbi = FSbi - Q*S_b;                //kg/d
+
+  //calculate biomass (OHOs)
+  let MX_BH    = FdSbi * f_XBH;          //kg_VSS        | OHO biomass produced
   const fH     = 0.20;                   //ø             | UPO OHO fraction
   let MX_EH    = fH * bHT * Rs * MX_BH;  //kg_VSS        | endogenous residue OHOs
   let MX_I     = FXti * Rs;              //kg_VSS        | unbiodegradable particulate organics
@@ -118,7 +126,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let Nae_balance = 100*Nae/(this.components.S_FSA+ON_FBSO+ON_BPO-(Ns-ON_UPO)); //percentage
 
   //2.7 - oxygen demand - page 13
-  let FOc = FSbi*((1-fCV_OHO*YH)+fCV_OHO*(1-fH)*bHT*f_XBH); //kg_O/d | carbonaceous oxygen demand
+  let FOc = FdSbi*((1-fCV_OHO*YH)+fCV_OHO*(1-fH)*bHT*f_XBH); //kg_O/d | carbonaceous oxygen demand
   let FOn = 4.57*Q*Nae;                                     //kg_O/d | nitrogenous oxygen demand
   let FOt = FOc + FOn;                                      //kg_O/d | total oxygen demand
   let OUR = FOt/(Vp*24)*1000;                               //mg/L·h | oxygen uptake rate
@@ -132,8 +140,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   /*BALANCES*/
   //2.9 - COD Balance
   let Suse        = frac.COD.usCOD;                                       //mg/L as O | USO influent == effluent
-  let FSe         = Qe*Suse;                                              //kg/d as O | USO effluent flux
-  let FSw         = Qw*(Suse + f*(fCV_OHO*(X_BH+X_EH)+fCV_UPO*X_I)*1000); //kg/d as O | COD wastage flux
+  let FSe         = Qe*(S_b + Suse);                                      //kg/d as O | USO effluent flux + bCOD not degraded
+  let FSw         = Qw*(S_b + Suse + f*(fCV_OHO*(X_BH+X_EH)+fCV_UPO*X_I)*1000); //kg/d as O | COD wastage flux
   let FSout       = FSe + FOc + FSw;                                      //kg/d as O | total COD out flux
   let COD_balance = 100*FSti/FSout;                                       //percentage
 
@@ -154,7 +162,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
 
   //Calculate the concentration of BPO, UPO and iSS at the wastage
   //Solids summary:
-  //  MX_BH = FSbi * X_BH;            //kg_VSS | biomass production                   (BPO)
+  //  MX_BH = FdSbi * X_BH;            //kg_VSS | biomass production                   (BPO)
   //  MX_EH = fH * bHT * Rs * MX_BH;  //kg_VSS | endogenous residue OHOs              (UPO)
   //  MX_I  = FXti * Rs;              //kg_VSS | unbiodegradable particulate organics (UPO)
   //  MX_V  = MX_BH + MX_EH + MX_I;   //kg_VSS | total VSS                            (BPO+UPO)
@@ -165,11 +173,13 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let UPO_was = f*(fCV_OHO*(fH*X_BH + X_EH)+fCV_UPO*X_I)*1000; //mg/L | UPO concentration
   let iSS_was = f*X_IO*1000;                                   //mg/L | iSS concentration
 
+  //NOx
+  let NOx = this.components.S_NOx;
+
   //create output state variables (effluent, wastage)
   //syntax ------------> constructor(Q,  VFA, FBSO, BPO,     UPO,     USO,  iSS,     FSA, PO4, NOx)
-  let effluent = new State_Variables(Qe, 0,   0,    0,       0,       Suse, 0,       Nae, Pse, this.components.S_NOx);
-  let wastage  = new State_Variables(Qw, 0,   0,    BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, this.components.S_NOx);
-  //TODO Vicenç claims that BSO in effluent is not 0
+  let effluent = new State_Variables(Qe, 0,   S_b,  0,       0,       Suse, 0,       Nae, Pse, NOx);
+  let wastage  = new State_Variables(Qw, 0,   S_b,  BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, NOx);
 
   //process_variables
   let process_variables={
@@ -218,18 +228,18 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
 /*test*/
 (function(){
   return;
-
   //new influent
   //syntax---------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
   let inf = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0);
-
   //apply AS wasting from {reactor, sst}
   let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor'); //AS wasting from the reactor
   let as_sst = inf.activated_sludge(16, 8473.3, 15, 1.0, 'sst');     //AS wasting from the sst
-
+  console.log("=== AS process variables"); console.log(as_rea.effluent.components);
+  return;
   //show results
   console.log("=== Influent");             console.log(inf.summary);
   console.log("=== AS process variables"); console.log(as_rea.process_variables);
+  return;
   ////=== waste from reactor
   console.log("=== Effluent summary (waste from reactor)"); console.log(as_rea.effluent.summary);
   console.log("=== Wastage summary (waste from reactor)");  console.log(as_rea.wastage.summary);

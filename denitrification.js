@@ -51,17 +51,18 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
   const K4T   = K4_20*Math.pow(1.029,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
 
   //3.2
-  let frac  = this.totals;    //Object
-  let Sbsi  = frac.COD.bsCOD; //mg/L  | biodegradable soluble COD
-  let Sbi   = frac.COD.bCOD;  //mg/L  | biodegradable COD
-  let fSb_s = Sbsi/Sbi;       //ratio BSO/(BSO+BPO)
+  let frac  = this.totals;                    //Object
+  let Sbsi  = frac.COD.bsCOD;                 //mg/L | biodegradable soluble COD
+  let Sbi   = frac.COD.bCOD;                  //mg/L | biodegradable COD
+  let fSb_s = Sbsi/Sbi;                       //ratio BSO/(BSO+BPO)
+  let S_b   = nit.effluent.components.S_FBSO; //mg/L of bCOD not degraded
 
   //Denitrification potential
   const fCV   = this.mass_ratios.f_CV_UPO;            //1.481 gUPO/gVSS
   const YH    = 0.45;                                 //gVSS/gCOD
   let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YH*Rs/(1+bHT*Rs)
   let Dp1RBSO = fSb_s*Sbi*(1-fCV*YH)/2.86;            //mgNO3-N/L   | influent
-  let Dp1BPO  = K2T*fxt*Sbi*f_XBH;                    //mgNO3-N/L   | influent
+  let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgNO3-N/L   | influent
   let Dp1     = Dp1RBSO + Dp1BPO;                     //mgNO3-N/L   | influent
 
   //Nitrate generated in nitrification
@@ -76,17 +77,13 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
     return (-B+Math.sqrt(B*B+4*A*C))/(2*A);
   })();
 
-  //primary and secondary anoxic sludge mass fractions (fx1, fx3) TODO (values not used)
-  //let fx1 = ()/(K2T*f_XBH*(1-fH)*X_BH); //TODO not finished
-  //let fx3 = 0;                          //TODO not finished
-
   //minimum effluent NOx concentration
   let NOx_min_eff = Nc/(a_opt + RAS + 1); //mg/L
 
   //calculate the effluent nitrate (Nne)
   let Nne; //mg/L
   if(a < a_opt) Nne = Nc/(a+RAS+1);
-  else          Nne = Nc-Dp1+(a*DO+RAS*DO_RAS)/2.86;
+  else          Nne = Nc - Dp1 + (a*DO + RAS*DO_RAS)/2.86;
 
   //calculate TN in the effluent (TKN+NOx)
   let TKNe = nit.process_variables.Nte_fxt.value; //mg/L
@@ -108,8 +105,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
   //TOD balance (TOD=COD+4.57*TKN)
   let inf_frac = this.totals;
   let eff_frac = nit.effluent.totals;
+  let Qe   = nit.effluent.Q; //ML/d | effluent flowrate
   let TODi = Q*(inf_frac.COD.total + 4.57*inf_frac.TKN.total); //kg/d
-  let TODe = Q*(eff_frac.COD.total + 4.57*eff_frac.TKN.total); //kg/d
+  let TODe = Qe*(eff_frac.COD.total + 4.57*eff_frac.TKN.total); //kg/d
 
   //calculate TOD wastage (TODw)
   const fCV_OHO = this.mass_ratios.f_CV_OHO;
@@ -131,7 +129,6 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
   //denitrification end---------------------------------------------------------------------------------
 
   //output state variables (effluent and wastage)
-  let Qe      = nit.effluent.Q;               //ML/d | effluent flowrate
   let Suse    = frac.COD.usCOD;               //mg/L as O | USO influent == effluent
   let Pse     = nit.effluent.components.S_OP; //mg/L
   let BPO_was = nit.wastage.components.X_BPO; //mg/L | BPO concentration
@@ -140,8 +137,8 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 
   //create output state variables (effluent, wastage)
   //syntax ------------------------>(Q,  VFA, FBSO, BPO,     UPO,     USO,  iSS,     FSA, PO4, NOx)
-  let effluent = new State_Variables(Qe, 0,   0,    0,       0,       Suse, 0,       Nae, Pse, Nne);
-  let wastage  = new State_Variables(Qw, 0,   0,    BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne);
+  let effluent = new State_Variables(Qe, 0,   S_b,  0,       0,       Suse, 0,       Nae, Pse, Nne);
+  let wastage  = new State_Variables(Qw, 0,   S_b,  BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne);
 
   //denitrification results
   let process_variables = {
@@ -182,13 +179,10 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 /*test*/
 (function(){
   return;
-
   //syntax--------------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
-  let influent = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0  );
-
+  let influent = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0);
   //as+n+dn syntax-----------------(T,  Vp,     Rs, RAS, waste_from, SF,   fxt,  DO,  pH,  IR,  DO_RAS, influent_alk)
-  let dn = influent.denitrification(16, 8473.3, 15, 1.0, 'reactor',  1.25, 0.39, 2.0, 7.2, 5.4, 1.0,    250         );
-
+  let dn = influent.denitrification(16, 8473.3, 15, 1.0, 'reactor',  1.25, 0.39, 2.0, 7.2, 5.0, 1.0,    250);
   //show process variables
   console.log("=== Influent summary");           console.log(influent.summary);
   console.log("=== AS+NIT+DN effluent summary"); console.log(dn.effluent.summary);

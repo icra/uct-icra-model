@@ -1,6 +1,7 @@
 /*
   All constants (kinetic and molecular weights)
 
+  TODO
   status: compilation phase, still not integrated to:
     "activated-sludge.js"
     "nitrification.js"
@@ -9,11 +10,12 @@
 */
 
 //Activated sludge
-  const bH       = 0.24;  //1/d       | growth rate at 20ºC
-  const theta_bH = 1.029; //unit?     | bH temperature correction factor
-  const YH       = 0.45;  //gVSS/gCOD | yield (does not change with temperature)
-  const fH       = 0.20;  //ø         | UPO OHO fraction
-  const f_iOHO   = 0.15;  //g_iSS/gX  | fraction of inert solids in biomass
+  const bH       = 0.24;  //1/d         | growth rate at 20ºC
+  const theta_bH = 1.029; //unit?       | bH temperature correction factor
+  const YH       = 0.45;  //gVSS/gCOD   | yield (does not change with temperature)
+  const fH       = 0.20;  //ø           | UPO OHO fraction
+  const f_iOHO   = 0.15;  //g_iSS/gX    | fraction of inert solids in biomass
+  const k_v20    = 0.07;  //L/(mgVSS·d) | constant for not degraded bCOD (FBSO)
 
 //Nitrification
   const µAm       = 0.45;  //1/d       | max growth rate at 20ºC

@@ -7,19 +7,19 @@ Steady state model by George Ekama.
 Implemented by Lluís Bosch (lbosch@icra.cat).
 
 ## items pending/todo/discuss/finish
-- Anoxic volume
-- How to deal with incomplete BOD removal
-- [P removal] ask george if we should consider that the Q changes when we add a volume of FeCl3
-  for example, 25 ML/d with [PO4]=7 mg/L need 6 ML/d of FeCl3 37%, making 31 ML/d
-- ask george if the HRT changes when using SST as wastage
-- [nitrification] mass of nitrifiers (MX-BA): add to MX-T?
-- [denitrification] fx1 and fx3 (fraction mass of unaerated sludge)
-- add energy consumption module
-- add anaerobic digestion (future)
-- add stoichiometry (for CO2(air) produced) (future)
+* How to deal with incomplete BOD removal
+  - unbiodegradable in wwtp is in the time the organics are in the plant
+- Check again the Rsm formula from the book
+- Make clear in the GUI that HRT is nominal
+- [future] Add energy consumption module
+- [future] Add anaerobic digestion
+- [future] Add stoichiometry (for CO2(air) produced)
 
-## items solved
+## items solved/clear
+- [denitrification] fx1 and fx3 (fraction mass of unaerated sludge) future extension
+- [nitrification] mass of nitrifiers (MX-BA) no worry about it (<3% of MX-T)
+- Anoxic volume (fxt related, clear)
 - Qw wastage (waste from reactor or sst)
 - DO inhibition in nitrification
 - pH sensitivity in nitrification
-- denitrification outputs (units and descriptions)
+- Denitrification outputs (units and descriptions)
