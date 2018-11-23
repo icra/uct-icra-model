@@ -78,7 +78,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
   })();
 
   //minimum effluent NOx concentration
-  let NOx_min_eff = Nc/(a_opt + RAS + 1); //mg/L
+  let Nne_opt = Nc/(a_opt + RAS + 1); //mg/L
 
   //calculate the effluent nitrate (Nne)
   let Nne; //mg/L
@@ -142,31 +142,30 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 
   //denitrification results
   let process_variables = {
-    K1T          :{value:K1T          ,unit:"mgN/mgOHOVSS"  ,descr:"K denitrification rate 1"},
-    K2T          :{value:K2T          ,unit:"mgN/mgOHOVSS"  ,descr:"K denitrification rate 2"},
-    K3T          :{value:K3T          ,unit:"mgN/mgOHOVSS"  ,descr:"K denitrification rate 3"},
-    K4T          :{value:K4T          ,unit:"mgN/mgOHOVSS"  ,descr:"K denitrification rate 4"},
-    fSb_s        :{value:fSb_s        ,unit:"gBSO/gBO"      ,descr:"BSO/(BSO+BPO) ratio"},
-    Dp1          :{value:Dp1          ,unit:"mgNOx/L"       ,descr:"Denitrification potential"},
-    a            :{value:a            ,unit:"ø"             ,descr:"IR (internal recirculation ratio)"},
-    a_opt        :{value:a_opt        ,unit:"ø"             ,descr:"optimal IR"},
-    NOx_min_eff  :{value:NOx_min_eff  ,unit:"mg/L"          ,descr:"Lowest effluent nitrate (using a_opt)"},
-    Nne          :{value:Nne          ,unit:"mg/L"          ,descr:"Effluent nitrate"},
-    TNe          :{value:TNe          ,unit:"mg/L"          ,descr:"Effluent total nitrogen"},
-    FOd          :{value:FOd          ,unit:"kgO/d"         ,descr:"Oxygen recovered by denitrification"},
-    FOt          :{value:FOt          ,unit:"kgO/d"         ,descr:"Total oxygen demand (FOc + FOn - FOd)"},
-    OUR          :{value:OUR          ,unit:"mgO/L·h"       ,descr:"Oxygen Uptake Rate"},
-    effluent_alk :{value:effluent_alk ,unit:"mg/L_as_CaCO3" ,descr:"Effluent alkalinity"},
-    TODi         :{value:TODi         ,unit:"kg/d"          ,descr:"Total oxygen demand (influent)"},
-    TODe         :{value:TODe         ,unit:"kg/d"          ,descr:"Total oxygen demand (effluent)"},
-    TODw         :{value:TODw         ,unit:"kg/d"          ,descr:"Total oxygen demand (wastage)"},
-    TODout       :{value:TODout       ,unit:"kg/d"          ,descr:"Total oxygen demand (effluent + wastage + FOt + FOd)"},
-    TOD_balance  :{value:TOD_balance  ,unit:"%"             ,descr:"Total oxygen demand balance (out/in)"},
+    K1T          :{value:K1T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 1"},
+    K2T          :{value:K2T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 2"},
+    K3T          :{value:K3T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 3"},
+    K4T          :{value:K4T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 4"},
+    fSb_s        :{value:fSb_s        ,unit:"gBSO/gBO"   ,descr:"BSO/(BSO+BPO) ratio"},
+    Dp1          :{value:Dp1          ,unit:"mgNOx/L"    ,descr:"Denitrification potential"},
+    a            :{value:a            ,unit:"ø"          ,descr:"IR (internal recirculation ratio)"},
+    a_opt        :{value:a_opt        ,unit:"ø"          ,descr:"optimal IR"},
+    Nne_opt      :{value:Nne_opt      ,unit:"mgN/L"      ,descr:"Lowest effluent nitrate (using a_opt)"},
+    Nne          :{value:Nne          ,unit:"mgN/L"      ,descr:"Effluent nitrate"},
+    TNe          :{value:TNe          ,unit:"mgN/L"      ,descr:"Effluent total nitrogen"},
+    FOd          :{value:FOd          ,unit:"kgO/d"      ,descr:"Oxygen recovered by denitrification"},
+    FOt          :{value:FOt          ,unit:"kgO/d"      ,descr:"Total oxygen demand (FOc + FOn - FOd)"},
+    OUR          :{value:OUR          ,unit:"mgO/L·h"    ,descr:"Oxygen Uptake Rate"},
+    effluent_alk :{value:effluent_alk ,unit:"mg/L_CaCO3" ,descr:"Effluent alkalinity"},
+    TODi         :{value:TODi         ,unit:"kgO/d"      ,descr:"Total oxygen demand (influent)"},
+    TODe         :{value:TODe         ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent)"},
+    TODw         :{value:TODw         ,unit:"kgO/d"      ,descr:"Total oxygen demand (wastage)"},
+    TODout       :{value:TODout       ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent + wastage + FOt + FOd)"},
+    TOD_balance  :{value:TOD_balance  ,unit:"%"          ,descr:"Total oxygen demand balance (out/in)"},
   };
 
   //hide description (debug)
-  Object.values(process_variables).forEach(value=>delete value.descr);
-
+  //Object.values(process_variables).forEach(value=>delete value.descr);
   return {
     process_variables,
     nit_process_variables:nit.process_variables,

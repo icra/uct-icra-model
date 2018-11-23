@@ -1,6 +1,6 @@
 <!doctype html><html><head>
   <meta charset=utf8>
-  <title>Fase 1</title>
+  <title>Phase 1</title>
   <style>
     @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
     body {
@@ -14,27 +14,32 @@
     td,th {
       border:1px solid #ccc;
     }
-    th{
-      background:#eee;
-      font-weight:normal;
-      text-align:left;
-    }
     input[type=number]{
-      width:55px;
       text-align:right;
     }
-    .flex{ display:flex; }
+    .flex{ 
+      display:flex; 
+    }
     .unit{ font-size:smaller;}
     .number{ text-align:right; }
+
+    #influent input{
+      display:block;
+      width:48px;
+    }
+    #edar input{
+      max-width:56px;
+    }
+    #processes table {
+      margin-right:3px;
+    }
   </style>
   <!--utils-->
   <script src=format.js></script>
 </head><body>
 
 <!--title-->
-<div style="border-bottom:1px solid #ccc;margin-bottom:4px">
-  <h3>Fase 1: Influent &rarr; plant</h3>
-</div>
+<div style="border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Phase 1: Influent &rarr; plant</h3></div>
 
 <!--main-->
 <div class=flex>
@@ -43,20 +48,20 @@
     <div><strong>Inputs</strong></div>
     <div><code>Influent</code></div>
     <table id=influent><tr>
-      <td title="Flowrate"                            >Q      <br><input type=number id=Q      value=25  > <br><span class=unit>ML/d</span>
-      <td title="Volatile fatty acids"                >S_VFA  <br><input type=number id=S_VFA  value=50  > <br><span class=unit>mg/L</span>
-      <td title="Fermentable organics"                >S_FBSO <br><input type=number id=S_FBSO value=115 > <br><span class=unit>mg/L</span>
-      <td title="Biodegradable particulate organics"  >X_BPO  <br><input type=number id=X_BPO  value=440 > <br><span class=unit>mg/L</span>
-      <td title="Unbiodegradable particulate organics">X_UPO  <br><input type=number id=X_UPO  value=100 > <br><span class=unit>mg/L</span>
-      <td title="Unbiodegradable soluble organics"    >S_USO  <br><input type=number id=S_USO  value=45  > <br><span class=unit>mg/L</span>
-      <td title="Inert suspended solids"              >X_iSS  <br><input type=number id=X_iSS  value=60  > <br><span class=unit>mg/L</span>
-      <td title="Free saline ammonia"                 >S_FSA  <br><input type=number id=S_FSA  value=39.1> <br><span class=unit>mg/L</span>
-      <td title="Orthophosphate (PO4)"                >S_OP   <br><input type=number id=S_OP   value=7.28> <br><span class=unit>mg/L</span>
-      <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx  <br><input type=number id=S_NOx  value=0   > <br><span class=unit>mg/L</span>
+      <td title="Flowrate"                            >Q     <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
+      <td title="Volatile fatty acids"                >S_VFA <input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
+      <td title="Fermentable organics"                >S_FBSO<input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span>
+      <td title="Biodegradable particulate organics"  >X_BPO <input type=number id=X_BPO  value=440 ><span class=unit>mg/L</span>
+      <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=X_UPO  value=100 ><span class=unit>mg/L</span>
+      <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=S_USO  value=45  ><span class=unit>mg/L</span>
+      <td title="Inert suspended solids"              >X_iSS <input type=number id=X_iSS  value=60  ><span class=unit>mg/L</span>
+      <td title="Free saline ammonia"                 >S_FSA <input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span>
+      <td title="Orthophosphate (PO4)"                >S_OP  <input type=number id=S_OP   value=7.28><span class=unit>mg/L</span>
+      <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span>
     </table> 
 
     <div><code>Plant</code></div>
-    <table id=edar>
+    <table id=edar style=font-size:smaller>
       <tr>
         <td><label><input type=checkbox id=pst> Primary settler</label>
         <td>fw         <br><input type=number id=fw          value=0.005  > <span class=unit>ø</span>
@@ -83,7 +88,7 @@
         <td><label><input type=checkbox id=dn> Denitrification</label>
         <td>IR          <br><input type=number id=IR           value=5.4> <span class=unit>ø</span>
         <td>DO_RAS      <br><input type=number id=DO_RAS       value=1.0> <span class=unit>mg/L</span>
-        <td>influent_alk<br><input type=number id=influent_alk value=250> <span class=unit>mg/L CaCO<sub>3<sub></span>
+        <td>influent_alk<br><input type=number id=influent_alk value=250> <span class=unit>mg/L</span>
       </tr>
       <tr>
         <td><label><input type=checkbox id=cpr> Chemical P removal</label>
@@ -104,6 +109,11 @@
         <td>T <br><input type=number id=Ti value=12>     <span class=unit>ºC</span>
       </tr>
     </table>
+
+    <!--run button-->
+    <div style=text-align:right>
+      <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
+    </div>
   </div>
 
   <!--outputs-->
@@ -112,10 +122,9 @@
     <div><code>Summaries</code></div>
     <div id=summaries></div>
     <div><code>Process variables</code></div>
-    <div id=processes>[work in progress]</div>
+    <div id=processes class=flex style="flex-wrap:wrap"></div>
   </div>
 </div>
-<button id=run style="font-size:44px;margin:5px 0px">RUN</button>
 
 <!--load backend-->
 <script src="../state-variables.js"></script>
@@ -126,10 +135,11 @@
 <script src="../chemical-P-removal.js"></script>
 <script src="../tram.js"></script>
 
+<!--execute model-->
 <script>
-  //btn run clicat listener
+  //btn run click listener
   document.querySelector('button#run').addEventListener('click',function(){
-    //nou influent
+    //get influent
     let influent=new State_Variables(
       parseFloat(document.querySelector('#influent #Q').value),
       parseFloat(document.querySelector('#influent #S_VFA').value),
@@ -143,15 +153,15 @@
       parseFloat(document.querySelector('#influent #S_NOx').value),
     );
 
-    //get configuració edar
-    let conf = {
+    //plant configuration
+    let conf={
       pst:document.querySelector('#edar #pst').checked,
       nit:document.querySelector('#edar #nit').checked,
       dn :document.querySelector('#edar #dn').checked,
       cpr:document.querySelector('#edar #cpr').checked,
-    }
+    };
 
-    //1: crida primary settler
+    //1: call primary settler
     let pst;
     if(conf.pst){
       pst = influent.primary_settler(
@@ -167,7 +177,7 @@
       };
     }
 
-    //2: crida AS+NIT+DN
+    //2: call AS+(NIT)+(DN)
     let as;
     if(conf.dn){
       as = pst.effluent.denitrification(
@@ -206,7 +216,7 @@
       );
     }
 
-    //3: aplica CPR
+    //3: call CPR
     let cpr;
     if(conf.cpr){
       cpr = as.effluent.chemical_P_removal(
@@ -220,43 +230,7 @@
       }
     }
 
-    //variables d'estat per dibuixar summary
-    let svs = {
-      Influent: influent.summary,
-    };
-
-    //afegeix variables d'estat a svs
-    if(conf.pst) svs.Primary_wastage    = pst.wastage.summary;
-    if(conf.pst) svs.Primary_effluent   = pst.effluent.summary;
-                 svs.Secondary_wastage  = cpr.wastage.summary;
-                 svs.Secondary_effluent = cpr.effluent.summary;
-
-    //4: end
-    (function draw_summaries(svs){
-      if(Object.keys(svs).length==0)return;
-      let div = document.querySelector('div#summaries'); div.innerHTML="";   //buida div summaries
-      let table = document.createElement('table');div.appendChild(table);    //crea nova taula
-      let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML="";   //posa els noms de les variables d'estat
-      Object.keys(svs).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2>"+key.replace('_',' ');});
-
-      //itera les keys del primer objecte (Q,COD,TKN...)
-      Object.keys(Object.values(svs)[0]).forEach(key=>{
-        let newRow = table.insertRow(-1);
-        newRow.insertCell(-1).innerHTML=`${key} <span class=unit>${key=="Q"?"(ML/d)":"(mg/L, kg/d)"}</span>`;
-        //itera cada variable d'estat
-        Object.values(svs).forEach(sv=>{
-          if(key=="Q"){
-            newRow.insertCell(-1).outerHTML="<td class=number colspan=2>"+format(sv[key]);
-          }else{
-            newRow.insertCell(-1).outerHTML="<td class=number>"+format(sv[key][0]);
-            newRow.insertCell(-1).outerHTML="<td class=number>"+format(sv[key][1]);
-          }
-
-
-        });
-      });
-    })(svs);
-
+    /*RIU*/
     //new Tram(wb, wt, Db, S, n, Li,Di)
     let tram=new Tram(
       parseFloat(document.querySelector('#wb').value),
@@ -269,6 +243,73 @@
     );
     //combina effluent i tram TODO
     //soluciona tram TODO
+
+    //GUI
+    //recopila per ordre els summaries de les variables d'estat
+    let svs = {
+      Influent: influent.summary,
+    };
+
+    //afegeix variables d'estat a svs
+    if(conf.pst) svs.Primary_wastage    = pst.wastage.summary;
+    if(conf.pst) svs.Primary_effluent   = pst.effluent.summary;
+                 svs.Secondary_wastage  = cpr.wastage.summary;
+                 svs.Secondary_effluent = cpr.effluent.summary;
+
+    //dibuixa els summaries (svs) de costat
+    (function draw_summaries(svs){
+      if(Object.keys(svs).length==0)return;
+      let div = document.querySelector('div#summaries'); div.innerHTML=""; //buida div summaries
+      let table = document.createElement('table');div.appendChild(table);  //crea nova taula
+      let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML=""; //posa els noms de les variables d'estat
+      Object.keys(svs).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller>"+key.replace('_','<br>');});
+      //itera les keys del primer objecte (Q,COD,TKN...)
+      Object.keys(Object.values(svs)[0]).forEach(key=>{
+        let newRow = table.insertRow(-1);
+        newRow.insertCell(-1).innerHTML=`${key} <span class=unit>${key=="Q"?"(ML/d)":"(mg/L, kg/d)"}</span>`;
+        //itera cada variable d'estat
+        Object.values(svs).forEach(sv=>{
+          if(key=="Q"){
+            newRow.insertCell(-1).outerHTML="<td class=number colspan=2>"+format(sv[key]);
+          }else{
+            newRow.insertCell(-1).outerHTML="<td class=number>"+format(sv[key][0]);
+            newRow.insertCell(-1).outerHTML="<td class=number><small>"+format(sv[key][1])+"</small>";
+          }
+        });
+      });
+    })(svs);
+
+    //compile process_variables
+    let processes = document.querySelector('#processes'); processes.innerHTML="";
+    let pvs={};
+    if(conf.dn){
+      pvs.Activated_sludge = as.as_process_variables;
+      pvs.Nitrification    = as.nit_process_variables;
+      pvs.Denitrification  = as.process_variables;
+    }else if(conf.nit){
+      pvs.Activated_sludge = as.as_process_variables;
+      pvs.Nitrification    = as.process_variables;
+    }else{
+      pvs.Activated_sludge = as.process_variables;
+    }
+    if(conf.cpr){
+      pvs.Chemical_P_removal = cpr.process_variables;
+    };
+
+    //draw the process variables
+    Object.entries(pvs).forEach(([key,pv])=>{
+      let table = document.createElement('table'); processes.appendChild(table);
+      table.insertRow(-1).innerHTML=key.replace(/_/g,' ');
+      Object.entries(pv).forEach(([key,val])=>{
+        let newRow = table.insertRow(-1);
+        newRow.setAttribute('title',val.descr);
+        newRow.insertCell(-1).innerHTML=key;
+        newRow.insertCell(-1).outerHTML="<td class=number style=font-size:small>"+format(val.value);
+        newRow.insertCell(-1).outerHTML="<td class=unit>"+val.unit;
+      });
+    });
   });
+
+  //clica el botó RUN
   document.querySelector('button#run').click();
 </script>

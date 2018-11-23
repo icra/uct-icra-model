@@ -1,11 +1,8 @@
 /*
   Chemical P removal
-  Metcalf & Eddy, Wastewater Engineering, 5th ed., 2014:
-  page 484
+  Metcalf & Eddy, Wastewater Engineering, 5th ed., 2014, page 484
 
   Qi → [Chemical P removal] → Qe
-              ↓
-              Qw
 */
 
 //import files
@@ -23,11 +20,11 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
   const M_FeOH3     = 106.866;  //g/mol (FeOH3 molecular weight)
 
   //get flowrate (Q) and available P (PO4 = S_OP in state variables)
-  let Q   = this.Q;               //ML/d
-  let PO4 = this.components.S_OP; //mg/L as P (calculated as "Pse" in 'activated-sludge.js')
+  let Q    = this.Q;               //ML/d
+  let PO4i = this.components.S_OP; //mg/L as P (calculated as "Pse" in 'activated-sludge.js')
 
   //get moles of P available in PO4
-  let moles_P = Q*PO4*1000/M_P; //moles/d of P
+  let moles_P = Q*PO4i*1000/M_P; //moles/d of P
 
   //convert kg/d of FeCl3 to moles of Fe
   let mass_Fe  = M_Fe/M_FeCl3*mass_FeCl3; //kg/d of Fe
@@ -37,13 +34,16 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
   let Fe_P_mole_ratio = moles_Fe/moles_P; //mol_Fe/mol_P
 
   //get PO4 effluent and PO4 removed
-  let PO4_eff     = get_PO4_eff(Fe_P_mole_ratio); //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function below 'get_PO4_eff')
-  PO4_eff         = Math.min(PO4, PO4_eff);       //PO4_eff cannot be higher than PO4 (i.e. if mass of FeCl3 = 0)
-  let PO4_removed = PO4 - PO4_eff;                //mg/L
+  let PO4e        = get_PO4_eff(Fe_P_mole_ratio); //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function below 'get_PO4_eff')
+  PO4e            = Math.min(PO4i, PO4e);         //PO4e cannot be higher than PO4i (i.e. if mass of FeCl3 = 0)
+  let PO4_removed = PO4i - PO4e;                  //mg/L
 
   //get extra iSS sludge produced
   let extra_iSS = Q*PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
   //chemical P removal end-----------------------------------------------------------------
+
+  //new iSS concentration TODO: move this iSS to the wastage
+  let X_iSS = this.components.X_iSS + extra_iSS/Q; //mg/L
 
   //new effluent
   let effluent=new State_Variables(
@@ -53,19 +53,19 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
     this.components.X_BPO, 
     this.components.X_UPO, 
     this.components.S_USO, 
-    this.components.X_iSS, 
+    X_iSS, 
     this.components.S_FSA, 
-    PO4_eff, 
+    PO4e, 
     this.components.S_NOx,
   );
 
   //process variables
   let process_variables={
-    Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"mol_Fe/mol_P", descr:"Fe/P mole ratio"},
-    PO4:             {value:PO4,             unit:"mg/L_as_P",    descr:"PO4 available concentration"},
-    PO4_eff:         {value:PO4_eff,         unit:"mg/L_as_P",    descr:"PO4 effluent concentration"},
-    PO4_removed:     {value:PO4_removed,     unit:"mg/L_as_P",    descr:"Concentration of P removed"},
-    extra_iSS:       {value:extra_iSS,       unit:"kg_iSS/d",     descr:"iSS produced by FeCl3 coprecipitation"},
+    Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"molFe/molP", descr:"Fe/P mole ratio"},
+    PO4i:            {value:PO4i,            unit:"mg/L_as_P",  descr:"PO4 available"},
+    PO4e:            {value:PO4e,            unit:"mg/L_as_P",  descr:"PO4 effluent"},
+    PO4_removed:     {value:PO4_removed,     unit:"mg/L_as_P",  descr:"Concentration of P removed"},
+    extra_iSS:       {value:extra_iSS,       unit:"kgiSS/d",    descr:"iSS produced by FeCl3 coprecipitation"},
   };
 
   return {
@@ -78,10 +78,8 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
 //Fig 6-13, page 484, M&EA, 5th ed
 function get_PO4_eff(Fe_P_mole_ratio){
   /* 
-    Output:  Residual soluble P concentration (C_P_residual), [mg/L]
-      -> range: 0.01, 0.1, 1, 10 (log scale)
-    Input: Fe to initial soluble P ratio, [mole/mole]
-      -> range: 0, 1, 2, 3, 4, 5 (lineal scale)
+    Calculate the residual soluble P concentration (C_P_residual), [mg/L] -> range: 0.01, 0.1, 1, 10 (log scale)
+    Input: Fe to initial soluble P ratio, [mole/mole] -> range: 0, 1, 2, 3, 4, 5 (lineal scale)
   */
 
   //rename input to "inp"
@@ -124,7 +122,7 @@ function get_PO4_eff(Fe_P_mole_ratio){
 
   //perform linear interpolation (only if the ratio is not in the Figure)
   if(Figure.filter(row=>{return row.inp==inp}).length==0) {
-    var Inps=Figure.map(row=>row.inp).sort(); //sort the values in asccending order
+    var Inps=Figure.map(row=>row.inp).sort(); //sort the values in ascending order
     for(var i=1;i<Inps.length;i++){
       if ((Inps[i-1]<inp) && (inp<Inps[i])){
         var i_below = Inps[i-1];
@@ -149,10 +147,7 @@ function get_PO4_eff(Fe_P_mole_ratio){
   return;
   //syntax---------------------(Q,     VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx)
   let inf = new State_Variables(0.353, 0,   0,    0,   0,   0,   0,   0,   5,  0);
-
-  //syntax------------------------(mass_FeCl3)
-  let cpr = inf.chemical_P_removal(25);
-
+  let cpr = inf.chemical_P_removal(25);//input: mass_FeCl3
   //show results
   console.log(cpr.process_variables);
   console.log(cpr.effluent.summary);

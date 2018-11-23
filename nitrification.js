@@ -78,8 +78,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
 
   //unaerated sludge (current and max)
-  let MX_unaer_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge
-  let MX_unaer_fxm = fxm*MX_T; //kg TSS | max uneaerated sludge
+  let MX_T_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge
+  let MX_T_fxm = fxm*MX_T; //kg TSS | max uneaerated sludge
 
   //effluent ammonia nitrification
   let Nae_fxt = KnT*(bAT + 1/Rs)/(µAm_pH*(1-fxt)-bAT-1/Rs); //mg/L as N | effluent ammonia concentration if fxt <  fxm
@@ -127,32 +127,31 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
 
   //pack nitrification process variables
   let process_variables={
-    µAmT         :{value:µAmT,         unit:"1/d",       descr:"Growth rate corrected by temperature"},
-    µAmO         :{value:µAmO,         unit:"1/d",       descr:"Growth rate corrected by temperature and DO available"},
-    µAm_pH       :{value:µAm_pH,       unit:"1/d",       descr:"Growth rate corrected by temperature and DO available and pH"},
-    KnT          :{value:KnT,          unit:"mg/L",      descr:"Half saturation constant corrected by temperature"},
-    bAT          :{value:bAT,          unit:"1/d",       descr:"Growth rate corrected by temperature"},
-    f_XBA        :{value:f_XBA,        unit:"g_VSS·d/g_COD", descr:"Nitrifiers Biomass production rate"},
-    fxt          :{value:fxt,          unit:"ratio",     descr:"Current design unaerated sludge mass fraction"},
-    fxm          :{value:fxm,          unit:"ratio",     descr:"Maximum design unaerated sludge mass fraction"},
-    Rsm          :{value:Rsm,          unit:"d",         descr:"Minimum sludge age for nitrification (below which theoretically nitrification cannot be achiveved)"},
-    MX_unaer_fxt :{value:MX_unaer_fxt, unit:"kg TSS",    descr:"Current uneaerated sludge mass        (fxt < fxm)"},
-    //MX_unaer_fxm :{value:MX_unaer_fxm, unit:"kg TSS",    descr:"Maximum design uneaerated sludge mass (fxt = fxm)"},
-    Nae_fxt      :{value:Nae_fxt,      unit:"mg/L as N", descr:"Effluent ammonia concentration        (fxt < fxm)"},
-    //Nae_fxm      :{value:Nae_fxm,      unit:"mg/L as N", descr:"Effluent ammonia concentration        (fxt = fxm)"},
-    Nte_fxt      :{value:Nte_fxt,      unit:"mg/L as N", descr:"Effluent TKN concentration            (fxt < fxm)"},
-    //Nte_fxm      :{value:Nte_fxm,      unit:"mg/L as N", descr:"Effluent TKN concentration            (fxt = fxm)"},
-    Nc_fxt       :{value:Nc_fxt,       unit:"mg/L as N", descr:"Nitrification capacity                (fxt < fxm)"},
-    //Nc_fxm       :{value:Nc_fxm,       unit:"mg/L as N", descr:"Nitrification capacity                (fxt = fxm)"},
-    FOn_fxt      :{value:FOn_fxt,      unit:"kg/d as O", descr:"Oxygen demand                         (fxt < fxm)"},
-    //FOn_fxm      :{value:FOn_fxm,      unit:"kg/d as O", descr:"Oxygen demand                         (fxt = fxm)"},
-    MX_BA        :{value:MX_BA,        unit:"kgANOVSS",    descr:"Mass of Nitrifiers"},
-    X_BA         :{value:X_BA,         unit:"kgANOVSS/m3", descr:"Concentration of Nitrifiers"},
+    µAmT     :{value:µAmT,     unit:"1/d",       descr:"Growth rate corrected by temperature"},
+    µAmO     :{value:µAmO,     unit:"1/d",       descr:"Growth rate corrected by temperature and DO available"},
+    µAm_pH   :{value:µAm_pH,   unit:"1/d",       descr:"Growth rate corrected by temperature and DO available and pH"},
+    KnT      :{value:KnT,      unit:"mg/L",      descr:"Half saturation constant corrected by temperature"},
+    bAT      :{value:bAT,      unit:"1/d",       descr:"Growth rate corrected by temperature"},
+    f_XBA    :{value:f_XBA,    unit:"gVSS·d/gCOD", descr:"Nitrifiers Biomass production rate"},
+    fxt      :{value:fxt,      unit:"ø",         descr:"Current unaerated sludge mass fraction"},
+    fxm      :{value:fxm,      unit:"ø",         descr:"Maximum design unaerated sludge mass fraction"},
+    Rsm      :{value:Rsm,      unit:"d",         descr:"Minimum sludge age for nitrification (below which theoretically nitrification cannot be achiveved)"},
+    MX_T_fxt :{value:MX_T_fxt, unit:"kgTSS",     descr:"Current uneaerated sludge mass (fxt < fxm)"},
+    //MX_T_fxm :{value:MX_T_fxm, unit:"kgTSS",     descr:"Maximum design uneaerated sludge mass (fxt = fxm)"},
+    Nae_fxt  :{value:Nae_fxt,  unit:"mgN/L",     descr:"Effluent ammonia concentration (fxt < fxm)"},
+    //Nae_fxm  :{value:Nae_fxm,  unit:"mgN/L",     descr:"Effluent ammonia concentration (fxt = fxm)"},
+    Nte_fxt  :{value:Nte_fxt,  unit:"mgN/L",     descr:"Effluent TKN concentration (fxt < fxm)"},
+    //Nte_fxm  :{value:Nte_fxm,  unit:"mgN/L",     descr:"Effluent TKN concentration (fxt = fxm)"},
+    Nc_fxt   :{value:Nc_fxt,   unit:"mgN/L",     descr:"Nitrification capacity (fxt < fxm)"},
+    //Nc_fxm   :{value:Nc_fxm,   unit:"mgN/L",     descr:"Nitrification capacity (fxt = fxm)"},
+    FOn_fxt  :{value:FOn_fxt,  unit:"kgO/d",     descr:"Oxygen demand (fxt < fxm)"},
+    //FOn_fxm  :{value:FOn_fxm,  unit:"kgO/d",     descr:"Oxygen demand (fxt = fxm)"},
+    MX_BA    :{value:MX_BA,    unit:"kgVSS",     descr:"Mass of Nitrifiers"},
+    X_BA     :{value:X_BA,     unit:"kgVSS/m3",  descr:"Concentration of Nitrifiers"},
   };
 
   //hide description (debug)
-  Object.values(process_variables).forEach(value=>delete value.descr);
-
+  //Object.values(process_variables).forEach(value=>delete value.descr);
   return {
     process_variables,
     as_process_variables:as.process_variables,
