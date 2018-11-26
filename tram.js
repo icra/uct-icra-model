@@ -12,12 +12,14 @@ class Tram {
     this.n  = isNaN(n ) ? 0.0358 : n ; //coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
     this.Li = isNaN(Li) ? 1000   : Li; //longitud tram (m)
     this.Di = isNaN(Di) ? 1.2    : Di; //fondària concreta (m)
+    this.T  = isNaN(T)  ? 12     : T;  //ºC | temperatura
 
     //trams connectats upstream (pares). Definits per l'usuari.
     this.pares=[]; /*array <Tram>*/
 
-    //State Variables(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx)
+    //State Variables(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx) (inici del tram)
     this.state_variables = new State_Variables(0,0,0,0,0,0,0,0,0,0);
+    this.state_variables.Q = this.Qi*86.4; //ML/d (converted from m3/s)
 
     //EDAR que aboca al tram (per defecte no n'hi ha)
     this.wwtp = null; //<State_Variables>
@@ -63,17 +65,36 @@ class Tram {
     Ll   :{value:this.Ll,    unit:"m",    descr:"Longitud del tram de barreja lateral"},
   }};
 
-  //massa o càrrega al final del tram fluvial degut a la degradació
+  //massa o càrrega al final del tram 'Mf' degut a la degradació per un sol component 'Mi'
   //en un futur es reemplaçarà per un model més complet
-  Mf(Mi,R_20,k,T){
+  Mf(Mi,R_20,k){
     //Mi  : massa a l'inici del tram fluvial: suma dels diferents trams que alimenten el tram (kg)
     //R_20: velocitat de reacció a 20ºC (g/m2·min)
     //k   : (input, es com una ks) (g/m3)
-    //T   : temperatura (ºC)
     if(Mi==0) return 0;
-    let Mf=Mi - R_20*this.HRTi*this.Si*Math.pow(1.0241,T-20)*(Mi/(this.Qi*60))/(k+Mi/this.Qi);
+    let Mf=Mi - R_20*this.HRTi*this.Si*Math.pow(1.0241,this.T-20)*(Mi/(this.Qi*60))/(k+Mi/this.Qi);
     return Math.max(Mf,0);
   };
+
+  //genera unes noves variables d'estat al final del tram aplicant degradació (Mf)
+  calcula_final(){
+    let R_20 = 0.001; //convertir a input TODO
+    let k = 10;       //convertir a input TODO
+    //syntax------------------(Q,VFA,FBSO,BPO,UPO,USO,iSS,FSA,OP,NOx)
+    return new State_Variables(
+      this.state_variables.Q,
+      this.Mf(this.state_variables.components.S_VFA,  R_20, k),
+      this.Mf(this.state_variables.components.S_FBSO, R_20, k),
+      this.Mf(this.state_variables.components.X_BPO,  R_20, k),
+      this.Mf(this.state_variables.components.X_UPO,  R_20, k),
+      this.Mf(this.state_variables.components.S_USO,  R_20, k),
+      this.Mf(this.state_variables.components.X_iSS,  R_20, k),
+      this.Mf(this.state_variables.components.S_FSA,  R_20, k),
+      this.Mf(this.state_variables.components.S_OP,   R_20, k),
+      this.Mf(this.state_variables.components.S_NOx,  R_20, k),
+    );
+  };
+  
 }
 
 //node imports and exports
@@ -87,13 +108,8 @@ if(typeof document == "undefined"){
   return;
   //sintaxi:  Tram(wb, wt, Db, S,     n,      Li,   Di)
   let t = new Tram(3,  6,  2,  0.005, 0.0358, 1000, 1.2);
-  console.log(t.resultats);
-
   //recorre variables d'estat (fluxes màssics) i calcula massa final
   t.state_variables.Q = 25;
   t.state_variables.set('S_VFA',10);
-  Object.entries(t.state_variables.fluxes.components).forEach(([key,Mi])=>{
-    let Mf=t.Mf(Mi, 0, 0, 0); //g/s
-    console.log(`Mf[${key}] (Mi=${Mi}): ${Mf} (g/s)`);
-  });
+  console.log(t.calcula_final().components);
 })();

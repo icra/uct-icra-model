@@ -48,10 +48,10 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let bHT  = bH*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
 
   //page 10
-  const YH     = 0.45;                   //gVSS/gCOD     | yield coefficient (does not change with temperature)
-  let f_XBH    = (YH*Rs)/(1+bHT*Rs);     //g_VSS·d/g_COD | OHO biomass production rate
+  const YH  = 0.45;               //gVSS/gCOD     | yield coefficient (does not change with temperature)
+  let f_XBH = (YH*Rs)/(1+bHT*Rs); //g_VSS·d/g_COD | OHO biomass production rate
 
-  //Deal with bCOD not degraded (FBSO)
+  //bCOD not degraded (FBSO)
   const k_v20 = 100.07;                    //TODO it should be 0.07 when done (current value makes it that FBSO is degraded to ~0 mg/L at the effluent) 
   let k_vT  = k_v20*Math.pow(1.035, T-20); //L/(mgVSS·d)
   let S_b   = 1/(f_XBH*k_vT);              //mgCOD/L
@@ -77,10 +77,10 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
 
   //secondary Settler (SST) and recycle flow state variables
   let SST=(function(RAS){
-    let f       = (1+RAS)/RAS;    //ø     | concentrating factor
-    let X_RAS   = f*X_T;          //kg/m3 | TSS concentration
-    let Qr      = Q*RAS;          //ML/d  | recycle flowrate
-    let Qw      = (Vp/Rs)/f/1000; //ML/d  | SST wastage flowrate
+    let f     = (1+RAS)/RAS;    //ø     | concentrating factor
+    let X_RAS = f*X_T;          //kg/m3 | TSS concentration
+    let Qr    = Q*RAS;          //ML/d  | recycle flowrate
+    let Qw    = (Vp/Rs)/f/1000; //ML/d  | SST wastage flowrate
     return {f,X_RAS,Qr,Qw};
   })(RAS);
 
@@ -173,7 +173,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let UPO_was = f*(fCV_OHO*(fH*X_BH + X_EH)+fCV_UPO*X_I)*1000; //mg/L | UPO concentration
   let iSS_was = f*X_IO*1000;                                   //mg/L | iSS concentration
 
-  //NOx
+  //influent nitrate goes directly to effluent
   let NOx = this.components.S_NOx;
 
   //create output state variables (effluent, wastage)

@@ -17,13 +17,16 @@
     input[type=number]{
       text-align:right;
     }
+
     .flex{ 
       display:flex; 
     }
     .unit{ font-size:smaller;}
     .number{ text-align:right; }
+    [onclick]{cursor:pointer}
 
-    #influent input{
+    #influent input,
+    #river input {
       display:block;
       width:48px;
     }
@@ -39,13 +42,12 @@
 </head><body>
 
 <!--title-->
-<div style="border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Phase 1: Influent &rarr; plant</h3></div>
+<div style="border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Phase 1: Influent &rarr; plant &rarr; river</h3></div>
 
 <!--main-->
 <div class=flex>
   <!--inputs-->
-  <div id=inputs style="border-right:1px solid #ccc;padding-right:4px;margin-right:4px">
-    <div><strong>Inputs</strong></div>
+  <div id=inputs style="border-right:1px solid #ccc;padding-right:4px;margin-right:4px"><div><strong>Inputs</strong></div>
     <div><code>Influent</code></div>
     <table id=influent><tr>
       <td title="Flowrate"                            >Q     <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
@@ -96,8 +98,8 @@
       </tr>
     </table> 
 
-    <!--<div><code>River</code></div>-->
-    <table id=riu style=display:none>
+    <div><code>River</code></div>
+    <table id=river>
       <tr>
         <td>wb<br><input type=number id=wb value=3>      <span class=unit>m</span>
         <td>wt<br><input type=number id=wt value=6>      <span class=unit>m</span>
@@ -106,7 +108,22 @@
         <td>n <br><input type=number id=n  value=0.0358> <span class=unit>s/m<sup>1/3</sup></span>
         <td>Li<br><input type=number id=Li value=1000>   <span class=unit>m</span>
         <td>Di<br><input type=number id=Di value=1.2>    <span class=unit>m</span>
-        <td>T <br><input type=number id=Ti value=12>     <span class=unit>ºC</span>
+        <td>T <br><input type=number id=T value=12>      <span class=unit>ºC</span>
+      </tr>
+      <tr>
+        <td title="Volatile fatty acids"                >S_VFA <input type=number id=S_VFA  value=0><span class=unit>mg/L</span>
+        <td title="Fermentable organics"                >S_FBSO<input type=number id=S_FBSO value=0><span class=unit>mg/L</span>
+        <td title="Biodegradable particulate organics"  >X_BPO <input type=number id=X_BPO  value=0><span class=unit>mg/L</span>
+        <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=X_UPO  value=0><span class=unit>mg/L</span>
+        <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=S_USO  value=0><span class=unit>mg/L</span>
+        <td title="Inert suspended solids"              >X_iSS <input type=number id=X_iSS  value=0><span class=unit>mg/L</span>
+        <td title="Free saline ammonia"                 >S_FSA <input type=number id=S_FSA  value=0><span class=unit>mg/L</span>
+        <td title="Orthophosphate (PO4)"                >S_OP  <input type=number id=S_OP   value=0><span class=unit>mg/L</span>
+        <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=9><span class=unit>mg/L</span>
+      </tr>
+      <tr>
+        <td>R<sub>20</sub> <input type=number id=R_20 value=0.001><span class=unit>g/m<sup>2</sup>·min</span>
+        <td>k              <input type=number id=k    value=10>   <span class=unit>mg/L</span>
       </tr>
     </table>
 
@@ -117,14 +134,28 @@
   </div>
 
   <!--outputs-->
-  <div id=outputs>
-    <div><strong>Outputs</strong></div>
-    <div><code>Summaries</code></div>
-    <div id=summaries></div>
-    <div><code>Process variables</code></div>
-    <div id=processes class=flex style="flex-wrap:wrap"></div>
+  <div id=outputs><div><strong>Outputs</strong></div>
+    <!--summaries-->
+    <div><code onclick="toggle_visibility('#outputs #summaries')">Summaries</code></div>
+    <div id=summaries style="display:"></div>
+
+    <!--plant-->
+    <div><code onclick="toggle_visibility('#outputs #processes')">Plant process variables</code></div>
+    <div id=processes class=flex style="flex-wrap:wrap;display:"></div>
+
+    <!--river-->
+    <div><code onclick="toggle_visibility('#outputs #river')">River</code></div>
+    <div id=river style="display:"></div>
   </div>
 </div>
+
+<!--gui utils-->
+<script>
+  function toggle_visibility(selector){
+    let element = document.querySelector(selector);
+    if(element) element.style.display = element.style.display=='none' ? '':'none';
+  }
+</script>
 
 <!--load backend-->
 <script src="../state-variables.js"></script>
@@ -135,7 +166,7 @@
 <script src="../chemical-P-removal.js"></script>
 <script src="../tram.js"></script>
 
-<!--execute model-->
+<!--execute model backend and integrate with gui-->
 <script>
   //btn run click listener
   document.querySelector('button#run').addEventListener('click',function(){
@@ -153,7 +184,7 @@
       parseFloat(document.querySelector('#influent #S_NOx').value),
     );
 
-    //plant configuration
+    //get plant configuration
     let conf={
       pst:document.querySelector('#edar #pst').checked,
       nit:document.querySelector('#edar #nit').checked,
@@ -170,12 +201,7 @@
         parseFloat(document.querySelector('#edar #removal_UPO').value),
         parseFloat(document.querySelector('#edar #removal_iSS').value)
       );
-    }else{
-      pst = {
-        effluent:influent,
-        wastage:null,
-      };
-    }
+    }else{ pst = { effluent:influent, wastage:null }; }
 
     //2: call AS+(NIT)+(DN)
     let as;
@@ -223,38 +249,61 @@
         parseFloat(document.querySelector('#edar #mass_FeCl3').value),
       );
       cpr.wastage = as.wastage;
-    }else{
-      cpr = {
-        effluent:as.effluent,
-        wastage:as.wastage,
-      }
-    }
+    }else{ cpr = { effluent:as.effluent, wastage:as.wastage }; }
 
-    /*RIU*/
-    //new Tram(wb, wt, Db, S, n, Li,Di)
+    /*backend RIU*/
+    //get tram upstream
+    //syntax-----Tram(wb, wt, Db, S, n, Li,Di)
     let tram=new Tram(
-      parseFloat(document.querySelector('#wb').value),
-      parseFloat(document.querySelector('#wt').value),
-      parseFloat(document.querySelector('#Db').value),
-      parseFloat(document.querySelector('#S').value),
-      parseFloat(document.querySelector('#n').value),
-      parseFloat(document.querySelector('#Li').value),
-      parseFloat(document.querySelector('#Di').value),
+      parseFloat(document.querySelector('#inputs #river #wb').value),
+      parseFloat(document.querySelector('#inputs #river #wt').value),
+      parseFloat(document.querySelector('#inputs #river #Db').value),
+      parseFloat(document.querySelector('#inputs #river #S').value),
+      parseFloat(document.querySelector('#inputs #river #n').value),
+      parseFloat(document.querySelector('#inputs #river #Li').value),
+      parseFloat(document.querySelector('#inputs #river #Di').value),
+      parseFloat(document.querySelector('#inputs #river #T').value),
     );
-    //combina effluent i tram TODO
-    //soluciona tram TODO
+    //get tram upstream state variables
+    Object.keys(tram.state_variables.components).forEach(key=>{
+      tram.state_variables.set(key,parseFloat(document.querySelector(`#inputs #river #${key}`).value));
+    });
+
+    //combina efluent depuradora i tram upstream
+    let sv_mixed = tram.state_variables.combine(cpr.effluent);
+
+    //aplica degradació al riu
+    let R_20 = parseFloat(document.querySelector('#inputs #river #R_20').value);
+    let k =    parseFloat(document.querySelector('#inputs #river #k').value);
+    let sv_end = new State_Variables(
+      sv_mixed.Q,
+      tram.Mf(sv_mixed.components.S_VFA,  R_20, k),
+      tram.Mf(sv_mixed.components.S_FBSO, R_20, k),
+      tram.Mf(sv_mixed.components.X_BPO,  R_20, k),
+      tram.Mf(sv_mixed.components.X_UPO,  R_20, k),
+      tram.Mf(sv_mixed.components.S_USO,  R_20, k),
+      tram.Mf(sv_mixed.components.X_iSS,  R_20, k),
+      tram.Mf(sv_mixed.components.S_FSA,  R_20, k),
+      tram.Mf(sv_mixed.components.S_OP,   R_20, k),
+      tram.Mf(sv_mixed.components.S_NOx,  R_20, k),
+    );
+    //backend end
 
     //GUI
-    //recopila per ordre els summaries de les variables d'estat
-    let svs = {
-      Influent: influent.summary,
-    };
+    //recopila els summaries de les variables d'estat (per ordre)
+    let svs = {};
 
-    //afegeix variables d'estat a svs
+    //afegeix els summaries de les variables d'estat a svs
+    svs.Influent = influent.summary;
     if(conf.pst) svs.Primary_wastage    = pst.wastage.summary;
     if(conf.pst) svs.Primary_effluent   = pst.effluent.summary;
                  svs.Secondary_wastage  = cpr.wastage.summary;
                  svs.Secondary_effluent = cpr.effluent.summary;
+
+    //afegeix variables d'estat del riu
+    svs.River_upstream = tram.state_variables.summary;
+    svs.River_mixed    = sv_mixed.summary;
+    svs.River_end      = sv_end.summary;
 
     //dibuixa els summaries (svs) de costat
     (function draw_summaries(svs){
@@ -279,7 +328,7 @@
       });
     })(svs);
 
-    //compile process_variables
+    //recopila process_variables
     let processes = document.querySelector('#processes'); processes.innerHTML="";
     let pvs={};
     if(conf.dn){
@@ -296,7 +345,7 @@
       pvs.Chemical_P_removal = cpr.process_variables;
     };
 
-    //draw the process variables
+    //dibuixa process variables (pvs)
     Object.entries(pvs).forEach(([key,pv])=>{
       let table = document.createElement('table'); processes.appendChild(table);
       table.insertRow(-1).innerHTML=key.replace(/_/g,' ');
@@ -308,6 +357,19 @@
         newRow.insertCell(-1).outerHTML="<td class=unit>"+val.unit;
       });
     });
+
+    //dibuixa les característiques del riu
+    (function draw_river(){
+      let river = document.querySelector('#outputs #river'); river.innerHTML="";
+      let table = document.createElement('table'); river.appendChild(table);
+      Object.entries(tram.resultats).forEach(([key,obj])=>{
+        let newRow=table.insertRow(-1);
+        newRow.setAttribute('title',obj.descr);
+        newRow.insertCell(-1).innerHTML=key;
+        newRow.insertCell(-1).outerHTML=`<td class=number><small>${format(obj.value)}</small>`;
+        newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit;
+      });
+    })();
   });
 
   //clica el botó RUN

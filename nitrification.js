@@ -50,8 +50,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   const µAm = 0.45;                     //1/d | growth rate at 20ºC (maximum specific growth rate)
   let µAmT  = µAm*Math.pow(1.123,T-20); //1/d | growth rate corrected by temperature
 
-  //correct µA by DO
-  const K_O = 0.0;              //mgDO/L | nitrifier Oxygen sensitivity constant 
+  //correct µA by DO (book page 468)
+  const K_O = 0.3;              //mgDO/L | nitrifier Oxygen sensitivity constant TODO current value does not turn off nitrification
   let µAmO  = µAmT*DO/(DO+K_O); //1/d    | growth rate corrected by temperature and DO
 
   //correct µA by pH inhibition

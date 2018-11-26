@@ -1,16 +1,18 @@
 #ecoadvisor backend
-Model for icra's ecoadvisor project.
-Coded in pure Javascript (without GUI)
+Model for Ecoadvisor project (Icra).
+Coded in pure Javascript (without GUI) without dependencies.
+
 ##status: under development
 Steady state model by George Ekama.
 Implemented by Lluís Bosch (lbosch@icra.cat).
 
 ##pending/todo/discuss/finish
+- Current DO K constant value (0.0) does not turn off nitrification when DO is low
+- The model does not deal with influent S-NOx
 - Deal with exceptions of fxm and Rsm
 - Add the extra iSS produced in chemical P removal to the wastage
-- The model does not deal with influent S-NOx
+- kg of FeCl3 added are not equal to extra iSS produced
 - Check again the Rsm formula from the book
-- Make clear in the GUI that HRT is nominal
 
 ##future items
 - [denitrification] fx1 and fx3 (fraction mass of unaerated sludge)

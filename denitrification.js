@@ -67,6 +67,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 
   //Nitrate generated in nitrification
   let Nc = nit.process_variables.Nc_fxt.value; //mgN/L
+  //add current NOx
 
   //optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
