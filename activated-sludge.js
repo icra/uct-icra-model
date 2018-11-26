@@ -216,7 +216,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   };
 
   //hide description (debug)
-  //Object.values(process_variables).forEach(value=>delete value.descr);
+  //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     effluent, 

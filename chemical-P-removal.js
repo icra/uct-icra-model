@@ -45,7 +45,16 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
   //new iSS concentration TODO: move this iSS to the wastage
   let X_iSS = this.components.X_iSS + extra_iSS/Q; //mg/L
 
-  //new effluent
+  //process variables
+  let process_variables={
+    Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"molFe/molP", descr:"Fe/P mole ratio"},
+    PO4i:            {value:PO4i,            unit:"mgP/L",      descr:"PO4 available"},
+    PO4e:            {value:PO4e,            unit:"mgP/L",      descr:"PO4 effluent"},
+    PO4_removed:     {value:PO4_removed,     unit:"mgP/L",      descr:"Concentration of P removed"},
+    extra_iSS:       {value:extra_iSS,       unit:"kgiSS/d",    descr:"iSS produced by FeCl3 coprecipitation"},
+  };
+
+  //create new effluent with the new PO4e and X_iSS
   let effluent=new State_Variables(
     this.Q, 
     this.components.S_VFA,
@@ -58,15 +67,6 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
     PO4e, 
     this.components.S_NOx,
   );
-
-  //process variables
-  let process_variables={
-    Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"molFe/molP", descr:"Fe/P mole ratio"},
-    PO4i:            {value:PO4i,            unit:"mgP/L",      descr:"PO4 available"},
-    PO4e:            {value:PO4e,            unit:"mgP/L",      descr:"PO4 effluent"},
-    PO4_removed:     {value:PO4_removed,     unit:"mgP/L",      descr:"Concentration of P removed"},
-    extra_iSS:       {value:extra_iSS,       unit:"kgiSS/d",    descr:"iSS produced by FeCl3 coprecipitation"},
-  };
 
   return {
     process_variables,
@@ -89,7 +89,7 @@ function get_PO4_eff(Fe_P_mole_ratio){
   inp=Math.min(5,Math.max(0.0001,inp));
 
   //Figure 6-13 (Fe_P_mole ratio vs PO4_eff)
-  var Figure=[
+  let Figure=[
     {inp:8.00   ,out:0.01},
     {inp:4.90   ,out:0.02}, //if output is less than 0.02 is not linear
     {inp:4.50   ,out:0.03},
@@ -122,8 +122,8 @@ function get_PO4_eff(Fe_P_mole_ratio){
 
   //perform linear interpolation (only if the ratio is not in the Figure)
   if(Figure.filter(row=>{return row.inp==inp}).length==0) {
-    var Inps=Figure.map(row=>row.inp).sort(); //sort the values in ascending order
-    for(var i=1;i<Inps.length;i++){
+    let Inps=Figure.map(row=>row.inp).sort(); //sort the values in ascending order
+    for(let i=1;i<Inps.length;i++){
       if ((Inps[i-1]<inp) && (inp<Inps[i])){
         var i_below = Inps[i-1];
         var i_above = Inps[i];
@@ -131,13 +131,13 @@ function get_PO4_eff(Fe_P_mole_ratio){
       }
     }
     //find output above and below (o_above and o_below)
-    var percentage = (inp-i_below)/(i_above-i_below);
-    var o_below = Figure.find(row=>{return row.inp==i_below}).out;
-    var o_above = Figure.find(row=>{return row.inp==i_above}).out;
-    var o_inter = o_below + (o_above-o_below)*percentage;
+    let percentage = (inp-i_below)/(i_above-i_below);
+    let o_below = Figure.find(row=>{return row.inp==i_below}).out;
+    let o_above = Figure.find(row=>{return row.inp==i_above}).out;
+    let o_inter = o_below + (o_above-o_below)*percentage;
     return o_inter;
   }else{ 
-    //input is directly in the Figure values
+    //input is in the Figure
     return Figure.find(row=>{return inp==row.inp}).out;
   }
 };

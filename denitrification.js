@@ -166,7 +166,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
   };
 
   //hide description (debug)
-  //Object.values(process_variables).forEach(value=>delete value.descr);
+  //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     nit_process_variables:nit.process_variables,

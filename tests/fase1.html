@@ -30,6 +30,9 @@
       display:block;
       width:48px;
     }
+    #river input{
+      width:60px;
+    }
     #edar input{
       max-width:56px;
     }
@@ -48,7 +51,7 @@
 <div class=flex>
   <!--inputs-->
   <div id=inputs style="border-right:1px solid #ccc;padding-right:4px;margin-right:4px"><div><strong>Inputs</strong></div>
-    <div><code>Influent</code></div>
+    <!--influent--><div><code>Influent</code></div>
     <table id=influent><tr>
       <td title="Flowrate"                            >Q     <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
       <td title="Volatile fatty acids"                >S_VFA <input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
@@ -62,7 +65,7 @@
       <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span>
     </table> 
 
-    <div><code>Plant</code></div>
+    <!--plant--><div><code>Plant</code></div>
     <table id=edar style=font-size:smaller>
       <tr>
         <td><label><input type=checkbox id=pst> Primary settler</label>
@@ -94,17 +97,17 @@
       </tr>
     </table> 
 
-    <div><code>River</code></div>
+    <!--river--><div><code>River</code></div>
     <table id=river>
       <tr>
-        <td>wb<br><input type=number id=wb value=25.88>     <span class=unit>m</span>
-        <td>wt<br><input type=number id=wt value=62.274>    <span class=unit>m</span>
-        <td>Db<br><input type=number id=Db value=18.458414> <span class=unit>m</span>
-        <td>S <br><input type=number id=S  value=0.0010055> <span class=unit>m/m</span>
-        <td>n <br><input type=number id=n  value=0.0358>    <span class=unit>s/m<sup>1/3</sup></span>
-        <td>Li<br><input type=number id=Li value=2000>      <span class=unit>m</span>
-        <td>Di<br><input type=number id=Di value=0.6>       <span class=unit>m</span>
-        <td>Ti<br><input type=number id=Ti value=15>        <span class=unit>ºC</span>
+        <td title="Amplada a llera mitjana">                wb<input type=number id=wb value=25.88>     <span class=unit>m</span>
+        <td title="Amplada a bankful mitjana">              wt<input type=number id=wt value=62.274>    <span class=unit>m</span>
+        <td title="Distància entre llera i bankful mitjana">Db<input type=number id=Db value=18.458414> <span class=unit>m</span>
+        <td title="Pendent de la llera">                    S <input type=number id=S  value=0.0010055> <span class=unit>m/m</span>
+        <td title="Coeficient de manning">                  n <input type=number id=n  value=0.0358>    <span class=unit>s/m<sup>1/3</sup></span>
+        <td title="Longitud del tram">                      Li<input type=number id=Li value=2000>      <span class=unit>m</span>
+        <td title="Fondària concreta">                      Di<input type=number id=Di value=0.6>       <span class=unit>m</span>
+        <td title="Temperatura">                            Ti<input type=number id=Ti value=15>        <span class=unit>ºC</span>
       </tr><tr>
         <td title="Volatile fatty acids"                >S_VFA <input type=number id=S_VFA  value=0><span class=unit>mg/L</span>
         <td title="Fermentable organics"                >S_FBSO<input type=number id=S_FBSO value=0><span class=unit>mg/L</span>
@@ -116,15 +119,13 @@
         <td title="Orthophosphate (PO4)"                >S_OP  <input type=number id=S_OP   value=0><span class=unit>mg/L</span>
         <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=9><span class=unit>mg/L</span>
       </tr><tr>
-        <td>R<sub>20</sub> <input type=number id=R_20 value=0.001><span class=unit>g/m<sup>2</sup>·min</span>
-        <td>k              <input type=number id=k    value=10>   <span class=unit>mg/L</span>
+        <td>R20<input type=number id=R_20 value=0.00001><span class=unit>g/m<sup>2</sup>·min</span>
+        <td>k             <input type=number id=k    value=10>     <span class=unit>mg/L</span>
       </tr>
     </table>
 
     <!--run button-->
-    <div style=text-align:right>
-      <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
-    </div>
+    <div style=text-align:right><button id=run style="font-size:22px;margin:5px 0px">RUN</button></div>
   </div>
 
   <!--outputs-->
@@ -135,21 +136,13 @@
 
     <!--plant-->
     <div><code onclick="toggle_visibility('#outputs #processes')">Plant process variables</code></div>
-    <div id=processes class=flex style="flex-wrap:wrap;display:"></div>
+    <div id=processes class=flex style="flex-wrap:wrap;display:none"></div>
 
     <!--river-->
     <div><code onclick="toggle_visibility('#outputs #river')">River</code></div>
     <div id=river style="display:"></div>
   </div>
 </div>
-
-<!--gui utils-->
-<script>
-  function toggle_visibility(selector){
-    let element = document.querySelector(selector);
-    if(element) element.style.display = element.style.display=='none' ? '':'none';
-  }
-</script>
 
 <!--load backend-->
 <script src="../state-variables.js"></script>
@@ -373,4 +366,12 @@
 
   //clica el botó RUN
   document.querySelector('button#run').click();
+</script>
+
+<!--gui utils-->
+<script>
+  function toggle_visibility(selector){
+    let el=document.querySelector(selector);
+    if(el)el.style.display=el.style.display=='none'?'':'none';
+  }
 </script>
