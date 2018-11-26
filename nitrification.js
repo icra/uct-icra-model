@@ -71,11 +71,11 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   //page 17
   //maximum design unaerated sludge mass fraction
   let fxm = 1 - SF*(bAT+1/Rs)/µAm_pH; //ø
-  if(fxt>fxm) throw `The mass of unaerated sludge (fxt=${fxt}) cannot be higher than fxm (${fxm})`;
+  //if(fxt>fxm) throw `The mass of unaerated sludge (fxt=${fxt}) cannot be higher than fxm (${fxm})`;
 
   //minimum sludge age for nitrification (Rsm)
   let Rsm = SF/(µAm_pH*(1-fxt) - bAT); //days
-  if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
+  //if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
 
   //unaerated sludge (current and max)
   let MX_T_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge

@@ -3,7 +3,7 @@
 */
 
 class Tram {
-  constructor(wb,wt,Db,S,n,Li,Di){
+  constructor(wb,wt,Db,S,n,Li,Di,Ti){
     //inputs i default values
     this.wb = isNaN(wb) ? 3      : wb; //amplada a llera mitjana (m)
     this.wt = isNaN(wt) ? 6      : wt; //amplada a bankful mitjana (m)
@@ -12,7 +12,7 @@ class Tram {
     this.n  = isNaN(n ) ? 0.0358 : n ; //coeficient de manning (n) s'obté de regressió entre Qi i HRi també es pot usar el mètode de Verzano et al per determinar n, o usar el valor 0.0358, que és la mitjana europea.
     this.Li = isNaN(Li) ? 1000   : Li; //longitud tram (m)
     this.Di = isNaN(Di) ? 1.2    : Di; //fondària concreta (m)
-    this.T  = isNaN(T)  ? 12     : T;  //ºC | temperatura
+    this.Ti = isNaN(Ti)  ? 12    : Ti; //ºC | temperatura
 
     //trams connectats upstream (pares). Definits per l'usuari.
     this.pares=[]; /*array <Tram>*/
@@ -72,7 +72,7 @@ class Tram {
     //R_20: velocitat de reacció a 20ºC (g/m2·min)
     //k   : (input, es com una ks) (g/m3)
     if(Mi==0) return 0;
-    let Mf=Mi - R_20*this.HRTi*this.Si*Math.pow(1.0241,this.T-20)*(Mi/(this.Qi*60))/(k+Mi/this.Qi);
+    let Mf=Mi - R_20*this.HRTi*this.Si*Math.pow(1.0241,this.Ti-20)*(Mi/(this.Qi*60))/(k+Mi/this.Qi);
     return Math.max(Mf,0);
   };
 
