@@ -1,6 +1,6 @@
 /*
   Primary settler implementation from G. Ekama notes
-  Removal % of the particulated fractions BPO, UPO and iSS
+  Removal % of the particulated fractions: BPO, UPO and iSS
 
   Qi → [Primary Settler] → Qe
               ↓
@@ -47,7 +47,7 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   let S_NOx  = this.components.S_NOx;  //mg/L soluble (not affected by primary settler)
 
   //new output state variables (wastage and effluent)
-  //syntax--------------------------(Q,  VFA,   FBSO,   BPO,     UPO,     USO,   iSS,     FSA,   OP,   NOx)
+  //syntax--------------------------(Qi, VFA,   FBSO,   BPO,     UPO,     USO,   iSS,     FSA,   OP,   NOx)
   let effluent = new State_Variables(Qe, S_VFA, S_FBSO, X_BPO_e, X_UPO_e, S_USO, X_iSS_e, S_FSA, S_OP, S_NOx);
   let wastage  = new State_Variables(Qw, S_VFA, S_FBSO, X_BPO_w, X_UPO_w, S_USO, X_iSS_w, S_FSA, S_OP, S_NOx);
 
