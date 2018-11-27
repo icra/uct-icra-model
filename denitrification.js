@@ -143,10 +143,10 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 
   //denitrification results
   let process_variables = {
-    K1T          :{value:K1T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 1"},
-    K2T          :{value:K2T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 2"},
-    K3T          :{value:K3T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 3"},
-    K4T          :{value:K4T          ,unit:"mgN/mgVSS"  ,descr:"K denitrification rate 4"},
+    K1T          :{value:K1T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 1"},
+    K2T          :{value:K2T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 2"},
+    K3T          :{value:K3T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 3"},
+    K4T          :{value:K4T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 4"},
     fSb_s        :{value:fSb_s        ,unit:"gBSO/gBO"   ,descr:"BSO/(BSO+BPO) ratio"},
     Dp1          :{value:Dp1          ,unit:"mgNOx/L"    ,descr:"Denitrification potential"},
     a            :{value:a            ,unit:"ø"          ,descr:"IR (internal recirculation ratio)"},

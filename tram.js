@@ -17,9 +17,9 @@ class Tram {
     //trams connectats upstream (pares). Definits per l'usuari.
     this.pares=[]; /*array <Tram>*/
 
-    //State Variables(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx) (inici del tram)
-    this.state_variables = new State_Variables(0,0,0,0,0,0,0,0,0,0);
-    this.state_variables.Q = this.Qi*86.4; //ML/d (converted from m3/s)
+    //State Variables(Q, VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx) (inici del tram)
+    //convert flowrate to ML/d (converted from m3/s)
+    this.state_variables = new State_Variables(this.Qi*86.4,0,0,0,0,0,0,0,0,0);
 
     //EDAR que aboca al tram (per defecte no n'hi ha)
     this.wwtp = null; //<State_Variables>
@@ -75,26 +75,6 @@ class Tram {
     let Mf=Mi - R_20*this.HRTi*this.Si*Math.pow(1.0241,this.Ti-20)*(Mi/(this.Qi*60))/(k+Mi/this.Qi);
     return Math.max(Mf,0);
   };
-
-  //genera unes noves variables d'estat al final del tram aplicant degradació (Mf)
-  calcula_final(){
-    let R_20 = 0.001; //convertir a input TODO
-    let k = 10;       //convertir a input TODO
-    //syntax------------------(Q,VFA,FBSO,BPO,UPO,USO,iSS,FSA,OP,NOx)
-    return new State_Variables(
-      this.state_variables.Q,
-      this.Mf(this.state_variables.components.S_VFA,  R_20, k),
-      this.Mf(this.state_variables.components.S_FBSO, R_20, k),
-      this.Mf(this.state_variables.components.X_BPO,  R_20, k),
-      this.Mf(this.state_variables.components.X_UPO,  R_20, k),
-      this.Mf(this.state_variables.components.S_USO,  R_20, k),
-      this.Mf(this.state_variables.components.X_iSS,  R_20, k),
-      this.Mf(this.state_variables.components.S_FSA,  R_20, k),
-      this.Mf(this.state_variables.components.S_OP,   R_20, k),
-      this.Mf(this.state_variables.components.S_NOx,  R_20, k),
-    );
-  };
-  
 }
 
 //node imports and exports
@@ -111,5 +91,4 @@ if(typeof document == "undefined"){
   //recorre variables d'estat (fluxes màssics) i calcula massa final
   t.state_variables.Q = 25;
   t.state_variables.set('S_VFA',10);
-  console.log(t.calcula_final().components);
 })();
