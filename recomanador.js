@@ -127,11 +127,9 @@ let run = run_model(influent, tram, conf, i, deg);
     //executa simulació "n"
     let run = run_model(influent, tram, conf, i, deg); simulacions++;
 
-    //comprova si aquesta run compleix els límits
-    if(run.NH4<0.5 && run.PO4<0.5){
-      //afegeix la combinació a "solucions"
-      solucions.push({Rs, RAS, DO});
-    }
+    //comprova si aquesta run compleix els límits i afegeix la combinació a "solucions"
+    if(run.NH4<0.5 && run.PO4<0.5) solucions.push({Rs, RAS, DO});
+
   });});});
   console.log({
     simulacions_fetes:  simulacions,
