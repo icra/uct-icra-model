@@ -6,7 +6,23 @@ Coded in pure Javascript (without GUI) without dependencies.
 Steady state model by George Ekama.
 Implemented by Lluís Bosch (lbosch@icra.cat).
 
+## items river
+- [DONE] posar R20 i k per amoni i fosfat (matèria orgànica i NO3 futur)
+- [DONE] canviar nomenclatura S-OP i S-FSA a PO4 i NH4
+* [TODO] n simulacions.  configuració: AS+NIT+DN (sense pst)
+  - variar:
+    - Rs:         [6, 8, 10, 12, 15, 20, 25, 30, 40]; //temps de residència (d)
+    - DO:         [1, 1.5, 2, 2.5];                   //mgO/L
+    - mass-FeCl3: [TBD];                              //kg/d | lluís c. enviarà valors
+    - RAS:        [0.75:0.10:1.25];                   //ø
+    - IR:         no variar, calcular optim i fer servir a cada iteració ('a-opt')
+  - solució funció objectiu: conjunt inputs que donen un resultat de:
+    - NH4 < 0.5 mg/L 
+    - PO4 < 0.5 mg/L
+    - mostra kg/d fang produït i kgO/d (FOt)
+
 ## pending/to do/to be discussed with george
+- [TODO] write george equations in pdf 
 * [TBD] Input S-NOx is not considered in equations. Ask george.
   see 'nitrification.js'
   see 'denitrification.js'

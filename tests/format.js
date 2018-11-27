@@ -14,5 +14,7 @@ function format(number,digits){
 String.prototype.prettifyUnit=function(){
   return this
     .replace('m3','m<sup>3</sup>')
+    .replace('m2','m<sup>2</sup>')
+    .replace('CO3','CO<sub>3</sub>')
     .replace(/_/g,' ')
 }

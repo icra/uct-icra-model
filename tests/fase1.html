@@ -26,12 +26,17 @@
     [onclick]{cursor:pointer}
 
     #influent input,
-    #river input {
+    #river input[type=number], 
+    #degradation input
+    {
       display:block;
       width:48px;
     }
-    #river input{
+    #river input[type=number]{
       width:60px;
+    }
+    #degradation input{
+      width:70px;
     }
     #edar input{
       max-width:56px;
@@ -60,9 +65,9 @@
       <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=X_UPO  value=100 ><span class=unit>mg/L</span>
       <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=S_USO  value=45  ><span class=unit>mg/L</span>
       <td title="Inert suspended solids"              >X_iSS <input type=number id=X_iSS  value=60  ><span class=unit>mg/L</span>
-      <td title="Free saline ammonia"                 >S_FSA <input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span>
-      <td title="Orthophosphate (PO4)"                >S_OP  <input type=number id=S_OP   value=7.28><span class=unit>mg/L</span>
-      <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span>
+      <td title="Free saline ammonia"                 >S_NH4 <input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span>
+      <td title="Orthophosphate (PO4)"                >S_PO4 <input type=number id=S_OP   value=7.28><span class=unit>mg/L</span>
+      <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=0   disabled><span class=unit>mg/L</span>
     </table> 
 
     <!--plant--><div><code>Plant</code></div>
@@ -100,6 +105,8 @@
     <!--river--><div><code>River</code></div>
     <table id=river>
       <tr>
+        <td><label><input type=checkbox id=active checked> on/off</label>
+      </tr><tr>
         <td title="Amplada a llera mitjana">                wb<input type=number id=wb value=25.88>     <span class=unit>m</span>
         <td title="Amplada a bankful mitjana">              wt<input type=number id=wt value=62.274>    <span class=unit>m</span>
         <td title="Distància entre llera i bankful mitjana">Db<input type=number id=Db value=18.458414> <span class=unit>m</span>
@@ -115,12 +122,22 @@
         <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=X_UPO  value=0><span class=unit>mg/L</span>
         <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=S_USO  value=0><span class=unit>mg/L</span>
         <td title="Inert suspended solids"              >X_iSS <input type=number id=X_iSS  value=0><span class=unit>mg/L</span>
-        <td title="Free saline ammonia"                 >S_FSA <input type=number id=S_FSA  value=0><span class=unit>mg/L</span>
-        <td title="Orthophosphate (PO4)"                >S_OP  <input type=number id=S_OP   value=0><span class=unit>mg/L</span>
-        <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=9><span class=unit>mg/L</span>
-      </tr><tr>
-        <td>R20<input type=number id=R_20 value=0.00001><span class=unit>g/m<sup>2</sup>·min</span>
-        <td>k             <input type=number id=k    value=10>     <span class=unit>mg/L</span>
+        <td title="Free saline ammonia"                 >S_NH4 <input type=number id=S_FSA  value=0><span class=unit>mg/L</span>
+        <td title="Orthophosphate (PO4)"                >S_PO4 <input type=number id=S_OP   value=0><span class=unit>mg/L</span>
+        <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=0><span class=unit>mg/L</span>
+      </tr>
+    </table>
+
+    <!--river--><div><code>River degradation</code></div>
+    <table id=degradation>
+      <tr id=NH4>
+        <td>NH<sub>4</sub>
+        <td>R20<input type=number id=R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
+        <td>k  <input type=number id=k    value=1>         <span class=unit>mg/L</span>
+      <tr id=PO4>
+        <td>PO<sub>4</sub>
+        <td>R20<input type=number id=R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
+        <td>k  <input type=number id=k    value=1>         <span class=unit>mg/L</span>
       </tr>
     </table>
 
@@ -131,16 +148,16 @@
   <!--outputs-->
   <div id=outputs><div><strong>Outputs</strong></div>
     <!--summaries-->
-    <div><code onclick="toggle_visibility('#outputs #summaries')">Summaries</code></div>
+    <div><code onclick="toggle_visibility('#outputs #summaries')">[+] Summaries</code></div>
     <div id=summaries style="display:"></div>
 
     <!--plant-->
-    <div><code onclick="toggle_visibility('#outputs #processes')">Plant process variables</code></div>
+    <div><code onclick="toggle_visibility('#outputs #processes')">[+] Plant process variables</code></div>
     <div id=processes class=flex style="flex-wrap:wrap;display:none"></div>
 
     <!--river-->
-    <div><code onclick="toggle_visibility('#outputs #river')">River</code></div>
-    <div id=river style="display:"></div>
+    <div><code onclick="toggle_visibility('#outputs #river')">[+] River</code></div>
+    <div id=river style="display:none"></div>
   </div>
 </div>
 
@@ -178,6 +195,7 @@
       nit:document.querySelector('#edar #nit').checked,
       dn :document.querySelector('#edar #dn').checked,
       cpr:document.querySelector('#edar #cpr').checked,
+      river:document.querySelector('#river #active').checked,
     };
 
     //call primary settler
@@ -265,19 +283,28 @@
     let sv_mixed = tram.state_variables.combine(cpr.effluent);
 
     //aplica degradació al riu
-    let R_20 = parseFloat(document.querySelector('#inputs #river #R_20').value);
-    let k    = parseFloat(document.querySelector('#inputs #river #k').value);
+    let deg = {
+      R_20:{
+        NH4:parseFloat(document.querySelector('#inputs #degradation #NH4 #R_20').value),
+        PO4:parseFloat(document.querySelector('#inputs #degradation #PO4 #R_20').value),
+      },
+      k:{
+        NH4:parseFloat(document.querySelector('#inputs #degradation #NH4 #k').value),
+        PO4:parseFloat(document.querySelector('#inputs #degradation #PO4 #k').value),
+      },
+    }
+
     let sv_end = new State_Variables(
       sv_mixed.Q,
-      tram.Mf(sv_mixed.components.S_VFA,  R_20, k),
-      tram.Mf(sv_mixed.components.S_FBSO, R_20, k),
-      tram.Mf(sv_mixed.components.X_BPO,  R_20, k),
-      tram.Mf(sv_mixed.components.X_UPO,  R_20, k),
-      tram.Mf(sv_mixed.components.S_USO,  R_20, k),
-      tram.Mf(sv_mixed.components.X_iSS,  R_20, k),
-      tram.Mf(sv_mixed.components.S_FSA,  R_20, k),
-      tram.Mf(sv_mixed.components.S_OP,   R_20, k),
-      tram.Mf(sv_mixed.components.S_NOx,  R_20, k),
+      0, //VFA
+      0, //FBSO
+      0, //BPO
+      0, //UPO
+      0, //USO
+      0, //iSS
+      tram.Mf(sv_mixed.components.S_FSA, deg.R_20.NH4, deg.k.NH4), //FSA
+      tram.Mf(sv_mixed.components.S_OP,  deg.R_20.PO4, deg.k.PO4), //OP
+      0, //NOx
     );
     /*backend end--------------------------------*/
 
@@ -293,9 +320,11 @@
                  svs.Secondary_effluent = cpr.effluent.summary;
 
     //afegeix variables d'estat riu a "svs"
-    svs.River_upstream = tram.state_variables.summary;
-    svs.River_mixed    = sv_mixed.summary;
-    svs.River_end      = sv_end.summary;
+    if(conf.river){
+      svs.River_upstream = tram.state_variables.summary;
+      svs.River_mixed    = sv_mixed.summary;
+      svs.River_end      = sv_end.summary;
+    }
 
     //dibuixa summaries (svs) en columnes
     (function draw_summaries(svs){
@@ -304,17 +333,20 @@
       let table = document.createElement('table');div.appendChild(table);  //crea nova taula
       let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML=""; //posa els noms de les variables d'estat
       Object.keys(svs).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller>"+key.replace('_','<br>');});
-      //itera les keys del primer objecte (Q,COD,TKN...)
+      //itera keys del primer objecte (Q,COD,TKN...)
       Object.keys(Object.values(svs)[0]).forEach(key=>{
         let newRow = table.insertRow(-1);
         newRow.insertCell(-1).innerHTML=`${key} <span class=unit>${key=="Q"?"(ML/d)":"(mg/L, kg/d)"}</span>`;
         //itera cada variable d'estat
-        Object.values(svs).forEach(sv=>{
+        Object.entries(svs).forEach(([name,sv])=>{
           if(key=="Q"){
             newRow.insertCell(-1).outerHTML="<td class=number colspan=2>"+format(sv[key]);
           }else{
-            newRow.insertCell(-1).outerHTML="<td class=number>"+format(sv[key][0]);
-            newRow.insertCell(-1).outerHTML="<td class=number><small>"+format(sv[key][1])+"</small>";
+            let conc = format(sv[key][0]);
+            let flux = format(sv[key][1]);
+            if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc = flux = "<span style=color:#ccc>ø</span>"; }
+            newRow.insertCell(-1).outerHTML="<td class=number>"+conc;
+            newRow.insertCell(-1).outerHTML=`<td class=number><small>${flux}</small>`;
           }
         });
       });
@@ -346,7 +378,7 @@
         newRow.setAttribute('title',obj.descr);
         newRow.insertCell(-1).innerHTML=key;
         newRow.insertCell(-1).outerHTML=`<td class=number><small>${format(obj.value)}</small>`;
-        newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit;
+        newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
       });
     });
 
@@ -359,7 +391,7 @@
         newRow.setAttribute('title',obj.descr);
         newRow.insertCell(-1).innerHTML=key;
         newRow.insertCell(-1).outerHTML=`<td class=number><small>${format(obj.value)}</small>`;
-        newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit;
+        newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
       });
     })();
   });

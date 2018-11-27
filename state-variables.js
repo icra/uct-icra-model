@@ -217,7 +217,7 @@ class State_Variables {
       Q: this.Q,
       COD: [totals.COD.total,      fluxes.totals.COD.total],
       TKN: [totals.TKN.total,      fluxes.totals.TKN.total],
-      FSA: [totals.TKN.FSA,        fluxes.totals.TKN.FSA],
+      NH4: [totals.TKN.FSA,        fluxes.totals.TKN.FSA],
       NOx: [this.components.S_NOx, fluxes.components.S_NOx],
       TP:  [totals.TP.total,       fluxes.totals.TP.total],
       PO4: [totals.TP.PO4,         fluxes.totals.TP.PO4],

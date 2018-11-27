@@ -61,8 +61,8 @@ class Tram {
     Qi   :{value:this.Qi,    unit:"m3/s", descr:"Cabal"},
     HRTi :{value:this.HRTi,  unit:"min",  descr:"Temps mig de residència de l'aigua"},
     Si   :{value:this.Si,    unit:"m2",   descr:"Superfície inundada"},
-    ky   :{value:this.ky,    unit:"?",    descr:"Coeficient de dispersió lateral"},
-    Ll   :{value:this.Ll,    unit:"m",    descr:"Longitud del tram de barreja lateral"},
+    //ky   :{value:this.ky,    unit:"?",    descr:"Coeficient de dispersió lateral"},
+    //Ll   :{value:this.Ll,    unit:"m",    descr:"Longitud del tram de barreja lateral"},
   }};
 
   //massa o càrrega al final del tram 'Mf' degut a la degradació per un sol component 'Mi'

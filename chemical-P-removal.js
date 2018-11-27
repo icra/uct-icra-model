@@ -90,34 +90,34 @@ function get_PO4_eff(Fe_P_mole_ratio){
 
   //Figure 6-13 (Fe_P_mole ratio vs PO4_eff)
   let Figure=[
-    {inp:8.00   ,out:0.01},
-    {inp:4.90   ,out:0.02}, //if output is less than 0.02 is not linear
-    {inp:4.50   ,out:0.03},
-    {inp:4.20   ,out:0.04},
-    {inp:3.90   ,out:0.05},
-    {inp:3.80   ,out:0.06},
-    {inp:3.70   ,out:0.07},
-    {inp:3.50   ,out:0.08},
-    {inp:3.35   ,out:0.09},
-    {inp:3.30   ,out:0.10}, //book example has this value {PO4_eff:0.1, Fe_P_mole_ratio:3.3)
-    {inp:2.60   ,out:0.20},
-    {inp:2.10   ,out:0.30},
-    {inp:2.00   ,out:0.40},
-    {inp:1.70   ,out:0.50},
-    {inp:1.50   ,out:0.60},
-    {inp:1.20   ,out:0.70},
-    {inp:1.10   ,out:0.80},
-    {inp:1.00   ,out:0.90},
-    {inp:1.00   ,out:1.00}, //if input is greater than 1, it's no more linear
-    {inp:0.20   ,out:2.00},
-    {inp:0.10   ,out:3.00},
-    {inp:0.10   ,out:4.00},
-    {inp:0.01   ,out:5.00},
-    {inp:0.01   ,out:6.00},
-    {inp:0.005  ,out:7.00},
-    {inp:0.001  ,out:8.00},
-    {inp:0.001  ,out:9.00},
-    {inp:0.0001 ,out:10.0},
+    {inp:8.00  , out:0.01},
+    {inp:4.90  , out:0.02}, //if output is less than 0.02 is not linear
+    {inp:4.50  , out:0.03},
+    {inp:4.20  , out:0.04},
+    {inp:3.90  , out:0.05},
+    {inp:3.80  , out:0.06},
+    {inp:3.70  , out:0.07},
+    {inp:3.50  , out:0.08},
+    {inp:3.35  , out:0.09},
+    {inp:3.30  , out:0.10}, //book example has this value {PO4_eff:0.1, Fe_P_mole_ratio:3.3)
+    {inp:2.60  , out:0.20},
+    {inp:2.10  , out:0.30},
+    {inp:2.00  , out:0.40},
+    {inp:1.70  , out:0.50},
+    {inp:1.50  , out:0.60},
+    {inp:1.20  , out:0.70},
+    {inp:1.10  , out:0.80},
+    {inp:1.00  , out:0.90},
+    {inp:1.00  , out:1.00}, //if input is greater than 1, it's no more linear
+    {inp:0.20  , out:2.00},
+    {inp:0.10  , out:3.00},
+    {inp:0.10  , out:4.00},
+    {inp:0.01  , out:5.00},
+    {inp:0.01  , out:6.00},
+    {inp:0.005 , out:7.00},
+    {inp:0.001 , out:8.00},
+    {inp:0.001 , out:9.00},
+    {inp:0.0001, out:10.0},
   ];
 
   //perform linear interpolation (only if the ratio is not in the Figure)
