@@ -361,9 +361,11 @@
           }else{
             let conc = sv[key][0];
             let flux = sv[key][1];
-            if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc = flux = "<span style=color:#ccc>ø</span>"; }
-            newRow.insertCell(-1).outerHTML=`<td class=number conc value=${conc}>${format(conc)}</td>`;
-            newRow.insertCell(-1).outerHTML=`<td class=number flux value=${flux}>${format(flux)}</td>`;
+            let conc_txt = format(conc);
+            let flux_txt = format(flux);
+            if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc_txt = flux_txt = "<span style=color:#ccc>ø</span>"; }
+            newRow.insertCell(-1).outerHTML=`<td class=number conc value=${conc}>${conc_txt}</td>`;
+            newRow.insertCell(-1).outerHTML=`<td class=number flux value=${flux}>${flux_txt}</td>`;
           }
         });
       });
@@ -392,9 +394,12 @@
       table.insertRow(-1).innerHTML=key.replace(/_/g,' ');
       Object.entries(pv).forEach(([key,obj])=>{
         let newRow = table.insertRow(-1);
+        newRow.id=key;
+        let value = obj.value;
+        newRow.value=value;
         newRow.setAttribute('title',obj.descr);
         newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).outerHTML=`<td class=number><small>${format(obj.value)}</small>`;
+        newRow.insertCell(-1).outerHTML=`<td class=number><small>${format(value)}</small>`;
         newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
       });
     });

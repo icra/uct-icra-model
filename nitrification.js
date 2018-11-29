@@ -71,6 +71,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   //page 17
   //maximum design unaerated sludge mass fraction
   let fxm = 1 - SF*(bAT+1/Rs)/µAm_pH; //ø
+  fxm=Math.max(fxm,0); //avoid negative fxm
   //if(fxt>fxm) throw `The mass of unaerated sludge (fxt=${fxt}) cannot be higher than fxm (${fxm})`;
 
   //minimum sludge age for nitrification (Rsm)
@@ -84,6 +85,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   //effluent ammonia nitrification
   let Nae_fxt = KnT*(bAT + 1/Rs)/(µAm_pH*(1-fxt)-bAT-1/Rs); //mg/L as N | effluent ammonia concentration if fxt <  fxm
   let Nae_fxm = KnT/(SF-1);                                 //mg/L as N | effluent ammonia concentration if fxt == fxm
+  Nae_fxt = Math.max(Nae_fxt, 0); //avoid 0
 
   //effluent TKN nitrification -- page 18
   let Nte_fxt = Nae_fxt + Nouse; //mg/L as N | effluent TKN concentration if fxt <  fxm
@@ -96,6 +98,9 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   //oxygen demand
   let FOn_fxt = 4.57*Q*Nc_fxt; //kg/d as O | O demand if fxt <  fxm
   let FOn_fxm = 4.57*Q*Nc_fxm; //kg/d as O | O demand if fxt == fxm
+  let FOc     = as.process_variables.FOc.value;
+  let FOt_fxt = FOc + FOn_fxt; //kg/d as O | total O demand if fxt <  fxm
+  let FOt_fxm = FOc + FOn_fxm; //kg/d as O | total O demand if fxt == fxm
 
   //page 475 4.14.22.3 book: calculate mass of nitrifiers
   let f_XBA = YAT*Rs/(1+bAT*Rs); //gVSS·d/gFSA
@@ -135,6 +140,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
     f_XBA    :{value:f_XBA,    unit:"gVSS·d/gCOD", descr:"Nitrifiers Biomass production rate"},
     fxt      :{value:fxt,      unit:"ø",           descr:"Current unaerated sludge mass fraction"},
     fxm      :{value:fxm,      unit:"ø",           descr:"Maximum design unaerated sludge mass fraction"},
+    Rs       :{value:Rs ,      unit:"d",           descr:"Current sludge age"},
     Rsm      :{value:Rsm,      unit:"d",           descr:"Minimum sludge age for nitrification (below which theoretically nitrification cannot be achiveved)"},
     MX_T_fxt :{value:MX_T_fxt, unit:"kgTSS",       descr:"Current uneaerated sludge mass (if fxt < fxm)"},
     MX_T_fxm :{value:MX_T_fxm, unit:"kgTSS",       descr:"Maximum design uneaerated sludge mass (if fxt = fxm)"},
@@ -144,8 +150,10 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
     Nte_fxm  :{value:Nte_fxm,  unit:"mgN/L",       descr:"Effluent TKN concentration (if fxt = fxm)"},
     Nc_fxt   :{value:Nc_fxt,   unit:"mgN/L",       descr:"Nitrification capacity (if fxt < fxm)"},
     Nc_fxm   :{value:Nc_fxm,   unit:"mgN/L",       descr:"Nitrification capacity (if fxt = fxm)"},
-    FOn_fxt  :{value:FOn_fxt,  unit:"kgO/d",       descr:"Oxygen demand (if fxt < fxm)"},
-    FOn_fxm  :{value:FOn_fxm,  unit:"kgO/d",       descr:"Oxygen demand (if fxt = fxm)"},
+    FOn_fxt  :{value:FOn_fxt,  unit:"kgO/d",       descr:"Nitrogenous Oxygen demand (if fxt < fxm)"},
+    FOn_fxm  :{value:FOn_fxm,  unit:"kgO/d",       descr:"Nitrogenous Oxygen demand (if fxt = fxm)"},
+    FOt_fxt  :{value:FOt_fxt,  unit:"kgO/d",       descr:"Total Oxygen demand (if fxt < fxm)"},
+    FOt_fxm  :{value:FOt_fxm,  unit:"kgO/d",       descr:"Total Oxygen demand (if fxt = fxm)"},
     MX_BA    :{value:MX_BA,    unit:"kgVSS",       descr:"Mass of Nitrifiers"},
     X_BA     :{value:X_BA,     unit:"kgVSS/m3",    descr:"Concentration of Nitrifiers"},
   };
@@ -167,11 +175,12 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  );
   //syntax-------------------(T   Vp      Rs  RAS  waste      SF    fxt   DO   pH)
   let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 1.25, 0.39, 2.0, 7.2);
-  console.log(nit.effluent.components);
+  //console.log(nit.effluent.components);
   //return;
   //print results
   console.log(nit.process_variables);
   console.log(nit.as_process_variables);
+  return
   console.log("=== AS+NIT effluent summary"); console.log(nit.effluent.summary);
   console.log("=== AS+NIT TKN effluent");     console.log(nit.effluent.totals.TKN);
   console.log("=== AS+NIT wastage summary");  console.log(nit.wastage.summary);

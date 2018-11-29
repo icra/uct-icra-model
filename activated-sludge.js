@@ -259,7 +259,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
     f_avOHO :{value:f_avOHO,   unit:"gOHO/gVSS",   descr:"Active fraction of the sludge (VSS)"},
     f_atOHO :{value:f_atOHO,   unit:"gOHO/gTSS",   descr:"Active fraction of the sludge (TSS)"},
     FOc     :{value:FOc,       unit:"kgO/d",       descr:"Carbonaceous Oxygen Demand"},
-    //FOc_george     :{value:FOc_new,       unit:"kgO/d",       descr:"Carbonaceous Oxygen Demand"},
+    FOc_george :{value:FOc_new,       unit:"kgO/d",       descr:"Carbonaceous Oxygen Demand"},
     FOn     :{value:FOn,       unit:"kgO/d",       descr:"Nitrogenous Oxygen Demand"},
     FOt     :{value:FOt,       unit:"kgO/d",       descr:"Total Oxygen Demand"},
     OUR     :{value:OUR,       unit:"mgO/L·h",     descr:"Oxygen Uptake Rate"},
