@@ -50,7 +50,13 @@
 </head><body>
 
 <!--title-->
-<div style="border-bottom:1px solid #ccc;margin-bottom:4px"><h3>Phase 1: Influent &rarr; plant &rarr; river</h3></div>
+<div style="border-bottom:1px solid #ccc;margin-bottom:4px">
+  <h3>
+    Phase 1: Influent &rarr; plant &rarr; river
+    <!--run button-->
+    <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
+  </h3>
+</div>
 
 <!--main-->
 <div class=flex>
@@ -140,9 +146,6 @@
         <td>k  <input type=number id=k    value=1>         <span class=unit>mg/L</span>
       </tr>
     </table>
-
-    <!--run button-->
-    <div style=text-align:right><button id=run style="font-size:22px;margin:5px 0px">RUN</button></div>
   </div>
 
   <!--outputs-->
@@ -358,8 +361,8 @@
             let conc = format(sv[key][0]);
             let flux = format(sv[key][1]);
             if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc = flux = "<span style=color:#ccc>ø</span>"; }
-            newRow.insertCell(-1).outerHTML="<td class=number conc>"+conc;
-            newRow.insertCell(-1).outerHTML=`<td class=number flux><small>${flux}</small>`;
+            newRow.insertCell(-1).outerHTML=`<td class=number conc>${conc}`;
+            newRow.insertCell(-1).outerHTML=`<td class=number flux>${flux}`;
           }
         });
       });
