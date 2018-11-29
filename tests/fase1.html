@@ -356,13 +356,14 @@
         //itera cada variable d'estat
         Object.entries(svs).forEach(([name,sv])=>{
           if(key=="Q"){
-            newRow.insertCell(-1).outerHTML="<td class=number colspan=2 flow>"+format(sv[key]);
+            let Q = sv.Q;
+            newRow.insertCell(-1).outerHTML=`<td class=number colspan=2 flow value=${Q}>${format(Q)}</td>`;
           }else{
-            let conc = format(sv[key][0]);
-            let flux = format(sv[key][1]);
+            let conc = sv[key][0];
+            let flux = sv[key][1];
             if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc = flux = "<span style=color:#ccc>ø</span>"; }
-            newRow.insertCell(-1).outerHTML=`<td class=number conc>${conc}`;
-            newRow.insertCell(-1).outerHTML=`<td class=number flux>${flux}`;
+            newRow.insertCell(-1).outerHTML=`<td class=number conc value=${conc}>${format(conc)}</td>`;
+            newRow.insertCell(-1).outerHTML=`<td class=number flux value=${flux}>${format(flux)}</td>`;
           }
         });
       });

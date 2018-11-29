@@ -14,14 +14,14 @@
 */
 
 //Carrega arxius necessaris
-const State_Variables = require('./state-variables.js'); //class State_Variables
-const Tram            = require('./tram.js');            //class Tram
-const Xarxa           = require('./xarxa.js');           //class Xarxa
-require('./primary-settler.js');                         //tecnologia primary_settler    (dins de State Variables)
-require('./activated-sludge.js');                        //tecnologia activated_sludge   (dins de State Variables)
-require('./nitrification.js');                           //tecnologia nitrification      (dins de State Variables)
-require('./denitrification.js');                         //tecnologia denitrification    (dins de State Variables)
-require('./chemical-P-removal.js');                      //tecnologia chemical P removal (dins de State Variables)
+const State_Variables = require('../state-variables.js');    //class State_Variables
+const Tram            = require('../tram.js');               //class Tram
+const Xarxa           = require('../xarxa.js');              //class Xarxa
+                        require('../primary-settler.js');    //tecnologia primary_settler    (dins de State Variables)
+                        require('../activated-sludge.js');   //tecnologia activated_sludge   (dins de State Variables)
+                        require('../nitrification.js');      //tecnologia nitrification      (dins de State Variables)
+                        require('../denitrification.js');    //tecnologia denitrification    (dins de State Variables)
+                        require('../chemical-P-removal.js'); //tecnologia chemical P removal (dins de State Variables)
 
 //Nova xarxa buida
 let xarxa = new Xarxa();
