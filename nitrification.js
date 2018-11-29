@@ -12,7 +12,7 @@ if(typeof document == "undefined"){
   require("./activated-sludge.js");
 }
 
-State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,DO,pH){
+State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH){
   /*inputs and default values*/
   //as inputs
   T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
@@ -21,6 +21,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
+  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //nitrification inputs
   SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
@@ -163,6 +164,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   return {
     process_variables,
     as_process_variables: as.process_variables,
+    cpr: as.cpr,
     effluent,
     wastage,
   };
@@ -173,13 +175,14 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from, SF,fxt,
   return;
   //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  );
-  //syntax-------------------(T   Vp      Rs  RAS  waste      SF    fxt   DO   pH)
-  let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 1.25, 0.39, 2.0, 7.2);
+  //syntax-------------------(T   Vp      Rs  RAS  waste      mass_FeCl3, SF    fxt   DO   pH)
+  let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,       1.25, 0.39, 2.0, 7.2);
   //console.log(nit.effluent.components);
   //return;
   //print results
   console.log(nit.process_variables);
   console.log(nit.as_process_variables);
+  console.log(nit.cpr);
   return
   console.log("=== AS+NIT effluent summary"); console.log(nit.effluent.summary);
   console.log("=== AS+NIT TKN effluent");     console.log(nit.effluent.totals.TKN);

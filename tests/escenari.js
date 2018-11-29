@@ -21,7 +21,6 @@ const Xarxa           = require('../xarxa.js');              //class Xarxa
                         require('../activated-sludge.js');   //tecnologia activated_sludge   (dins de State Variables)
                         require('../nitrification.js');      //tecnologia nitrification      (dins de State Variables)
                         require('../denitrification.js');    //tecnologia denitrification    (dins de State Variables)
-                        require('../chemical-P-removal.js'); //tecnologia chemical P removal (dins de State Variables)
 
 //Nova xarxa buida
 let xarxa = new Xarxa();
@@ -57,12 +56,10 @@ let inf = new State_Variables(25, 50,  115,  440, 100, 45,  60,  39.1, 7.28, 0);
 /*Apply PST + AS + N + DN + CPR*/
 //pst syntax-----------------(fw,    removal_BPO, removal_UPO, removal_iSS)
 let pst = inf.primary_settler(0.005, 42.335,      90.05,       75.125);
-//as+n+dn syntax---------------------(T,  Vp,     Rs, RAS, waste_from, SF,   fxt,  DO,  pH,  IR,  DO_RAS, influent_alk)
-let dn = pst.effluent.denitrification(16, 8473.3, 15, 1.0, 'reactor',  1.25, 0.39, 2.0, 7.2, 5.4, 1.0,    250 );
-//cpr syntax----------------------------(mass_FeCl3)
-let cpr = dn.effluent.chemical_P_removal(6000);
+//as+n+dn syntax---------------------(T,  Vp,     Rs, RAS, waste_from, mass_FeCl3, SF,   fxt,  DO,  pH,  IR,  DO_RAS, influent_alk)
+let dn = pst.effluent.denitrification(16, 8473.3, 15, 1.0, 'reactor',  6000,       1.25, 0.39, 2.0, 7.2, 5.4, 1.0,    250 );
 //connecta la sortida al tram 5
-t5.wwtp = cpr.effluent;
+t5.wwtp = dn.effluent;
 
 //Soluciona xarxa
 //console.log("=== RESOL XARXA ==="); 

@@ -179,7 +179,6 @@
 <script src="../activated-sludge.js"></script>
 <script src="../nitrification.js"></script>
 <script src="../denitrification.js"></script>
-<script src="../chemical-P-removal.js"></script>
 <script src="../tram.js"></script>
 
 <!--execute model backend and gui integration-->
@@ -221,6 +220,10 @@
       );
     }else{ pst = { effluent:influent, wastage:null }; }
 
+    //check if there is chemical P removal
+    let mass_FeCl3 = parseFloat(document.querySelector('#edar #mass_FeCl3').value);
+    if(conf.cpr==false){ mass_FeCl3 = 0; }
+
     //call AS+(NIT)+(DN)
     let as;
     if(conf.dn){
@@ -230,6 +233,7 @@
         parseFloat(document.querySelector('#edar #Rs').value),
         parseFloat(document.querySelector('#edar #RAS').value),
         document.querySelector('#edar #waste_from').value,
+        mass_FeCl3,
         parseFloat(document.querySelector('#edar #SF').value),
         parseFloat(document.querySelector('#edar #fxt').value),
         parseFloat(document.querySelector('#edar #DO').value),
@@ -245,6 +249,7 @@
         parseFloat(document.querySelector('#edar #Rs').value),
         parseFloat(document.querySelector('#edar #RAS').value),
         document.querySelector('#edar #waste_from').value,
+        mass_FeCl3,
         parseFloat(document.querySelector('#edar #SF').value),
         parseFloat(document.querySelector('#edar #fxt').value),
         parseFloat(document.querySelector('#edar #DO').value),
@@ -257,17 +262,9 @@
         parseFloat(document.querySelector('#edar #Rs').value),
         parseFloat(document.querySelector('#edar #RAS').value),
         document.querySelector('#edar #waste_from').value,
+        mass_FeCl3,
       );
     }
-
-    //call CPR
-    let cpr;
-    if(conf.cpr){
-      cpr = as.effluent.chemical_P_removal(
-        parseFloat(document.querySelector('#edar #mass_FeCl3').value),
-      );
-      cpr.wastage = as.wastage;
-    }else{ cpr = { effluent:as.effluent, wastage:as.wastage }; }
 
     /*backend riu*/
     //get tram upstream
@@ -292,7 +289,7 @@
     });
 
     //combina efluent depuradora i tram upstream
-    let sv_mixed = tram.state_variables.combine(cpr.effluent);
+    let sv_mixed = tram.state_variables.combine(as.effluent);
 
     //aplica degradació al riu
     let deg = {
@@ -328,8 +325,8 @@
     svs.Influent = influent.summary;
     if(conf.pst) svs.Primary_wastage    = pst.wastage.summary;
     if(conf.pst) svs.Primary_effluent   = pst.effluent.summary;
-                 svs.Secondary_wastage  = cpr.wastage.summary;
-                 svs.Secondary_effluent = cpr.effluent.summary;
+                 svs.Secondary_wastage  = as.wastage.summary;
+                 svs.Secondary_effluent = as.effluent.summary;
 
     //afegeix variables d'estat riu a "svs"
     if(conf.river){
@@ -385,7 +382,7 @@
       pvs.Activated_sludge = as.process_variables;
     }
     if(conf.cpr){
-      pvs.Chemical_P_removal = cpr.process_variables;
+      pvs.Chemical_P_removal = as.cpr;
     };
 
     //dibuixa process variables (pvs)

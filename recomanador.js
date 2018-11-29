@@ -8,7 +8,6 @@ if(typeof document == "undefined"){
                     require('./activated-sludge.js');   //tecnologia activated_sludge   (dins de State Variables)
                     require('./nitrification.js');      //tecnologia nitrification      (dins de State Variables)
                     require('./denitrification.js');    //tecnologia denitrification    (dins de State Variables)
-                    require('./chemical-P-removal.js'); //tecnologia chemical P removal (dins de State Variables)
 }
 
 //run model 1 vegada
@@ -18,19 +17,14 @@ function run_model(influent, tram, conf, i, deg){
   if(conf.pst) pst = influent.primary_settler(i.fw, i.removal_BPO, i.removal_UPO, i.removal_iSS);
   else         pst = { effluent:influent, wastage:null };
 
+  //chemical P removal
+  if(conf.cpr==false){ i.mass_FeCl3=0; }
+
   //call AS+(NIT)+(DN)
   let as;
-  if(conf.dn)       as = pst.effluent.denitrification (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.SF,i.fxt,i.DO,i.pH,i.IR,i.DO_RAS,i.influent_alk);
-  else if(conf.nit) as = pst.effluent.nitrification   (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.SF,i.fxt,i.DO,i.pH);
-  else              as = pst.effluent.activated_sludge(i.T,i.Vp,i.Rs,i.RAS,i.waste_from);
-
-  //call CPR
-  let cpr;
-  if(conf.cpr){
-    cpr = as.effluent.chemical_P_removal(i.mass_FeCl3);
-    cpr.wastage = as.wastage;
-  }
-  else cpr = { effluent:as.effluent, wastage:as.wastage };
+  if(conf.dn)       as = pst.effluent.denitrification (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH,i.IR,i.DO_RAS,i.influent_alk);
+  else if(conf.nit) as = pst.effluent.nitrification   (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH);
+  else              as = pst.effluent.activated_sludge(i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,);
 
   //combina efluent depuradora i tram upstream
   let river_mixed = tram.state_variables.combine(cpr.effluent);
@@ -125,6 +119,7 @@ let combinacions; //global per fer accessible variable a DOM
     Rs           : 15,        //d     | AS  | solids retention time or sludge age
     RAS          : 1.0,       //ø     | AS  | SST underflow recycle ratio
     waste_from   : "reactor", //option| AS  | waste_from | options {'reactor','sst'}
+    mass_FeCl3   : 3000,      //kg/d  | CPR | mass of FeCl3 added for chemical P removal
     SF           : 1.25,      //ø     | NIT | safety factor. design choice. Moves the sludge age
     fxt          : 0.39,      //ø     | NIT | current unaerated sludge mass fraction
     DO           : 2.0,       //mgO/L | NIT | DO in the aerobic reactor
@@ -132,7 +127,6 @@ let combinacions; //global per fer accessible variable a DOM
     IR           : 5.4,       //ø     | DN  | internal recirculation ratio
     DO_RAS       : 1.0,       //mgO/L | DN  | DO in the underflow recycle
     influent_alk : 250,       //mg/L  | DN  | influent alkalinity (mg/L CaCO3)
-    mass_FeCl3   : 3000,      //kg/d  | CPR | mass of FeCl3 added 
   };
 
   //tram upstream--(wb,     wt,     Db,       S,         n,         Li,   Di,  Ti)

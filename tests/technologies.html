@@ -123,6 +123,7 @@
         <tr><td>Rs  <td><input id=Rs  type=number min=0    value=15>     <td class=unit>d
         <tr><td>RAS <td><input id=RAS type=number min=0    value=1.0>    <td class=unit>&empty;
         <tr><td>Waste from <td colspan=2><select id=waste_from><option>reactor<option>sst</select>
+        <tr><td>FeCl3 <td><input id=mass_FeCl3 type=number min=0    value=3000> <td class=unit>kg/d
       </table>
       <button onclick="run_AS();">Run</button>
       <script>
@@ -132,11 +133,12 @@
           let Rs         = parseFloat(document.querySelector('#activated_sludge #Rs' ).value);
           let RAS        = parseFloat(document.querySelector('#activated_sludge #RAS').value);
           let waste_from = document.querySelector('#activated_sludge #waste_from').value;
-          let as = sv.activated_sludge(T,Vp,Rs,RAS,waste_from);
+          let mass_FeCl3 = parseFloat(document.querySelector('#activated_sludge #mass_FeCl3').value);
+          let as = sv.activated_sludge(T,Vp,Rs,RAS,waste_from,mass_FeCl3);
           redisplay();
           print_proces_variables(
             'activated_sludge',
-            `activated_sludge(${T}, ${Vp}, ${Rs}, ${RAS}, "${waste_from}") calculated`,
+            `activated_sludge(${T}, ${Vp}, ${Rs}, ${RAS}, "${waste_from}", ${mass_FeCl3}) calculated`,
             as.process_variables
           );
         }
@@ -147,11 +149,6 @@
     <fieldset id=nitrification>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/nitrification.js" target=_blank>Activated Sludge + Nitrification</a></legend>
       <table border=1>
-        <tr><td>T   <td><input id=T   type=number value=16>    <td class=unit>ºC
-        <tr><td>Vp  <td><input id=Vp  type=number value=8473.3><td class=unit>m<sup>3</sup>
-        <tr><td>Rs  <td><input id=Rs  type=number value=15>    <td class=unit>d
-        <tr><td>RAS <td><input id=RAS type=number min=0 value=1.0><td class=unit>&empty;
-        <tr><td>Waste from <td colspan=2><select id=waste_from><option>reactor<option>sst</select>
         <tr><td>SF  <td><input id=SF  type=number value=1.25><td class=unit>&empty;
         <tr><td>fxt <td><input id=fxt type=number value=0.39><td class=unit>ratio
         <tr><td>DO  <td><input id=DO  type=number value=2.0> <td class=unit>mg/L as O
@@ -160,20 +157,23 @@
       <button onclick="run_nitri();">Run</button>
       <script>
         function run_nitri(){
-          let T   = parseFloat(document.querySelector('#nitrification #T' ).value);
-          let Vp  = parseFloat(document.querySelector('#nitrification #Vp').value);
-          let Rs  = parseFloat(document.querySelector('#nitrification #Rs').value);
-          let RAS = parseFloat(document.querySelector('#nitrification #RAS').value);
-          let waste_from = document.querySelector('#nitrification #waste_from').value;
+          let T          = parseFloat(document.querySelector('#activated_sludge #T'  ).value);
+          let Vp         = parseFloat(document.querySelector('#activated_sludge #Vp' ).value);
+          let Rs         = parseFloat(document.querySelector('#activated_sludge #Rs' ).value);
+          let RAS        = parseFloat(document.querySelector('#activated_sludge #RAS').value);
+          let waste_from = document.querySelector('#activated_sludge #waste_from').value;
+          let mass_FeCl3 = parseFloat(document.querySelector('#activated_sludge #mass_FeCl3').value);
+
           let SF  = parseFloat(document.querySelector('#nitrification #SF').value);
           let fxt = parseFloat(document.querySelector('#nitrification #fxt').value);
           let DO  = parseFloat(document.querySelector('#nitrification #DO').value);
           let pH  = parseFloat(document.querySelector('#nitrification #pH').value);
-          let nitri=sv.nitrification(T,Vp,Rs,RAS,waste_from,SF,fxt,DO,pH);
+
+          let nitri=sv.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH);
           redisplay();
           print_proces_variables(
             'nitrification',
-            `nitrirication(${T}, ${Vp}, ${Rs}, ${RAS}, "${waste_from}", ${SF}, ${fxt}, ${DO}, ${pH}) calculated`,
+            `nitrirication(${SF}, ${fxt}, ${DO}, ${pH}) calculated`,
             nitri.process_variables
           );
         }
@@ -184,15 +184,6 @@
     <fieldset id=denitrification>
       <legend><a href="//github.com/icra/ecoadvisor/blob/master/denitrification.js" target=_blank>Activated Sludge + Nitrification + Denitrification</a></legend>
       <table border=1>
-        <tr><td>T   <td><input id=T   type=number value=16>    <td class=unit>ºC
-        <tr><td>Vp  <td><input id=Vp  type=number value=8473.3><td class=unit>m<sup>3</sup>
-        <tr><td>Rs  <td><input id=Rs  type=number value=15>    <td class=unit>d
-        <tr><td>RAS <td><input id=RAS type=number min=0 value=1.0><td class=unit>&empty;
-        <tr><td>Waste from <td colspan=2><select id=waste_from><option>reactor<option>sst</select>
-        <tr><td>SF  <td><input id=SF  type=number value=1.25><td class=unit>&empty;
-        <tr><td>fxt <td><input id=fxt type=number value=0.39><td class=unit>ratio
-        <tr><td>DO  <td><input id=DO  type=number value=2.0> <td class=unit>mg/L as O
-        <tr><td>pH  <td><input id=pH  type=number value=7.2> <td class=unit>pH units
         <tr><td>IR           <td><input id=IR           type=number value=5.4> <td class=unit>ratio
         <tr><td>DO_RAS       <td><input id=DO_RAS       type=number value=1.0> <td class=unit>mg/L as O
         <tr><td>influent_alk <td><input id=influent_alk type=number value=250> <td class=unit>mg/L as CaCO<sub>3</sub>
@@ -200,51 +191,32 @@
       <button onclick="run_denitri();">Run</button>
       <script>
         function run_denitri(){
-          let T   = parseFloat(document.querySelector('#denitrification #T' ).value);
-          let Vp  = parseFloat(document.querySelector('#denitrification #Vp').value);
-          let Rs  = parseFloat(document.querySelector('#denitrification #Rs').value);
-          let RAS = parseFloat(document.querySelector('#denitrification #RAS').value);
-          let waste_from =     document.querySelector('#denitrification #waste_from').value;
-          let SF  = parseFloat(document.querySelector('#denitrification #SF').value);
-          let fxt = parseFloat(document.querySelector('#denitrification #fxt').value);
-          let DO  = parseFloat(document.querySelector('#denitrification #DO').value);
-          let pH  = parseFloat(document.querySelector('#denitrification #pH').value);
+          let T          = parseFloat(document.querySelector('#activated_sludge #T'  ).value);
+          let Vp         = parseFloat(document.querySelector('#activated_sludge #Vp' ).value);
+          let Rs         = parseFloat(document.querySelector('#activated_sludge #Rs' ).value);
+          let RAS        = parseFloat(document.querySelector('#activated_sludge #RAS').value);
+          let waste_from = document.querySelector('#activated_sludge #waste_from').value;
+          let mass_FeCl3 = parseFloat(document.querySelector('#activated_sludge #mass_FeCl3').value);
+
+          let SF  = parseFloat(document.querySelector('#nitrification #SF').value);
+          let fxt = parseFloat(document.querySelector('#nitrification #fxt').value);
+          let DO  = parseFloat(document.querySelector('#nitrification #DO').value);
+          let pH  = parseFloat(document.querySelector('#nitrification #pH').value);
+
           let IR           = parseFloat(document.querySelector('#denitrification #IR').value);
           let DO_RAS       = parseFloat(document.querySelector('#denitrification #DO_RAS').value);
           let influent_alk = parseFloat(document.querySelector('#denitrification #influent_alk').value);
 
-          let denitri=sv.denitrification(T,Vp,Rs,RAS,waste_from,SF,fxt,DO,pH,IR,DO_RAS,influent_alk);
+          let denitri=sv.denitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH,IR,DO_RAS,influent_alk);
           redisplay();
           print_proces_variables(
             'denitrification',
-            `denitrirication(${T}, ${Vp}, ${Rs}, ${RAS}, "${waste_from}", ${SF}, ${fxt}, ${DO}, ${pH}, ${IR}, ${DO_RAS}, ${influent_alk}) calculated`,
+            `denitrirication(${IR}, ${DO_RAS}, ${influent_alk}) calculated`,
             denitri.process_variables
           );
         }
       </script>
     </fieldset>
-
-    <!--CPR-->
-    <fieldset id=chemical_P_removal>
-      <legend><a href="//github.com/icra/ecoadvisor/blob/master/chemical-P-removal.js" target=_blank>Chemical P removal</a></legend>
-      <table border=1>
-        <tr><td>mass_FeCl3 <td><input id=mass_FeCl3 type=number min=0 value=25> <td class=unit>kg/d
-      </table>
-      <button onclick="run_cpr();">Run</button>
-      <script>
-        function run_cpr(){
-          let mass_FeCl3 = parseFloat(document.querySelector('#chemical_P_removal #mass_FeCl3').value);
-          let cpr = sv.chemical_P_removal(mass_FeCl3);
-          redisplay();
-          print_proces_variables(
-            'chemical_P_removal',
-            `chemical_P_removal(${mass_FeCl3}) calculated`,
-            cpr.process_variables,
-          );
-        }
-      </script>
-    </fieldset>
-
   </div>
 
   <!--river-->
@@ -293,7 +265,6 @@
 <script src="../activated-sludge.js"></script>
 <script src="../nitrification.js"></script>
 <script src="../denitrification.js"></script>
-<script src="../chemical-P-removal.js"></script>
 <script src="../tram.js"></script>
 
 <!--user defined default scenario-->

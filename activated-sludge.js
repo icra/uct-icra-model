@@ -9,12 +9,12 @@
 //import files
 if(typeof document == "undefined"){State_Variables=require("./state-variables.js");}
 
-State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
+State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3){
   //inputs and default values
-  T   = isNaN(T )  ? 16     : T ;  //ºC   | Temperature
-  Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume
-  Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
-  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
+  T          = isNaN(T )         ? 16     : T ;         //ºC   | Temperature
+  Vp         = isNaN(Vp)         ? 8473.3 : Vp;         //m3   | Volume
+  Rs         = isNaN(Rs)         ? 15     : Rs;         //days | Solids Retention Time or Sludge Age
+  RAS        = isNaN(RAS)        ? 1.0    : RAS;        //ø    | SST underflow recycle ratio
   /* 
     option 'waste_from'
 
@@ -26,6 +26,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   */
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
+  mass_FeCl3 = isNaN(mass_FeCl3) ? 50     : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -184,7 +185,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let Pte   = Pti - Ps;              //mg/L | total P effluent
   let Pouse = frac.TP.usOP;          //mg/L | P organic unbiodegradable soluble effluent
   let Pobse = S_b*f_P_FBSO/fCV_FBSO; //mg/L | P organic biodegradable soluble effluent
-  let Pse   = Pte - Pouse - Pobse;   //mg/L | inorganic soluble P effluent
+  let Pse   = Pte - Pouse - Pobse;   //mg/L | inorganic soluble P available for chemical P removal
 
   //Calculate the concentration of BPO, UPO and iSS at the wastage
   //Solids summary:
@@ -197,7 +198,12 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   //  f is the concentrating factor (if we are wasting from SST) = (1+RAS)/RAS. Otherwise is 1
   let BPO_was = f*fCV_BPO*(1-fH)*X_BH*1000;            //mg/L | BPO concentration
   let UPO_was = f*fCV_UPO*(fH*X_BH + X_EH + X_I)*1000; //mg/L | UPO concentration
-  let iSS_was = f*X_IO*1000;                           //mg/L | iSS concentration
+  let iSS_was = f*X_IO*1000;                           //mg/L | iSS concentration (the iSS FeCl3 solids are added below)
+
+  /*chemical P removal*/
+  let cpr  = chemical_P_removal(Q, Pse, mass_FeCl3);
+  Pse      = cpr.PO4e.value;         //mgP/L | overwrite Pse
+  iSS_was += cpr.extra_iSS.value/Qw; //mg/L  | add the extra iSS from FeCl3 precipitation
 
   //influent nitrate goes directly to effluent
   let NOx = this.components.S_NOx;
@@ -216,7 +222,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let FSe         = eff_fluxes.totals.COD.total; //kg/d | total COD effluent: USO effluent flux + bCOD not degraded | Qe*(Suse+S_b)
   let FSw         = was_fluxes.totals.COD.total; //kg/d | total COD wastage
 
-  //TODO
+  //TODO discuss with george
   let FOc_real = FSti - FSe - FSw;
   //console.log({FOc, FOc_real});
   FOc=FOc_real;
@@ -235,7 +241,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   let FPti      = fluxes.totals.TP.total;     //kg/d as P | total TP influent
   let FPte      = eff_fluxes.totals.TP.total; //kg/d as P | total TP effluent
   let FPw       = was_fluxes.totals.TP.total; //kg/d as P | total TP wastage
-  let FPout     = FPte + FPw;                 //kg/d as P | total TP out
+  let FPremoved = cpr.PO4_removed.value;      //kg/d as P | total PO4 removed by FeCl3
+  let FPout     = FPte + FPw + FPremoved;     //kg/d as P | total TP out
   let P_balance = 100*FPti/FPout;             //percentage
 
   //process_variables
@@ -277,23 +284,135 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
   //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
+    cpr,
     effluent, 
     wastage,
   };
 };
 
+function chemical_P_removal(Q, PO4i, mass_FeCl3){
+  //inputs and default values
+  Q          = isNaN(Q)          ? 1  : Q;          //ML/d
+  PO4i       = isNaN(PO4i)       ? 7  : PO4i;       //mg/L as P (calculated as "Pse" in 'activated-sludge.js')
+  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added 
+
+  //molecular weights (constants)
+  const M_Fe        = 55.845;   //g/mol (Fe molecular weight)
+  const M_P         = 30.974;   //g/mol (P molecular weight)
+  const M_FeCl3     = 162.195;  //g/mol (FeCl3 molecular weight)
+  const M_FeH2PO4OH = 250.9646; //g/mol ((Fe)(1.6)(H2PO4)(OH)(3.8) molecular weight)
+  const M_FeOH3     = 106.866;  //g/mol (FeOH3 molecular weight)
+
+  //get the PO4 effluent concentration from the Fe/P mole ratio
+  //Fig 6-13, page 484, M&EA, 5th ed
+  function get_PO4_eff(Fe_P_mole_ratio){
+    /* 
+      Calculate the residual soluble P concentration (C_P_residual), [mg/L] -> range: 0.01, 0.1, 1, 10 (log scale)
+      Input: Fe to initial soluble P ratio, [mole/mole] -> range: 0, 1, 2, 3, 4, 5 (lineal scale)
+    */
+
+    //rename input to "inp"
+    let inp = Fe_P_mole_ratio || 0;
+
+    //min and max values are: 0.0001 and 5
+    inp=Math.min(5,Math.max(0.0001,inp));
+
+    //Figure 6-13 (Fe_P_mole ratio vs PO4_eff)
+    let Figure=[
+      {inp:8.00  , out:0.01},
+      {inp:4.90  , out:0.02}, //if output is less than 0.02 is not linear
+      {inp:4.50  , out:0.03},
+      {inp:4.20  , out:0.04},
+      {inp:3.90  , out:0.05},
+      {inp:3.80  , out:0.06},
+      {inp:3.70  , out:0.07},
+      {inp:3.50  , out:0.08},
+      {inp:3.35  , out:0.09},
+      {inp:3.30  , out:0.10}, //book example has this value {PO4_eff:0.1, Fe_P_mole_ratio:3.3)
+      {inp:2.60  , out:0.20},
+      {inp:2.10  , out:0.30},
+      {inp:2.00  , out:0.40},
+      {inp:1.70  , out:0.50},
+      {inp:1.50  , out:0.60},
+      {inp:1.20  , out:0.70},
+      {inp:1.10  , out:0.80},
+      {inp:1.00  , out:0.90},
+      {inp:1.00  , out:1.00}, //if input is greater than 1, it's no more linear
+      {inp:0.20  , out:2.00},
+      {inp:0.10  , out:3.00},
+      {inp:0.10  , out:4.00},
+      {inp:0.01  , out:5.00},
+      {inp:0.01  , out:6.00},
+      {inp:0.005 , out:7.00},
+      {inp:0.001 , out:8.00},
+      {inp:0.001 , out:9.00},
+      {inp:0.0001, out:10.0},
+    ];
+
+    //perform linear interpolation (only if the ratio is not in the Figure)
+    if(Figure.filter(row=>{return row.inp==inp}).length==0) {
+      let Inps=Figure.map(row=>row.inp).sort(); //sort the values in ascending order
+      for(let i=1;i<Inps.length;i++){
+        if ((Inps[i-1]<inp) && (inp<Inps[i])){
+          var i_below = Inps[i-1];
+          var i_above = Inps[i];
+          break;
+        }
+      }
+      //find output above and below (o_above and o_below)
+      let percentage = (inp-i_below)/(i_above-i_below);
+      let o_below = Figure.find(row=>{return row.inp==i_below}).out;
+      let o_above = Figure.find(row=>{return row.inp==i_above}).out;
+      let o_inter = o_below + (o_above-o_below)*percentage;
+      return o_inter;
+    }else{ 
+      //input is in the Figure
+      return Figure.find(row=>{return inp==row.inp}).out;
+    }
+  };
+
+  //get moles of P available in PO4
+  let moles_P = Q*PO4i*1000/M_P; //moles/d of P
+
+  //convert kg/d of FeCl3 to moles of Fe
+  let mass_Fe  = M_Fe/M_FeCl3*mass_FeCl3; //kg/d of Fe
+  let moles_Fe = mass_Fe*1000/M_Fe;       //moles/d Fe
+
+  //get Fe/P mole ratio
+  let Fe_P_mole_ratio = moles_Fe/moles_P; //mol_Fe/mol_P
+
+  //get PO4 effluent and PO4 removed
+  let PO4e        = get_PO4_eff(Fe_P_mole_ratio); //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function below 'get_PO4_eff')
+  PO4e            = Math.min(PO4i, PO4e);         //PO4e cannot be higher than PO4i (i.e. if mass of FeCl3 = 0)
+  let PO4_removed = Q*(PO4i - PO4e);              //kgP/d
+
+  //get extra iSS sludge produced
+  let extra_iSS = PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
+  //chemical P removal end-----------------------------------------------------------------
+
+  //return cpr process variables
+  return {
+    Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"molFe/molP", descr:"Fe/P mole ratio"},
+    PO4i:            {value:PO4i,            unit:"mgP/L",      descr:"PO4 available"},
+    PO4e:            {value:PO4e,            unit:"mgP/L",      descr:"PO4 effluent"},
+    PO4_removed:     {value:PO4_removed,     unit:"kgP/d",      descr:"P removed"},
+    extra_iSS:       {value:extra_iSS,       unit:"kgiSS/d",    descr:"iSS produced by FeCl3 coprecipitation (Fe(OH)3 and Fe(1.6)H2PO4(OH)3.8)"},
+  };
+};
+
 /*test*/
 (function(){
-  return;
+  return
   //new influent
   //syntax---------------------(Q,  VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
   let inf = new State_Variables(25, 50,  115,  440, 100,  45,  60, 39.1, 7.28, 0);
   //apply AS wasting from {reactor, sst}
-  let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor'); //AS wasting from the reactor
-  let as_sst = inf.activated_sludge(16, 8473.3, 15, 1.0, 'sst');     //AS wasting from the sst
+  let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000); //AS wasting from the reactor
+  let as_sst = inf.activated_sludge(16, 8473.3, 15, 1.0, 'sst',     3000); //AS wasting from the sst
   //show results
   //console.log("=== Influent");             console.log(inf.summary);
-  console.log("=== AS process variables"); console.log(as_rea.process_variables);
+  console.log("=== AS process variables");   console.log(as_rea.process_variables);
+  console.log("=== AS chemical P removal "); console.log(as_rea.cpr);
   return;
   ////=== waste from reactor
   console.log("=== Effluent summary (waste from reactor)"); console.log(as_rea.effluent.summary);
