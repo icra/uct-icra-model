@@ -33,7 +33,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let frac = this.totals;
 
   //execute activated sludge without nitrification
-  let as = this.activated_sludge(T,Vp,Rs,RAS,waste_from); //Object{effluent, wastage, process_variables}
+  let as = this.activated_sludge(T,Vp,Rs,RAS,waste_from,mass_FeCl3); //Object{effluent, wastage, process_variables}
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -77,6 +77,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
   //minimum sludge age for nitrification (Rsm)
   let Rsm = SF/(µAm_pH*(1-fxt) - bAT); //days
+  Rsm=Math.max(Rsm,0); //avoid negative Rsm
   //if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
 
   //unaerated sludge (current and max)

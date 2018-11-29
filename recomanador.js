@@ -27,7 +27,7 @@ function run_model(influent, tram, conf, i, deg){
   else              as = pst.effluent.activated_sludge(i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,);
 
   //combina efluent depuradora i tram upstream
-  let river_mixed = tram.state_variables.combine(cpr.effluent);
+  let river_mixed = tram.state_variables.combine(as.effluent);
 
   //final del tram de riu
   let river_end = new State_Variables(
@@ -52,7 +52,6 @@ function run_model(influent, tram, conf, i, deg){
   let FOt = conf.dn ? dn_process_variables.FOt.value : (conf.nit ? nit_process_variables.FOt_fxt.value : as_process_variables.FOt.value); //kgO/d | oxygen demand
   let TSS = as.wastage.fluxes.totals.TSS.total;             //kgTSS/d | sludge produced in secondary
   if(conf.pst) TSS += pst.wastage.fluxes.totals.TSS.total;  //kgTSS/d | sludge produced in pst
-  if(conf.cpr) TSS += pst.effluent.fluxes.totals.TSS.total; //kgiSS/d | sludge produced from FeCl3
   let NH4 = river_end.components.S_FSA;                     //mgN/L NH4 at river end
   let PO4 = river_end.components.S_OP;                      //mgP/L PO4 al river end
 
@@ -69,11 +68,12 @@ function run_model(influent, tram, conf, i, deg){
 function run_simulacions(influent, tram, conf, i, deg){
   let combinacions = []; //totes les combinacions fetes
 
-  //variacions de Rs, RAS, DO, mass_FeCl3
+  //CONFIGURACIÓ VARIACIONS DE Rs, RAS, DO, mass_FeCl3
   [6,    8,    10,   12,   15,   20,  25, 30, 40 ].forEach(Rs =>{         //Rs         | d
   [0.75, 0.85, 0.95, 1.05, 1.15, 1.25            ].forEach(RAS=>{         //RAS        | ø
   [1.00, 1.50, 2.00, 2.50                        ].forEach(DO =>{         //DO         | mgO/L
-  [1000, 1500, 2000, 2500, 3000                  ].forEach(mass_FeCl3 =>{ //mass_FeCl3 | kg/d
+  [500,  600,  700,  800, 900, 1000              ].forEach(mass_FeCl3 =>{ //mass_FeCl3 | kg/d
+
     //varia paràmetres
     i.Rs         = Rs;
     i.RAS        = RAS;

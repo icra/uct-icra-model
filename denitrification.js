@@ -35,7 +35,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
 
   //execute AS+Nit
-  let nit = this.nitrification(T,Vp,Rs,RAS,waste_from, SF,fxt,DO,pH); //Object{process_variables, as_process_variables, effluent, wastage}
+  let nit = this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3, SF,fxt,DO,pH); //Object{process_variables, as_process_variables, effluent, wastage}
 
   //flowrate
   let Q = this.Q; //ML/d

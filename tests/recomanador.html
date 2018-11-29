@@ -7,6 +7,9 @@
       font-family: 'Roboto', verdana;
       color: #5C5C5C;
     }
+    table{
+      border-collapse:collapse;
+    }
   </style>
   <!--gui decimal number formatter-->
   <script src="format.js"></script>
@@ -20,25 +23,44 @@
   <script src="../recomanador.js"></script>
 </head>
 <h2>Recomanador</h2>
-<button id=run>Veure combinacions (NH4&lt;0.5 &amp; PO4&lt;0.5)</button>
-<table id=combinacions border=1 style=border-collapse:collapse></table>
+
+<div>
+  <table border=1 style=font-size:smaller>
+    <tr><th colspan=5>Execució del model amb variació del següents paràmetres:
+    <tr><th>Input                 <th>Unitat <th>Valors provats <th>Descripció
+    <tr><td>Rs                    <td>d      <td>[6 - 40]       <td>Temps de residència
+    <tr><td>RAS                   <td>ø      <td>[0.75 - 1.25]  <td>Ratio recirculació externa
+    <tr><td>DO                    <td>mgO/L  <td>[1.00 - 2.50]  <td>Oxigen dissolt al reactor
+    <tr><td>mass FeCl<sub>3</sub> <td>kg/d   <td>[500 - 600]    <td>Clorur fèrric afegit (eliminació fosfat)
+    <tr><th>Output                <th>Unitat <th>Valor desitjat <th>Descripció
+    <tr><td>FOt                   <td>kgO/d  <td>               <td>Demanda total d'oxigen
+    <tr><td>TSS                   <td>kg/d   <td>               <td>Producció de fangs total
+    <tr><td>NH<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Amoni al final del riu
+    <tr><td>PO<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Fosfat al final del riu
+  </table>
+</div>
+
+<button id=run style="margin:5px 0;font-size:18px">Generar combinacions</button>
+
+<table id=combinacions border=1></table>
 
 <!--recomanador-->
 <script>
   document.querySelector('#run').addEventListener('click',function(){
-    let t = document.querySelector("#combinacions"); 
-    //la variable combinacions ve definida 'recomanador.js' conté totes les combinacions sense filtrar
+    //taula
+    let t = document.querySelector("#combinacions"); t.innerHTML="";
 
+    //la variable combinacions ve definida 'recomanador.js' conté totes les combinacions sense filtrar
     //filtra les combinacinos que compleixen amb els limits
     let solucions = combinacions.filter(obj=>(obj.NH4 && obj.NH4<0.5 && obj.PO4 && obj.PO4<0.5)); 
 
     //dibuixa taula de solucions
     let newRow=t.insertRow(-1);
-    newRow.insertCell(-1).outerHTML=`<td colspan=16>${solucions.length} solucions (NH4<0.5 && PO4<0.5) de ${combinacions.length} combinacions provades`;
+    newRow.insertCell(-1).outerHTML=`<th colspan=16>Veient ${solucions.length} solucions (NH<sub>4</sub><0.5 & PO<sub>4</sub><0.5) de ${combinacions.length} combinacions provades`;
     if(solucions.length==0)return;
 
     //escriu headers columnes
-    newRow=t.insertRow(-1);Object.keys(solucions[0]).forEach(key=>{newRow.insertCell(-1).innerHTML=key;});
+    newRow=t.insertRow(-1);Object.keys(solucions[0]).forEach(key=>{newRow.insertCell(-1).outerHTML="<th>"+key.prettifyUnit();});
 
     //itera solucions
     solucions.forEach((obj,i)=>{

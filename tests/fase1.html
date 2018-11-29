@@ -1,11 +1,11 @@
-<!doctype html><html><head>
-  <meta charset=utf8>
+<!doctype html><html><head><meta charset=utf8>
   <title>Phase 1</title>
   <style>
     @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
     body {
       font-family: 'Roboto', verdana;
       color: #5C5C5C;
+      overflow-y:scroll;
     }
     table{
       border-collapse:collapse;
@@ -39,23 +39,26 @@
       width:70px;
     }
     #edar input{
-      max-width:56px;
+      max-width:64px;
     }
     #processes table {
       margin-right:3px;
     }
   </style>
-  <!--utils-->
-  <script src=format.js></script>
 </head><body>
 
 <!--title-->
-<div style="border-bottom:1px solid #ccc;margin-bottom:4px">
+<div style="border-bottom:1px solid #ccc;margin-bottom:4px;justify-content:space-between" class=flex>
   <h3>
     Phase 1: Influent &rarr; plant &rarr; river
     <!--run button-->
     <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
   </h3>
+  <ul>
+    <li><a target=_blank href="//github.com/icra/ecoadvisor">github</a>
+    <li><a target=_blank href="../state-variables.js">all mass ratios</a>
+    <li><a target=_blank href="../constants.js">all constants</a>
+  </ul>
 </div>
 
 <!--main-->
@@ -146,6 +149,7 @@
         <td>k  <input type=number id=k    value=1>         <span class=unit>mg/L</span>
       </tr>
     </table>
+
   </div>
 
   <!--outputs-->
@@ -172,6 +176,9 @@
     <div id=river style="display:none"></div>
   </div>
 </div>
+
+<!--gui decimal number formatter-->
+<script src=format.js></script>
 
 <!--load backend-->
 <script src="../state-variables.js"></script>
@@ -418,6 +425,7 @@
     document.querySelector('input[name=summary_units]:checked').click();
   });
 
+  //select unit in summaries
   document.querySelectorAll('input[name=summary_units]').forEach(input=>{
     input.addEventListener('click',function(){
       let summaries = document.querySelector('#outputs #summaries');
@@ -445,6 +453,15 @@
           break;
       }
     });
+  });
+
+  //telca 'Enter' listener for inputs
+  document.querySelectorAll('#inputs input').forEach(input=>{
+    input.addEventListener('keypress',function(e){
+      if(e.key=="Enter"){
+        document.querySelector('button#run').click();
+      }
+    }); 
   });
 
   //clica el botó RUN
