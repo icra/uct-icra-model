@@ -8,6 +8,8 @@
       color: #5C5C5C;
     }
   </style>
+  <!--gui decimal number formatter-->
+  <script src="format.js"></script>
   <!--load backend-->
   <script src="../state-variables.js"></script>
   <script src="../primary-settler.js"></script>
@@ -17,7 +19,6 @@
   <script src="../chemical-P-removal.js"></script>
   <script src="../tram.js"></script>
   <script src="../recomanador.js"></script>
-  <script src="format.js"></script>
 </head>
 <h2>Recomanador</h2>
 <button id=run>Veure combinacions (NH4&lt;0.5 &amp; PO4&lt;0.5)</button>
@@ -27,21 +28,25 @@
 <script>
   document.querySelector('#run').addEventListener('click',function(){
     let t = document.querySelector("#combinacions"); 
-
     //la variable combinacions ve definida 'recomanador.js' conté totes les combinacions sense filtrar
+
     //filtra les combinacinos que compleixen amb els limits
     let solucions = combinacions.filter(obj=>(obj.NH4 && obj.NH4<0.5 && obj.PO4 && obj.PO4<0.5)); 
 
     //dibuixa taula de solucions
     let newRow=t.insertRow(-1);
     newRow.insertCell(-1).outerHTML=`<td colspan=16>${solucions.length} solucions (NH4<0.5 && PO4<0.5) de ${combinacions.length} combinacions provades`;
-    newRow=t.insertRow(-1);
-    Object.keys(solucions[0]).forEach(key=>{newRow.insertCell(-1).innerHTML=key;});
+    if(solucions.length==0)return;
 
-    solucions.forEach(obj=>{
+    //escriu headers columnes
+    newRow=t.insertRow(-1);Object.keys(solucions[0]).forEach(key=>{newRow.insertCell(-1).innerHTML=key;});
+
+    //itera solucions
+    solucions.forEach((obj,i)=>{
       let newRow = t.insertRow(-1);
-      Object.values(obj).forEach(val=>{
-        newRow.insertCell(-1).innerHTML=format(val);
+      newRow.setAttribute('combinacio',i);
+      Object.entries(obj).forEach(([key,val])=>{
+        newRow.insertCell(-1).outerHTML=`<td key=${key} value=${val}>${format(val)}`;
       });
     });
   });
