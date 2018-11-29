@@ -73,7 +73,7 @@ class Tram {
     //k   : (input, es com una ks) (g/m3)
     if(Mi==0) return 0;
     let Mf=Mi - R_20*this.HRTi*this.Si*Math.pow(1.0241,this.Ti-20)*(Mi/(this.Qi*60))/(k+Mi/this.Qi);
-    return Math.max(Mf,0);
+    return Mf;
   };
 }
 

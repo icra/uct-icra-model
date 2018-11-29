@@ -72,12 +72,10 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //page 17
   //maximum design unaerated sludge mass fraction
   let fxm = 1 - SF*(bAT+1/Rs)/µAm_pH; //ø
-  fxm=Math.max(fxm,0); //avoid negative fxm
   //if(fxt>fxm) throw `The mass of unaerated sludge (fxt=${fxt}) cannot be higher than fxm (${fxm})`;
 
   //minimum sludge age for nitrification (Rsm)
   let Rsm = SF/(µAm_pH*(1-fxt) - bAT); //days
-  Rsm=Math.max(Rsm,0); //avoid negative Rsm
   //if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
 
   //unaerated sludge (current and max)
@@ -87,7 +85,6 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //effluent ammonia nitrification
   let Nae_fxt = KnT*(bAT + 1/Rs)/(µAm_pH*(1-fxt)-bAT-1/Rs); //mg/L as N | effluent ammonia concentration if fxt <  fxm
   let Nae_fxm = KnT/(SF-1);                                 //mg/L as N | effluent ammonia concentration if fxt == fxm
-  Nae_fxt = Math.max(Nae_fxt, 0); //avoid 0
 
   //effluent TKN nitrification -- page 18
   let Nte_fxt = Nae_fxt + Nouse; //mg/L as N | effluent TKN concentration if fxt <  fxm
@@ -98,11 +95,11 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Nc_fxm = Nti - Ns - Nte_fxm; //mg/L as N | Nitrification capacity if fxt == fxm
 
   //oxygen demand
-  let FOn_fxt = 4.57*Q*Nc_fxt; //kg/d as O | O demand if fxt <  fxm
-  let FOn_fxm = 4.57*Q*Nc_fxm; //kg/d as O | O demand if fxt == fxm
-  let FOc     = as.process_variables.FOc.value;
-  let FOt_fxt = FOc + FOn_fxt; //kg/d as O | total O demand if fxt <  fxm
-  let FOt_fxm = FOc + FOn_fxm; //kg/d as O | total O demand if fxt == fxm
+  let FOn_fxt = 4.57*Q*Nc_fxt; //kgO/d | O demand if fxt <  fxm
+  let FOn_fxm = 4.57*Q*Nc_fxm; //kgO/d | O demand if fxt == fxm
+  let FOc     = as.process_variables.FOc.value; //kg=/d
+  let FOt_fxt = FOc + FOn_fxt; //kgO/d | total O demand if fxt <  fxm
+  let FOt_fxm = FOc + FOn_fxm; //kgO/d | total O demand if fxt == fxm
 
   //page 475 4.14.22.3 book: calculate mass of nitrifiers
   let f_XBA = YAT*Rs/(1+bAT*Rs); //gVSS·d/gFSA

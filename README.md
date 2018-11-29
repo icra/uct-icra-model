@@ -6,20 +6,20 @@ Coded in pure Javascript (without GUI) without dependencies.
 Steady state model by George Ekama.
 Implemented by Lluís Bosch (lbosch@icra.cat).
 
-## [RIVER] items pending
-- nothing
+## pending
+- [DOUBT] should extra iSS from chemical P removal be added to MX-T?
+- [DOUBT] Input S-NOx (nitrate) is not considered in equations. Ask george.
+- [DOUBT] why is kg of FeCl3 added is not equal to the extra iSS produced (for example 3000 kg FeCl3 produces 2417 kg iSS. The rest (583 kg) is Cl(-) ion?). Ask george.
+- [DOUBT] Current DO "KO" constant value is 0.3 (µ = µ·DO/(DO + KO)). Ask george. Book says KO value is [0.3, 2.0].
+- [TBD] Check again Rsm formula (page 471, equation 140 is -> Rsm = 1/(µApHT·(1-fxm) - bnT) )
 
-## [AS MODEL]: items pending/to do/to be discussed with george
-- [TODO] write george equations in pdf 
-* [TBD] Input S-NOx (nitrate) is not considered in equations. Ask george.
-- [TBD] kg of FeCl3 added is not equal to the extra iSS produced (i.e. 3000 kg FeCl3 produces 2417 kg iSS. The rest (583 kg) is Cl(-) ion?). Ask george.
-- [TBD] Current DO "KO" constant value is 0.3 (µ = µ·DO/(DO + KO)). Ask george. Book says KO value is [0.3, 2.0].
-* [TODO] Nitrification requirements: 
-  - fxt should be smaller than fxm 
-  - Rs should be higher than Rsm
-- [TODO] Check again Rsm formula (page 471, equation 140 is -> Rsm = 1/(µApHT·(1-fxm) - bnT) )
+## tasks
+- write equations in pdf
+* Add errors in nitrification when: 
+  - fxt > fxm
+  - Rs  < Rsm
 
-## future items (not discussed in detail)
+## future
 - Add energy consumption module
 - Add anaerobic digestion
 - Add stoichiometry (for {CO2,N2}(air) produced)
