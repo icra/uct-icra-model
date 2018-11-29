@@ -76,109 +76,110 @@ class State_Variables {
 
   //calculate totals and complete fractionation for COD, TKN, TP, TOC and TSS
   get totals(){
+    let mr = this.mass_ratios; //alias for code reduction
+    let co = this.components;  //alias for code reduction
+
     //totals
-      let Total_COD = this.components.S_VFA + this.components.S_FBSO + this.components.S_USO + this.components.X_BPO + this.components.X_UPO;
+      let Total_COD = co.S_VFA + co.S_FBSO + co.S_USO + co.X_BPO + co.X_UPO;
       let Total_TOC = 
-        this.mass_ratios.f_C_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
-        this.mass_ratios.f_C_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
-        this.mass_ratios.f_C_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
-        this.mass_ratios.f_C_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
-        this.mass_ratios.f_C_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
-      let Total_TKN = 
-        this.components.S_FSA + 
-        this.mass_ratios.f_N_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
-        this.mass_ratios.f_N_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
-        this.mass_ratios.f_N_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
-        this.mass_ratios.f_N_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
-        this.mass_ratios.f_N_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
-      let Total_TP = 
-        this.components.S_OP +
-        this.mass_ratios.f_P_VFA  / this.mass_ratios.f_CV_VFA  * this.components.S_VFA  +
-        this.mass_ratios.f_P_FBSO / this.mass_ratios.f_CV_FBSO * this.components.S_FBSO +
-        this.mass_ratios.f_P_USO  / this.mass_ratios.f_CV_USO  * this.components.S_USO  +
-        this.mass_ratios.f_P_BPO  / this.mass_ratios.f_CV_BPO  * this.components.X_BPO  +
-        this.mass_ratios.f_P_UPO  / this.mass_ratios.f_CV_UPO  * this.components.X_UPO  ;
+        co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA  +
+        co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO +
+        co.S_USO  * mr.f_C_USO  / mr.f_CV_USO  +
+        co.X_BPO  * mr.f_C_BPO  / mr.f_CV_BPO  +
+        co.X_UPO  * mr.f_C_UPO  / mr.f_CV_UPO  ;
+      let Total_TKN = co.S_FSA  + 
+        co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA  +
+        co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO +
+        co.S_USO  * mr.f_N_USO  / mr.f_CV_USO  +
+        co.X_BPO  * mr.f_N_BPO  / mr.f_CV_BPO  +
+        co.X_UPO  * mr.f_N_UPO  / mr.f_CV_UPO  ;
+      let Total_TP = co.S_OP    +
+        co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA  +
+        co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO +
+        co.S_USO  * mr.f_P_USO  / mr.f_CV_USO  +
+        co.X_BPO  * mr.f_P_BPO  / mr.f_CV_BPO  +
+        co.X_UPO  * mr.f_P_UPO  / mr.f_CV_UPO  ;
       let Total_VSS =
-        this.components.X_BPO / this.mass_ratios.f_CV_BPO + 
-        this.components.X_UPO / this.mass_ratios.f_CV_UPO ;
-      let Total_TSS = Total_VSS + this.components.X_iSS;
+        co.X_BPO / mr.f_CV_BPO + 
+        co.X_UPO / mr.f_CV_UPO ;
+      let Total_TSS = Total_VSS + co.X_iSS;
 
     //fractionation of COD
-      let bsCOD = this.components.S_VFA + this.components.S_FBSO;
-      let usCOD = this.components.S_USO;
-      let bpCOD = this.components.X_BPO;
-      let upCOD = this.components.X_UPO;
+      let bsCOD = co.S_VFA + co.S_FBSO;
+      let usCOD = co.S_USO;
+      let bpCOD = co.X_BPO;
+      let upCOD = co.X_UPO;
       let bCOD = bsCOD + bpCOD;
       let uCOD = usCOD + upCOD;
       let sCOD = bsCOD + usCOD;
       let pCOD = bpCOD + upCOD;
       let COD={
-        total:Total_COD, 
-        bCOD, uCOD, sCOD, pCOD,
+        total: Total_COD, 
+        bCOD,  uCOD,  sCOD,  pCOD,
         bsCOD, usCOD, bpCOD, upCOD,
       };
 
     //fractionation of Total Organic Carbon (TOC)
       let bsOC = 
-        this.mass_ratios.f_C_VFA  /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
-        this.mass_ratios.f_C_FBSO /this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
-      let usOC = this.mass_ratios.f_C_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
-      let bpOC = this.mass_ratios.f_C_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
-      let upOC = this.mass_ratios.f_C_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
+        co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA +
+        co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO;
+      let usOC = co.S_USO * mr.f_C_USO / mr.f_CV_USO;
+      let bpOC = co.X_BPO * mr.f_C_BPO / mr.f_CV_BPO;
+      let upOC = co.X_UPO * mr.f_C_UPO / mr.f_CV_UPO;
       let bOC = bsOC + bpOC;
       let uOC = usOC + upOC;
       let sOC = bsOC + usOC;
       let pOC = bpOC + upOC;
       let TOC={
         total:sOC+pOC,
-        bOC, uOC, sOC, pOC,
+        bOC,  uOC,  sOC,  pOC,
         bsOC, usOC, bpOC, upOC,
       };
 
     //fractionation of Organic Nitrogen (part of TKN)
       let bsON = 
-        this.mass_ratios.f_N_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
-        this.mass_ratios.f_N_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
-      let usON = this.mass_ratios.f_N_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
-      let bpON = this.mass_ratios.f_N_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
-      let upON = this.mass_ratios.f_N_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
+        co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA +
+        co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO;
+      let usON = co.S_USO * mr.f_N_USO / mr.f_CV_USO;
+      let bpON = co.X_BPO * mr.f_N_BPO / mr.f_CV_BPO;
+      let upON = co.X_UPO * mr.f_N_UPO / mr.f_CV_UPO;
       let bON = bsON + bpON;
       let uON = usON + upON;
       let sON = bsON + usON;
       let pON = bpON + upON;
       let TKN={
         total:Total_TKN,
-        FSA:this.components.S_FSA,
+        FSA:co.S_FSA,
         ON:sON+pON, 
-        bON, uON, sON, pON,
+        bON,  uON,  sON,  pON,
         bsON, usON, bpON, upON,
       }
 
     //fractionation of Organic Phosphorus (TP)
       let bsOP = 
-        this.mass_ratios.f_P_VFA /this.mass_ratios.f_CV_VFA *this.components.S_VFA +
-        this.mass_ratios.f_P_FBSO/this.mass_ratios.f_CV_FBSO*this.components.S_FBSO;
-      let usOP = this.mass_ratios.f_P_USO/this.mass_ratios.f_CV_USO*this.components.S_USO;
-      let bpOP = this.mass_ratios.f_P_BPO/this.mass_ratios.f_CV_BPO*this.components.X_BPO;
-      let upOP = this.mass_ratios.f_P_UPO/this.mass_ratios.f_CV_UPO*this.components.X_UPO;
+        co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA +
+        co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO;
+      let usOP = co.S_USO * mr.f_P_USO / mr.f_CV_USO;
+      let bpOP = co.X_BPO * mr.f_P_BPO / mr.f_CV_BPO;
+      let upOP = co.X_UPO * mr.f_P_UPO / mr.f_CV_UPO;
       let bOP = bsOP + bpOP;
       let uOP = usOP + upOP;
       let sOP = bsOP + usOP;
       let pOP = bpOP + upOP;
       let TP={
         total:Total_TP,
-        PO4:this.components.S_OP,
+        PO4:co.S_OP,
         OP:sOP+pOP,
-        bOP, uOP, sOP, pOP,
+        bOP,  uOP,  sOP,  pOP,
         bsOP, usOP, bpOP, upOP,
       };
 
     //fractionation of TSS (Total Supsended Solids)
-      let bVSS = this.components.X_BPO / this.mass_ratios.f_CV_BPO;
-      let uVSS = this.components.X_UPO / this.mass_ratios.f_CV_UPO;
+      let bVSS = co.X_BPO / mr.f_CV_BPO;
+      let uVSS = co.X_UPO / mr.f_CV_UPO;
       let TSS={
         total:Total_TSS,
-        iSS:this.components.X_iSS,
+        iSS:co.X_iSS,
         VSS:Total_VSS, 
         bVSS,
         uVSS,
@@ -209,7 +210,7 @@ class State_Variables {
     return {components, totals};
   }
 
-  //get reduced table (concentrations and fluxes combined)
+  //get summary table (concentrations and fluxes combined)
   get summary(){
     let totals = this.totals;
     let fluxes = this.fluxes;

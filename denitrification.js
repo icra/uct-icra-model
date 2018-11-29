@@ -112,9 +112,13 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 
   //calculate TOD wastage (TODw)
   const fCV_OHO = this.mass_ratios.f_CV_OHO;
-  const f_N_OHO = this.mass_ratios.f_N_OHO;
   const fCV_UPO = this.mass_ratios.f_CV_UPO;
+  const fCV_BPO = this.mass_ratios.f_CV_BPO;
+  const f_N_OHO = this.mass_ratios.f_N_OHO;
   const f_N_UPO = this.mass_ratios.f_N_UPO;
+  const f_N_BPO = this.mass_ratios.f_N_BPO;
+  const fH      = 0.20; //UPO OHO fraction
+
   let Qw     = nit.wastage.Q;                                                               //ML/d  | wastage flowrate
   let Nae    = nit.process_variables.Nae_fxt.value;                                         //mg/L  | effluent ammonia
   let f      = nit.as_process_variables.f.value;                                            //ø     | (1+RAS)/RAS (or 1 if we waste from reactor)
@@ -122,8 +126,15 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
   let X_EH   = nit.as_process_variables.MX_EH.value/Vp;                                     //kg/m3 | endogenous residue
   let X_I    = nit.as_process_variables.MX_I .value/Vp;                                     //kg/m3 | UPO
   let X_IO   = nit.as_process_variables.MX_IO.value/Vp;                                     //kg/m3 | iSS
+
   let sTODw  = Qw*(nit.wastage.totals.COD.sCOD + 4.57*(nit.wastage.totals.TKN.sON + Nae));  //kg/d  | soluble      TODw
-  let pTODw  = Qw*(f*((fCV_OHO+4.57*f_N_OHO)*(X_BH+X_EH)+(fCV_UPO+4.57*f_N_UPO)*X_I)*1000); //kg/d  | particulated TODw
+
+  let pTODw  = Qw*(
+    f*(
+      (fCV_BPO + 4.57*f_N_BPO)*(1-fH)*X_BH + 
+      (fCV_UPO + 4.57*f_N_UPO)*(fH*X_BH + X_EH + X_I) 
+    )*1000); //kg/d  | particulated TODw
+
   let TODw   = sTODw + pTODw;                                                               //kg/d  | total TOD in wastage
   let TODout = TODw + TODe + FOt + FOd;                                                     //kg/d  | total TOD out
   let TOD_balance = 100*TODout/TODi;                                                        //percentage
@@ -178,7 +189,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from, SF,fx
 
 /*test*/
 (function(){
-  return;
+  //return;
   //syntax--------------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
   let influent = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0);
   //as+n+dn syntax-----------------(T,  Vp,     Rs, RAS, waste_from, SF,   fxt,  DO,  pH,  IR,  DO_RAS, influent_alk)
