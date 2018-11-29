@@ -148,7 +148,16 @@
   <!--outputs-->
   <div id=outputs><div><strong>Outputs</strong></div>
     <!--summaries-->
-    <div><code onclick="toggle_visibility('#outputs #summaries')">[+] Summaries</code></div>
+    <div>
+      <code onclick="toggle_visibility('#outputs #summaries')">
+        [+] Summaries
+      </code>
+      <span>
+        <label onclick=""><input type=radio name=summary_units value=both checked> all </label>
+        <label onclick=""><input type=radio name=summary_units value=conc>         mg/L</label>
+        <label onclick=""><input type=radio name=summary_units value=flux>         kg/d</label>
+      </span>
+    </div>
     <div id=summaries style="display:"></div>
 
     <!--plant-->
@@ -329,24 +338,28 @@
     //dibuixa summaries (svs) en columnes
     (function draw_summaries(svs){
       if(Object.keys(svs).length==0)return;
-      let div = document.querySelector('div#summaries'); div.innerHTML=""; //buida div summaries
-      let table = document.createElement('table');div.appendChild(table);  //crea nova taula
-      let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML=""; //posa els noms de les variables d'estat
-      Object.keys(svs).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller>"+key.replace('_','<br>');});
+      let div   = document.querySelector('div#summaries'); div.innerHTML=""; //buida div summaries
+      let table = document.createElement('table');div.appendChild(table);    //crea nova taula
+      let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML="";   //posa els noms de les variables d'estat
+      Object.keys(svs).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller stream>"+key.replace('_','<br>');});
       //itera keys del primer objecte (Q,COD,TKN...)
       Object.keys(Object.values(svs)[0]).forEach(key=>{
         let newRow = table.insertRow(-1);
-        newRow.insertCell(-1).innerHTML=`${key} <span class=unit>${key=="Q"?"(ML/d)":"(mg/L, kg/d)"}</span>`;
+        if(key=="Q"){
+          newRow.insertCell(-1).innerHTML=`${key} <span class=unit>(ML/d)</span>`;
+        }else{
+          newRow.insertCell(-1).innerHTML=`${key} <span unit class=unit>(mg/L, kg/d)</span>`;
+        }
         //itera cada variable d'estat
         Object.entries(svs).forEach(([name,sv])=>{
           if(key=="Q"){
-            newRow.insertCell(-1).outerHTML="<td class=number colspan=2>"+format(sv[key]);
+            newRow.insertCell(-1).outerHTML="<td class=number colspan=2 flow>"+format(sv[key]);
           }else{
             let conc = format(sv[key][0]);
             let flux = format(sv[key][1]);
             if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc = flux = "<span style=color:#ccc>ø</span>"; }
-            newRow.insertCell(-1).outerHTML="<td class=number>"+conc;
-            newRow.insertCell(-1).outerHTML=`<td class=number><small>${flux}</small>`;
+            newRow.insertCell(-1).outerHTML="<td class=number conc>"+conc;
+            newRow.insertCell(-1).outerHTML=`<td class=number flux><small>${flux}</small>`;
           }
         });
       });
@@ -394,6 +407,38 @@
         newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
       });
     })();
+
+    //clica les unitats que toquen
+    document.querySelector('input[name=summary_units]:checked').click();
+  });
+
+  document.querySelectorAll('input[name=summary_units]').forEach(input=>{
+    input.addEventListener('click',function(){
+      let summaries = document.querySelector('#outputs #summaries');
+      switch(this.value){
+        case "conc": 
+          summaries.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
+          summaries.querySelectorAll('td[flux]').forEach(td=>td.style.display='none');
+          summaries.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
+          summaries.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
+          summaries.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L)");
+          break;
+        case "flux": 
+          summaries.querySelectorAll('td[conc]').forEach(td=>td.style.display='none');
+          summaries.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
+          summaries.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
+          summaries.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
+          summaries.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(kg/d)");
+          break;
+        case "both":
+          summaries.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
+          summaries.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
+          summaries.querySelectorAll('td[flow]').forEach(td=>td.colSpan=2);
+          summaries.querySelectorAll('td[stream]').forEach(td=>td.colSpan=2);
+          summaries.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L, kg/d)");
+          break;
+      }
+    });
   });
 
   //clica el botó RUN

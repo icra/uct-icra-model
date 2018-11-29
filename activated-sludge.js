@@ -218,7 +218,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from){
 
   //TODO
   let FOc_real = FSti - FSe - FSw;
-  console.log({FOc, FOc_real});
+  //console.log({FOc, FOc_real});
   FOc=FOc_real;
 
   let FSout       = FSe + FSw + FOc;             //kg/d | total COD out flux

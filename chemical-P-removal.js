@@ -36,10 +36,10 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
   //get PO4 effluent and PO4 removed
   let PO4e        = get_PO4_eff(Fe_P_mole_ratio); //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function below 'get_PO4_eff')
   PO4e            = Math.min(PO4i, PO4e);         //PO4e cannot be higher than PO4i (i.e. if mass of FeCl3 = 0)
-  let PO4_removed = PO4i - PO4e;                  //mg/L
+  let PO4_removed = Q*(PO4i - PO4e);              //kgP/d
 
   //get extra iSS sludge produced
-  let extra_iSS = Q*PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
+  let extra_iSS = PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
   //chemical P removal end-----------------------------------------------------------------
 
   //new iSS concentration TODO: move this iSS to the wastage
@@ -50,7 +50,7 @@ State_Variables.prototype.chemical_P_removal=function(mass_FeCl3){
     Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"molFe/molP", descr:"Fe/P mole ratio"},
     PO4i:            {value:PO4i,            unit:"mgP/L",      descr:"PO4 available"},
     PO4e:            {value:PO4e,            unit:"mgP/L",      descr:"PO4 effluent"},
-    PO4_removed:     {value:PO4_removed,     unit:"mgP/L",      descr:"Concentration of P removed"},
+    PO4_removed:     {value:PO4_removed,     unit:"kgP/d",      descr:"P removed"},
     extra_iSS:       {value:extra_iSS,       unit:"kgiSS/d",    descr:"iSS produced by FeCl3 coprecipitation"},
   };
 

@@ -2,11 +2,11 @@
 function format(number,digits){
   digits=digits||0;
   let abs_number = Math.abs(number);
-  if(abs_number< 100   )digits=2;
-  if(abs_number<  10   )digits=3;
-  if(abs_number<   1   )digits=4;
-  if(abs_number<   0.1 )digits=5;
-  if(abs_number<   0.01)digits=6;
+  if(abs_number< 100   )digits=1;
+  if(abs_number<  10   )digits=2;
+  if(abs_number<   1   )digits=3;
+  if(abs_number<   0.1 )digits=4;
+  if(abs_number<   0.01)digits=5;
   let str=new Intl.NumberFormat('en-EN',{maximumFractionDigits:digits}).format(number);
   return str;
 }
