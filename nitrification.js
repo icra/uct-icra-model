@@ -105,6 +105,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let FOc     = as.process_variables.FOc.value; //kg=/d
   let FOt_fxt = FOc + FOn_fxt; //kgO/d | total O demand if fxt <  fxm
   let FOt_fxm = FOc + FOn_fxm; //kgO/d | total O demand if fxt == fxm
+  let OUR_fxt = FOt_fxt*1000/(Vp*(1-fxt)*24); //mgO/L·h
+  let OUR_fxm = FOt_fxm*1000/(Vp*(1-fxm)*24); //mgO/L·h
 
   //page 475 4.14.22.3 book: calculate mass of nitrifiers
   let f_XBA = YAT*Rs/(1+bAT*Rs); //gVSS·d/gFSA
@@ -160,6 +162,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
     FOn_fxm  :{value:FOn_fxm,  unit:"kgO/d",       descr:"Nitrogenous Oxygen demand (if fxt = fxm)"},
     FOt_fxt  :{value:FOt_fxt,  unit:"kgO/d",       descr:"Total Oxygen demand (if fxt < fxm)"},
     FOt_fxm  :{value:FOt_fxm,  unit:"kgO/d",       descr:"Total Oxygen demand (if fxt = fxm)"},
+    OUR_fxt  :{value:OUR_fxt,  unit:"mgO/L·h",     descr:"Oxygen Uptake Rate (if fxt < fxm)"},
+    OUR_fxm  :{value:OUR_fxm,  unit:"mgO/L·h",     descr:"Oxygen Uptake Rate (if fxt = fxm)"},
   };
 
   //hide description (debug)
