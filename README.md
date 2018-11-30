@@ -12,7 +12,8 @@ Implemented by Lluís Bosch (lbosch@icra.cat).
 - Current DO "KO" constant value is 0.3 (µ = µ·DO/(DO + KO)). Ask george. Book says KO value is [0.3, 2.0].
 - Check again Rsm formula (page 471, equation 140 is -> Rsm = 1/(µApHT·(1-fxm) - bnT) )
 
-## Tasks
+## Lluís B tasks
+- refactoritzar chemical P removal i tots els exports de node
 - Write equations in pdf (file "formulas.ms")
 - Add errors in nitrification when: 
   - fxt > fxm
