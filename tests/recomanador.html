@@ -52,7 +52,7 @@
 
     //la variable combinacions ve definida 'recomanador.js' conté totes les combinacions sense filtrar
     //filtra les combinacinos que compleixen amb els limits
-    let solucions = combinacions.filter(obj=>(obj.NH4 && obj.NH4<0.5 && obj.PO4 && obj.PO4<0.5)); 
+    let solucions = combinacions.filter(obj=>(obj.NH4>0 && obj.NH4<0.5 && obj.PO4>0 && obj.PO4<0.5)); 
 
     //dibuixa taula de solucions
     let newRow=t.insertRow(-1);
