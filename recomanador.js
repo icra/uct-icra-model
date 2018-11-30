@@ -29,7 +29,7 @@ function run_model(influent, tram, conf, i, deg){
   //combina efluent depuradora i tram upstream
   let river_mixed = tram.state_variables.combine(as.effluent);
 
-  //final del tram de riu
+  //calcula concentració final del tram de riu
   let river_end = new State_Variables(
     river_mixed.Q,
     0, //VFA

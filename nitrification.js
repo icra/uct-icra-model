@@ -40,8 +40,9 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
   //nitrification starts at page 17
   //get necessary TKN fractions
-  let Nti   = frac.TKN.total; //mg/L | total TKN influent
-  let Nouse = frac.TKN.usON;  //mg/L | total N_USO_influent = N_USO_effluent
+  let Nti   = frac.TKN.total;              //mg/L | total TKN influent
+  let Nouse = frac.TKN.usON;               //mg/L | total N_USO_influent = N_USO_effluent
+  let Nobse = as.effluent.totals.TKN.bsON; //mg/L | total bsON (from FBSO not degraded)
 
   //get necessary variables from activated_sludge
   let MX_T = as.process_variables.MX_T.value; //kg   | total sludge produced
@@ -52,10 +53,10 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let µAmT  = µAm*Math.pow(1.123,T-20); //1/d | growth rate corrected by temperature
 
   //correct µA by DO (book page 468)
-  const K_O = 0.3;              //mgDO/L | nitrifier Oxygen sensitivity constant TODO current value does not turn off nitrification
+  const K_O = 0.5;              //mgDO/L | nitrifier Oxygen sensitivity constant TODO current value does not turn off nitrification
   let µAmO  = µAmT*DO/(DO+K_O); //1/d    | growth rate corrected by temperature and DO
 
-  //correct µA by pH inhibition
+  //correct µA by pH inhibition TODO no cal mostrar equacions
   const Ki   = 1.13; //page 471
   const Kii  = 0.3;  //page 471
   const Kmax = 9.5;  //page 471
@@ -78,7 +79,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Rsm = SF/(µAm_pH*(1-fxt) - bAT); //days
   //if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
 
-  //unaerated sludge (current and max)
+  //unaerated sludge (current and max) TODO no cal mostrar equacions
   let MX_T_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge
   let MX_T_fxm = fxm*MX_T; //kg TSS | max uneaerated sludge
 
@@ -87,12 +88,16 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Nae_fxm = KnT/(SF-1);                                 //mg/L as N | effluent ammonia concentration if fxt == fxm
 
   //effluent TKN nitrification -- page 18
-  let Nte_fxt = Nae_fxt + Nouse; //mg/L as N | effluent TKN concentration if fxt <  fxm
-  let Nte_fxm = Nae_fxm + Nouse; //mg/L as N | effluent TKN concentration if fxt == fxm
+  let Nte_fxt = Nae_fxt + Nouse + Nobse; //mg/L as N | effluent TKN concentration if fxt <  fxm
+  let Nte_fxm = Nae_fxm + Nouse + Nobse; //mg/L as N | effluent TKN concentration if fxt == fxm
 
   //nitrification capacity Nc
   let Nc_fxt = Nti - Ns - Nte_fxt; //mg/L as N | Nitrification capacity if fxt <  fxm
   let Nc_fxm = Nti - Ns - Nte_fxm; //mg/L as N | Nitrification capacity if fxt == fxm
+
+  //add nitrate coming from as TODO discuss with george
+  Nc_fxt += as.effluent.components.S_NOx;
+  Nc_fxm += as.effluent.components.S_NOx;
 
   //oxygen demand
   let FOn_fxt = 4.57*Q*Nc_fxt; //kgO/d | O demand if fxt <  fxm
@@ -103,9 +108,9 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
   //page 475 4.14.22.3 book: calculate mass of nitrifiers
   let f_XBA = YAT*Rs/(1+bAT*Rs); //gVSS·d/gFSA
-  let MX_BA = Q*Nc_fxt * f_XBA;  //kg VSS
+  let MX_BA = Q*Nc_fxt*f_XBA;    //kg VSS
   let X_BA  = MX_BA/Vp;          //kgVSS/m3
-  //end nitrification -----------------------------------
+  //end nitrification ---------------------
 
   //prepare nitrification outputs
   let Qe   = as.effluent.Q;                //ML/d
@@ -162,7 +167,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   return {
     process_variables,
     as_process_variables: as.process_variables,
-    cpr: as.cpr,
+    cpr:                  as.cpr,
     effluent,
     wastage,
   };
