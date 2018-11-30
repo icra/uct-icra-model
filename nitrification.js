@@ -142,6 +142,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
     KnT      :{value:KnT,      unit:"mg/L",        descr:"Half saturation constant corrected by temperature"},
     bAT      :{value:bAT,      unit:"1/d",         descr:"Growth rate corrected by temperature"},
     f_XBA    :{value:f_XBA,    unit:"gVSS·d/gCOD", descr:"Nitrifiers Biomass production rate"},
+    MX_BA    :{value:MX_BA,    unit:"kgVSS",       descr:"Mass of Nitrifiers"},
+    X_BA     :{value:X_BA,     unit:"kgVSS/m3",    descr:"Concentration of Nitrifiers"},
     fxt      :{value:fxt,      unit:"ø",           descr:"Current unaerated sludge mass fraction"},
     fxm      :{value:fxm,      unit:"ø",           descr:"Maximum design unaerated sludge mass fraction"},
     Rs       :{value:Rs ,      unit:"d",           descr:"Current sludge age"},
@@ -158,8 +160,6 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
     FOn_fxm  :{value:FOn_fxm,  unit:"kgO/d",       descr:"Nitrogenous Oxygen demand (if fxt = fxm)"},
     FOt_fxt  :{value:FOt_fxt,  unit:"kgO/d",       descr:"Total Oxygen demand (if fxt < fxm)"},
     FOt_fxm  :{value:FOt_fxm,  unit:"kgO/d",       descr:"Total Oxygen demand (if fxt = fxm)"},
-    MX_BA    :{value:MX_BA,    unit:"kgVSS",       descr:"Mass of Nitrifiers"},
-    X_BA     :{value:X_BA,     unit:"kgVSS/m3",    descr:"Concentration of Nitrifiers"},
   };
 
   //hide description (debug)
