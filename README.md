@@ -5,19 +5,19 @@ Model backend for Ecoadvisor project. Coded in Javascript without dependencies.
 Steady state model by George Ekama.
 Implemented by Lluís Bosch (lbosch@icra.cat).
 
-## Lluís B. tasks (ordered by priority)
-- write equations in pdf (file "formulas.ms")
-- integrate constants.js to the code
-- add errors in nitrification when: 
-  - fxt > fxm
-  - Rs  < Rsm
-
 ## doubts/pending
 - SF value in nitrification (affects fxm, Rsm, Nae-fxm): Lluís C. does not like it.
 - input (nitrate, NOx) ask george. TOD balance not closing.
 - why is kg of FeCl3 added is not equal to the extra iSS produced (for example 3000 kg FeCl3 produces 2500 kg iSS. The remaining 500 kg is Cl(-) ion?). Ask george.
 - current DO "KO" constant value is 0.3 (µ = µ·DO/(DO + KO)). Ask george. Book says KO value is [0.3, 2.0]. Which one I keep?
 - check again Rsm formula (page 471, equation 140 is -> Rsm = 1/(µApHT·(1-fxm) - bnT) )
+
+## Lluís B. tasks (ordered by priority)
+- integrate constants.js to the code
+- add errors in nitrification when: 
+  - fxt > fxm
+  - Rs  < Rsm
+- write equations in pdf (file "formulas.ms")
 
 ## Future
 - add energy consumption module
