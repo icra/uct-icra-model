@@ -1,14 +1,14 @@
 /*RECOMANADOR*/
 
 //import files
-if(typeof document == "undefined"){
-  State_Variables = require('./state-variables.js');    //class State_Variables
-  Tram            = require('./tram.js');               //class Tram
-                    require('./primary-settler.js');    //tecnologia primary_settler    (dins de State Variables)
-                    require('./activated-sludge.js');   //tecnologia activated_sludge   (dins de State Variables)
-                    require('./nitrification.js');      //tecnologia nitrification      (dins de State Variables)
-                    require('./denitrification.js');    //tecnologia denitrification    (dins de State Variables)
-}
+try{
+  State_Variables = require('./state-variables.js');  //class State_Variables
+  Tram            = require('./tram.js');             //class Tram
+                    require('./primary-settler.js');  //tecnologia primary_settler  (dins de State Variables)
+                    require('./activated-sludge.js'); //tecnologia activated_sludge (dins de State Variables)
+                    require('./nitrification.js');    //tecnologia nitrification    (dins de State Variables)
+                    require('./denitrification.js');  //tecnologia denitrification  (dins de State Variables)
+}catch(e){}
 
 //run model 1 vegada
 function run_model(influent, tram, conf, i, deg){

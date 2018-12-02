@@ -7,10 +7,10 @@
 */
 
 //import files
-if(typeof document == "undefined"){
+try{
   State_Variables=require("./state-variables.js");
   require("./activated-sludge.js");
-}
+}catch(e){}
 
 State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH){
   /*inputs and default values*/
@@ -124,9 +124,6 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let BPO_was = as.wastage.components.X_BPO; //mg/L | BPO concentration
   let UPO_was = as.wastage.components.X_UPO; //mg/L | UPO concentration
   let iSS_was = as.wastage.components.X_iSS; //mg/L | iSS concentration
-  //ask george TODO if we should add BPO of ANOs
-  //ask george TODO if we should add UPO of ANOs
-  //ask george TODO if we should add iSS of ANOs
 
   //FBSO from previous step
   let S_b = as.effluent.components.S_FBSO; //mg/L of bCOD not degraded
@@ -179,13 +176,11 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
 /*test*/
 (function(){
-  return;
-  //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
+  return
+  //new influent---------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  );
-  //syntax-------------------(T   Vp      Rs  RAS  waste      mass_FeCl3, SF    fxt   DO   pH)
+  //call as+nit--------------(T   Vp      Rs  RAS  waste      mass_FeCl3, SF    fxt   DO   pH)
   let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,       1.25, 0.39, 2.0, 7.2);
-  //console.log(nit.effluent.components);
-  //return;
   //print results
   console.log(nit.process_variables);
   console.log(nit.as_process_variables);

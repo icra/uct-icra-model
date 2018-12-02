@@ -77,18 +77,16 @@ class Tram {
   };
 }
 
-//node imports and exports
-if(typeof document == "undefined"){
+//imports and exports
+try{
   State_Variables=require("./state-variables.js");
   module.exports=Tram;
-}
+}catch(e){}
 
 //test valors Vicenç Acuña (vacuna@icra.cat)
 (function(){
-  return;
+  return
   //sintaxi:  Tram(wb, wt, Db, S,     n,      Li,   Di)
   let t = new Tram(3,  6,  2,  0.005, 0.0358, 1000, 1.2);
-  //recorre variables d'estat (fluxes màssics) i calcula massa final
-  t.state_variables.Q = 25;
-  t.state_variables.set('S_VFA',10);
+  console.log(t.resultats);
 })();

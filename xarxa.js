@@ -100,15 +100,15 @@ class Xarxa {
   }
 }
 
-//node imports and exports
-if(typeof document == "undefined"){
+//imports and exports
+try{
+  Tram=require("./tram.js");
   module.exports=Xarxa;
-}
+}catch(e){}
 
 /*test: exemples xarxes de trams*/
 (function(){
-  return;
-  const Tram=require("./tram.js"); 
+  return
   //2 exemples de xarxes
   {/* Exemple 1:
     t1--+

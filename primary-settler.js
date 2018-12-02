@@ -1,14 +1,13 @@
 /*
   Primary settler implementation from G. Ekama notes
   Removal % of the particulated fractions: BPO, UPO and iSS
-
   Qi → [Primary Settler] → Qe
               ↓
               Qw
 */
 
 //import files
-if(typeof document == "undefined"){ State_Variables = require("./state-variables.js"); }
+try{State_Variables=require("./state-variables.js");}catch(e){}
 
 State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO, removal_iSS){
   //inputs and default values
@@ -69,7 +68,7 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
 
 //test
 (function test(){
-  return;
+  return
   let inf = new State_Variables(); //use default values
   let pst = inf.primary_settler(); //use default values
   //show info

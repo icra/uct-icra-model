@@ -246,8 +246,8 @@ class State_Variables {
   }
 }
 
-//node export
-if(typeof document == "undefined"){module.exports=State_Variables;}
+//export
+try{module.exports=State_Variables;}catch(e){}
 
 /*test*/
 (function(){

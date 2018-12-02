@@ -7,10 +7,10 @@
 */
 
 //import files
-if(typeof document == "undefined"){
+try{
   State_Variables=require("./state-variables.js");
   require("./nitrification.js");
-}
+}catch(e){}
 
 State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3, SF,fxt,DO,pH, IR,DO_RAS,influent_alk){
   /*inputs and default values*/
@@ -192,7 +192,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
 /*test*/
 (function(){
-  return;
+  return
   //syntax--------------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
   let influent = new State_Variables(24.875, 50,  115,  255, 10,  45,  15,  39.1, 7.28, 0);
   //as+n+dn syntax-----------------(T,  Vp,     Rs, RAS, waste_from, mass_FeCl3, SF,   fxt,  DO,  pH,  IR,  DO_RAS, influent_alk)

@@ -16,6 +16,16 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   const M_FeH2PO4OH = 250.9646; //g/mol ((Fe)(1.6)(H2PO4)(OH)(3.8) molecular weight)
   const M_FeOH3     = 106.866;  //g/mol (FeOH3 molecular weight)
 
+  //get moles of P available in PO4
+  let moles_P = Q*PO4i*1000/M_P; //moles/d of P
+
+  //convert kg/d of FeCl3 to moles of Fe
+  let mass_Fe  = M_Fe/M_FeCl3*mass_FeCl3; //kg/d of Fe
+  let moles_Fe = mass_Fe*1000/M_Fe;       //moles/d Fe
+
+  //get Fe/P mole ratio
+  let Fe_P_mole_ratio = moles_Fe/moles_P; //mol_Fe/mol_P
+
   //get the PO4 effluent concentration from the Fe/P mole ratio
   //Fig 6-13, page 484, M&EA, 5th ed
   function get_PO4_eff(Fe_P_mole_ratio){
@@ -84,16 +94,6 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
     }
   };
 
-  //get moles of P available in PO4
-  let moles_P = Q*PO4i*1000/M_P; //moles/d of P
-
-  //convert kg/d of FeCl3 to moles of Fe
-  let mass_Fe  = M_Fe/M_FeCl3*mass_FeCl3; //kg/d of Fe
-  let moles_Fe = mass_Fe*1000/M_Fe;       //moles/d Fe
-
-  //get Fe/P mole ratio
-  let Fe_P_mole_ratio = moles_Fe/moles_P; //mol_Fe/mol_P
-
   //get PO4 effluent and PO4 removed
   let PO4e        = get_PO4_eff(Fe_P_mole_ratio); //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function below 'get_PO4_eff')
   PO4e            = Math.min(PO4i, PO4e);         //PO4e cannot be higher than PO4i (i.e. if mass of FeCl3 = 0)
@@ -101,7 +101,6 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
 
   //get extra iSS sludge produced
   let extra_iSS = PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
-  //chemical P removal end---------------------------------------------------------------
 
   //return cpr process variables
   return {
