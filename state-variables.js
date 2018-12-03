@@ -47,7 +47,7 @@ class State_Variables {
       S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | inorganic nitrite and nitrate (NO2 + NO3) (not part of TKN)
     };
     this.mass_ratios={
-      /* mass ratios for COD, C, N, P vs:
+      /* mass ratios of VSS to: COD, C, N, P for:
         -  BPO       (biodegradable    particulate  organics)
         -  VFA+FBSO  (biodegradable    soluble      organics)
         -  UPO       (unbiodegradable  particulate  organics)

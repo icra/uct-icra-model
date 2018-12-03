@@ -178,7 +178,7 @@
 
     <!--export-->
     <div><code onclick="toggle_visibility('#outputs #export')">[+] Export</code></div>
-    <textarea id=export style="display:none;width:50%;height:200px"></textarea>
+    <textarea id=export style="display:none;width:100%;height:200px"></textarea>
   </div>
 </div>
 
@@ -461,6 +461,9 @@
     document.querySelectorAll('#inputs select[id]').forEach(select=>{
       newUrl += `${select.id}=${select.value}&`;
     });
+    //delete last '&' character
+    newUrl = newUrl.substring(0,newUrl.length-1);
+    //write newUrl to GUI
     document.querySelector('#outputs #export').value=newUrl;
   });
 
