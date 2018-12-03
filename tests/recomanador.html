@@ -24,38 +24,39 @@
   <script src="../recomanador.js"></script>
 </head>
 
+<!--gui-->
 <h2>Recomanador</h2>
 <div>
-  <table border=1 style=font-size:smaller>
+  <table id=info border=1 style=font-size:smaller>
     <tr><th colspan=5>Execució del model amb variació del següents paràmetres:
     <tr><th>Input                 <th>Unitat <th>Valors provats <th>Descripció
-    <tr><td>Rs                    <td>d      <td>[6 - 40]       <td>Temps de residència
-    <tr><td>RAS                   <td>ø      <td>[0.75 - 1.25]  <td>Ratio recirculació externa
-    <tr><td>DO                    <td>mgO/L  <td>[1.00 - 2.50]  <td>Oxigen dissolt al reactor
-    <tr><td>mass FeCl<sub>3</sub> <td>kg/d   <td>[500 - 600]    <td>Clorur fèrric afegit (eliminació fosfat)
+    <tr><td>Rs                    <td>d     <td id=Rs         >[6 - 40]      <td>Temps de residència
+    <tr><td>RAS                   <td>ø     <td id=RAS        >[0.75 - 1.25] <td>Ratio recirculació externa
+    <tr><td>DO                    <td>mgO/L <td id=DO         >[1.00 - 2.50] <td>Oxigen dissolt al reactor
+    <tr><td>mass FeCl<sub>3</sub> <td>kg/d  <td id=mass_FeCl3 >[500 - 600]   <td>Clorur fèrric afegit (eliminació fosfat)
     <tr><th>Output                <th>Unitat <th>Valor desitjat <th>Descripció
-    <tr><td>FOt                   <td>kgO/d  <td>               <td>Demanda total d'oxigen
-    <tr><td>TSS                   <td>kg/d   <td>               <td>Producció de fangs total
-    <tr><td>NH<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Amoni al final del riu
-    <tr><td>PO<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Fosfat al final del riu
+    <tr><td>FOt                   <td>kgO/d  <td>               <td>Demanda total oxigen
+    <tr><td>TSS                   <td>kg/d   <td>               <td>Producció fangs total
+    <tr><td>NH<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Amoni  final riu
+    <tr><td>PO<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Fosfat final riu
   </table>
 </div>
 <button id=run style="margin:5px 0;font-size:18px">Generar combinacions</button>
 <table id=combinacions border=1></table>
 
-<!--recomanador-->
+<!--recomanador backend-->
 <script>
   //GET inputs from URL
   try{
-    let url        = new URL(window.location.href);
-    let influent   = JSON.parse(url.searchParams.get('influent'));
-    let tram       = JSON.parse(url.searchParams.get('tram'));
-    let conf       = JSON.parse(url.searchParams.get('conf'));
-    let inputs     = JSON.parse(url.searchParams.get('inputs'));
-    let deg        = JSON.parse(url.searchParams.get('deg'));
-    let variacions = JSON.parse(url.searchParams.get('variacions'));
+    let url      = new URL(window.location.href);
+    let influent = JSON.parse(url.searchParams.get('influent'));   //array  | influent inputs (Q, VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx)
+    let tram     = JSON.parse(url.searchParams.get('tram'));       //array  | river    inputs (wb, wt, Db, S, n, Li, Di, Ti)
+    let conf     = JSON.parse(url.searchParams.get('conf'));       //object | example {pst:false, nit:true, dn:true, cpr:true, river:true}
+    let inputs   = JSON.parse(url.searchParams.get('inputs'));     //object | wwtp parameters {fw,removal_BPO,removal_UPO,removal_iSS,T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH,IR,DO_RAS,influent_alk}
+    let deg      = JSON.parse(url.searchParams.get('deg'));        //object | river degradation { R_20:{NH4,PO4}, k:{NH4,PO4} }
+    variacions   = JSON.parse(url.searchParams.get('variacions')); //object | variations of wwtp parameters. example [Rs:[1,2],RAS:[2,3]]
 
-    //run simulations again
+    //run n simulations
     combinacions = run_simulacions(
       new State_Variables(...influent), 
       new Tram(...tram), 
@@ -64,6 +65,11 @@
       deg,
       variacions,
     );
+
+    //draw parameter variations
+    Object.entries(variacions).forEach(([key,arr])=>{
+      document.querySelector(`#info #${key}`).innerHTML=`[${arr.join(', ')}]`;
+    });
   }catch(e){console.log(e);}
 
   //click run button listener
@@ -71,27 +77,33 @@
     //taula combinacions
     let t = document.querySelector("#combinacions"); t.innerHTML="";
 
-    //la variable combinacions ve definida 'recomanador.js' conté totes les combinacions sense filtrar
+    //la variable combinacions ve definida 'recomanador.js' conté TOTES les combinacions sense filtrar
     //filtra les combinacinos que compleixen amb els limits
-    let solucions = combinacions.filter(obj=>(obj.NH4>0 && obj.NH4<0.5 && obj.PO4>0 && obj.PO4<0.5 && obj.errors.length>-1)); 
+    let solucions = combinacions.filter(obj=>(
+      obj.NH4>0 && obj.NH4<0.5 &&  //limits NH4
+      obj.PO4>0 && obj.PO4<0.5 &&  //limits PO4
+      obj.errors.length==0         //errors allowed (max value: 2 (Rsm and fxm related)
+    )); 
 
-    //dibuixa taula de solucions
+    /*dibuixa taula solucions*/
+
+    //nombre de solucions vs combinacions
     let newRow=t.insertRow(-1);
     newRow.insertCell(-1).outerHTML=`<th colspan=16>Veient ${solucions.length} solucions (NH<sub>4</sub><0.5 & PO<sub>4</sub><0.5) de ${combinacions.length} combinacions provades`;
     if(solucions.length==0)return;
 
-    //escriu headers columnes
+    //headers columnes
     newRow=t.insertRow(-1);Object.keys(solucions[0]).forEach(key=>{newRow.insertCell(-1).outerHTML="<th>"+key.prettifyUnit();});
 
     //itera solucions
     solucions.forEach((obj,i)=>{
       let newRow = t.insertRow(-1);
       newRow.setAttribute('combinacio',i);
+      newRow.title=`combinacio ${i+1}`;
       Object.entries(obj).forEach(([key,val])=>{
         if(typeof(val)=='object'){
-          newRow.insertCell(-1).innerHTML=val.join(', ');
-        }
-        else{
+          newRow.insertCell(-1).innerHTML=val.join(', '); //mostra els errors
+        }else{
           newRow.insertCell(-1).outerHTML=`<td key=${key} value=${val}>${format(val)}`;
         }
       });

@@ -294,20 +294,20 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 (function(){
   return
   //new influent
-  //syntax---------------------(Q,      VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
-  let inf = new State_Variables(24.875, 50,  115,  255,  10,  45,  15, 39.1, 7.28, 0  ); //settled ww
+  //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
+  let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  ); //settled ww
   //apply AS wasting from {reactor, sst}
   let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000); //AS wasting from the reactor
   let as_sst = inf.activated_sludge(16, 8473.3, 15, 1.0, 'sst',     3000); //AS wasting from the sst
   //show results
-  //console.log("=== Influent");             console.log(inf.summary);
+  console.log("=== Influent");               console.log(inf.summary);
   console.log("=== AS process variables");   console.log(as_rea.process_variables);
   console.log("=== AS chemical P removal "); console.log(as_rea.cpr);
-  return;
-  ////=== waste from reactor
+  return
+  //=== waste from reactor
   console.log("=== Effluent summary (waste from reactor)"); console.log(as_rea.effluent.summary);
   console.log("=== Wastage summary (waste from reactor)");  console.log(as_rea.wastage.summary);
-  ////=== waste from sst
+  //=== waste from sst
   console.log("=== Effluent summary (waste from sst)");     console.log(as_sst.effluent.summary);
   console.log("=== Wastage summary (waste from sst)");      console.log(as_sst.wastage.summary);
 })();

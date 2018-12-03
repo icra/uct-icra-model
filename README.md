@@ -10,13 +10,11 @@ Implemented by Lluís Bosch (lbosch@icra.cat).
 - input (nitrate, NOx) ask george. TOD balance not closing.
 - why is kg of FeCl3 added is not equal to the extra iSS produced (for example 3000 kg FeCl3 produces 2500 kg iSS. The remaining 500 kg is Cl(-) ion?). Ask george.
 - current DO "KO" constant value is 0.3 (µ = µ·DO/(DO + KO)). Ask george. Book says KO value is [0.3, 2.0]. Which one I keep?
-- check again Rsm formula (page 471, equation 140 is -> Rsm = 1/(µApHT·(1-fxm) - bnT) )
+- confirm again Rsm formula (page 471, equation 140 is -> Rsm =  1/(µApHT·(1-fxm) - bnT) )
+                                                    or -> Rsm = SF/(µApHT·(1-fxm) - bnT) )
 
 ## Lluís B. tasks (ordered by priority)
 - integrate constants.js to the code
-- add errors in nitrification when: 
-  - fxt > fxm
-  - Rs  < Rsm
 - write equations in pdf (file "formulas.ms")
 
 ## Future
@@ -28,6 +26,7 @@ Implemented by Lluís Bosch (lbosch@icra.cat).
 - [gui] generate links for fase1.html
 - [river] R20 and k for NH4 and PO4
 - [river] names S-OP and S-FSA to PO4 and NH4 in the interface only
+- [as model] add errors in nitrification when: (1) fxt > fxm, (2) Rs  < Rsm
 - [as model] add incomplete BOD removal
 - [as model] mass of nitrifiers (MX-BA) no worry about it (<3% of MX-T)
 - [as model] anoxic volume (fxt related)

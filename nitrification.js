@@ -73,11 +73,14 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //page 17
   //maximum design unaerated sludge mass fraction
   let fxm = 1 - SF*(bAT+1/Rs)/µAm_pH; //ø
-  //if(fxt>fxm) throw `The mass of unaerated sludge (fxt=${fxt}) cannot be higher than fxm (${fxm})`;
 
   //minimum sludge age for nitrification (Rsm)
-  let Rsm = SF/(µAm_pH*(1-fxt) - bAT); //days
-  //if(Rs<Rsm) throw `The sludge age (Rs=${Rs}) cannot be lower than the minimum sludge age (Rsm=${Rsm})`;
+  let Rsm = 1/(µAm_pH*(1-fxt)-bAT); //days
+
+  //compile Rsm and fxm errors
+  let errors = [];
+  if(Rs  < Rsm) errors.push("Rs  < Rsm");
+  if(fxt > fxm) errors.push("fxt > fxm");
 
   //unaerated sludge (current and max) TODO no cal mostrar equacions
   let MX_T_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge
@@ -129,9 +132,9 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let S_b = as.effluent.components.S_FBSO; //mg/L of bCOD not degraded
 
   //create output state variables (effluent, wastage)
-  //syntax--------------------------(Q,  VFA, FBSO, BPO,     UPO,     USO,  iSS,     FSA,     PO4, NOx)
-  let effluent = new State_Variables(Qe, 0,   S_b,  0,       0,       Suse, 0,       Nae_fxt, Pse, Nc_fxt);
-  let wastage  = new State_Variables(Qw, 0,   S_b,  BPO_was, UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nc_fxt);
+  //syntax--------------------------(Q   VFA FBSO BPO      UPO      USO   iSS      FSA      PO4  NOx)
+  let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae_fxt, Pse, Nc_fxt);
+  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nc_fxt);
 
   //pack nitrification process variables
   let process_variables={
@@ -162,11 +165,6 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
     OUR_fxt  :{value:OUR_fxt,  unit:"mgO/L·h",     descr:"Oxygen Uptake Rate (if fxt < fxm)"},
     OUR_fxm  :{value:OUR_fxm,  unit:"mgO/L·h",     descr:"Oxygen Uptake Rate (if fxt = fxm)"},
   };
-
-  //errors
-  let errors = [];
-  if(Rs  < Rsm) errors.push("Rs  < Rsm");
-  if(fxt > fxm) errors.push("fxt > fxm");
 
   //hide description (debug)
   //Object.values(process_variables).forEach(obj=>delete obj.descr);

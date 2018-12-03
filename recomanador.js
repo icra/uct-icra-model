@@ -2,12 +2,13 @@
 
 //import files
 try{
-  State_Variables = require('./state-variables.js');  //class State_Variables
-  Tram            = require('./tram.js');             //class Tram
-                    require('./primary-settler.js');  //tecnologia primary_settler  (dins de State Variables)
-                    require('./activated-sludge.js'); //tecnologia activated_sludge (dins de State Variables)
-                    require('./nitrification.js');    //tecnologia nitrification    (dins de State Variables)
-                    require('./denitrification.js');  //tecnologia denitrification  (dins de State Variables)
+  State_Variables = require('./state-variables.js');    //class State_Variables
+  Tram            = require('./tram.js');               //class Tram
+                    require('./primary-settler.js');    //tecnologia primary_settler  (dins de State Variables)
+                    require('./activated-sludge.js');   //tecnologia activated_sludge (dins de State Variables)
+                    require('./nitrification.js');      //tecnologia nitrification    (dins de State Variables)
+                    require('./denitrification.js');    //tecnologia denitrification  (dins de State Variables)
+                    require('./chemical-P-removal.js'); //tecnologia chemical P rem   (dins de State Variables)
 }catch(e){}
 
 //run model 1 vegada
@@ -38,8 +39,8 @@ function run_model(influent, tram, conf, i, deg){
     0, //UPO
     0, //USO
     0, //iSS
-    tram.Mf(river_mixed.components.S_FSA, deg.R_20.NH4, deg.k.NH4), //FSA
-    tram.Mf(river_mixed.components.S_OP,  deg.R_20.PO4, deg.k.PO4), //OP
+    tram.Mf(river_mixed.components.S_FSA, deg.R_20.NH4, deg.k.NH4), //FSA (NH4)
+    tram.Mf(river_mixed.components.S_OP,  deg.R_20.PO4, deg.k.PO4), //OP  (PO4)
     0, //NOx
   );
 
@@ -55,24 +56,24 @@ function run_model(influent, tram, conf, i, deg){
   let NH4 = river_end.components.S_FSA;                     //mgN/L NH4 at river end
   let PO4 = river_end.components.S_OP;                      //mgP/L PO4 al river end
 
-  let results={
-    FOt, //kgO/d
-    TSS, //kgTSS/d
-    NH4, //mgN/L
-    PO4, //mgP/L
-    errors: as.errors,
+  //results
+  return {
+    FOt,               //kgO/d
+    TSS,               //kgTSS/d
+    NH4,               //mgN/L
+    PO4,               //mgP/L
+    errors: as.errors, //errors  (Rs<Rsm  and/or  fxt>fxm)
   };
-  return results;
 }
 
 //run model n vegades
 function run_simulacions(influent, tram, conf, i, deg, variacions){
-  console.log({influent,tram,conf,i,deg});
+  console.log({influent:influent.components,tram,conf,i,deg});
+  let combinacions = []; //return value | totes les combinacions fetes
 
-  let combinacions = []; //totes les combinacions fetes
-
+  //recursive variations
   function itera_variacions(variacions, j){
-    j = j || 0;
+    j = j || 0; //int
 
     let keys = Object.keys(variacions);
     if(j>=keys.length){
@@ -95,26 +96,26 @@ function run_simulacions(influent, tram, conf, i, deg, variacions){
     }
 
     let key = keys[j];
-
     variacions[key].forEach(n=>{
       i[key]=n;
       itera_variacions(variacions, j+1);
     });
-  }
-
+  };
   itera_variacions(variacions);
 
+  //end simulations
   console.log(`simulacions_fetes: ${combinacions.length}`);
   return combinacions;
 };
 
 /*test*/
-let combinacions; //global perquè siguii accessible a DOM
+let combinacions; //global so is accessible to DOM
+let variacions;   //global so is accessible to DOM
 (function(){
-  return;
+  return
+
   //crea un influent--------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0  );
-  //unitats-----------------------(ML/d---------------------mg/L-----------------)
 
   //configuració edar
   let conf={pst:false, nit:true, dn:true, cpr:true, river:true};
@@ -140,9 +141,8 @@ let combinacions; //global perquè siguii accessible a DOM
     influent_alk : 250,       //mg/L  | DN  | influent alkalinity (mg/L CaCO3)
   };
 
-  //tram upstream--(wb,     wt,     Db,       S,         n,         Li,   Di,  Ti)
-  let tram=new Tram(25.880, 62.274, 18.45841, 0.0010055, 0.0358,    2000, 0.6, 15);
-  //unitats--------(m,      m,      m,        m/m,       s/m^(1/3), m,    m,   ºC)
+  //tram upstream--(wb      wt      Db        S          n       Li    Di   Ti)
+  let tram=new Tram(25.880, 62.274, 18.45841, 0.0010055, 0.0358, 2000, 0.6, 15);
 
   //degradació riu paràmetres
   let deg={
@@ -150,7 +150,8 @@ let combinacions; //global perquè siguii accessible a DOM
     k    :{ NH4:1,         PO4:1         },
   };
 
-  let variacions={
+  //recursive wwtp parameter variations for each simulation run
+  variacions={
     Rs:        [6,    8,    10,   12,   15,   20,  25, 30, 40 ], //d
     RAS:       [0.75, 0.85, 0.95, 1.05, 1.15, 1.25            ], //ø
     DO:        [1.00, 1.50, 2.00, 2.50                        ], //mgO/L

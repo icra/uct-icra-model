@@ -35,7 +35,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
 
   //execute as+nit
-  let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH); //Object{process_variables, as_process_variables, effluent, wastage}
+  let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH); //object
 
   //get fractionations
   let inf_frac = this.totals;         //object | influent fractionation
@@ -149,9 +149,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let UPO_was = nit.wastage.components.X_UPO; //mg/L | UPO concentration
   let iSS_was = nit.wastage.components.X_iSS; //mg/L | iSS concentration
 
-  //create output streams---------->(Q,  VFA, FBSO, BPO,     UPO,     USO,  iSS,     FSA, PO4, NOx)
-  let effluent = new State_Variables(Qe, 0,   S_b,  0,       0,       Suse, 0,       Nae, Pse, Nne);
-  let wastage  = new State_Variables(Qw, 0,   S_b,  BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne);
+  //create output streams---------->(Q   VFA FBSO BPO      UPO      USO   iSS      FSA  PO4  NOx)
+  let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae, Pse, Nne);
+  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne);
 
   //denitrification results
   let process_variables = {
