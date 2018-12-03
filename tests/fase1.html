@@ -452,9 +452,14 @@
   //generate URL with current inputs
   document.querySelector('button#run').addEventListener('click',function(){
     let newUrl = url.origin + url.pathname + '?'; //new url with all current inputs
+    //get <input> elements
     document.querySelectorAll('#inputs input[id]').forEach(input=>{
       if(input.type=='checkbox') input.value = input.checked;
       newUrl += `${input.id}=${input.value}&`;
+    });
+    //get <select> elements
+    document.querySelectorAll('#inputs select[id]').forEach(select=>{
+      newUrl += `${select.id}=${select.value}&`;
     });
     document.querySelector('#outputs #export').innerHTML=newUrl;
   });
