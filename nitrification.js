@@ -163,12 +163,18 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
     OUR_fxm  :{value:OUR_fxm,  unit:"mgO/L·h",     descr:"Oxygen Uptake Rate (if fxt = fxm)"},
   };
 
+  //errors
+  let errors = [];
+  if(Rs  < Rsm) errors.push("Rs  < Rsm");
+  if(fxt > fxm) errors.push("fxt > fxm");
+
   //hide description (debug)
   //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     as_process_variables: as.process_variables,
     cpr:                  as.cpr,
+    errors,
     effluent,
     wastage,
   };

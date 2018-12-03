@@ -185,6 +185,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     nit_process_variables: nit.process_variables,
     as_process_variables:  nit.as_process_variables,
     cpr:                   nit.cpr,
+    errors:                nit.errors,
     effluent,
     wastage,
   };

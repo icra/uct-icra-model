@@ -47,19 +47,22 @@
 <script>
   //GET inputs from URL
   try{
-    let url      = new URL(window.location.href);
-    let influent = JSON.parse(url.searchParams.get('influent'));
-    let tram     = JSON.parse(url.searchParams.get('tram'));
-    let conf     = JSON.parse(url.searchParams.get('conf'));
-    let inputs   = JSON.parse(url.searchParams.get('inputs'));
-    let deg      = JSON.parse(url.searchParams.get('deg'));
+    let url        = new URL(window.location.href);
+    let influent   = JSON.parse(url.searchParams.get('influent'));
+    let tram       = JSON.parse(url.searchParams.get('tram'));
+    let conf       = JSON.parse(url.searchParams.get('conf'));
+    let inputs     = JSON.parse(url.searchParams.get('inputs'));
+    let deg        = JSON.parse(url.searchParams.get('deg'));
+    let variacions = JSON.parse(url.searchParams.get('variacions'));
+
     //run simulations again
     combinacions = run_simulacions(
       new State_Variables(...influent), 
       new Tram(...tram), 
       conf,
       inputs, 
-      deg
+      deg,
+      variacions,
     );
   }catch(e){console.log(e);}
 
@@ -70,7 +73,7 @@
 
     //la variable combinacions ve definida 'recomanador.js' conté totes les combinacions sense filtrar
     //filtra les combinacinos que compleixen amb els limits
-    let solucions = combinacions.filter(obj=>(obj.NH4>0 && obj.NH4<0.5 && obj.PO4>0 && obj.PO4<0.5)); 
+    let solucions = combinacions.filter(obj=>(obj.NH4>0 && obj.NH4<0.5 && obj.PO4>0 && obj.PO4<0.5 && obj.errors.length>-1)); 
 
     //dibuixa taula de solucions
     let newRow=t.insertRow(-1);
@@ -85,7 +88,12 @@
       let newRow = t.insertRow(-1);
       newRow.setAttribute('combinacio',i);
       Object.entries(obj).forEach(([key,val])=>{
-        newRow.insertCell(-1).outerHTML=`<td key=${key} value=${val}>${format(val)}`;
+        if(typeof(val)=='object'){
+          newRow.insertCell(-1).innerHTML=val.join(', ');
+        }
+        else{
+          newRow.insertCell(-1).outerHTML=`<td key=${key} value=${val}>${format(val)}`;
+        }
       });
     });
   });

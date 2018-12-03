@@ -284,6 +284,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   return {
     process_variables,
     cpr,
+    errors:[], //no error checking in AS
     effluent, 
     wastage,
   };

@@ -60,49 +60,58 @@ function run_model(influent, tram, conf, i, deg){
     TSS, //kgTSS/d
     NH4, //mgN/L
     PO4, //mgP/L
+    errors: as.errors,
   };
   return results;
 }
 
 //run model n vegades
-function run_simulacions(influent, tram, conf, i, deg){
+function run_simulacions(influent, tram, conf, i, deg, variacions){
   console.log({influent,tram,conf,i,deg});
 
   let combinacions = []; //totes les combinacions fetes
 
-  //CONFIGURACIÓ VARIACIONS DE Rs, RAS, DO, mass_FeCl3
-  [6,    8,    10,   12,   15,   20,  25, 30, 40 ].forEach(Rs =>{         //Rs         | d
-  [0.75, 0.85, 0.95, 1.05, 1.15, 1.25            ].forEach(RAS=>{         //RAS        | ø
-  [1.00, 1.50, 2.00, 2.50                        ].forEach(DO =>{         //DO         | mgO/L
-  [500,  600,  700,  800, 900, 1000              ].forEach(mass_FeCl3 =>{ //mass_FeCl3 | kg/d
+  function itera_variacions(variacions, j){
+    j = j || 0;
 
-    //varia paràmetres
-    i.Rs         = Rs;
-    i.RAS        = RAS;
-    i.DO         = DO;
-    i.mass_FeCl3 = mass_FeCl3;
-    //executa simulació "n"
-    let run = run_model(influent, tram, conf, i, deg);
-    //combinació actual
-    let combinacio = {
-      Rs,
-      RAS,
-      DO,
-      mass_FeCl3,
-      FOt: run.FOt,
-      TSS: run.TSS,
-      NH4: run.NH4,
-      PO4: run.PO4,
-    };
-    combinacions.push(combinacio);
-  });});});});
-  console.log({simulacions_fetes: combinacions.length,});
+    let keys = Object.keys(variacions);
+    if(j>=keys.length){
+      //executa simulació "n"
+      let run = run_model(influent, tram, conf, i, deg);
+      //combinació actual
+      let combinacio = {
+        Rs         :i.Rs,
+        RAS        :i.RAS,
+        DO         :i.DO,
+        mass_FeCl3 :i.mass_FeCl3,
+        FOt: run.FOt,
+        TSS: run.TSS,
+        NH4: run.NH4,
+        PO4: run.PO4,
+        errors: run.errors,
+      };
+      combinacions.push(combinacio);
+      return;
+    }
+
+    let key = keys[j];
+
+    variacions[key].forEach(n=>{
+      i[key]=n;
+      itera_variacions(variacions, j+1);
+    });
+  }
+
+  itera_variacions(variacions);
+
+  console.log(`simulacions_fetes: ${combinacions.length}`);
   return combinacions;
 };
 
 /*test*/
-let combinacions; //global per fer accessible variable a DOM
+let combinacions; //global perquè siguii accessible a DOM
 (function(){
+  return;
   //crea un influent--------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0  );
   //unitats-----------------------(ML/d---------------------mg/L-----------------)
@@ -141,10 +150,13 @@ let combinacions; //global per fer accessible variable a DOM
     k    :{ NH4:1,         PO4:1         },
   };
 
-  //executa el model una sola vegada 
-  //let run = run_model(influent, tram, conf, i, deg);
+  let variacions={
+    Rs:        [6,    8,    10,   12,   15,   20,  25, 30, 40 ], //d
+    RAS:       [0.75, 0.85, 0.95, 1.05, 1.15, 1.25            ], //ø
+    DO:        [1.00, 1.50, 2.00, 2.50                        ], //mgO/L
+    mass_FeCl3:[500,  600,  700,  800, 900, 1000              ], //kg/d
+  };
 
   //executa el model n vegades
-  combinacions = run_simulacions(influent, tram, conf, i, deg);
+  combinacions = run_simulacions(influent, tram, conf, i, deg, variacions);
 })();
-//console.log(combinacions);
