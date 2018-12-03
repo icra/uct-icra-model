@@ -1,10 +1,8 @@
 # ecoadvisor 
-backend Model backend for Ecoadvisor project. Coded in Javascript
-without dependencies.
+Backend Model backend for Ecoadvisor project. Coded in Javascript without dependencies.
 
 ## status: under development 
-Steady state model by George Ekama.  Implemented
-by Lluís Bosch (lbosch@icra.cat).
+Steady state model by George Ekama. Implemented by Lluís Bosch (lbosch@icra.cat).
 
 ## doubts/pending
 - confirm final Rsm formula (min sludge age to ensure nitrification).  options:
@@ -23,6 +21,7 @@ by Lluís Bosch (lbosch@icra.cat).
 ## Lluís B. tasks (ordered by priority)
 - integrate constants.js to the code
 - write equations in pdf (file "formulas.ms")
+- add a 'see.php' source code syntax viewer for html
 
 ## Future
 - add energy consumption module
