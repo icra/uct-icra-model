@@ -11,9 +11,9 @@ S_OP   = 4.9;
 S_NOx  = 1;
 
 //inputs edar peralada
-Rs            =  35.9;
 T             =  19;
 Vp            =  829;
+Rs            =  35.9;
 RAS           =  1;
 waste_from    =  "sst";
 FeCl3         =  20;

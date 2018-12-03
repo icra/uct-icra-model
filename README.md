@@ -25,6 +25,7 @@ Implemented by Lluís Bosch (lbosch@icra.cat).
 - add stoichiometry (for {CO2, N2}(air) produced)
 
 ## done/solved/clear/discussed
+- [gui] generate links for fase1.html
 - [river] R20 and k for NH4 and PO4
 - [river] names S-OP and S-FSA to PO4 and NH4 in the interface only
 - [as model] add incomplete BOD removal

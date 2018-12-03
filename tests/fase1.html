@@ -50,7 +50,9 @@
 <!--title-->
 <div style="border-bottom:1px solid #ccc;margin-bottom:4px;justify-content:space-between" class=flex>
   <h3>
-    Phase 1: Influent &rarr; plant &rarr; river
+    <span id=title onclick>
+      Phase 1: Influent &rarr; plant &rarr; river
+    </span>
     <!--run button-->
     <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
   </h3>
@@ -125,15 +127,15 @@
         <td title="Fondària concreta">                      Di<input type=number id=Di value=0.6>       <span class=unit>m</span>
         <td title="Temperatura">                            Ti<input type=number id=Ti value=15>        <span class=unit>ºC</span>
       </tr><tr>
-        <td title="Volatile fatty acids"                >S_VFA <input type=number id=S_VFA  value=0><span class=unit>mg/L</span>
-        <td title="Fermentable organics"                >S_FBSO<input type=number id=S_FBSO value=0><span class=unit>mg/L</span>
-        <td title="Biodegradable particulate organics"  >X_BPO <input type=number id=X_BPO  value=0><span class=unit>mg/L</span>
-        <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=X_UPO  value=0><span class=unit>mg/L</span>
-        <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=S_USO  value=0><span class=unit>mg/L</span>
-        <td title="Inert suspended solids"              >X_iSS <input type=number id=X_iSS  value=0><span class=unit>mg/L</span>
-        <td title="Free saline ammonia"                 >S_NH4 <input type=number id=S_FSA  value=0><span class=unit>mg/L</span>
-        <td title="Orthophosphate (PO4)"                >S_PO4 <input type=number id=S_OP   value=0><span class=unit>mg/L</span>
-        <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=0><span class=unit>mg/L</span>
+        <td title="Volatile fatty acids"                >S_VFA <input type=number id=river_S_VFA  value=0><span class=unit>mg/L</span>
+        <td title="Fermentable organics"                >S_FBSO<input type=number id=river_S_FBSO value=0><span class=unit>mg/L</span>
+        <td title="Biodegradable particulate organics"  >X_BPO <input type=number id=river_X_BPO  value=0><span class=unit>mg/L</span>
+        <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=river_X_UPO  value=0><span class=unit>mg/L</span>
+        <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=river_S_USO  value=0><span class=unit>mg/L</span>
+        <td title="Inert suspended solids"              >X_iSS <input type=number id=river_X_iSS  value=0><span class=unit>mg/L</span>
+        <td title="Free saline ammonia"                 >S_NH4 <input type=number id=river_S_FSA  value=0><span class=unit>mg/L</span>
+        <td title="Orthophosphate (PO4)"                >S_PO4 <input type=number id=river_S_OP   value=0><span class=unit>mg/L</span>
+        <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=river_S_NOx  value=0><span class=unit>mg/L</span>
       </tr>
     </table>
 
@@ -141,15 +143,14 @@
     <table id=degradation>
       <tr id=NH4>
         <td>NH<sub>4</sub>
-        <td>R20<input type=number id=R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
-        <td>k  <input type=number id=k    value=1>         <span class=unit>mg/L</span>
+        <td>R20<input type=number id=NH4_R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
+        <td>k  <input type=number id=NH4_k    value=1>         <span class=unit>mg/L</span>
       <tr id=PO4>
         <td>PO<sub>4</sub>
-        <td>R20<input type=number id=R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
-        <td>k  <input type=number id=k    value=1>         <span class=unit>mg/L</span>
+        <td>R20<input type=number id=PO4_R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
+        <td>k  <input type=number id=PO4_k    value=1>         <span class=unit>mg/L</span>
       </tr>
     </table>
-
   </div>
 
   <!--outputs-->
@@ -174,6 +175,10 @@
     <!--river-->
     <div><code onclick="toggle_visibility('#outputs #river')">[+] River</code></div>
     <div id=river style="display:none"></div>
+
+    <!--export-->
+    <div><code onclick="toggle_visibility('#outputs #export')">[+] Export</code></div>
+    <textarea id=export style="display:none"></textarea>
   </div>
 </div>
 
@@ -191,7 +196,25 @@
 
 <!--execute model backend and gui integration-->
 <script>
-  //btn run click listener
+  //GET inputs from URL
+  let url=new URL(window.location.href);
+
+  //iterate GET keys
+  for(let pair of url.searchParams.entries()) {
+    let key = pair[0];
+    let val = pair[1];
+    let el  = document.querySelector(`#inputs #${key}`);
+    if(el){ 
+      if(el.type=='checkbox'){
+        if(val=='on') el.checked=true;
+      }else{
+        //includes <input type=number> and <select id>
+        el.value = val;
+      }
+    }
+  }
+
+  //execute model
   document.querySelector('button#run').addEventListener('click',function(){
     //get influent
     let influent=new State_Variables(
@@ -292,7 +315,7 @@
     Object.keys(tram.state_variables.components).forEach(key=>{
       tram.state_variables.set(
         key,
-        parseFloat(document.querySelector(`#inputs #river #${key}`).value)
+        parseFloat(document.querySelector(`#inputs #river #river_${key}`).value)
       );
     });
 
@@ -302,12 +325,12 @@
     //aplica degradació al riu
     let deg = {
       R_20:{
-        NH4:parseFloat(document.querySelector('#inputs #degradation #NH4 #R_20').value),
-        PO4:parseFloat(document.querySelector('#inputs #degradation #PO4 #R_20').value),
+        NH4:parseFloat(document.querySelector('#inputs #degradation #NH4_R_20').value),
+        PO4:parseFloat(document.querySelector('#inputs #degradation #PO4_R_20').value),
       },
       k:{
-        NH4:parseFloat(document.querySelector('#inputs #degradation #NH4 #k').value),
-        PO4:parseFloat(document.querySelector('#inputs #degradation #PO4 #k').value),
+        NH4:parseFloat(document.querySelector('#inputs #degradation #NH4_k').value),
+        PO4:parseFloat(document.querySelector('#inputs #degradation #PO4_k').value),
       },
     }
 
@@ -426,6 +449,15 @@
     document.querySelector('input[name=summary_units]:checked').click();
   });
 
+  //generate URL with current inputs
+  document.querySelector('button#run').addEventListener('click',function(){
+    let newUrl = url.origin + url.pathname + '?'; //new url with all current inputs
+    document.querySelectorAll('#inputs input[id]').forEach(input=>{
+      newUrl += `${input.id}=${input.value}&`;
+    });
+    document.querySelector('#outputs #export').innerHTML=newUrl;
+  });
+
   //select unit in summaries
   document.querySelectorAll('input[name=summary_units]').forEach(input=>{
     input.addEventListener('click',function(){
@@ -456,7 +488,7 @@
     });
   });
 
-  //telca 'Enter' listener for inputs
+  //enter key listener: execute model
   document.querySelectorAll('#inputs input').forEach(input=>{
     input.addEventListener('keypress',function(e){
       if(e.key=="Enter"){
@@ -465,7 +497,17 @@
     }); 
   });
 
-  //clica el botó RUN
+  //default values onclick title
+  document.querySelector('#title').addEventListener('click',function(){
+    window.location=url.origin + url.pathname;
+  });
+
+  //select text inside #export
+  document.querySelector('#export').addEventListener('focus',function(){
+    this.select();
+  });
+
+  //click run button
   document.querySelector('button#run').click();
 </script>
 
