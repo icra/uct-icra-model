@@ -194,7 +194,7 @@
 <script src="../chemical-P-removal.js"></script>
 <script src="../tram.js"></script>
 
-<!--execute model backend and gui integration-->
+<!--model backend and gui integration-->
 <script>
   //GET inputs from URL
   let url=new URL(window.location.href);
@@ -206,7 +206,7 @@
     let el  = document.querySelector(`#inputs #${key}`);
     if(el){ 
       if(el.type=='checkbox'){
-        if(val=='on') el.checked=true;
+        if(val=='true') el.checked=true;
       }else{
         //includes <input type=number> and <select id>
         el.value = val;
@@ -453,6 +453,7 @@
   document.querySelector('button#run').addEventListener('click',function(){
     let newUrl = url.origin + url.pathname + '?'; //new url with all current inputs
     document.querySelectorAll('#inputs input[id]').forEach(input=>{
+      if(input.type=='checkbox') input.value = input.checked;
       newUrl += `${input.id}=${input.value}&`;
     });
     document.querySelector('#outputs #export').innerHTML=newUrl;
