@@ -23,8 +23,8 @@
   <script src="../tram.js"></script>
   <script src="../recomanador.js"></script>
 </head>
-<h2>Recomanador</h2>
 
+<h2>Recomanador</h2>
 <div>
   <table border=1 style=font-size:smaller>
     <tr><th colspan=5>Execució del model amb variació del següents paràmetres:
@@ -40,15 +40,32 @@
     <tr><td>PO<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Fosfat al final del riu
   </table>
 </div>
-
 <button id=run style="margin:5px 0;font-size:18px">Generar combinacions</button>
-
 <table id=combinacions border=1></table>
 
 <!--recomanador-->
 <script>
+  //GET inputs from URL
+  try{
+    let url      = new URL(window.location.href);
+    let influent = JSON.parse(url.searchParams.get('influent'));
+    let tram     = JSON.parse(url.searchParams.get('tram'));
+    let conf     = JSON.parse(url.searchParams.get('conf'));
+    let inputs   = JSON.parse(url.searchParams.get('inputs'));
+    let deg      = JSON.parse(url.searchParams.get('deg'));
+    //run simulations again
+    combinacions = run_simulacions(
+      new State_Variables(...influent), 
+      new Tram(...tram), 
+      conf,
+      inputs, 
+      deg
+    );
+  }catch(e){console.log(e);}
+
+  //click run button listener
   document.querySelector('#run').addEventListener('click',function(){
-    //taula
+    //taula combinacions
     let t = document.querySelector("#combinacions"); t.innerHTML="";
 
     //la variable combinacions ve definida 'recomanador.js' conté totes les combinacions sense filtrar

@@ -66,6 +66,8 @@ function run_model(influent, tram, conf, i, deg){
 
 //run model n vegades
 function run_simulacions(influent, tram, conf, i, deg){
+  console.log({influent,tram,conf,i,deg});
+
   let combinacions = []; //totes les combinacions fetes
 
   //CONFIGURACIÓ VARIACIONS DE Rs, RAS, DO, mass_FeCl3
@@ -101,9 +103,9 @@ function run_simulacions(influent, tram, conf, i, deg){
 /*test*/
 let combinacions; //global per fer accessible variable a DOM
 (function(){
-  //crea un influent--------------(Q,    VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,   NOx)
-  let influent=new State_Variables(25,   50,  115,  440, 100, 45,  60,  39.1, 7.28, 0  );
-  //unitats-----------------------(ML/d, --------------------mg/L----------------------)
+  //crea un influent--------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx)
+  let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0  );
+  //unitats-----------------------(ML/d---------------------mg/L-----------------)
 
   //configuració edar
   let conf={pst:false, nit:true, dn:true, cpr:true, river:true};
@@ -141,6 +143,7 @@ let combinacions; //global per fer accessible variable a DOM
 
   //executa el model una sola vegada 
   //let run = run_model(influent, tram, conf, i, deg);
+
   //executa el model n vegades
   combinacions = run_simulacions(influent, tram, conf, i, deg);
 })();
