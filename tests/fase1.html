@@ -461,7 +461,7 @@
     document.querySelectorAll('#inputs select[id]').forEach(select=>{
       newUrl += `${select.id}=${select.value}&`;
     });
-    document.querySelector('#outputs #export').innerHTML=newUrl;
+    document.querySelector('#outputs #export').value=newUrl;
   });
 
   //select unit in summaries
