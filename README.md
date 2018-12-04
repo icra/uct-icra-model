@@ -4,19 +4,16 @@ Backend Model backend for Ecoadvisor project. Coded in Javascript without depend
 ## status: under development 
 Steady state model by George Ekama. Implemented by Lluís Bosch (lbosch@icra.cat).
 
-## doubts/pending
-- confirm final Rsm formula (min sludge age to ensure nitrification).  options:
+## doubts/pending/ask george ekama
+- confirm final Rsm formula (min sludge age to ensure nitrification). options:
   - Rsm =  1/(µApHT·(1-fxm) - bAT) ) (book chapter 4, page 471)
   - Rsm = SF/(µApHT·(1-fxm) - bAT) ) (skype meeting)
-  - Rsm = SF/(µApHT - bAT) )         (IWAChp5 page 105)
-- input (nitrate, NOx) ask george. TOD balance not closing.
+  - Rsm = SF/(µApHT         - bAT) ) (IWAChp5 page 105)
+- input (nitrate, NOx) ask george. if we have influent NOx then TOD balance not closing.
 - why is kg of FeCl3 added is not equal to the extra iSS produced (for example
-  3000 kg FeCl3 produces 2500 kg iSS. The remaining 500 kg is Cl(-) ion?). Ask
-  george.
-- current DO "KO" constant value is 0.3 (µ = µ·DO/(DO + KO)). Ask george. Book
+  3000 kg FeCl3 produces 2500 kg iSS. The remaining 500 kg is Cl(-) ion?).
+- current DO "KO" constant value is 0.3 (µ = µ·DO/(DO + KO)). Book
   says KO value is [0.3, 2.0]. Which one I keep?
-- SF in nitrification (affects fxm, Rsm, Nae-fxm): Lluís C. does not like it
-  because we are not designing.
 
 ## Lluís B. tasks (ordered by priority)
 - integrate constants.js to the code

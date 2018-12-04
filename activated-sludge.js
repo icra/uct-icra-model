@@ -218,7 +218,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
     let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | oxygen demand for endogenous respiration (O2->CO2)
     return FdSbi*(catabolism + respiration);    //kgO/d
   })();
-  //overwrite formula TODO 
+  //overwrite formula TODO
   FOc = FSti - (FSe+FSw);
 
   let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand
