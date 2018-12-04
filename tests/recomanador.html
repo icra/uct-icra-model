@@ -29,16 +29,18 @@
 <div>
   <table id=info border=1 style=font-size:smaller>
     <tr><th colspan=5>Execució del model amb variació del següents paràmetres:
-    <tr><th>Input                 <th>Unitat <th>Valors provats <th>Descripció
-    <tr><td>Rs                    <td>d     <td id=Rs         >[6 - 40]      <td>Temps de residència
-    <tr><td>RAS                   <td>ø     <td id=RAS        >[0.75 - 1.25] <td>Ratio recirculació externa
-    <tr><td>DO                    <td>mgO/L <td id=DO         >[1.00 - 2.50] <td>Oxigen dissolt al reactor
-    <tr><td>mass FeCl<sub>3</sub> <td>kg/d  <td id=mass_FeCl3 >[500 - 600]   <td>Clorur fèrric afegit (eliminació fosfat)
-    <tr><th>Output                <th>Unitat <th>Valor desitjat <th>Descripció
-    <tr><td>FOt                   <td>kgO/d  <td>               <td>Demanda total oxigen
-    <tr><td>TSS                   <td>kg/d   <td>               <td>Producció fangs total
-    <tr><td>NH<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Amoni  final riu
-    <tr><td>PO<sub>4</sub>        <td>mg/L   <td>&lt;0.5        <td>Fosfat final riu
+    <tr><th>Input                 <th>Unitat <th>Valors provats              <th>Descripció
+    <tr><td>Rs                    <td>d      <td id=Rs        >[6 - 40]      <td>Temps de residència
+    <tr><td>RAS                   <td>ø      <td id=RAS       >[0.75 - 1.25] <td>Ratio recirculació externa
+    <tr><td>DO                    <td>mgO/L  <td id=DO        >[1.00 - 2.50] <td>Oxigen dissolt al reactor
+    <tr><td>mass FeCl<sub>3</sub> <td>kg/d   <td id=mass_FeCl3>[500 - 600]   <td>Clorur fèrric afegit (eliminació fosfat)
+    <tr><th>Output                <th>Unitat <th>Valor desitjat              <th>Descripció
+    <tr><td>FOt                   <td>kgO/d  <td>                            <td>Demanda total oxigen
+    <tr><td>TSS                   <td>kg/d   <td>                            <td>Producció fangs total
+    <tr><td>NH<sub>4</sub>plant   <td>mg/L   <td>&lt;15                      <td>Amoni  efluent planta
+    <tr><td>PO<sub>4</sub>plant   <td>mg/L   <td>&lt;2                       <td>Fosfat efluent planta
+    <tr><td>NH<sub>4</sub>river   <td>mg/L   <td>&lt;0.5                     <td>Amoni  final riu
+    <tr><td>PO<sub>4</sub>river   <td>mg/L   <td>&lt;0.5                     <td>Fosfat final riu
   </table>
 </div>
 <button id=run style="margin:5px 0;font-size:18px">Generar combinacions</button>
@@ -70,7 +72,7 @@
     Object.entries(variacions).forEach(([key,arr])=>{
       document.querySelector(`#info #${key}`).innerHTML=`[${arr.join(', ')}]`;
     });
-  }catch(e){console.log(e);}
+  }catch(e){console.log("No s'han especificat inputs personalitzats. Utilitzant valors per defecte (Ekama)");}
 
   //click run button listener
   document.querySelector('#run').addEventListener('click',function(){
@@ -80,9 +82,11 @@
     //la variable combinacions ve definida 'recomanador.js' conté TOTES les combinacions sense filtrar
     //filtra les combinacinos que compleixen amb els limits
     let solucions = combinacions.filter(obj=>(
-      obj.NH4>0 && obj.NH4<0.5 &&  //limits NH4
-      obj.PO4>0 && obj.PO4<0.5 &&  //limits PO4
-      obj.errors.length==0         //errors allowed (max value: 2 (Rsm and fxm related)
+      obj.NH4_plant>0 && obj.NH4_plant<15  && //limits NH4 plant
+      obj.PO4_plant>0 && obj.PO4_plant<2   && //limits PO4 plant
+      obj.NH4_river>0 && obj.NH4_river<0.5 && //limits NH4 riu
+      obj.PO4_river>0 && obj.PO4_river<0.5 && //limits PO4 riu
+      obj.errors.length==0                    //errors allowed (max value: 2 (Rsm and fxm related)
     )); 
 
     /*dibuixa taula solucions*/

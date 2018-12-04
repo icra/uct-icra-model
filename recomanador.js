@@ -49,19 +49,25 @@ function run_model(influent, tram, conf, i, deg){
   let nit_process_variables = conf.dn ? as.nit_process_variables : (conf.nit ? as.process_variables    : null);
   let dn_process_variables  = conf.dn ? as.process_variables     : null;
 
-  //get TSS, FOt, NH4, PO4
+  //get TSS and FOt
   let FOt = conf.dn ? dn_process_variables.FOt.value : (conf.nit ? nit_process_variables.FOt_fxt.value : as_process_variables.FOt.value); //kgO/d | oxygen demand
   let TSS = as.wastage.fluxes.totals.TSS.total;             //kgTSS/d | sludge produced in secondary
   if(conf.pst) TSS += pst.wastage.fluxes.totals.TSS.total;  //kgTSS/d | sludge produced in pst
-  let NH4 = river_end.components.S_FSA;                     //mgN/L NH4 at river end
-  let PO4 = river_end.components.S_OP;                      //mgP/L PO4 al river end
+
+  //get NH4 and PO4 (plant and river)
+  let NH4_plant = as.effluent.components.S_FSA; //mgN/L NH4 at plant effluent
+  let PO4_plant = as.effluent.components.S_OP;  //mgP/L PO4 al plant effluent
+  let NH4_river = river_end.components.S_FSA;   //mgN/L NH4 at river end
+  let PO4_river = river_end.components.S_OP;    //mgP/L PO4 al river end
 
   //results
   return {
     FOt,               //kgO/d
     TSS,               //kgTSS/d
-    NH4,               //mgN/L
-    PO4,               //mgP/L
+    NH4_plant,         //mgN/L
+    NH4_river,         //mgN/L
+    PO4_plant,         //mgP/L
+    PO4_river,         //mgP/L
     errors: as.errors, //errors  (Rs<Rsm  and/or  fxt>fxm)
   };
 }
@@ -87,8 +93,10 @@ function run_simulacions(influent, tram, conf, i, deg, variacions){
         mass_FeCl3 :i.mass_FeCl3,
         FOt: run.FOt,
         TSS: run.TSS,
-        NH4: run.NH4,
-        PO4: run.PO4,
+        NH4_plant: run.NH4_plant,
+        PO4_plant: run.PO4_plant,
+        NH4_river: run.NH4_river,
+        PO4_river: run.PO4_river,
         errors: run.errors,
       };
       combinacions.push(combinacio);
@@ -109,10 +117,10 @@ function run_simulacions(influent, tram, conf, i, deg, variacions){
 };
 
 /*test*/
-let combinacions; //global so is accessible to DOM
 let variacions;   //global so is accessible to DOM
+let combinacions; //global so is accessible to DOM
 (function(){
-  return
+  //return
 
   //crea un influent--------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0  );
