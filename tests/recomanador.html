@@ -34,7 +34,7 @@
     <tr><td>RAS                   <td>ø      <td id=RAS       >[0.75 - 1.25] <td>Ratio recirculació externa
     <tr><td>DO                    <td>mgO/L  <td id=DO        >[1.00 - 2.50] <td>Oxigen dissolt al reactor
     <tr><td>mass FeCl<sub>3</sub> <td>kg/d   <td id=mass_FeCl3>[500 - 600]   <td>Clorur fèrric afegit (eliminació fosfat)
-    <tr><th>Output                <th>Unitat <th>Valor desitjat              <th>Descripció
+    <tr><th>Output                <th>Unitat <th>Valors desitjats            <th>Descripció
     <tr><td>FOt                   <td>kgO/d  <td>                            <td>Demanda total oxigen
     <tr><td>TSS                   <td>kg/d   <td>                            <td>Producció fangs total
     <tr><td>NH<sub>4</sub>plant   <td>mg/L   <td>&lt;15                      <td>Amoni  efluent planta
@@ -93,7 +93,7 @@
 
     //nombre de solucions vs combinacions
     let newRow=t.insertRow(-1);
-    newRow.insertCell(-1).outerHTML=`<th colspan=16>Veient ${solucions.length} solucions (NH<sub>4</sub><0.5 & PO<sub>4</sub><0.5) de ${combinacions.length} combinacions provades`;
+    newRow.insertCell(-1).outerHTML=`<th colspan=16>Veient ${solucions.length} de ${combinacions.length} combinacions provades que compleixen amb els valors desitjats`;
     if(solucions.length==0)return;
 
     //headers columnes
