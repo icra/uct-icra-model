@@ -2,18 +2,113 @@
 Ecoadvisor model formulas
 .AU
 Institut Català de Recerca de l'Aigua (ICRA)
-
-.nr GROWPS 3
-.nr PSINCR 1.5p
-
 .SH
 .ce
 Compilation command
 .LP
 .ce
 .CW
-groff -e -ms formulas.ms -T pdf -K utf-8
+groff -e -t -ms formulas.ms -T pdf -K utf-8
 
+.nr GROWPS 3
+.nr PSINCR 1p
+.EQ
+delim $$
+.EN
+
+.NH
+State Variables
+.NH 2
+Inputs
+.EQ (ML/d)
+Q
+.EN
+.EQ (mg/L)
+{S sub VFA, S sub FBSO, X sub BPO, X sub UPO, S sub USO, X sub iSS, S sub FSA, S sub OP, S sub NOx}
+.EN
+
+.NH 2
+Total chemical oxygen demand (COD = $S sub t$)
+.EQ (mg/L)
+S sub t = S sub bs + S sub bp + S sub up
+.EN
+
+where:
+.EQ (mg/L)
+S sub bs = S sub VFA + S sub FBSO 
+.EN
+.EQ
+  S sub t = S sub b + S sub u
+.EN
+.EQ
+  S sub t = S sub s + S sub p
+.EN
+
+.NH 2
+Mass ratios for COD, N, P and C
+
+.LP
+.TS
+tab(;) center ;
+cb cb cb cb cb
+n  n  n  n  n.
+State Variable; COD ($f sub cv$); N ($f sub N$); P ($f sub P$); C ($f sub C$)
+$ S sub VFA  $; 1.0667; 0.0000; 0.0000; 0.400
+$ S sub FBSO $; 1.4200; 0.0464; 0.0118; 0.471
+$ X sub BPO  $; 1.5230; 0.0323; 0.0072; 0.498
+$ X sub UPO  $; 1.4810; 0.1000; 0.0250; 0.518
+$ S sub USO  $; 1.4930; 0.0366; 0.0000; 0.498
+.TE
+
+.NH 2
+Total Kjehdahl Nitrogen (TKN)
+.EQ (mg/L)
+  TKN = N sub t = N sub o + S sub FSA
+.EN
+where:
+.TS
+tab(;) center;
+l.
+$N sub o = N sub obs + N sub obp + N sub ous + N sub oup$;
+$N sub obs = S sub VFA f sub N sub VFA over f sub cv sub VFA + S sub FBSO f sub N sub FBSO over f sub cv sub FBSO$;
+$N sub obp = X sub BPO f sub N sub BPO over f sub cv sub BPO$;
+$N sub ous = S sub USO f sub N sub USO over f sub cv sub USO$;
+$N sub oup = S sub UPO f sub N sub UPO over f sub cv sub UPO$;
+.TE
+
+.NH 2
+Total Phosphorus (TP)
+.EQ (mg/L)
+  TP = P sub t = P sub o + S sub OP
+.EN
+where:
+.TS
+tab(;) center;
+l.
+$P sub o   = P sub obs + P sub obp + P sub ous + P sub oup$;
+$P sub obs = S sub VFA f sub P sub VFA over f sub cv sub VFA + S sub FBSO f sub P sub FBSO over f sub cv sub FBSO$;
+$P sub obp = X sub BPO f sub P sub BPO over f sub cv sub BPO$;
+$P sub ous = S sub USO f sub P sub USO over f sub cv sub USO$;
+$P sub oup = S sub UPO f sub P sub UPO over f sub cv sub UPO$;
+.TE
+
+.NH 2
+Total Organic Carbon (TOC)
+.EQ (mg/L)
+  TOC = C sub t = C sub obs + C sub obp + C sub ous + C sub oup
+.EN
+where:
+.TS
+tab(;) center;
+l.
+$C sub obs = S sub VFA f sub C sub VFA over f sub cv sub VFA + S sub FBSO f sub C sub FBSO over f sub cv sub FBSO$;
+$C sub obp = X sub BPO f sub C sub BPO over f sub cv sub BPO$;
+$C sub ous = S sub USO f sub C sub USO over f sub cv sub USO$;
+$C sub oup = S sub UPO f sub C sub UPO over f sub cv sub UPO$;
+.TE
+
+
+.bp
 .NH
 Activated sludge
 
