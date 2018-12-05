@@ -4,7 +4,7 @@ Ecoadvisor model formulas
 Institut Català de Recerca de l'Aigua (ICRA)
 .SH
 .ce
-Compilation command
+Compilation command (bash)
 .LP
 .ce
 .CW
@@ -16,6 +16,7 @@ groff -e -t -ms formulas.ms -T pdf -K utf-8
 delim $$
 .EN
 
+.bp
 .NH
 State Variables
 .NH 2
@@ -24,32 +25,34 @@ Inputs
 Q
 .EN
 .EQ (mg/L)
-{S sub VFA, S sub FBSO, X sub BPO, X sub UPO, S sub USO, X sub iSS, S sub FSA, S sub OP, S sub NOx}
+S sub VFA, S sub FBSO, X sub BPO, X sub UPO, S sub USO, X sub iSS, S sub FSA, S sub OP, S sub NOx
 .EN
 
 .NH 2
 Total chemical oxygen demand (COD = $S sub t$)
 .EQ (mg/L)
-S sub t = S sub bs + S sub bp + S sub up
+S sub t = S sub VFA + S sub FBSO + X sub BPO + X sub UPO + S sub USO
 .EN
-
-where:
-.EQ (mg/L)
-S sub bs = S sub VFA + S sub FBSO 
-.EN
-.EQ
-  S sub t = S sub b + S sub u
-.EN
-.EQ
-  S sub t = S sub s + S sub p
-.EN
+also:
+.TS
+tab(;) center;
+l.
+$ S sub t = S sub b + S sub u = S sub s + S sub p = S sub bs + S sub bp + S sub {u p} + S sub us $;
+$ S sub b = S sub bs + S sub bp    $;
+$ S sub u = S sub us + S sub {u p} $;
+$ S sub s = S sub bs + S sub us    $;
+$ S sub p = S sub bp + S sub {u p} $;
+$ S sub bs = S sub VFA + S sub FBSO $;
+$ S sub bp = X sub BPO $;
+$ S sub {u p } = X sub UPO $;
+$ S sub us = S sub USO $;
+.TE
 
 .NH 2
 Mass ratios for COD, N, P and C
-
 .LP
 .TS
-tab(;) center ;
+tab(;) center;
 cb cb cb cb cb
 n  n  n  n  n.
 State Variable; COD ($f sub cv$); N ($f sub N$); P ($f sub P$); C ($f sub C$)
@@ -58,12 +61,15 @@ $ S sub FBSO $; 1.4200; 0.0464; 0.0118; 0.471
 $ X sub BPO  $; 1.5230; 0.0323; 0.0072; 0.498
 $ X sub UPO  $; 1.4810; 0.1000; 0.0250; 0.518
 $ S sub USO  $; 1.4930; 0.0366; 0.0000; 0.498
+$ OHO        $; 1.4810; 0.1000; 0.0250; 0.518
+$ ANO        $; 1.4810; 0.1000; 0.0250; 0.518
+$ PAO        $; 1.4810; 0.1000; 0.0250; 0.518
 .TE
 
 .NH 2
-Total Kjehdahl Nitrogen (TKN)
+Total Kjeldahl Nitrogen (TKN = $N sub t$)
 .EQ (mg/L)
-  TKN = N sub t = N sub o + S sub FSA
+N sub t = N sub o + S sub FSA
 .EN
 where:
 .TS
@@ -73,13 +79,13 @@ $N sub o = N sub obs + N sub obp + N sub ous + N sub oup$;
 $N sub obs = S sub VFA f sub N sub VFA over f sub cv sub VFA + S sub FBSO f sub N sub FBSO over f sub cv sub FBSO$;
 $N sub obp = X sub BPO f sub N sub BPO over f sub cv sub BPO$;
 $N sub ous = S sub USO f sub N sub USO over f sub cv sub USO$;
-$N sub oup = S sub UPO f sub N sub UPO over f sub cv sub UPO$;
+$N sub oup = X sub UPO f sub N sub UPO over f sub cv sub UPO$;
 .TE
 
 .NH 2
-Total Phosphorus (TP)
+Total Phosphorus (TP = $P sub t$)
 .EQ (mg/L)
-  TP = P sub t = P sub o + S sub OP
+P sub t = P sub o + S sub OP
 .EN
 where:
 .TS
@@ -89,13 +95,13 @@ $P sub o   = P sub obs + P sub obp + P sub ous + P sub oup$;
 $P sub obs = S sub VFA f sub P sub VFA over f sub cv sub VFA + S sub FBSO f sub P sub FBSO over f sub cv sub FBSO$;
 $P sub obp = X sub BPO f sub P sub BPO over f sub cv sub BPO$;
 $P sub ous = S sub USO f sub P sub USO over f sub cv sub USO$;
-$P sub oup = S sub UPO f sub P sub UPO over f sub cv sub UPO$;
+$P sub oup = X sub UPO f sub P sub UPO over f sub cv sub UPO$;
 .TE
 
 .NH 2
-Total Organic Carbon (TOC)
+Total Organic Carbon (TOC = $C sub t$)
 .EQ (mg/L)
-  TOC = C sub t = C sub obs + C sub obp + C sub ous + C sub oup
+C sub t = C sub obs + C sub obp + C sub ous + C sub oup
 .EN
 where:
 .TS
@@ -104,9 +110,20 @@ l.
 $C sub obs = S sub VFA f sub C sub VFA over f sub cv sub VFA + S sub FBSO f sub C sub FBSO over f sub cv sub FBSO$;
 $C sub obp = X sub BPO f sub C sub BPO over f sub cv sub BPO$;
 $C sub ous = S sub USO f sub C sub USO over f sub cv sub USO$;
-$C sub oup = S sub UPO f sub C sub UPO over f sub cv sub UPO$;
+$C sub oup = X sub UPO f sub C sub UPO over f sub cv sub UPO$;
 .TE
 
+.NH 2
+Total suspended solids (TSS = $X sub T$)
+.EQ (mg/L)
+X sub T = X sub V + X sub iSS
+.EN
+where:
+.TS
+tab(;) center;
+l.
+$ X sub V = X sub BPO over f sub cv sub BPO + X sub UPO over f sub cv sub UPO $;
+.TE
 
 .bp
 .NH
@@ -115,7 +132,7 @@ Activated sludge
 .NH 2
 Inputs
 .EQ
-{T , V sub p, R sub s, RAS, mass sub FeCl sub 3 }
+T, V sub p, R sub s, RAS, mass sub FeCl sub 3
 .EN
 
 .NH 2
@@ -373,15 +390,14 @@ Optimum internal recirculation
   a sub opt = {-B + sqrt { B sup 2 + 4AC }} over 2A
 .EN
 where:
-.EQ L
-  A = DO over 2.86
-.EN
-.EQ L
-  B = N sub c - D sub p1 +{ (1+RAS)·DO + RAS·DO sub RAS } over 2.86
-.EN
-.EQ L
-  C = (1+RAS) · (D sub p1 - {RAS·DO sub RAS} over 2.86 )-RAS·N sub c
-.EN
+
+.TS
+tab(;) center;
+l.
+$ A = DO over 2.86 $
+$ B = N sub c - D sub p1 +{ (1+RAS)·DO + RAS·DO sub RAS } over 2.86 $
+$ C = (1+RAS) · (D sub p1 - {RAS·DO sub RAS} over 2.86 )-RAS·N sub c $
+.TE
 
 .NH 2
 Minimum effluent NOx concentration
