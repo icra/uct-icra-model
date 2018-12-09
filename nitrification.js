@@ -75,7 +75,10 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let fxm = 1 - SF*(bAT+1/Rs)/µAm_pH; //ø
 
   //minimum sludge age for nitrification (Rsm)
-  let Rsm = 1/(µAm_pH*(1-fxt)-bAT); //days
+  let Rsm = 1/(µAm_pH*(1-fxt)-bAT);    //days
+  //let Rsm =  1/(µApHT·(1-fxm) - bAT) ) //(book chapter 4, page 471)
+  //let Rsm = SF/(µApHT·(1-fxm) - bAT) ) //(skype meeting)
+  //let Rsm = SF/(µApHT         - bAT) ) //(IWAChp5 page 105)
 
   //compile Rsm and fxm errors
   let errors = [];

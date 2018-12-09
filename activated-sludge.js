@@ -218,8 +218,10 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
     let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | oxygen demand for endogenous respiration (O2->CO2)
     return FdSbi*(catabolism + respiration);    //kgO/d
   })();
-  //overwrite formula TODO
+  //overwrite FOc formula TODO
+  console.log({FOc});
   FOc = FSti - (FSe+FSw);
+  console.log({FOc});
 
   let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
@@ -292,12 +294,13 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
 /*test*/
 (function(){
-  return
+  //return
   //new influent
   //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  ); //settled ww
   //apply AS wasting from {reactor, sst}
   let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000); //AS wasting from the reactor
+  return
   let as_sst = inf.activated_sludge(16, 8473.3, 15, 1.0, 'sst',     3000); //AS wasting from the sst
   //show results
   console.log("=== Influent");               console.log(inf.summary);
