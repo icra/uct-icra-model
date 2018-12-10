@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#compile file to pdf
+#compile "file.ms" to "file.ms.pdf"
 
 file="formulas.ms"
 

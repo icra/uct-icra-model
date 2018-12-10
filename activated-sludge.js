@@ -62,14 +62,12 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let FXti       = inf_fluxes.totals.TSS.uVSS; //kg_VSS/d  | UPO in VSS influent
   let FiSS       = inf_fluxes.totals.TSS.iSS;  //kg_iSS/d  | iSS flux influent
 
-  //2.2 - kinetics
-  const bH = 0.24;                    //1/d | endogenous respiration rate at 20ºC
-  let bHT  = bH*Math.pow(1.029,T-20); //1/d | endogenous respiration rate corrected by temperature
-
-  //page 10
-  const YH  = 0.45;               //gVSS/gCOD   | yield coefficient (does not change with temperature)
-  //const YH  = 0.67/1.481;       //gVSS/gCOD   | yield coefficient (does not change with temperature)
-  let f_XBH = (YH*Rs)/(1+bHT*Rs); //gVSS·d/gCOD | OHO biomass production rate
+  //2.2 - kinetics - page 10
+  const YH  = 0.45;                    //gVSS/gCOD | yield coefficient (does not change with temperature)
+  //const YH  = 0.67/1.481;              //gVSS/gCOD | yield coefficient (does not change with temperature)
+  const bH  = 0.24;                    //1/d | endogenous respiration rate at 20ºC
+  let bHT   = bH*Math.pow(1.029,T-20); //1/d | endogenous respiration rate corrected by temperature
+  let f_XBH = (YH*Rs)/(1+bHT*Rs);      //gVSS·d/gCOD | OHO biomass production rate
 
   //bCOD not degraded (FBSO)
   const k_v20       = 10000;                    //TODO change to 0.07 (high value makes that BSO effluent is ≈ 0) 

@@ -10,9 +10,9 @@ Compilation command (bash)
 .CW
 groff -e -t -ms formulas.ms -T pdf -K utf-8
 
-.nr GROWPS 3
-.nr PSINCR 1p
-.EQ
+.nr GROWPS 3  .\conf tamanys títols
+.nr PSINCR 1p .\conf tamanys títols
+.EQ           .\conf equacions 
 delim $$
 .EN
 
@@ -144,19 +144,28 @@ Y sub H = 0.45
 b sub H = 0.24
 .EN
 .EQ (1/d)
-b sub {HT} = b sub H (1.029) sup { ( T - 20 ) }
+b sub {HT} = b sub H (1.029) sup { T - 20 }
 .EN
 .EQ (gVSS·d/gCOD)
 f sub X sub BH = {Y sub H · R sub s} over {1 + b sub HT · R sub s}
 .EN
+.EQ (L/mgVSS·d)
+  k sub vT = 0.007·(1.035) sup {T-20}
+.EN
+.EQ (mg/L)
+  S sub nd = 1 over {f sub X sub BH k sub vT}
+.EN
+.EQ (mg/L)
+  FdS sub bi = FS sub bi - Q · S sub nd
+.EN
 .EQ (kgVSS)
-MX sub BH = FS sub bi · f sub X sub BH
+MX sub BH = FdS sub bi · f sub X sub BH
 .EN
 .EQ (kgVSS)
 MX sub EH = f sub H · b sub HT · R sub s · MX sub BH
 .EN
 .EQ (kgVSS)
-MX sub I = FX sub ti · R sub s
+MX sub I = FX sub Ti · R sub s
 .EN
 .EQ (kgVSS)
 MX sub V  = MX sub BH + MX sub EH + MX sub I
@@ -354,7 +363,6 @@ K sub 2 sup 20 = 0.10,
 K sub 3 sup 20 = 0.10,
 K sub 4 sup 20 = 0.00
 .EN
-
 .EQ (mgN/mgVSS·d)
 K sub 1T = K sub 1 sup 20 (1.200) sup {T-20}
 .EN
@@ -370,19 +378,15 @@ K sub 4T = K sub 4 sup 20 (1.029) sup {T-20}
 
 .NH 2
 Denitrification potential
-
 .EQ (mgN/L)
 D sub p1RBSO = {S sub bsi (1 - f sub cv Y sub H )} over 2.86
 .EN
-
 .EQ (mgN/L)
-D sub p1BPO  = K sub 2T f sub xt S sub bi f sub X sub BH
+D sub p1BPO  = K sub 2T f sub xt (S sub bi - S sub nd ) f sub X sub BH
 .EN
-
 .EQ (mgN/L)
 D sub p1 = D sub p1RBSO + D sub p1BPO
 .EN
-
 
 .NH 2
 Optimum internal recirculation
@@ -400,13 +404,13 @@ $ C = (1+RAS) · (D sub p1 - {RAS·DO sub RAS} over 2.86 )-RAS·N sub c $
 .TE
 
 .NH 2
-Minimum effluent NOx concentration
+Minimum (optimum) effluent nitrate concentration
 .EQ (mgN/L)
-N sub ne_opt = Nc over {a sub opt + RAS + 1}
+N sub ne_opt = N sub c over {a sub opt + RAS + 1}
 .EN
 
 .NH 2
-Effluent nitrate
+Effluent nitrate ($N sub ne$)
 .EQ L
 if(a < a sub opt ) 
 .EN
@@ -417,13 +421,13 @@ N sub ne = N sub c over {a+RAS+1}
 if(a > a sub opt ) 
 .EN
 .EQ (mgN/L)
-  N sub ne = N sub c - D sub p1 + { a*DO + RAS*DO sub RAS } over 2.86
+N sub ne = N sub c - D sub p1 + { a·DO + RAS·DO sub RAS } over 2.86
 .EN
 
 .NH 2
-Nitrogen gas
+Nitrogen gas production ($FN sub 2$)
 .EQ (kgN/d)
-  FN sub 2 = Q(N sub c - N sub ne )
+FN sub 2 = Q(N sub c - N sub ne )
 .EN
 
 .NH 2
@@ -440,4 +444,3 @@ Effluent alkalinity
 .EQ (mg/L)
 alk sub e = alk sub i + 3.57·(N sub obi - (N sub s - N sub oupi )) - 7.14·N sub c + 2.86·(N sub c -N sub ne )
 .EN
-
