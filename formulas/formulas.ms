@@ -259,7 +259,95 @@ OUR = FO sub t over V sub p
 .EN
 
 .bp
+.NH
+Chemical P removal
 
+.LP
+.TS
+tab(;) center;
+l l
+l n.
+Sludge component; mass (g/mol)
+$ M sub Fe         $; 55.845
+$ M sub P          $; 30.974
+$ M sub FeCl sub 3 $; 162.195
+$ M sub {Fe (OH) sub 3 }$; 106.866
+$ M sub {Fe sub 1.6 H sub 2 PO sub 4 OH sub 3.8} $; 250.9646
+.TE
+
+.NH 2
+Moles of Fe added
+.EQ (molFe/d)
+moles sub Fe = {mass sub FeCl sub 3 M sub Fe over {M sub FeCl sub 3 } } over M sub Fe
+.EN
+
+.NH 2
+Moles of P available
+.EQ (mgP/L)
+  P sub available = P sub ti - P sub s - P sub ouse - P sub obse 
+.EN
+.EQ (molFe/d)
+moles sub P = {Q · P sub available } over M sub P
+.EN
+
+.NH 2
+Fe/P mole ratio
+.EQ (molFe/molP)
+  Fe/P sub ratio = {moles sub Fe } over {moles sub P }
+.EN
+
+.NH 2
+Figure 6-13 Metcalf and Eddy 5th ed, page 484
+.LP
+.TS H
+tab(;) center ;
+l l
+n n.
+Fe/P ratio ; $ PO sub 4e $ (mgP/L)
+.TH
+8.00  ; 0.01
+4.90  ; 0.02
+4.50  ; 0.03
+4.20  ; 0.04
+3.90  ; 0.05
+3.80  ; 0.06
+3.70  ; 0.07
+3.50  ; 0.08
+3.35  ; 0.09
+3.30  ; 0.10
+2.60  ; 0.20
+2.10  ; 0.30
+2.00  ; 0.40
+1.70  ; 0.50
+1.50  ; 0.60
+1.20  ; 0.70
+1.10  ; 0.80
+1.00  ; 0.90
+1.00  ; 1.00
+0.20  ; 2.00
+0.10  ; 3.00
+0.10  ; 4.00
+0.01  ; 5.00
+0.01  ; 6.00
+0.005 ; 7.00
+0.001 ; 8.00
+0.001 ; 9.00
+0.0001; 10.00
+.TE
+
+.NH 2
+P removed by precipitation
+.EQ (kgP/d)
+P sub precipitation = Q·(P sub available - PO sub 4e )
+.EN
+
+.NH 2
+Extra iSS production by precipitation
+.EQ (kgiSS/d)
+F sub iSS_precipitation = P sub precipitation over M sub P (M sub {Fe sub 1.6 H sub 2 PO sub 4 OH sub 3.8} + M sub Fe(OH) sub 3 · (Fe/P sub ratio - 1.6))
+.EN
+
+.bp
 .NH
 Nitrification
 
