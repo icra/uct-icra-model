@@ -145,7 +145,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //BPO, UPO, iSS concentrating factor in the recycle underflow
   let f = waste_from=='sst' ? SST.f : 1;
 
-  //2.5 - TODO no cal mostrar les formules
+  //2.5
   let fi      = MX_V/MX_T;  //VSS/TSS ratio
   let f_avOHO = MX_BH/MX_V; //mgOHOVSS/mgVSS | fraction of active biomass in VSS
   let f_atOHO = fi*f_avOHO; //mgOHOVSS/mgTSS | fraction of active biomass in TSS

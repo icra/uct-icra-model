@@ -56,7 +56,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   const K_O = 0.5;              //mgDO/L | nitrifier Oxygen sensitivity constant TODO current value does not turn off nitrification
   let µAmO  = µAmT*DO/(DO+K_O); //1/d    | growth rate corrected by temperature and DO
 
-  //correct µA by pH inhibition TODO no cal mostrar equacions
+  //correct µA by pH inhibition
   const Ki   = 1.13; //page 471
   const Kii  = 0.3;  //page 471
   const Kmax = 9.5;  //page 471
@@ -85,7 +85,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   if(Rs  < Rsm) errors.push("Rs  < Rsm");
   if(fxt > fxm) errors.push("fxt > fxm");
 
-  //unaerated sludge (current and max) TODO no cal mostrar equacions
+  //unaerated sludge (current and max)
   let MX_T_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge
   let MX_T_fxm = fxm*MX_T; //kg TSS | max uneaerated sludge
 

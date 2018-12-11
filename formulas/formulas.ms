@@ -30,7 +30,7 @@ S sub VFA, S sub FBSO, X sub BPO, X sub UPO, S sub USO, X sub iSS, S sub FSA, S 
 
 .NH 2
 Total chemical oxygen demand (COD = $S sub t$)
-.EQ (mg/L)
+.EQ (mgCOD/L)
 S sub t = S sub VFA + S sub FBSO + X sub BPO + X sub UPO + S sub USO
 .EN
 also:
@@ -68,7 +68,7 @@ $ PAO        $; 1.4810; 0.1000; 0.0250; 0.518
 
 .NH 2
 Total Kjeldahl Nitrogen (TKN = $N sub t$)
-.EQ (mg/L)
+.EQ (mgN/L)
 N sub t = N sub o + S sub FSA
 .EN
 where:
@@ -84,7 +84,7 @@ $N sub oup = X sub UPO f sub N sub UPO over f sub cv sub UPO$;
 
 .NH 2
 Total Phosphorus (TP = $P sub t$)
-.EQ (mg/L)
+.EQ (mgP/L)
 P sub t = P sub o + S sub OP
 .EN
 where:
@@ -100,7 +100,7 @@ $P sub oup = X sub UPO f sub P sub UPO over f sub cv sub UPO$;
 
 .NH 2
 Total Organic Carbon (TOC = $C sub t$)
-.EQ (mg/L)
+.EQ (mgC/L)
 C sub t = C sub obs + C sub obp + C sub ous + C sub oup
 .EN
 where:
@@ -115,15 +115,13 @@ $C sub oup = X sub UPO f sub C sub UPO over f sub cv sub UPO$;
 
 .NH 2
 Total suspended solids (TSS = $X sub T$)
-.EQ (mg/L)
+.EQ (mgTSS/L)
 X sub T = X sub V + X sub iSS
 .EN
 where:
-.TS
-tab(;) center;
-l.
-$ X sub V = X sub BPO over f sub cv sub BPO + X sub UPO over f sub cv sub UPO $;
-.TE
+.EQ (mgVSS/L)
+X sub V = X sub BPO over f sub cv sub BPO + X sub UPO over f sub cv sub UPO
+.EN
 
 .bp
 .NH
@@ -149,13 +147,13 @@ b sub {HT} = b sub H (1.029) sup { T - 20 }
 .EQ (gVSS·d/gCOD)
 f sub X sub BH = {Y sub H · R sub s} over {1 + b sub HT · R sub s}
 .EN
-.EQ (L/mgVSS·d)
+.EQ (L/gVSS·d)
   k sub vT = 0.007·(1.035) sup {T-20}
 .EN
-.EQ (mg/L)
+.EQ (mgCOD/L)
   S sub nd = 1 over {f sub X sub BH k sub vT}
 .EN
-.EQ (mg/L)
+.EQ (kgCOD/d)
   FdS sub bi = FS sub bi - Q · S sub nd
 .EN
 .EQ (kgVSS)
@@ -212,34 +210,31 @@ Q sub e = Q - Q sub w
 
 .NH 2
 Nitrogen and Phosphorus required for sludge production
-.EQ (mg/L)
+.EQ (mgN/L)
 N sub s = {f sub N sub OHO (MX sub BH + MX sub EH ) + f sub N sub UPO MX sub I } over {R sub s · Q}
 .EN
-.EQ (mg/L)
+.EQ (mgP/L)
 P sub s = {f sub P sub OHO (MX sub BH + MX sub EH ) + f sub P sub UPO MX sub I } over {R sub s · Q}
 .EN
 
 .NH 2
-Effluent Ammonia concentration
-.EQ (mg/L)
+Effluent Ammonia ($N sub ae$) and effluent Orthophosphate ($P sub se$) concentration
+.EQ (mgN/L)
 N sub ae = N sub ti - N sub s - N sub ouse
 .EN
-
-.NH 2
-Effluent Orthophosphate concentration
-.EQ (mg/L)
+.EQ (mgP/L)
 P sub se = P sub ti - P sub s - P sub ouse - P sub precipitation
 .EN
 
 .NH 2
 Wastage solids concentration
-.EQ (mg/L)
+.EQ (mgCOD/L)
 BPO sub was = f sub cv sub BPO (1-f sub H ) X sub BH
 .EN
-.EQ (mg/L)
+.EQ (mgCOD/L)
 UPO sub was = f sub cv sub UPO (f sub H X sub BH + X sub EH + X sub I )
 .EN
-.EQ (mg/L)
+.EQ (mgiSS/L)
 iSS sub was = MX sub IO over V sub p
 .EN
 
@@ -267,7 +262,7 @@ Chemical P removal
 tab(;) center;
 l l
 l n.
-Sludge component; mass (g/mol)
+Sludge component; weight (g/mol)
 $ M sub Fe         $; 55.845
 $ M sub P          $; 30.974
 $ M sub FeCl sub 3 $; 162.195
@@ -278,7 +273,7 @@ $ M sub {Fe sub 1.6 H sub 2 PO sub 4 OH sub 3.8} $; 250.9646
 .NH 2
 Moles of Fe added
 .EQ (molFe/d)
-moles sub Fe = {mass sub FeCl sub 3 M sub Fe over {M sub FeCl sub 3 } } over M sub Fe
+moles sub Fe = mass sub FeCl sub 3 over {M sub FeCl sub 3 }{ {1 mol sub Fe } over {1 mol sub FeCl sub 3 }}
 .EN
 
 .NH 2
@@ -303,7 +298,7 @@ Figure 6-13 Metcalf and Eddy 5th ed, page 484
 tab(;) center ;
 l l
 n n.
-Fe/P ratio ; $ PO sub 4e $ (mgP/L)
+Fe/P ratio ; $ P sub se $ (mgP/L)
 .TH
 8.00  ; 0.01
 4.90  ; 0.02
@@ -338,7 +333,7 @@ Fe/P ratio ; $ PO sub 4e $ (mgP/L)
 .NH 2
 P removed by precipitation
 .EQ (kgP/d)
-P sub precipitation = Q·(P sub available - PO sub 4e )
+P sub precipitation = Q·(P sub available - P sub se )
 .EN
 
 .NH 2
@@ -377,16 +372,16 @@ K sub i = 1.13, K sub ii  = 0.3, K sub max = 9.5
 .EQ (1/d)
 µ sub AmpH = µ sub AmO (2.35) sup { pH-7.2 } K sub i {{K sub max - pH } over {K sub max + K sub ii - pH }}
 .EN
-.EQ (gVSS/gNH4)
+.EQ (gVSS/gN)
 Y sub A = 0.1
 .EN
 .EQ (gVSS/gNH4)
 Y sub AT  = Y sub A sup { T-20 }
 .EN
-.EQ (mg/L)
+.EQ (mgN/L)
 K sub n = 1.0
 .EN
-.EQ (mg/L)
+.EQ (mgN/L)
 K sub nT = K sub n (1.123) sup { T-20 }
 .EN
 .EQ (1/d)
@@ -410,13 +405,13 @@ R sub sm = 1 over {µ sub AmpH ( 1-f sub xt ) - b sub AT }
 
 .NH 2
 Effluent Ammonia concentration
-.EQ (mg/L)
+.EQ (mgN/L)
 N sub ae = {K sub nT (b sub AT + 1 over R sub s )} over {µ sub AmpH (1-f sub xt ) - b sub AT - 1 over R sub s }
 .EN
 
 .NH 2
 Nitrification capacity
-.EQ (mg/L)
+.EQ (mgN/L)
 N sub c = N sub ti - N sub s - (N sub ae + N sub ouse)
 .EN
 
@@ -440,7 +435,7 @@ Denitrification
 .NH 2
 Inputs
 .EQ
-  IR, DO sub RAS, alk sub i
+  a, DO sub RAS, alk sub i
 .EN
 
 .NH 2
@@ -477,7 +472,7 @@ D sub p1 = D sub p1RBSO + D sub p1BPO
 .EN
 
 .NH 2
-Optimum internal recirculation
+Optimum internal recirculation (a)
 .EQ (ø)
   a sub opt = {-B + sqrt { B sup 2 + 4AC }} over 2A
 .EN
@@ -519,7 +514,7 @@ FN sub 2 = Q(N sub c - N sub ne )
 .EN
 
 .NH 2
-Oxygen recovered by denitrification
+Oxygen recovered by denitrification and total oxygen demand corrected
 .EQ (kgO/d)
 FO sub d = 2.86 · Q · (N sub c -N sub ne )
 .EN
@@ -529,6 +524,6 @@ FO sub t = FO sub c + FO sub n - FO sub d
 
 .NH 2
 Effluent alkalinity
-.EQ (mg/L)
+.EQ (mgCaCO3/L)
 alk sub e = alk sub i + 3.57·(N sub obi - (N sub s - N sub oupi )) - 7.14·N sub c + 2.86·(N sub c -N sub ne )
 .EN

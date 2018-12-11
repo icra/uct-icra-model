@@ -116,7 +116,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let TODi = Q *(inf_frac.COD.total + 4.57*inf_frac.TKN.total); //kgO/d
   let TODe = Qe*(eff_frac.COD.total + 4.57*eff_frac.TKN.total); //kgO/d
 
-  //calculate TOD wastage (TODw) TODO no cal mostrar equacions
+  //calculate TOD wastage (TODw)
   const fH = 0.20; //UPO OHO fraction
   const fCV_OHO = this.mass_ratios.f_CV_OHO;
   const fCV_UPO = this.mass_ratios.f_CV_UPO;
