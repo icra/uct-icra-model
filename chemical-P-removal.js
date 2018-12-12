@@ -16,7 +16,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   const M_FeH2PO4OH = 250.9646; //g/mol ((Fe)(1.6)(H2PO4)(OH)(3.8) molecular weight)
   const M_FeOH3     = 106.866;  //g/mol (FeOH3 molecular weight)
 
-  //get moles of P available in PO4
+  //get moles of P available in PO4 (influent)
   let moles_P = Q*PO4i*1000/M_P; //moles/d of P
 
   //convert kg/d of FeCl3 to moles of Fe

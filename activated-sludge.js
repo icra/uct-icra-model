@@ -47,7 +47,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Q = this.Q; //ML/d
 
   //2 - page 9
-  let frac = this.totals;    //object: fractionation (COD,TOC,TKN,TP,TSS)
+  let frac = this.totals;    //object: influent fractionation (COD,TOC,TKN,TP,TSS)
   let COD  = frac.COD.total; //mg_COD/L influent "Sti"
 
   //fSus and fSup ratios
@@ -64,52 +64,41 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
   //2.2 - kinetics - page 10
   const YH  = 0.45;                    //gVSS/gCOD | yield coefficient (does not change with temperature)
-  //const YH  = 0.67/1.481;              //gVSS/gCOD | yield coefficient (does not change with temperature)
   const bH  = 0.24;                    //1/d | endogenous respiration rate at 20ºC
   let bHT   = bH*Math.pow(1.029,T-20); //1/d | endogenous respiration rate corrected by temperature
   let f_XBH = (YH*Rs)/(1+bHT*Rs);      //gVSS·d/gCOD | OHO biomass production rate
 
   //bCOD not degraded (FBSO)
-  const k_v20       = 10000;                    //TODO change to 0.07 (high value makes that BSO effluent is ≈ 0) 
-  const theta_k_v20 = 1.035;                    //temperature correction factor
-  let k_vT  = k_v20*Math.pow(theta_k_v20,T-20); //L/(mgVSS·d)
-  let S_b   = 1/(f_XBH*k_vT);                   //mgCOD/L
-  let FdSbi = FSbi - Q*S_b;                     //kg/d COD
+  const k_v20 = 10000;                      //change to 0.07 (current value makes that BSO effluent is ≈ 0) TODO
+  let k_vT    = k_v20*Math.pow(1.035,T-20); //L/(mgVSS·d)
+  let S_b     = 1/(f_XBH*k_vT);             //mgCOD/L
+  let FdSbi   = FSbi - Q*S_b;               //kg/d COD
 
   //total VSS solids
   let MX_BH = FdSbi * f_XBH;          //kgVSS | OHO live biomass
   const fH  = 0.20;                   //ø     | UPO OHO fraction
   let MX_EH = fH * bHT * Rs * MX_BH;  //kgVSS | endogenous residue OHOs
   let MX_I  = FXti * Rs;              //kgVSS | influent UPO
-  let MX_V  = MX_BH + MX_EH + MX_I;   //kgVSS | VSS
+  let MX_V  = MX_BH + MX_EH + MX_I;   //kgVSS | total VSS
 
-  //2.8 - effluent Phosphorus | P in influent required for sludge production
-  //Ps original formula (George) TODO discuss with George
-  let Ps = (f_P_OHO*(MX_BH+MX_EH) + f_P_UPO*MX_I)/(Rs*Q); //mgP/L | P influent required for sludge production
-  //Ps new formula
-  let Ps_new = (function(){                     //mgP/L
-    let Ps_BPO = f_P_BPO*(1-fH)*MX_BH;          //kgP
-    let Ps_UPO = f_P_UPO*(fH*MX_BH+MX_EH+MX_I); //kgP
-    return (Ps_BPO+Ps_UPO)/(Rs*Q);              //kg/ML == g/m3 == mg/L
-  })();
-  //console.log({Ps, Ps_new}); //to see the difference
-  Ps=Ps_new;
-  let Pti   = frac.TP.total;         //mg/L | total P influent
-  let Pte   = Pti - Ps;              //mg/L | total P effluent
-  let Pouse = frac.TP.usOP;          //mg/L | P organic unbiodegradable soluble effluent
-  let Pobse = S_b*f_P_FBSO/fCV_FBSO; //mg/L | P organic biodegradable soluble effluent
-  let Pse   = Pte - Pouse - Pobse;   //mg/L | inorganic soluble P available for chemical P removal
+  //2.8 - effluent Phosphorus 
+  let Ps    = (f_P_OHO*(MX_BH+MX_EH) + f_P_UPO*MX_I)/(Rs*Q); //mgP/L | P influent required for sludge production
+  let Pti   = frac.TP.total;                                 //mgP/L | total P influent
+  let Pte   = Pti - Ps;                                      //mgP/L | total P effluent
+  let Pouse = frac.TP.usOP;                                  //mgP/L | P organic unbiodegradable soluble effluent
+  let Pobse = S_b*f_P_FBSO/fCV_FBSO;                         //mgP/L | P organic biodegradable soluble effluent
+  let Psa   = Pte - Pouse - Pobse;                           //mgP/L | inorganic soluble P available for chemical P removal
 
   /*chemical P removal*/
-  let cpr         = chemical_P_removal(Q, Pse, mass_FeCl3); //object
+  let cpr         = chemical_P_removal(Q, Psa, mass_FeCl3); //object
   let F_extra_iSS = cpr.extra_iSS.value;                    //kgiSS/d
-  Pse             = cpr.PO4e.value;                         //mgP/L | overwrite Pse | PO4 effluent after chemical P removal
+  let Pse         = cpr.PO4e.value;                         //mgP/L | PO4 effluent after chemical P removal
 
   //total inert solids
   const f_iOHO = 0.15;                                 //giSS/gVSS | fraction of inert solids in biomass
   let MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS*Rs; //kgiSS | total inert solids
 
-  //total solids = VSS + iSS
+  //total solids TSS = VSS + iSS
   let MX_T = MX_V + MX_IO; //kgTSS | MX_BH + MX_EH + MX_I + MX_IO
 
   //all solids concentrations
@@ -150,55 +139,41 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let f_avOHO = MX_BH/MX_V; //mgOHOVSS/mgVSS | fraction of active biomass in VSS
   let f_atOHO = fi*f_avOHO; //mgOHOVSS/mgTSS | fraction of active biomass in TSS
 
-  /*Calculate N and P in influent required for sludge production*/
-  /*2.6 - Nitrogen - page 12 | N in influent required for sludge production*/
-
-  //Ns original formula (George)
-  let Ns = (f_N_OHO*(MX_BH+MX_EH) + f_N_UPO*MX_I)/(Rs*Q); //mgN/L
-
-  //Ns new formula corrected TODO discuss with George
-  let Ns_new = (function(){                     //mgN/L
-    let Ns_BPO = f_N_BPO*(1-fH)*MX_BH;          //kgN
-    let Ns_UPO = f_N_UPO*(fH*MX_BH+MX_EH+MX_I); //kgN
-    return (Ns_BPO+Ns_UPO)/(Rs*Q);              //kg/ML == g/m3 == mg/L
-  })();
-  //console.log({Ns, Ns_new}); //to see the difference
-  Ns=Ns_new;
-
-  //TKN effluent
-  let Nti   = frac.TKN.total;        //mg/L | total TKN influent
-  let Nte   = Nti - Ns;              //mg/L | total TKN effluent
-  let Nobsi = frac.TKN.bsON;         //mg/L | bsON influent
-  let Nouse = frac.TKN.usON;         //mg/L | usON influent = effluent
-  let Nobpi = frac.TKN.bpON;         //mg/L | bpON influent
-  let Noupi = frac.TKN.upON;         //mg/L | upON influent
-  let Nobse = S_b*f_N_FBSO/fCV_FBSO; //mg/L | bsON effluent (not all FBSO is degraded)
+  //2.6 - Nitrogen - page 12 
+  let Ns    = (f_N_OHO*(MX_BH+MX_EH) + f_N_UPO*MX_I)/(Rs*Q); //mgN/L | N in influent required for sludge production
+  let Nti   = frac.TKN.total;                                //mgN/L | total TKN influent
+  let Nte   = Nti - Ns;                                      //mgN/L | total TKN effluent
+  let Nobsi = frac.TKN.bsON;                                 //mgN/L | bsON influent
+  let Nouse = frac.TKN.usON;                                 //mgN/L | usON influent = effluent
+  let Nobpi = frac.TKN.bpON;                                 //mgN/L | bpON influent
+  let Noupi = frac.TKN.upON;                                 //mgN/L | upON influent
+  let Nobse = S_b*f_N_FBSO/fCV_FBSO;                         //mgN/L | bsON effluent (not all FBSO is degraded)
 
   //effluent ammonia = total TKN - usON - bsON
   let Nae = Nte - Nouse - Nobse; //mg/L
 
-  //NH4 balance
+  //ammonia balance
   let Nae_balance = 100*Nae/(this.components.S_FSA + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
 
   //concentration of wastage {BPO, UPO, iSS}
   //f is the concentrating factor (if we are wasting from SST) = (1+RAS)/RAS. Otherwise is 1
   //solids summary:
-  //  MX_BH = FdSbi * X_BH;                         //kg_VSS | biomass production                   (BPO)
-  //  MX_EH = fH * bHT * Rs * MX_BH;                //kg_VSS | endogenous residue OHOs              (UPO)
-  //  MX_I  = FXti * Rs;                            //kg_VSS | unbiodegradable particulate organics (UPO)
-  //  MX_V  = MX_BH + MX_EH + MX_I;                 //kg_VSS | total VSS                            (BPO+UPO)
-  //  MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS; //kg_iSS | total inert solids                   (iSS)
-  //  MX_T  = MX_V + MX_IO;                         //kg_TSS | total TSS                            (BPO+UPO+iSS)
-  let BPO_was = f*fCV_BPO*(1-fH)*X_BH*1000;            //mg/L | BPO concentration
-  let UPO_was = f*fCV_UPO*(fH*X_BH + X_EH + X_I)*1000; //mg/L | UPO concentration
-  let iSS_was = f*X_IO*1000;                           //mg/L | iSS concentration (the iSS FeCl3 solids are added below)
+  //  MX_BH = FdSbi * X_BH;                                  //kg_VSS | biomass production                   (OHO)
+  //  MX_EH = fH * bHT * Rs * MX_BH;                         //kg_VSS | endogenous residue OHOs              (OHO)
+  //  MX_I  = FXti * Rs;                                     //kg_VSS | unbiodegradable particulate organics (UPO)
+  //  MX_V  = MX_BH + MX_EH + MX_I;                          //kg_VSS | total VSS                            (OHO+UPO)
+  //  MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS;          //kg_iSS | total inert solids                   (iSS)
+  //  MX_T  = MX_V + MX_IO;                                  //kg_TSS | total TSS                            (OHO+UPO+iSS)
+  let BPO_was = f*fCV_OHO*(1-fH)*X_BH*1000;                  //mg/L   | BPO concentration
+  let UPO_was = f*(fCV_OHO*(fH*X_BH+X_EH)+fCV_UPO*X_I)*1000; //mg/L   | UPO concentration
+  let iSS_was = f*X_IO*1000;                                 //mg/L   | iSS concentration (precipitation iSS already included in X_IO)
 
-  //influent nitrate goes directly to effluent
-  let NOx = this.components.S_NOx;
+  //influent nitrate
+  let Nni = this.components.S_NOx;
 
-  //output streams------------------(Q,  VFA, FBSO, BPO,     UPO,     USO,  iSS,     FSA, OP,  NOx)
-  let effluent = new State_Variables(Qe, 0,   S_b,  0,       0,       Suse, 0,       Nae, Pse, NOx);
-  let wastage  = new State_Variables(Qw, 0,   S_b,  BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, NOx); 
+  //output streams------------------(Q,  VFA FBSO BPO      UPO      USO   iSS      FSA  OP   NOx)
+  let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae, Pse, Nni);
+  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nni); 
 
   //get output fluxes
   let eff_fluxes = effluent.fluxes; //object
@@ -210,24 +185,22 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let FSw  = was_fluxes.totals.COD.total; //kg/d | total COD wastage
 
   //2.7 - oxygen demand - page 13
-  //FOc original formula (George) | carbonaceous oxygen demand
+  //carbonaceous oxygen demand
   let FOc = (function(){
     let catabolism  = 1 - fCV_OHO*YH;           //gCOD/gCOD | electrons used for energy (catabolism)
     let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | oxygen demand for endogenous respiration (O2->CO2)
     return FdSbi*(catabolism + respiration);    //kgO/d
   })();
-  //overwrite FOc formula TODO
-  console.log({FOc});
-  FOc = FSti - (FSe+FSw);
-  console.log({FOc});
-
+  //console.log({FOc});
+  //FOc = FSti - (FSe+FSw);
+  //console.log({FOc});
   let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
   let OUR = FOt/(Vp*24)*1000; //mg/L·h | oxygen uptake rate
 
   //COD balance
   let FSout       = FSe + FSw + FOc; //kg/d | total COD out flux
-  let COD_balance = 100*FSti/FSout;  //percentage
+  let COD_balance = 100*FSout/FSti;  //percentage
 
   //2.10 - N balance
   let FNti      = inf_fluxes.totals.TKN.total; //kg/d as N | total TKN influent
@@ -279,8 +252,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   };
 
   //hide description (debug)
-  //Object.values(process_variables).forEach(obj=>delete obj.descr);
-  //Object.values(cpr).forEach(obj=>delete obj.descr);
+  Object.values(process_variables).forEach(obj=>delete obj.descr);
+  Object.values(cpr).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     cpr,
@@ -296,19 +269,14 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //new influent
   //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  ); //settled ww
-  //apply AS wasting from {reactor, sst}
-  let as_rea = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000); //AS wasting from the reactor
-  return
-  let as_sst = inf.activated_sludge(16, 8473.3, 15, 1.0, 'sst',     3000); //AS wasting from the sst
+
+  //syntax---------------------(T   Vp      Rs  RAS  waste_from mass_FeCl3)
+  let as = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000);
+
   //show results
-  console.log("=== Influent");               console.log(inf.summary);
-  console.log("=== AS process variables");   console.log(as_rea.process_variables);
-  console.log("=== AS chemical P removal "); console.log(as_rea.cpr);
+  console.log("=== AS process variables");   console.log(as.process_variables);
+  console.log("=== AS chemical P removal "); console.log(as.cpr);
   return
-  //=== waste from reactor
-  console.log("=== Effluent summary (waste from reactor)"); console.log(as_rea.effluent.summary);
-  console.log("=== Wastage summary (waste from reactor)");  console.log(as_rea.wastage.summary);
-  //=== waste from sst
-  console.log("=== Effluent summary (waste from sst)");     console.log(as_sst.effluent.summary);
-  console.log("=== Wastage summary (waste from sst)");      console.log(as_sst.wastage.summary);
+  console.log("=== Effluent summary");       console.log(as.effluent.summary);
+  console.log("=== Wastage summary");        console.log(as.wastage.summary);
 })();

@@ -188,10 +188,10 @@
 <!--load backend-->
 <script src="../state-variables.js"></script>
 <script src="../primary-settler.js"></script>
+<script src="../chemical-P-removal.js"></script>
 <script src="../activated-sludge.js"></script>
 <script src="../nitrification.js"></script>
 <script src="../denitrification.js"></script>
-<script src="../chemical-P-removal.js"></script>
 <script src="../tram.js"></script>
 
 <!--model backend and gui integration-->
@@ -200,7 +200,7 @@
   let url=new URL(window.location.href);
 
   //iterate GET keys
-  for(let pair of url.searchParams.entries()) {
+  for(let pair of url.searchParams.entries()){
     let key = pair[0];
     let val = pair[1];
     let el  = document.querySelector(`#inputs #${key}`);
@@ -506,15 +506,11 @@
     }); 
   });
 
-  //default values onclick title
-  document.querySelector('#title').addEventListener('click',function(){
-    window.location=url.origin + url.pathname;
-  });
+  //reset inputs clicking the title
+  document.querySelector('#title').addEventListener('click',function(){window.location=url.origin+url.pathname;});
 
   //select text inside #export
-  document.querySelector('#export').addEventListener('focus',function(){
-    this.select();
-  });
+  document.querySelector('#export').addEventListener('focus',function(){this.select();});
 
   //click run button
   document.querySelector('button#run').click();

@@ -37,6 +37,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //execute as+nit
   let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH); //object
 
+  //let influent nitrate
+  let Nni = this.components.S_NOx;
+
   //get fractionations
   let inf_frac = this.totals;         //object | influent fractionation
   let eff_frac = nit.effluent.totals; //object | nit effluent fractionation
@@ -78,8 +81,8 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let a = IR; //symbol change from "IR" to "a"
   let a_opt = (function(){
     let A = DO/2.86;
-    let B = Nc-Dp1+((1+RAS)*DO + RAS*DO_RAS)/2.86; //TODO ask george how influent nitrate affects this
-    let C = (1+RAS)*(Dp1-RAS*DO_RAS/2.86)-RAS*Nc;  //TODO ask george how influent nitrate affects this
+    let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/2.86; //TODO ask george how influent nitrate affects this
+    let C = (1+RAS)*((Dp1-Nni)-RAS*DO_RAS/2.86)-RAS*Nc;  //TODO ask george how influent nitrate affects this
     return (-B+Math.sqrt(B*B+4*A*C))/(2*A);
   })();
 
@@ -87,12 +90,12 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let Nne_opt = Nc/(a_opt + RAS + 1); //mg/L
 
   //effluent nitrate (Nne)
-  let Nne = 0;                                             //mgN/L
-  if(a < a_opt) Nne = Nc/(a+RAS+1);                        //mgN/L
-  else          Nne = Nc - Dp1 + (a*DO + RAS*DO_RAS)/2.86; //mgN/L
+  let Nne = 0;                                                   //mgN/L
+  if(a < a_opt) Nne = Nc/(a+RAS+1);                              //mgN/L
+  else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L
 
-  //N2 gas produced TODO ask George if this is correct
-  let FN2g = Q*(Nc - Nne); //kgN/d
+  //N2 gas produced
+  let FN2g = Q*(Nni + Nc - Nne); //kgN/d
 
   //TN effluent (TKN+NOx)
   let TKNe = eff_frac.TKN.total; //mg/L
@@ -140,6 +143,13 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let TODw   = sTODw + pTODw;                                         //kg/d | total TOD in wastage
   let TODout = TODw + TODe + FOt + FOd;                               //kg/d | total TOD out
   let TOD_balance = 100*TODout/TODi;                                  //percentage
+
+  //2.10 - N balance
+  let FNti      = this.fluxes.totals.TKN.total         + Q *Nni; //kg/d as N | total TN influent
+  let FNte      = nit.effluent.fluxes.totals.TKN.total + Qe*Nne; //kg/d as N | total TN effluent
+  let FNw       = nit.wastage.fluxes.totals.TKN.total  + Qw*Nne; //kg/d as N | total TN wastage
+  let FNout     = FNte + FNw + FN2g;                             //kg/d as N | total TN out
+  let N_balance = 100*FNout/FNti;                                //percentage
   //denitrification end-------------------------------------------------------------
 
   //create output streams (effluent and wastage)
@@ -193,19 +203,19 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
 /*test*/
 (function(){
-  return
+  //return
   //syntax--------------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
-  let influent = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  );
+  let influent = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 10  );
 
   //as+n+dn syntax-----------------(T   Vp      Rs  RAS  waste_from mass_FeCl3 SF    fxt   DO   pH   IR   DO_RAS influent_alk)
   let dn = influent.denitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2, 5.0, 1.0,   250         );
 
   //show process variables
-  console.log("=== Influent summary");           console.log(influent.summary);
-  console.log("=== AS+NIT+DN effluent summary"); console.log(dn.effluent.summary);
-  console.log("=== AS+NIT+DN wastage summary");  console.log(dn.wastage.summary);
-  console.log("=== AS process");                 console.log(dn.as_process_variables);
-  console.log("=== NIT process");                console.log(dn.nit_process_variables);
+  //console.log("=== Influent summary");           console.log(influent.summary);
+  //console.log("=== AS+NIT+DN effluent summary"); console.log(dn.effluent.summary);
+  //console.log("=== AS+NIT+DN wastage summary");  console.log(dn.wastage.summary);
+  //console.log("=== AS process");                 console.log(dn.as_process_variables);
+  //console.log("=== NIT process");                console.log(dn.nit_process_variables);
   console.log("=== DN process");                 console.log(dn.process_variables);
-  console.log("=== DN chemical P removal");      console.log(dn.cpr);
+  //console.log("=== DN chemical P removal");      console.log(dn.cpr);
 })();

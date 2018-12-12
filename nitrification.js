@@ -24,7 +24,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //nitrification inputs
-  SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
+  SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
+                                 //              | Choose a higher value for high influent ammonia concentration variation
   fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
   DO  = isNaN(DO ) ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
   pH  = isNaN(pH ) ? 7.2  : pH ; //pH units
@@ -53,7 +54,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let µAmT  = µAm*Math.pow(1.123,T-20); //1/d | growth rate corrected by temperature
 
   //correct µA by DO (book page 468)
-  const K_O = 0.5;              //mgDO/L | nitrifier Oxygen sensitivity constant TODO current value does not turn off nitrification
+  const K_O = 0.3;              //mgDO/L | nitrifier Oxygen sensitivity constant TODO current value does not turn off nitrification
   let µAmO  = µAmT*DO/(DO+K_O); //1/d    | growth rate corrected by temperature and DO
 
   //correct µA by pH inhibition
@@ -75,10 +76,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let fxm = 1 - SF*(bAT+1/Rs)/µAm_pH; //ø
 
   //minimum sludge age for nitrification (Rsm)
-  let Rsm = 1/(µAm_pH*(1-fxt)-bAT);    //days
-  //let Rsm =  1/(µApHT·(1-fxm) - bAT) ) //(book chapter 4, page 471)
-  //let Rsm = SF/(µApHT·(1-fxm) - bAT) ) //(skype meeting)
-  //let Rsm = SF/(µApHT         - bAT) ) //(IWAChp5 page 105)
+  let Rsm = 1/(µAm_pH/SF*(1-fxt)-bAT); //days | reorganized equation for fxm
 
   //compile Rsm and fxm errors
   let errors = [];
@@ -93,6 +91,11 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Nae_fxt = KnT*(bAT + 1/Rs)/(µAm_pH*(1-fxt)-bAT-1/Rs); //mg/L as N | effluent ammonia concentration if fxt <  fxm
   let Nae_fxm = KnT/(SF-1);                                 //mg/L as N | effluent ammonia concentration if fxt == fxm
 
+  //2 checks for effluent ammonia concentration
+  let Nae_max = Nti - Ns - Nouse - Nobse;
+  if(Nae_fxt < 0)       Nae_fxt = Nae_max;
+  if(Nae_fxt > Nae_max) Nae_fxt = Nae_max;
+
   //effluent TKN nitrification -- page 18
   let Nte_fxt = Nae_fxt + Nouse + Nobse; //mg/L as N | effluent TKN concentration if fxt <  fxm
   let Nte_fxm = Nae_fxm + Nouse + Nobse; //mg/L as N | effluent TKN concentration if fxt == fxm
@@ -100,10 +103,6 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //nitrification capacity Nc
   let Nc_fxt = Nti - Ns - Nte_fxt; //mg/L as N | Nitrification capacity if fxt <  fxm
   let Nc_fxm = Nti - Ns - Nte_fxm; //mg/L as N | Nitrification capacity if fxt == fxm
-
-  //add nitrate coming from as TODO discuss with george
-  Nc_fxt += as.effluent.components.S_NOx;
-  Nc_fxm += as.effluent.components.S_NOx;
 
   //oxygen demand
   let FOn_fxt = 4.57*Q*Nc_fxt; //kgO/d | O demand if fxt <  fxm
@@ -135,9 +134,9 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let S_b = as.effluent.components.S_FBSO; //mg/L of bCOD not degraded
 
   //create output state variables (effluent, wastage)
-  //syntax--------------------------(Q   VFA FBSO BPO      UPO      USO   iSS      FSA      PO4  NOx)
-  let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae_fxt, Pse, Nc_fxt);
-  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nc_fxt);
+  //syntax--------------------------(Q   VFA FBSO BPO      UPO      USO   iSS      FSA      PO4  NOx    )
+  let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae_fxt, Pse, Nc_fxt );
+  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nc_fxt );
 
   //pack nitrification process variables
   let process_variables={
@@ -157,6 +156,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
     MX_T_fxm :{value:MX_T_fxm, unit:"kgTSS",       descr:"Maximum design uneaerated sludge mass (if fxt = fxm)"},
     Nae_fxt  :{value:Nae_fxt,  unit:"mgN/L",       descr:"Effluent ammonia concentration (if fxt < fxm)"},
     Nae_fxm  :{value:Nae_fxm,  unit:"mgN/L",       descr:"Effluent ammonia concentration (if fxt = fxm)"},
+    Nae_max  :{value:Nae_max,  unit:"mgN/L",       descr:"Maximum possible effluent ammonia concentration"},
     Nte_fxt  :{value:Nte_fxt,  unit:"mgN/L",       descr:"Effluent TKN concentration (if fxt < fxm)"},
     Nte_fxm  :{value:Nte_fxm,  unit:"mgN/L",       descr:"Effluent TKN concentration (if fxt = fxm)"},
     Nc_fxt   :{value:Nc_fxt,   unit:"mgN/L",       descr:"Nitrification capacity (if fxt < fxm)"},
@@ -170,7 +170,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   };
 
   //hide description (debug)
-  //Object.values(process_variables).forEach(obj=>delete obj.descr);
+  Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     as_process_variables: as.process_variables,
@@ -186,8 +186,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   return
   //new influent---------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0  );
-  //call as+nit--------------(T   Vp      Rs  RAS  waste      mass_FeCl3, SF    fxt   DO   pH)
-  let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,       1.25, 0.39, 2.0, 7.2);
+  //call as+nit--------------(T   Vp      Rs  RAS  waste      mass_FeCl3 SF    fxt   DO   pH)
+  let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2);
   //print results
   console.log(nit.process_variables);
   console.log(nit.as_process_variables);
