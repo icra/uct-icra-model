@@ -42,6 +42,7 @@ function run_model(influent, tram, conf, i, deg){
     tram.Mf(river_mixed.components.S_FSA, deg.R_20.NH4, deg.k.NH4), //FSA (NH4)
     tram.Mf(river_mixed.components.S_OP,  deg.R_20.PO4, deg.k.PO4), //OP  (PO4)
     0, //NOx
+    0, //OHO
   );
 
   //pack process variables
@@ -122,8 +123,8 @@ let combinacions; //global so is accessible to DOM
 (function(){
   //return
 
-  //crea un influent--------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx)
-  let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0  );
+  //crea un influent--------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
+  let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );
 
   //configuració edar
   let conf={pst:false, nit:true, dn:true, cpr:true, river:true};

@@ -37,7 +37,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //execute as+nit
   let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH); //object
 
-  //let influent nitrate
+  //influent nitrate (not including nitrification capacity)
   let Nni = this.components.S_NOx;
 
   //get fractionations
@@ -66,23 +66,22 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let S_b   = nit.effluent.components.S_FBSO; //mg/L of bCOD not degraded
 
   //Denitrification potential
-  const fCV   = this.mass_ratios.f_CV_UPO;            //1.481 gUPO/gVSS
+  const fCV   = this.mass_ratios.f_CV_OHO;            //1.481 gUPO/gVSS
   const YH    = 0.45;                                 //gVSS/gCOD
   let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YH*Rs/(1+bHT*Rs)
-  let Dp1RBSO = Sbsi*(1-fCV*YH)/2.86;                 //mgNO3-N/L   | influent TODO ask george if we shoud subtract S_b (FBSO not degraded) here
+  let Dp1RBSO = Sbsi*(1-fCV*YH)/2.86;                 //mgNO3-N/L   | influent
   let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgNO3-N/L   | influent
   let Dp1     = Dp1RBSO + Dp1BPO;                     //mgNO3-N/L   | influent
 
-  //Nitrate generated in nitrification
-  //includes influent nitrate
-  let Nc = nit.effluent.components.S_NOx; //mgN/L
+  //Nitrate generated in nitrification (does not include influent nitrate)
+  let Nc = nit.process_variables.Nc_fxt.value; //mgN/L
 
   //optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
   let a_opt = (function(){
     let A = DO/2.86;
-    let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/2.86; //TODO ask george how influent nitrate affects this
-    let C = (1+RAS)*((Dp1-Nni)-RAS*DO_RAS/2.86)-RAS*Nc;  //TODO ask george how influent nitrate affects this
+    let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/2.86;
+    let C = (1+RAS)*((Dp1-Nni)-RAS*DO_RAS/2.86)-RAS*Nc;
     return (-B+Math.sqrt(B*B+4*A*C))/(2*A);
   })();
 
@@ -95,7 +94,8 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L
 
   //N2 gas produced
-  let FN2g = Q*(Nni + Nc - Nne); //kgN/d
+  let N2g  = Nni + Nc - Nne; //mgN/L
+  let FN2g = Q*N2g;          //kgN/d
 
   //TN effluent (TKN+NOx)
   let TKNe = eff_frac.TKN.total; //mg/L
@@ -137,38 +137,38 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let sTODw = Qw*(was_frac.COD.sCOD + 4.57*(was_frac.TKN.sON + Nae)); //kg/d   | soluble TODw
   let pTODw = Qw*(
     f*(
-      (fCV_BPO + 4.57*f_N_BPO)*(1-fH)*X_BH + 
-      (fCV_UPO + 4.57*f_N_UPO)*(fH*X_BH + X_EH + X_I) 
+      (fCV_OHO + 4.57*f_N_OHO)*(X_BH+X_EH) +
+      (fCV_UPO + 4.57*f_N_UPO)*(X_I) 
     )*1000);                                                          //kg/d | particulated TODw
   let TODw   = sTODw + pTODw;                                         //kg/d | total TOD in wastage
   let TODout = TODw + TODe + FOt + FOd;                               //kg/d | total TOD out
   let TOD_balance = 100*TODout/TODi;                                  //percentage
 
   //2.10 - N balance
-  let FNti      = this.fluxes.totals.TKN.total         + Q *Nni; //kg/d as N | total TN influent
-  let FNte      = nit.effluent.fluxes.totals.TKN.total + Qe*Nne; //kg/d as N | total TN effluent
-  let FNw       = nit.wastage.fluxes.totals.TKN.total  + Qw*Nne; //kg/d as N | total TN wastage
-  let FNout     = FNte + FNw + FN2g;                             //kg/d as N | total TN out
+  let FNti      = this.fluxes.totals.TKN.total         + Q *Nni; //kgN/d | total TN influent
+  let FNte      = nit.effluent.fluxes.totals.TKN.total + Qe*Nne; //kgN/d | total TN effluent
+  let FNw       = nit.wastage.fluxes.totals.TKN.total  + Qw*Nne; //kgN/d | total TN wastage
+  let FNout     = FNte + FNw + FN2g;                             //kgN/d | total TN out
   let N_balance = 100*FNout/FNti;                                //percentage
   //denitrification end-------------------------------------------------------------
 
   //create output streams (effluent and wastage)
   let Suse    = inf_frac.COD.usCOD;           //mg/L | USO influent == effluent
   let Pse     = nit.effluent.components.S_OP; //mg/L | PO4 nit effluent
-  let BPO_was = nit.wastage.components.X_BPO; //mg/L | BPO concentration
   let UPO_was = nit.wastage.components.X_UPO; //mg/L | UPO concentration
   let iSS_was = nit.wastage.components.X_iSS; //mg/L | iSS concentration
+  let OHO_was = nit.wastage.components.X_OHO; //mg/L | OHO concentration
 
-  //create output streams---------->(Q   VFA FBSO BPO      UPO      USO   iSS      FSA  PO4  NOx)
-  let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae, Pse, Nne);
-  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne);
+  //create output streams---------->(Q   VFA FBSO BPO UPO      USO   iSS      FSA  PO4  NOx  OHO    )
+  let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae, Pse, Nne, 0      );
+  let wastage  = new State_Variables(Qw, 0,  S_b, 0,  UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was);
 
   //denitrification results
   let process_variables = {
-    K1T          :{value:K1T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 1"},
+    //K1T          :{value:K1T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 1"},
     K2T          :{value:K2T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 2"},
-    K3T          :{value:K3T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 3"},
-    K4T          :{value:K4T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 4"},
+    //K3T          :{value:K3T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 3"},
+    //K4T          :{value:K4T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 4"},
     fSb_s        :{value:fSb_s        ,unit:"gBSO/gBO"   ,descr:"BSO/(BSO+BPO) ratio"},
     Dp1          :{value:Dp1          ,unit:"mgNOx/L"    ,descr:"Denitrification potential"},
     a            :{value:a            ,unit:"ø"          ,descr:"IR (internal recirculation ratio)"},
@@ -179,17 +179,19 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     FOd          :{value:FOd          ,unit:"kgO/d"      ,descr:"Oxygen recovered by denitrification"},
     FOt          :{value:FOt          ,unit:"kgO/d"      ,descr:"Total oxygen demand (FOc + FOn - FOd)"},
     OUR          :{value:OUR          ,unit:"mgO/L·h"    ,descr:"Oxygen Uptake Rate"},
-    effluent_alk :{value:effluent_alk ,unit:"mg/L_CaCO3" ,descr:"Effluent alkalinity"},
-    FN2g         :{value:FN2g         ,unit:"kgN/d"      ,descr:"N2 gas production"},           
-    TODi         :{value:TODi         ,unit:"kgO/d"      ,descr:"Total oxygen demand (influent)"},
-    TODe         :{value:TODe         ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent)"},
-    TODw         :{value:TODw         ,unit:"kgO/d"      ,descr:"Total oxygen demand (wastage)"},
-    TODout       :{value:TODout       ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent + wastage + FOt + FOd)"},
+    effluent_alk :{value:effluent_alk ,unit:"mgCaCO3/L"  ,descr:"Effluent alkalinity"},
+    N2g          :{value:N2g          ,unit:"mgN/L"      ,descr:"N2 gas production (concentration)"},           
+    FN2g         :{value:FN2g         ,unit:"kgN/d"      ,descr:"N2 gas production (mass flux)"},           
+    //TODi         :{value:TODi         ,unit:"kgO/d"      ,descr:"Total oxygen demand (influent)"},
+    //TODe         :{value:TODe         ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent)"},
+    //TODw         :{value:TODw         ,unit:"kgO/d"      ,descr:"Total oxygen demand (wastage)"},
+    //TODout       :{value:TODout       ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent + wastage + FOt + FOd)"},
     TOD_balance  :{value:TOD_balance  ,unit:"%"          ,descr:"Total oxygen demand balance (out/in)"},
+    N_balance    :{value:N_balance    ,unit:"%"          ,descr:"Nitrogen balance (out/in)"},
   };
 
   //hide description (debug)
-  //Object.values(process_variables).forEach(obj=>delete obj.descr);
+  Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     nit_process_variables: nit.process_variables,
@@ -203,9 +205,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
 /*test*/
 (function(){
-  //return
-  //syntax--------------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx)
-  let influent = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 10  );
+  return
+  //syntax--------------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx  OHO)
+  let influent = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 10,   0  );
 
   //as+n+dn syntax-----------------(T   Vp      Rs  RAS  waste_from mass_FeCl3 SF    fxt   DO   pH   IR   DO_RAS influent_alk)
   let dn = influent.denitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2, 5.0, 1.0,   250         );

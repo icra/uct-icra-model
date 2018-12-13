@@ -36,23 +36,23 @@ class State_Variables {
     //inputs and default values
     this.Q = isNaN(Q) ? 25 : Q; //ML/d | flowrate 
     this.components={ 
-      S_VFA : isNaN(S_VFA ) ? 50   : S_VFA , //mg/L | biodegradable   soluble     organics (BSO) (volatile fatty acids)
-      S_FBSO: isNaN(S_FBSO) ? 115  : S_FBSO, //mg/L | biodegradable   soluble     organics (BSO) (fermentable organics)
-      X_BPO : isNaN(X_BPO ) ? 440  : X_BPO , //mg/L | biodegradable   particulate organics (BPO)
-      X_UPO : isNaN(X_UPO ) ? 100  : X_UPO , //mg/L | unbiodegradable particulate organics (UPO)
-      S_USO : isNaN(S_USO ) ? 45   : S_USO , //mg/L | unbiodegradable soluble     organics (USO)
-      X_iSS : isNaN(X_iSS ) ? 60   : X_iSS , //mg/L | inorganic inert suspended solids (sand)
-      S_FSA : isNaN(S_FSA ) ? 39.1 : S_FSA , //mg/L | inorganic free saline ammonia (NH4)
-      S_OP  : isNaN(S_OP  ) ? 7.28 : S_OP  , //mg/L | inorganic orthophosphate (PO4)
-      S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | inorganic nitrite and nitrate (NO2 + NO3) (not part of TKN)
-      X_OHO : isNaN(X_OHO ) ? 1    : X_OHO , //TODO mg/L | Ordinary heterotrophic organisms (expressed as COD)
+      S_VFA : isNaN(S_VFA ) ? 50   : S_VFA , //mg/L | Biodegradable   Soluble     Organics (BSO) (volatile fatty acids)
+      S_FBSO: isNaN(S_FBSO) ? 115  : S_FBSO, //mg/L | Biodegradable   Soluble     Organics (BSO) (fermentable organics)
+      X_BPO : isNaN(X_BPO ) ? 440  : X_BPO , //mg/L | Biodegradable   Particulate Organics (BPO)
+      X_UPO : isNaN(X_UPO ) ? 100  : X_UPO , //mg/L | Unbiodegradable Particulate Organics (UPO)
+      S_USO : isNaN(S_USO ) ? 45   : S_USO , //mg/L | Unbiodegradable Soluble     Organics (USO)
+      X_iSS : isNaN(X_iSS ) ? 60   : X_iSS , //mg/L | Inert Suspended Solids (sand)
+      S_FSA : isNaN(S_FSA ) ? 39.1 : S_FSA , //mg/L | Inorganic Free Saline Ammonia (NH4)
+      S_OP  : isNaN(S_OP  ) ? 7.28 : S_OP  , //mg/L | Inorganic OrthoPhosphate (PO4)
+      S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
+      X_OHO : isNaN(X_OHO ) ? 0    : X_OHO , //mg/L | Ordinary Heterotrophic Organisms (expressed as COD)
     };
     this.mass_ratios={
       /*----+------------------+----------------+-----------------+-----------------+
       |     | COD              | C              | N               | P               |
       +-----+------------------+----------------+-----------------+-----------------*/
-      /*VFA*/ f_CV_VFA : 1.0667, f_C_VFA : 0.400, f_N_VFA : 0.0000, f_P_VFA : 0.0000, // BSO (VFA)
-      /*FBS*/ f_CV_FBSO: 1.4200, f_C_FBSO: 0.471, f_N_FBSO: 0.0464, f_P_FBSO: 0.0118, // BSO (FBSO)
+      /*VFA*/ f_CV_VFA : 1.0667, f_C_VFA : 0.400, f_N_VFA : 0.0000, f_P_VFA : 0.0000, // part of BSO (VFA)
+      /*FBS*/ f_CV_FBSO: 1.4200, f_C_FBSO: 0.471, f_N_FBSO: 0.0464, f_P_FBSO: 0.0118, // part of BSO (FBSO)
       /*BPO*/ f_CV_BPO : 1.5230, f_C_BPO : 0.498, f_N_BPO : 0.0323, f_P_BPO : 0.0072, // BPO
       /*UPO*/ f_CV_UPO : 1.4810, f_C_UPO : 0.518, f_N_UPO : 0.1000, f_P_UPO : 0.0250, // UPO
       /*USO*/ f_CV_USO : 1.4930, f_C_USO : 0.498, f_N_USO : 0.0366, f_P_USO : 0.0000, // USO
@@ -70,41 +70,41 @@ class State_Variables {
     this.components[key]=newValue;
   };
 
-  //calculate totals and complete fractionation for COD, TKN, TP, TOC and TSS
+  //calculate totals and complete fractionation for [COD, TKN, TP, TOC,TSS]
   get totals(){
     let mr = this.mass_ratios; //alias for code reduction
     let co = this.components;  //alias for code reduction
 
     //totals
-      let Total_COD = co.S_VFA + co.S_FBSO + co.S_USO + co.X_BPO + co.X_UPO + co.X_OHO; //TODO
+      let Total_COD = co.S_VFA + co.S_FBSO + co.S_USO + co.X_BPO + co.X_UPO + co.X_OHO;
       let Total_TOC = 
         co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA  +
         co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO +
         co.S_USO  * mr.f_C_USO  / mr.f_CV_USO  +
         co.X_BPO  * mr.f_C_BPO  / mr.f_CV_BPO  +
         co.X_UPO  * mr.f_C_UPO  / mr.f_CV_UPO  +
-        co.X_OHO  * mr.f_C_OHO  / mr.f_CV_OHO  ; //new TODO
+        co.X_OHO  * mr.f_C_OHO  / mr.f_CV_OHO  ;
       let Total_TKN = co.S_FSA  + 
         co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA  +
         co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO +
         co.S_USO  * mr.f_N_USO  / mr.f_CV_USO  +
         co.X_BPO  * mr.f_N_BPO  / mr.f_CV_BPO  +
         co.X_UPO  * mr.f_N_UPO  / mr.f_CV_UPO  +
-        co.X_OHO  * mr.f_N_OHO  / mr.f_CV_OHO  ; //new TODO
+        co.X_OHO  * mr.f_N_OHO  / mr.f_CV_OHO  ;
       let Total_TP = co.S_OP    +
         co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA  +
         co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO +
         co.S_USO  * mr.f_P_USO  / mr.f_CV_USO  +
         co.X_BPO  * mr.f_P_BPO  / mr.f_CV_BPO  +
         co.X_UPO  * mr.f_P_UPO  / mr.f_CV_UPO  +
-        co.X_OHO  * mr.f_P_OHO  / mr.f_CV_OHO  ; //new TODO
+        co.X_OHO  * mr.f_P_OHO  / mr.f_CV_OHO  ;
       let Total_VSS =
         co.X_BPO / mr.f_CV_BPO + 
         co.X_UPO / mr.f_CV_UPO +
         co.X_OHO / mr.f_CV_OHO ;
       let Total_TSS = Total_VSS + co.X_iSS;
 
-    //fractionation of COD
+    //COD all fractions
       let bsCOD = co.S_VFA + co.S_FBSO;
       let usCOD = co.S_USO;
       let bpCOD = co.X_BPO;
@@ -115,12 +115,12 @@ class State_Variables {
       let pCOD = bpCOD + upCOD;
       let COD={
         total: Total_COD, 
-        active: co.X_OHO,
         bCOD,  uCOD,  sCOD,  pCOD,
         bsCOD, usCOD, bpCOD, upCOD,
+        active: co.X_OHO,
       };
 
-    //fractionation of Total Organic Carbon (TOC)
+    //TOC all fractions
       let bsOC = 
         co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO;
@@ -131,15 +131,14 @@ class State_Variables {
       let uOC = usOC + upOC;
       let sOC = bsOC + usOC;
       let pOC = bpOC + upOC;
-      let activeOC = co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO; //new TODO
       let TOC={
         total:Total_TOC,
-        activeOC,
         bOC,  uOC,  sOC,  pOC,
         bsOC, usOC, bpOC, upOC,
+        active: co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO,
       };
 
-    //fractionation of Organic Nitrogen (part of TKN)
+    //ON all fractions (TKN=ON+NH4)
       let bsON = 
         co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO;
@@ -150,17 +149,16 @@ class State_Variables {
       let uON = usON + upON;
       let sON = bsON + usON;
       let pON = bpON + upON;
-      let activeON = co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO; //new TODO
       let TKN={
         total:Total_TKN,
         FSA:co.S_FSA,
-        activeON,
         ON:sON+pON, 
         bON,  uON,  sON,  pON,
         bsON, usON, bpON, upON,
+        active: co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO,
       }
 
-    //fractionation of Organic Phosphorus (TP)
+    //OP all fractions (TP=OP+PO4)
       let bsOP = 
         co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO;
@@ -171,27 +169,25 @@ class State_Variables {
       let uOP = usOP + upOP;
       let sOP = bsOP + usOP;
       let pOP = bpOP + upOP;
-      let activeOP = co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO; //new TODO
       let TP={
         total:Total_TP,
         PO4:co.S_OP,
-        activeOP,
         OP:sOP+pOP,
         bOP,  uOP,  sOP,  pOP,
         bsOP, usOP, bpOP, upOP,
+        active: co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO,
       };
 
-    //fractionation of TSS (Total Supsended Solids)
+    //TSS all fractions
       let bVSS = co.X_BPO / mr.f_CV_BPO;
       let uVSS = co.X_UPO / mr.f_CV_UPO;
-      let activeVSS = co.X_OHO / mr.f_CV_OHO; //new TODO
       let TSS={
         total:Total_TSS,
         iSS:co.X_iSS,
         VSS:Total_VSS, 
-        activeVSS,
         bVSS,
         uVSS,
+        active: co.X_OHO / mr.f_CV_OHO,
       };
 
     //pack results
@@ -238,10 +234,11 @@ class State_Variables {
     }
   }
 
-  //combine 2 state variables: return a new SV object with the sum
+  //combine 2 "state variables" objects: return a new SV object with the sum
   combine(sv){
-    let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0);
-    //new flowrate
+    //new object
+    let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);
+    //new object's flowrate
     let Q = this.Q + sv.Q;
     new_sv.Q = Q;
     //new concentrations: sum fluxes and divide by new Q
@@ -273,12 +270,16 @@ try{module.exports=State_Variables;}catch(e){}
   })();
   //check totals and fluxes
   (function(){
+    return
     let s = new State_Variables(25);
     console.log("=== Components (mg/L) ===");  console.log(s.components);
     console.log("=== Totals (mg/L) ===");      console.log(s.totals);
     console.log("=== Fluxes (kg/d) ===");      console.log(s.fluxes);
   })();
-  {/*example from george ekama (raw ww + set ww)
+  //example from george ekama (raw ww + set ww)
+  (function(){
+    return
+    /*
     [inputs]                    [outputs]
     S_VFA_inf:         50,      Total_COD_raw:  1151,
     S_FBSO_inf:        186,     Total_C_raw:    383.4286,
@@ -294,9 +295,9 @@ try{module.exports=State_Variables;}catch(e){}
                                 Total_TSS_set:  245.1406 */
 
     //create 2 manual scenarios: (1) raw ww, (2) settled ww
-    //syntax--------------------(Q,  VFA, FBSO, BPO, UPO, USO, iSS, FSA,  OP,    NOx)
-    let sv = new State_Variables(25, 50,  186,  0,   0,   58,  0,   59.6, 14.15, 0);
+    //syntax--------------------(Q   VFA  FBSO  BPO  UPO  USO  iSS  FSA   OP     NOx OHO)
+    let sv = new State_Variables(25, 50,  186,  0,   0,   58,  0,   59.6, 14.15, 0,  0  );
     sv.set("X_BPO", 707); sv.set("X_UPO", 150); sv.set("X_iSS", 100); console.log(sv.summary);
     sv.set('X_BPO', 301); sv.set('X_UPO', 20);  sv.set('X_iSS', 34);  console.log(sv.summary);
-  };
+  })();
 })();
