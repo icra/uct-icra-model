@@ -5,22 +5,27 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
 
 ## status: under development 
 
+## Model assumptions
+  - influent VFA is 0 at the effluent
+  - influent OHO is always 0
+  - [TODO] finish list
+
 ## doubts/pending/ask george ekama
-- technically we can have influent OHOs
-- [next skype] discuss about formulas for for Ns, Ps, FOc regarding to mass
-  ratios
+  - ?
 
 ## Lluís B. tasks (ordered by priority)
+  - Separar balanços de process variables
   - [not finished] write equations in pdf (file "formulas.ms")
+  - [pending] API
   - [pending] integrate constants.js to the code
-  - [pending] add a 'see.php' source code syntax viewer for html
   - [pending] ./activated-sludge.js: change kv to 0.07 (high value makes that BSO effluent is ≈ 0) 
+  - [pending] add a 'see.php' source code syntax viewer for html
   - [done] check K-O in ASM1
 
 ## Future
   - add energy consumption module
   - add anaerobic digestion module
-  - add stoichiometry (for {CO2, N2}(air) produced)
+  - add stoichiometry for CO2 produced
 
 ## done/solved/clear/discussed
   - [as model] confirm final Rsm formula (min sludge age to ensure nitrification).
@@ -34,6 +39,7 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
   - [as model] Qw wastage (waste from reactor or sst)
   - [as model] extra-iSS produced in CPR to wastage and MX-IO
   - [as model] influent nitrate (NOx): if we have influent NOx, TOD balance not closing.
+  - [as model] OHO as a new state variable
   - [as model] why is kg of FeCl3 added is not equal to the extra iSS produced
     (for example 3000 kg FeCl3 produces ~2500 kg iSS. The remaining ~500 kg is
     Cl(-) ion?).

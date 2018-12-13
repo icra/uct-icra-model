@@ -1,4 +1,5 @@
 /*RECOMANADOR*/
+/*Executa el model una vegada i n vegades*/
 
 //import files
 try{
@@ -52,8 +53,8 @@ function run_model(influent, tram, conf, i, deg){
 
   //get TSS and FOt
   let FOt = conf.dn ? dn_process_variables.FOt.value : (conf.nit ? nit_process_variables.FOt_fxt.value : as_process_variables.FOt.value); //kgO/d | oxygen demand
-  let TSS = as.wastage.fluxes.totals.TSS.total;             //kgTSS/d | sludge produced in secondary
-  if(conf.pst) TSS += pst.wastage.fluxes.totals.TSS.total;  //kgTSS/d | sludge produced in pst
+  let TSS = as.wastage.fluxes.totals.TSS.total;             //kgTSS/d | secondary sludge produced in sst
+  if(conf.pst) TSS += pst.wastage.fluxes.totals.TSS.total;  //kgTSS/d | primary   sludge produced in pst
 
   //get NH4 and PO4 (plant and river)
   let NH4_plant = as.effluent.components.S_FSA; //mgN/L NH4 at plant effluent
@@ -88,17 +89,17 @@ function run_simulacions(influent, tram, conf, i, deg, variacions){
       let run = run_model(influent, tram, conf, i, deg);
       //combinació actual
       let combinacio = {
-        Rs         :i.Rs,
-        RAS        :i.RAS,
-        DO         :i.DO,
-        mass_FeCl3 :i.mass_FeCl3,
-        FOt: run.FOt,
-        TSS: run.TSS,
-        NH4_plant: run.NH4_plant,
-        PO4_plant: run.PO4_plant,
-        NH4_river: run.NH4_river,
-        PO4_river: run.PO4_river,
-        errors: run.errors,
+        Rs:         i.Rs,
+        RAS:        i.RAS,
+        DO:         i.DO,
+        mass_FeCl3: i.mass_FeCl3,
+        FOt:        run.FOt,
+        TSS:        run.TSS,
+        NH4_plant:  run.NH4_plant,
+        PO4_plant:  run.PO4_plant,
+        NH4_river:  run.NH4_river,
+        PO4_river:  run.PO4_river,
+        errors:     run.errors,
       };
       combinacions.push(combinacio);
       return;
@@ -118,12 +119,12 @@ function run_simulacions(influent, tram, conf, i, deg, variacions){
 };
 
 /*test*/
-let variacions;   //global so is accessible to DOM
-let combinacions; //global so is accessible to DOM
+let variacions;   //global, accessible to DOM (user input)
+let combinacions; //global, accessible to DOM (output)
 (function(){
-  //return
+  return
 
-  //crea un influent--------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
+  //nou influent------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );
 
   //configuració edar
@@ -150,7 +151,7 @@ let combinacions; //global so is accessible to DOM
     influent_alk : 250,       //mg/L  | DN  | influent alkalinity (mg/L CaCO3)
   };
 
-  //tram upstream--(wb      wt      Db        S          n       Li    Di   Ti)
+  //riu upstream.--(wb      wt      Db        S          n       Li    Di   Ti)
   let tram=new Tram(25.880, 62.274, 18.45841, 0.0010055, 0.0358, 2000, 0.6, 15);
 
   //degradació riu paràmetres
@@ -159,7 +160,7 @@ let combinacions; //global so is accessible to DOM
     k    :{ NH4:1,         PO4:1         },
   };
 
-  //recursive wwtp parameter variations for each simulation run
+  //recursive variations for each simulation run
   variacions={
     Rs:        [6,    8,    10,   12,   15,   20,  25, 30, 40 ], //d
     RAS:       [0.75, 0.85, 0.95, 1.05, 1.15, 1.25            ], //ø

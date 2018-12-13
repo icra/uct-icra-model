@@ -21,11 +21,11 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   removal_UPO /= 100;
   removal_iSS /= 100;
 
-  //assume that influent OHO are settled as BPO
-  let removal_OHO = removal_BPO;
+  //influent OHO removed as UPO (is not important because influent OHO is always 0)
+  let removal_OHO = removal_UPO;
 
   //calculate wastage and primary effluent flowrates
-  let Qi = this.Q;
+  let Qi = this.Q;  //ML/d
   let Qw = fw * Qi; //ML/d
   let Qe = Qi - Qw; //ML/d
 
@@ -59,30 +59,17 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   let effluent = new State_Variables(Qe, S_VFA, S_FBSO, X_BPO_e, X_UPO_e, S_USO, X_iSS_e, S_FSA, S_OP, S_NOx, X_OHO_e);
   let wastage  = new State_Variables(Qw, S_VFA, S_FBSO, X_BPO_w, X_UPO_w, S_USO, X_iSS_w, S_FSA, S_OP, S_NOx, X_OHO_w);
 
-  //calculate mass flux sludge produced (kg TSS)
-  let primary_sludge = wastage.fluxes.totals.TSS.total;
-
-  //pack process variables
-  let process_variables={
-    primary_sludge: {value:primary_sludge, unit:"kg_TSS/d", descr:"Primary sludge production"},
-  };
-
-  //results
-  return {
-    process_variables,
-    effluent,
-    wastage
-  };
+  //end
+  return { effluent, wastage };
 };
 
 //test
 (function test(){
-  return
+  //return
   let inf = new State_Variables(); //use default values
   let pst = inf.primary_settler(); //use default values
   //show info
   console.log(inf.summary);
-  console.log(pst.process_variables);
   console.log(pst.effluent.summary);
   console.log(pst.wastage.summary); //same as table page 8 G.Ekama notes
 })();

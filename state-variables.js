@@ -1,9 +1,8 @@
 /* 
   STATE VARIABLES AND MASS RATIOS ENCAPSULATION
-
-  Each removal technology is be a method inside state variables,
-  implemented in its own file (e.g. nitrification.js)
-  as "State_Variables.prototype.technology_name=function(){implementation}"
+  Each removal technology is be a method inside state variables, implemented in
+  its own file (e.g. nitrification.js) as
+  "State_Variables.prototype.technology_name=function(){implementation}"
   technologies are: 
     "primary-settler", 
     "activated-sludge", 
@@ -12,10 +11,9 @@
     "chemical-P-removal"
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
-
-  Qi → [PST] → [AS] → [nitrification] → Qe
-        ↓      ↓            ↓
-        Qw     Qw           Qw
+    Qi → [PST] → [AS] → [nitrification] → Qe
+          ↓      ↓            ↓
+          Qw     Qw           Qw
 
   Summary of this file:
     1. class data structure
@@ -46,6 +44,7 @@ class State_Variables {
       S_OP  : isNaN(S_OP  ) ? 7.28 : S_OP  , //mg/L | Inorganic OrthoPhosphate (PO4)
       S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
       X_OHO : isNaN(X_OHO ) ? 0    : X_OHO , //mg/L | Ordinary Heterotrophic Organisms (expressed as COD)
+                                             //influent OHO should always be 0 (model assumption)
     };
     this.mass_ratios={
       /*----+------------------+----------------+-----------------+-----------------+
@@ -65,8 +64,8 @@ class State_Variables {
 
   //set a single state variable. example -> sv.set("S_VFA",10);
   set(key, newValue){
-    if(this.components[key]===undefined) throw 'key '+key+' not found';
-    if(typeof newValue != 'number')      throw 'newValue is not a number';
+    if(this.components[key]===undefined) throw `key "${key}" not found`;
+    if(typeof newValue != 'number')      throw `newValue ("${newValue}") is not a number`;
     this.components[key]=newValue;
   };
 
@@ -75,7 +74,7 @@ class State_Variables {
     let mr = this.mass_ratios; //alias for code reduction
     let co = this.components;  //alias for code reduction
 
-    //totals
+    //all totals
       let Total_COD = co.S_VFA + co.S_FBSO + co.S_USO + co.X_BPO + co.X_UPO + co.X_OHO;
       let Total_TOC = 
         co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA  +
@@ -104,7 +103,7 @@ class State_Variables {
         co.X_OHO / mr.f_CV_OHO ;
       let Total_TSS = Total_VSS + co.X_iSS;
 
-    //COD all fractions
+    //COD all subfractions
       let bsCOD = co.S_VFA + co.S_FBSO;
       let usCOD = co.S_USO;
       let bpCOD = co.X_BPO;
@@ -120,7 +119,7 @@ class State_Variables {
         active: co.X_OHO,
       };
 
-    //TOC all fractions
+    //TOC all subfractions
       let bsOC = 
         co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO;
@@ -138,7 +137,7 @@ class State_Variables {
         active: co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO,
       };
 
-    //ON all fractions (TKN=ON+NH4)
+    //ON all subfractions (TKN=ON+NH4)
       let bsON = 
         co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO;
@@ -158,7 +157,7 @@ class State_Variables {
         active: co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO,
       }
 
-    //OP all fractions (TP=OP+PO4)
+    //OP all subfractions (TP=OP+PO4)
       let bsOP = 
         co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO;
@@ -178,7 +177,7 @@ class State_Variables {
         active: co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO,
       };
 
-    //TSS all fractions
+    //TSS all subfractions
       let bVSS = co.X_BPO / mr.f_CV_BPO;
       let uVSS = co.X_UPO / mr.f_CV_UPO;
       let TSS={
@@ -227,21 +226,21 @@ class State_Variables {
       NOx: [this.components.S_NOx, fluxes.components.S_NOx],
       TP:  [totals.TP.total,       fluxes.totals.TP.total],
       PO4: [totals.TP.PO4,         fluxes.totals.TP.PO4],
-      TOC: [totals.TOC.total,      fluxes.totals.TOC.total],
-      TSS: [totals.TSS.total,      fluxes.totals.TSS.total],
-      iSS: [totals.TSS.iSS,        fluxes.totals.TSS.iSS],
       VSS: [totals.TSS.VSS,        fluxes.totals.TSS.VSS],
+      iSS: [totals.TSS.iSS,        fluxes.totals.TSS.iSS],
+      TSS: [totals.TSS.total,      fluxes.totals.TSS.total],
+      TOC: [totals.TOC.total,      fluxes.totals.TOC.total],
     }
   }
 
-  //combine 2 "state variables" objects: return a new SV object with the sum
+  //combine 2 state variable objects
   combine(sv){
-    //new object
+    //new empty object
     let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);
-    //new object's flowrate
+    //new flowrate
     let Q = this.Q + sv.Q;
     new_sv.Q = Q;
-    //new concentrations: sum fluxes and divide by new Q
+    //new concentrations: fluxes divided by new Q
     Object.keys(this.components).forEach(key=>{
       let mass=0;
       mass += this.Q * this.components[key];
@@ -257,6 +256,15 @@ try{module.exports=State_Variables;}catch(e){}
 
 /*tests*/
 (function(){
+  //check totals and fluxes
+  (function(){
+    return
+    let s = new State_Variables(25);
+    console.log("=== Components (mg/L) ===");     console.log(s.components);
+    console.log("=== Summary (mg/L & kg/d) ==="); console.log(s.summary);
+    console.log("=== Totals (mg/L) ===");         console.log(s.totals);
+    console.log("=== Fluxes (kg/d) ===");         console.log(s.fluxes);
+  })();
   //combine 2 state variables and check summary
   (function(){
     return
@@ -267,14 +275,6 @@ try{module.exports=State_Variables;}catch(e){}
     console.log(s2.summary);
     console.log(s3.summary);
     console.log(s3.components);
-  })();
-  //check totals and fluxes
-  (function(){
-    return
-    let s = new State_Variables(25);
-    console.log("=== Components (mg/L) ===");  console.log(s.components);
-    console.log("=== Totals (mg/L) ===");      console.log(s.totals);
-    console.log("=== Fluxes (kg/d) ===");      console.log(s.fluxes);
   })();
   //example from george ekama (raw ww + set ww)
   (function(){

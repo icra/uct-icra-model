@@ -38,8 +38,9 @@
     #degradation input{
       width:70px;
     }
-    #edar input{
-      max-width:64px;
+    #edar input[type=number], #edar select{
+      display:block;
+      max-width:70px;
     }
     #processes table {
       margin-right:3px;
@@ -69,90 +70,92 @@
   <div id=inputs style="border-right:1px solid #ccc;padding-right:4px;margin-right:4px"><div><strong>Inputs</strong></div>
     <!--influent--><div><code>Influent</code></div>
     <table id=influent><tr>
-      <td title="Flowrate"                            >Q     <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
-      <td title="Volatile fatty acids"                >S_VFA <input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
-      <td title="Fermentable organics"                >S_FBSO<input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span>
-      <td title="Biodegradable particulate organics"  >X_BPO <input type=number id=X_BPO  value=440 ><span class=unit>mg/L</span>
-      <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=X_UPO  value=100 ><span class=unit>mg/L</span>
-      <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=S_USO  value=45  ><span class=unit>mg/L</span>
-      <td title="Inert suspended solids"              >X_iSS <input type=number id=X_iSS  value=60  ><span class=unit>mg/L</span>
-      <td title="Free saline ammonia"                 >S_NH4 <input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span>
-      <td title="Orthophosphate (PO4)"                >S_PO4 <input type=number id=S_OP   value=7.28><span class=unit>mg/L</span>
-      <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span>
-      <td title="OHOs" style="display:none"           >X_OHO <input type=number id=X_OHO  value=0   ><span class=unit>mg/L</span>
+      <td title="Flowrate"                            >Q               <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
+      <td title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
+      <td title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span>
+      <td title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=X_BPO  value=440 ><span class=unit>mg/L</span>
+      <td title="Unbiodegradable particulate organics">X<sub>UPO </sub><input type=number id=X_UPO  value=100 ><span class=unit>mg/L</span>
+      <td title="Unbiodegradable soluble organics"    >S<sub>USO </sub><input type=number id=S_USO  value=45  ><span class=unit>mg/L</span>
+      <td title="Inert suspended solids"              >X<sub>iSS </sub><input type=number id=X_iSS  value=60  ><span class=unit>mg/L</span>
+      <td title="Free saline ammonia"                 >S<sub>NH4 </sub><input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span>
+      <td title="Orthophosphate (PO4)"                >S<sub>PO4 </sub><input type=number id=S_OP   value=7.28><span class=unit>mg/L</span>
+      <td title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span>
+      <td title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0   ><span class=unit>mg/L</span>
     </table> 
 
     <!--plant--><div><code>Plant</code></div>
     <table id=edar style=font-size:smaller>
       <tr>
         <td><label><input type=checkbox id=pst> Primary settler</label>
-        <td>fw         <br><input type=number id=fw          value=0.005  > <span class=unit>ø</span>
-        <td>removal_BPO<br><input type=number id=removal_BPO value=42.3352> <span class=unit>%</span>
-        <td>removal_UPO<br><input type=number id=removal_UPO value=90.0500> <span class=unit>%</span>
-        <td>removal_iSS<br><input type=number id=removal_iSS value=75.1250> <span class=unit>%</span>
+        <td>fw                    <span class=unit>(ø)</span> <input type=number id=fw          value=0.005  > 
+        <td>removal<sub>BPO</sub> <span class=unit>(%)</span> <input type=number id=removal_BPO value=42.3352> 
+        <td>removal<sub>UPO</sub> <span class=unit>(%)</span> <input type=number id=removal_UPO value=90.0500> 
+        <td>removal<sub>iSS</sub> <span class=unit>(%)</span> <input type=number id=removal_iSS value=75.1250> 
       </tr><tr>
         <td><label><input type=checkbox id=as checked=true disabled> Activated sludge</label>
-        <td>T         <br><input type=number id=T          value=16  >   <span class=unit>ºC</span>
-        <td>Vp        <br><input type=number id=Vp         value=8473.3> <span class=unit>m<sup>3</sup></span>
-        <td>Rs        <br><input type=number id=Rs         value=15  >   <span class=unit>d</span>
-        <td>RAS       <br><input type=number id=RAS        value=1.0 >   <span class=unit>ø</span>
-        <td>waste_from<br><select id=waste_from><option>reactor<option>sst</select>
+        <td>T          <span class=unit>(ºC)</span>           <input type=number id=T   value=16    >   
+        <td>Vp         <span class=unit>(m<sup>3</sup>)</span><input type=number id=Vp  value=8473.3> 
+        <td>Rs         <span class=unit>(d)</span>            <input type=number id=Rs  value=15    >   
+        <td>RAS        <span class=unit>(ø)</span>            <input type=number id=RAS value=1.0   >   
+        <td>waste from <select id=waste_from><option>reactor<option>sst</select>
       </tr><tr>
         <td><label><input type=checkbox id=nit> Nitrification</label>
-        <td>SF <br><input type=number id=SF  value=1.25> <span class=unit>ø</span>
-        <td>fxt<br><input type=number id=fxt value=0.39> <span class=unit>ø</span>
-        <td>DO <br><input type=number id=DO  value=2.0 > <span class=unit>mg/L</span>
-        <td>pH <br><input type=number id=pH  value=7.2 > <span class=unit>ø</span>
+        <td>SF  <span class=unit>(ø)</span>   <input type=number id=SF  value=1.25> 
+        <td>fxt <span class=unit>(ø)</span>   <input type=number id=fxt value=0.39> 
+        <td>DO  <span class=unit>(mg/L)</span><input type=number id=DO  value=2.0 > 
+        <td>pH  <span class=unit>(ø)</span>   <input type=number id=pH  value=7.2 > 
       </tr><tr>
         <td><label><input type=checkbox id=dn> Denitrification</label>
-        <td>IR          <br><input type=number id=IR           value=5.4> <span class=unit>ø</span>
-        <td>DO_RAS      <br><input type=number id=DO_RAS       value=1.0> <span class=unit>mg/L</span>
-        <td>influent_alk<br><input type=number id=influent_alk value=250> <span class=unit>mg/L</span>
+        <td>IR                     <span class=unit>(ø)   </span><input type=number id=IR           value=5.4> 
+        <td>DO<sub>RAS</sub>       <span class=unit>(mg/L)</span><input type=number id=DO_RAS       value=1.0> 
+        <td>influent<sub>alk</sub> <span class=unit>(mg/L)</span><input type=number id=influent_alk value=250> 
       </tr><tr>
         <td><label><input type=checkbox id=cpr> Chemical P removal</label>
-        <td>mass_FeCl<sub>3</sub><br><input type=number id=mass_FeCl3 value=3000> <span class=unit>kg/d</span>
+        <td>FeCl<sub>3</sub> <span class=unit>(kg/d)</span> <input type=number id=mass_FeCl3 value=3000>
       </tr>
     </table> 
 
-    <!--river--><div><code>River</code></div>
-    <table id=river>
-      <tr>
-        <td><label><input type=checkbox id=active> on/off</label>
-      </tr><tr>
-        <td title="Amplada a llera mitjana">                wb<input type=number id=wb value=25.88>     <span class=unit>m</span>
-        <td title="Amplada a bankful mitjana">              wt<input type=number id=wt value=62.274>    <span class=unit>m</span>
-        <td title="Distància entre llera i bankful mitjana">Db<input type=number id=Db value=18.458414> <span class=unit>m</span>
-        <td title="Pendent de la llera">                    S <input type=number id=S  value=0.0010055> <span class=unit>m/m</span>
-        <td title="Coeficient de manning">                  n <input type=number id=n  value=0.0358>    <span class=unit>s/m<sup>1/3</sup></span>
-        <td title="Longitud del tram">                      Li<input type=number id=Li value=2000>      <span class=unit>m</span>
-        <td title="Fondària concreta">                      Di<input type=number id=Di value=0.6>       <span class=unit>m</span>
-        <td title="Temperatura">                            Ti<input type=number id=Ti value=15>        <span class=unit>ºC</span>
-      </tr><tr>
-        <td title="Volatile fatty acids"                >S_VFA <input type=number id=river_S_VFA  value=0><span class=unit>mg/L</span>
-        <td title="Fermentable organics"                >S_FBSO<input type=number id=river_S_FBSO value=0><span class=unit>mg/L</span>
-        <td title="Biodegradable particulate organics"  >X_BPO <input type=number id=river_X_BPO  value=0><span class=unit>mg/L</span>
-        <td title="Unbiodegradable particulate organics">X_UPO <input type=number id=river_X_UPO  value=0><span class=unit>mg/L</span>
-        <td title="Unbiodegradable soluble organics"    >S_USO <input type=number id=river_S_USO  value=0><span class=unit>mg/L</span>
-        <td title="Inert suspended solids"              >X_iSS <input type=number id=river_X_iSS  value=0><span class=unit>mg/L</span>
-        <td title="Free saline ammonia"                 >S_NH4 <input type=number id=river_S_FSA  value=0><span class=unit>mg/L</span>
-        <td title="Orthophosphate (PO4)"                >S_PO4 <input type=number id=river_S_OP   value=0><span class=unit>mg/L</span>
-        <td title="Nitrate (NO3), nitrite (NO2)"        >S_NOx <input type=number id=river_S_NOx  value=0><span class=unit>mg/L</span>
-        <td title="OHOs" style="display:none"           >X_OHO <input type=number id=river_X_OHO  value=0><span class=unit>mg/L</span>
-      </tr>
-    </table>
+    <!--river--><div><code onclick=toggle_visibility('#river_container')>[+] River</code></div>
+    <div id=river_container>
+      <table id=river>
+        <tr>
+          <td><label><input type=checkbox id=active> on/off</label>
+        </tr><tr>
+          <td title="Amplada a llera mitjana">                wb<input type=number id=wb value=25.88>     <span class=unit>m</span>
+          <td title="Amplada a bankful mitjana">              wt<input type=number id=wt value=62.274>    <span class=unit>m</span>
+          <td title="Distància entre llera i bankful mitjana">Db<input type=number id=Db value=18.458414> <span class=unit>m</span>
+          <td title="Pendent de la llera">                    S <input type=number id=S  value=0.0010055> <span class=unit>m/m</span>
+          <td title="Coeficient de manning">                  n <input type=number id=n  value=0.0358>    <span class=unit>s/m<sup>1/3</sup></span>
+          <td title="Longitud del tram">                      Li<input type=number id=Li value=2000>      <span class=unit>m</span>
+          <td title="Fondària concreta">                      Di<input type=number id=Di value=0.6>       <span class=unit>m</span>
+          <td title="Temperatura">                            Ti<input type=number id=Ti value=15>        <span class=unit>ºC</span>
+        </tr><tr>
+          <td title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=river_S_VFA  value=0><span class=unit>mg/L</span>
+          <td title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=river_S_FBSO value=0><span class=unit>mg/L</span>
+          <td title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=river_X_BPO  value=0><span class=unit>mg/L</span>
+          <td title="Unbiodegradable particulate organics">X<sub>UPO </sub><input type=number id=river_X_UPO  value=0><span class=unit>mg/L</span>
+          <td title="Unbiodegradable soluble organics"    >S<sub>USO </sub><input type=number id=river_S_USO  value=0><span class=unit>mg/L</span>
+          <td title="Inert suspended solids"              >X<sub>iSS </sub><input type=number id=river_X_iSS  value=0><span class=unit>mg/L</span>
+          <td title="Free saline ammonia"                 >S<sub>NH4 </sub><input type=number id=river_S_FSA  value=0><span class=unit>mg/L</span>
+          <td title="Orthophosphate (PO4)"                >S<sub>PO4 </sub><input type=number id=river_S_OP   value=0><span class=unit>mg/L</span>
+          <td title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=river_S_NOx  value=0><span class=unit>mg/L</span>
+          <td title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=river_X_OHO  value=0><span class=unit>mg/L</span>
+        </tr>
+      </table>
 
-    <!--river--><div><code>River degradation</code></div>
-    <table id=degradation>
-      <tr id=NH4>
-        <td>NH<sub>4</sub>
-        <td>R20<input type=number id=NH4_R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
-        <td>k  <input type=number id=NH4_k    value=1>         <span class=unit>mg/L</span>
-      <tr id=PO4>
-        <td>PO<sub>4</sub>
-        <td>R20<input type=number id=PO4_R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
-        <td>k  <input type=number id=PO4_k    value=1>         <span class=unit>mg/L</span>
-      </tr>
-    </table>
+      <!--river--><div><code>River degradation</code></div>
+      <table id=degradation>
+        <tr id=NH4>
+          <td>NH<sub>4</sub>
+          <td>R<sub>20</sub><input type=number id=NH4_R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
+          <td>k             <input type=number id=NH4_k    value=1>         <span class=unit>mg/L</span>
+        <tr id=PO4>
+          <td>PO<sub>4</sub>
+          <td>R<sub>20</sub><input type=number id=PO4_R_20 value=0.0000005> <span class=unit>g/m<sup>2</sup>·min</span>
+          <td>k             <input type=number id=PO4_k    value=1>         <span class=unit>mg/L</span>
+        </tr>
+      </table>
+    </div>
   </div>
 
   <!--outputs-->
