@@ -65,7 +65,7 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
 
 //test
 (function test(){
-  //return
+  return
   let inf = new State_Variables(); //use default values
   let pst = inf.primary_settler(); //use default values
   //show info

@@ -25,28 +25,54 @@ Inputs
 Q
 .EN
 .EQ (mg/L)
-S sub VFA, S sub FBSO, X sub BPO, X sub UPO, S sub USO, X sub iSS, S sub FSA, S sub OP, S sub NOx
+  S sub VFA,
+  S sub FBSO,
+  X sub BPO,
+  X sub UPO,
+  S sub USO,
+  X sub iSS,
+  S sub FSA,
+  S sub OP,
+  S sub NOx,
+  X sub OHO
 .EN
 
 .NH 2
 Total chemical oxygen demand (COD = $S sub t$)
 .EQ (mgCOD/L)
-S sub t = S sub VFA + S sub FBSO + X sub BPO + X sub UPO + S sub USO
+S sub t = S sub VFA + S sub FBSO + X sub BPO + X sub UPO + S sub USO + X sub OHO
 .EN
-also:
+
+and:
+
 .TS
 tab(;) center;
 l.
-$ S sub t = S sub b + S sub u = S sub s + S sub p = S sub bs + S sub bp + S sub {u p} + S sub us $;
-$ S sub b = S sub bs + S sub bp    $;
-$ S sub u = S sub us + S sub {u p} $;
-$ S sub s = S sub bs + S sub us    $;
-$ S sub p = S sub bp + S sub {u p} $;
 $ S sub bs = S sub VFA + S sub FBSO $;
 $ S sub bp = X sub BPO $;
 $ S sub {u p } = X sub UPO $;
 $ S sub us = S sub USO $;
+$ S sub active = X sub OHO $;
+$ S sub t = S sub bs + S sub bp + S sub {u p} + S sub us + S sub active $;
 .TE
+
+The components can be grouped as follows:
+
+.TS
+tab(;) center box;
+lb lb lb.
+;$S sub  s $;$S sub  p    $
+$S sub b$ ;$S sub bs $;$S sub bp    $
+$S sub u$ ;$S sub us $;$S sub {u p} $
+.TE
+
+So,
+.EQ
+S sub t = S sub b + S sub u + S sub active
+.EN
+.EQ
+S sub t = S sub s + S sub p + S sub active
+.EN
 
 .NH 2
 Mass ratios for COD, N, P and C
@@ -61,7 +87,7 @@ $ S sub FBSO $; 1.4200; 0.0464; 0.0118; 0.471
 $ X sub BPO  $; 1.5230; 0.0323; 0.0072; 0.498
 $ X sub UPO  $; 1.4810; 0.1000; 0.0250; 0.518
 $ S sub USO  $; 1.4930; 0.0366; 0.0000; 0.498
-$ OHO        $; 1.4810; 0.1000; 0.0250; 0.518
+$ X sub OHO  $; 1.4810; 0.1000; 0.0250; 0.518
 $ ANO        $; 1.4810; 0.1000; 0.0250; 0.518
 $ PAO        $; 1.4810; 0.1000; 0.0250; 0.518
 .TE
@@ -69,7 +95,7 @@ $ PAO        $; 1.4810; 0.1000; 0.0250; 0.518
 .NH 2
 Total Kjeldahl Nitrogen (TKN = $N sub t$)
 .EQ (mgN/L)
-N sub t = N sub o + S sub FSA
+N sub t = N sub o + S sub FSA + N sub active
 .EN
 where:
 .TS
@@ -80,12 +106,13 @@ $N sub obs = S sub VFA f sub N sub VFA over f sub cv sub VFA + S sub FBSO f sub 
 $N sub obp = X sub BPO f sub N sub BPO over f sub cv sub BPO$;
 $N sub ous = S sub USO f sub N sub USO over f sub cv sub USO$;
 $N sub oup = X sub UPO f sub N sub UPO over f sub cv sub UPO$;
+$N sub active = X sub OHO f sub N sub OHO over f sub cv sub OHO $;
 .TE
 
 .NH 2
 Total Phosphorus (TP = $P sub t$)
 .EQ (mgP/L)
-P sub t = P sub o + S sub OP
+P sub t = P sub o + S sub OP + P sub active
 .EN
 where:
 .TS
@@ -96,12 +123,13 @@ $P sub obs = S sub VFA f sub P sub VFA over f sub cv sub VFA + S sub FBSO f sub 
 $P sub obp = X sub BPO f sub P sub BPO over f sub cv sub BPO$;
 $P sub ous = S sub USO f sub P sub USO over f sub cv sub USO$;
 $P sub oup = X sub UPO f sub P sub UPO over f sub cv sub UPO$;
+$P sub active = X sub OHO f sub P sub OHO over f sub cv sub OHO$;
 .TE
 
 .NH 2
 Total Organic Carbon (TOC = $C sub t$)
 .EQ (mgC/L)
-C sub t = C sub obs + C sub obp + C sub ous + C sub oup
+C sub t = C sub obs + C sub obp + C sub ous + C sub oup + C sub active
 .EN
 where:
 .TS
@@ -111,6 +139,7 @@ $C sub obs = S sub VFA f sub C sub VFA over f sub cv sub VFA + S sub FBSO f sub 
 $C sub obp = X sub BPO f sub C sub BPO over f sub cv sub BPO$;
 $C sub ous = S sub USO f sub C sub USO over f sub cv sub USO$;
 $C sub oup = X sub UPO f sub C sub UPO over f sub cv sub UPO$;
+$C sub active = X sub OHO f sub C sub OHO over f sub cv sub OHO$;
 .TE
 
 .NH 2
@@ -120,7 +149,10 @@ X sub T = X sub V + X sub iSS
 .EN
 where:
 .EQ (mgVSS/L)
-X sub V = X sub BPO over f sub cv sub BPO + X sub UPO over f sub cv sub UPO
+X sub V = 
+  X sub BPO over f sub cv sub BPO + 
+  X sub UPO over f sub cv sub UPO + 
+  X sub OHO over f sub cv sub OHO
 .EN
 
 .bp
@@ -229,10 +261,13 @@ P sub se = P sub ti - P sub s - P sub ouse - P sub precipitation
 .NH 2
 Wastage solids concentration
 .EQ (mgCOD/L)
-BPO sub was = f sub cv sub BPO (1-f sub H ) X sub BH
+BPO sub was = 0
 .EN
 .EQ (mgCOD/L)
-UPO sub was = f sub cv sub UPO (f sub H X sub BH + X sub EH + X sub I )
+UPO sub was = f sub cv sub UPO · X sub I
+.EN
+.EQ (mgCOD/L)
+OHO sub was = f sub cv sub OHO (X sub BH + X sub EH )
 .EN
 .EQ (mgiSS/L)
 iSS sub was = MX sub IO over V sub p
@@ -400,7 +435,7 @@ f sub xm = 1 - SF { b sub AT + 1 over R sub s } over µ sub AmpH
 .NH 2
 Minimum sludge age for nitrification
 .EQ (d)
-R sub sm = 1 over {µ sub AmpH ( 1-f sub xt ) - b sub AT }
+R sub sm = 1 over {{µ sub AmpH over SF} ( 1-f sub xt ) - b sub AT }
 .EN
 
 .NH 2
