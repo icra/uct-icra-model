@@ -162,7 +162,7 @@ Activated sludge
 .NH 2
 Inputs
 .EQ
-T, V sub p, R sub s, RAS, mass sub FeCl sub 3
+T, V sub p, R sub s, RAS
 .EN
 
 .NH 2
@@ -292,6 +292,17 @@ OUR = FO sub t over V sub p
 .NH
 Chemical P removal
 
+.NH 2
+Inputs
+
+.LP
+.EQ
+mass sub FeCl sub 3
+.EN
+
+.NH 2
+Molar weights
+
 .LP
 .TS
 tab(;) center;
@@ -314,7 +325,7 @@ moles sub Fe = mass sub FeCl sub 3 over {M sub FeCl sub 3 }{ {1 mol sub Fe } ove
 .NH 2
 Moles of P available
 .EQ (mgP/L)
-  P sub available = P sub ti - P sub s - P sub ouse - P sub obse 
+P sub available = P sub ti - P sub s - P sub ouse - P sub obse 
 .EN
 .EQ (molFe/d)
 moles sub P = {Q · P sub available } over M sub P
@@ -323,7 +334,7 @@ moles sub P = {Q · P sub available } over M sub P
 .NH 2
 Fe/P mole ratio
 .EQ (molFe/molP)
-  Fe/P sub ratio = {moles sub Fe } over {moles sub P }
+Fe/P sub ratio = {moles sub Fe } over {moles sub P }
 .EN
 
 .NH 2

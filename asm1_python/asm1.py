@@ -36,19 +36,19 @@ SO_sat = 8     # Valor de saturacio de oxigen
 # Solve the system dy/dt = f(y,t)
 # array of expressions to integrate
 def f(y,t):
-  ########################################################################
-  # STATE VARIABLES: Total COD, Total Nitrogen and Oxygen                #
-  ########################################################################
-  XBH = y[0]  # Active mass COD Heterotrophs                             | OHO
-  XBA = y[1]  # Active mass COD Autotrophs                               | ANO
-  Ss  = y[2]  # Biodegradable COD Soluble                                | BSO (VFA+FBSO)
-  Xs  = y[3]  # Biodegradable COD Particulate                            | BPO
-  XP  = y[4]  # Nonbiodegradable COD Particulate                         | UPO
-  XND = y[5]  # Particulate organic N Biodegradable N                    | bpON
-  SND = y[6]  # Soluble organic N Biodegradable N                        | bsON   
-  SNH = y[7]  # Free & Saline Ammonia                                    | NH4/FSA
-  SNO = y[8]  # Nitrate and Nitrite N                                    | NOx
-  SO  = y[9]  # Dissolved Oxygen Concentration                           | DO
+  #########################################################
+  # STATE VARIABLES: Total COD, Total Nitrogen and Oxygen #
+  #########################################################
+  XBH = y[0]  # Active mass COD Heterotrophs              | OHO
+  XBA = y[1]  # Active mass COD Autotrophs                | ANO
+  Ss  = y[2]  # Biodegradable COD Soluble                 | BSO (VFA+FBSO)
+  Xs  = y[3]  # Biodegradable COD Particulate             | BPO
+  XP  = y[4]  # Nonbiodegradable COD Particulate          | UPO
+  XND = y[5]  # Particulate organic N Biodegradable N     | bpON
+  SND = y[6]  # Soluble organic N Biodegradable N         | bsON   
+  SNH = y[7]  # Free & Saline Ammonia                     | NH4/FSA
+  SNO = y[8]  # Nitrate and Nitrite N                     | NOx
+  SO  = y[9]  # Dissolved Oxygen Concentration            | DO
 
   ########
   # ODEs #
