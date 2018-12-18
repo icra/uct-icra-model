@@ -69,7 +69,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let f_XBH = (YH*Rs)/(1+bHT*Rs);      //gVSS·d/gCOD | OHO biomass production rate
 
   //bCOD not degraded (FBSO)
-  const k_v20 = 10000;                      //change to 0.07 (current value makes that BSO effluent is ≈ 0) TODO
+  const k_v20 = 0.07;                       //note: a high value (~1000) makes FBSO effluent ~0
   let k_vT    = k_v20*Math.pow(1.035,T-20); //L/(mgVSS·d)
   let S_b     = 1/(f_XBH*k_vT);             //mgCOD/L
   let FdSbi   = FSbi - Q*S_b;               //kg/d COD
@@ -170,7 +170,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let iSS_was = f*X_IO*1000;                //mg/L | iSS wastage (precipitation by FeCl3 already included)
   let UPO_was = f*fCV_UPO*(X_I)      *1000; //mg/L | UPO wastage
   let OHO_was = f*fCV_OHO*(X_BH+X_EH)*1000; //mg/L | OHO wastage
-  let BPO_was = 0;                          //mg/L | BPO wastage TODO ask george about this change
+  let BPO_was = 0;                          //mg/L | BPO wastage
 
   //output streams------------------(Q,  VFA FBSO BPO UPO      USO   iSS      FSA  OP   NOx  OHO    )
   let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae, Pse, Nne, 0      );
@@ -275,4 +275,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   console.log("=== Effluent summary");       console.log(as.effluent.summary);
   console.log("=== Wastage summary");        console.log(as.wastage.components);
   console.log("=== Wastage totals");         console.log(as.wastage.totals);
+  console.log("=== Effluent summary");       console.log(as.effluent.components);
+  console.log("=== Effluent totals");        console.log(as.effluent.totals);
 })();

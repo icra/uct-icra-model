@@ -1,13 +1,4 @@
-/*
-  Xarxa de trams de riu
-    Mail Anna:
-    A la BD es desen les connexions en aquest format:
-    [
-      {"id":"WWTP65-WWTP66", "id0":"WWTP65", "id1":"WWTP66"},
-      {"id":"WWTP64-WWTP66", "id0":"WWTP64", "id1":"WWTP66"},
-      {"id":"WWTP66-WWTP63", "id0":"WWTP66", "id1":"WWTP63"},
-    ]
-*/
+/* Xarxa de trams de riu */
 
 class Xarxa {
   constructor(){
@@ -106,29 +97,29 @@ try{
   module.exports=Xarxa;
 }catch(e){}
 
-/*test: exemples xarxes de trams*/
+/*test*/
 (function(){
   return
-  //2 exemples de xarxes
-  {/* Exemple 1:
-    t1--+
-        |--> t5--+
-    t2--+        |
-                 +--> t7
-    t3--+        |
-        |--> t6--+
-    t4--+
-    */
-    let xarxa = new Xarxa();
-    let t1 = new Tram(); t1.state_variables.Q = 10; t1.state_variables.set('S_VFA',1);
-    let t2 = new Tram(); t2.state_variables.Q = 10;
-    let t3 = new Tram(); t3.state_variables.Q = 10;
-    let t4 = new Tram(); t4.state_variables.Q = 10;
-    let t5 = new Tram(); t5.pares=[t1,t2];
-    let t6 = new Tram(); t6.pares=[t3,t4];
-    let t7 = new Tram(); t7.pares=[t5,t6];
-    xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
-    xarxa.soluciona(verbose=true);
-  }
-  return;
+  /* 
+    Exemple xarxa:
+
+      t1--+
+          |--> t5--+
+      t2--+        |
+                  +--> t7
+      t3--+        |
+          |--> t6--+
+      t4--+
+
+  */
+  let xarxa = new Xarxa();
+  let t1 = new Tram(); t1.state_variables.Q = 10; t1.state_variables.set('S_VFA',1);
+  let t2 = new Tram(); t2.state_variables.Q = 10;
+  let t3 = new Tram(); t3.state_variables.Q = 10;
+  let t4 = new Tram(); t4.state_variables.Q = 10;
+  let t5 = new Tram(); t5.pares=[t1,t2];
+  let t6 = new Tram(); t6.pares=[t3,t4];
+  let t7 = new Tram(); t7.pares=[t5,t6];
+  xarxa.trams=[t1,t2,t3,t4,t5,t6,t7];
+  xarxa.soluciona(verbose=true);
 })();

@@ -6,9 +6,8 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
 ## status: under development 
 
 ## Model assumptions
-  - influent VFA is 0 at the effluent
-  - influent OHO is always 0
-  - [TODO] finish list
+  - XOHO influent is 0
+  - SVFA effluent is 0
 
 ## doubts/pending/ask george ekama
   - ?
@@ -18,7 +17,8 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
   - [not finished] write equations in pdf (file "formulas.ms")
   - [pending] API
   - [pending] integrate constants.js to the code
-  - [pending] ./activated-sludge.js: change kv to 0.07 (high value makes that BSO effluent is ≈ 0) 
+  - [pending] ./activated-sludge.js: change kv to 0.07 (high value
+    makes that BSO effluent is ≈ 0) 
   - [pending] add a 'see.php' source code syntax viewer for html
   - [done] check K-O in ASM1
 

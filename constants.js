@@ -1,8 +1,7 @@
 /*
   All constants (kinetic and molecular weights)
 
-  TODO
-  status: compilation phase, still not integrated to:
+  status: compilation phase, still not integrated to: TODO
     "activated-sludge.js"
     "nitrification.js"
     "denitrification.js"
@@ -10,7 +9,7 @@
 */
 
 //Activated sludge
-  const bH       = 0.24;  //1/d         | growth rate at 20ºC
+  const bH       = 0.24;  //1/d         | endogenous respiration rate at 20ºC
   const theta_bH = 1.029; //unit?       | bH temperature correction factor
   const YH       = 0.45;  //gVSS/gCOD   | yield (does not change with temperature)
   const fH       = 0.20;  //ø           | UPO OHO fraction

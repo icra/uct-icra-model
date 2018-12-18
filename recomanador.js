@@ -1,82 +1,20 @@
 /*RECOMANADOR*/
-/*Executa el model una vegada i n vegades*/
+/*Executa el model n vegades*/
 
 //import files
 try{
   State_Variables = require('./state-variables.js');    //class State_Variables
-  Tram            = require('./tram.js');               //class Tram
                     require('./primary-settler.js');    //tecnologia primary_settler  (dins de State Variables)
                     require('./activated-sludge.js');   //tecnologia activated_sludge (dins de State Variables)
                     require('./nitrification.js');      //tecnologia nitrification    (dins de State Variables)
                     require('./denitrification.js');    //tecnologia denitrification  (dins de State Variables)
                     require('./chemical-P-removal.js'); //tecnologia chemical P rem   (dins de State Variables)
+  Tram            = require('./tram.js');               //class Tram
+  run_model       = require('./run_model.js');          //run model
 }catch(e){}
-
-//run model 1 vegada
-function run_model(influent, tram, conf, i, deg){
-  //call primary settler
-  let pst;
-  if(conf.pst) pst = influent.primary_settler(i.fw, i.removal_BPO, i.removal_UPO, i.removal_iSS);
-  else         pst = { effluent:influent, wastage:null };
-
-  //chemical P removal
-  if(conf.cpr==false){ i.mass_FeCl3=0; }
-
-  //call AS+(NIT)+(DN)
-  let as;
-  if(conf.dn)       as = pst.effluent.denitrification (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH,i.IR,i.DO_RAS,i.influent_alk);
-  else if(conf.nit) as = pst.effluent.nitrification   (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH);
-  else              as = pst.effluent.activated_sludge(i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,);
-
-  //combina efluent depuradora i tram upstream
-  let river_mixed = tram.state_variables.combine(as.effluent);
-
-  //calcula concentració final del tram de riu
-  let river_end = new State_Variables(
-    river_mixed.Q,
-    0, //VFA
-    0, //FBSO
-    0, //BPO
-    0, //UPO
-    0, //USO
-    0, //iSS
-    tram.Mf(river_mixed.components.S_FSA, deg.R_20.NH4, deg.k.NH4), //FSA (NH4)
-    tram.Mf(river_mixed.components.S_OP,  deg.R_20.PO4, deg.k.PO4), //OP  (PO4)
-    0, //NOx
-    0, //OHO
-  );
-
-  //pack process variables
-  let as_process_variables  = conf.dn ? as.as_process_variables  : (conf.nit ? as.as_process_variables : as.process_variables);
-  let nit_process_variables = conf.dn ? as.nit_process_variables : (conf.nit ? as.process_variables    : null);
-  let dn_process_variables  = conf.dn ? as.process_variables     : null;
-
-  //get TSS and FOt
-  let FOt = conf.dn ? dn_process_variables.FOt.value : (conf.nit ? nit_process_variables.FOt_fxt.value : as_process_variables.FOt.value); //kgO/d | oxygen demand
-  let TSS = as.wastage.fluxes.totals.TSS.total;             //kgTSS/d | secondary sludge produced in sst
-  if(conf.pst) TSS += pst.wastage.fluxes.totals.TSS.total;  //kgTSS/d | primary   sludge produced in pst
-
-  //get NH4 and PO4 (plant and river)
-  let NH4_plant = as.effluent.components.S_FSA; //mgN/L NH4 at plant effluent
-  let PO4_plant = as.effluent.components.S_OP;  //mgP/L PO4 al plant effluent
-  let NH4_river = river_end.components.S_FSA;   //mgN/L NH4 at river end
-  let PO4_river = river_end.components.S_OP;    //mgP/L PO4 al river end
-
-  //results
-  return {
-    FOt,               //kgO/d
-    TSS,               //kgTSS/d
-    NH4_plant,         //mgN/L
-    NH4_river,         //mgN/L
-    PO4_plant,         //mgP/L
-    PO4_river,         //mgP/L
-    errors: as.errors, //errors  (Rs<Rsm  and/or  fxt>fxm)
-  };
-}
 
 //run model n vegades
 function run_simulacions(influent, tram, conf, i, deg, variacions){
-  console.log({influent:influent.components,tram,conf,i,deg});
   let combinacions = []; //return value | totes les combinacions fetes
 
   //recursive variations
@@ -122,7 +60,7 @@ function run_simulacions(influent, tram, conf, i, deg, variacions){
 let variacions;   //global, accessible to DOM (user input)
 let combinacions; //global, accessible to DOM (output)
 (function(){
-  return
+  //return
 
   //nou influent------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );
