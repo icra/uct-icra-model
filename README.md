@@ -5,30 +5,30 @@ Steady state model by George Ekama. Implemented by Lluís Bosch (lbosch@icra.cat
 ## status: under development 
 
 ## Model assumptions
-  - X.OHO influent is 0
-  - S.VFA and X.BPO are 100% consumed and turned into biomass (they are 0 at the effluent)
+  - X.OHO influent is 0.
+  - S.VFA and X.BPO are 100% consumed and turned into biomass (they are 0 at the effluent).
   - S.FBSO is not consumed 100% because it depends on the HRT, whereas the X.BPO depends on Rs (slower).
-  - Solids in effluent (X.BPO, X.UPO, X.OHO) are 0
-  - All CO2 produced is stripped out
-  - Inorganic carbon not included (it's very small) in the carbon balance over the AS reactor
+  - Solids in effluent (X.BPO, X.UPO, X.OHO) are 0.
+  - All CO2 produced is stripped out.
+  - Inorganic carbon not included (it's very small) in the carbon balance over the AS reactor.
 
 ## doubts/pending/ask george ekama
-  - receive dynamic comparison paper
-  - receive SST capacity paper
+  - create item list with lluís corominas
 
 ## Lluís B. tasks (ordered by priority)
-  - add a limit for X.T concentration for a given reactor volume (Vp)
-  - add a warning for effluent alkalinity below 50 mg/L as CaCO3, so CaCO3 it should be added
-  - [not finished] write equations in pdf (file "formulas.ms")
-  - [pending]      integrate constants.js to the code
-  - [pending]      take out balances from technologies
-  - [pending]      API
-  - [pending]      add a 'see.php' source code syntax viewer for html
+  - read dynamic comparison paper.
+  - read SST capacity paper (add a limit for X.T concentration for a given reactor volume (Vp)).
+  - add a warning for effluent alkalinity below 50 mg/L as CaCO3.
+  - [not finished] write equations in pdf (file "formulas.ms").
+  - [pending]      integrate constants.js to the code.
+  - [pending]      take out balances from technologies.
+  - [pending]      add a 'see.php' source code syntax viewer for html.
+  - [pending]      API.
 
 ## Future
-  - add energy consumption module
-  - add anaerobic digestion module (will consider inorganic carbon exiting, created from TOC)
-  - add stoichiometry for CO2 produced
+  - add energy consumption module.
+  - add anaerobic digestion module (will consider inorganic carbon exiting, created from TOC).
+  - add stoichiometry for CO2 produced.
 
 ## done/solved/clear/discussed
   - [as model] check K.O in ASM1 = 0.4

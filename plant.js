@@ -52,5 +52,4 @@ class Plant {
       wastages, //{primary, secondary}
     };
   };
-
 }

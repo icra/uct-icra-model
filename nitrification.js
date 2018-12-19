@@ -136,8 +136,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //effluent nitrate: nitrate generated + influent
   let Nne = Nc_fxt + as.effluent.components.S_NOx;
 
-  //create output state variables (effluent, wastage)
-  //syntax--------------------------(Q   VFA FBSO BPO UPO      USO   iSS      FSA      PO4  NOx  OHO    )
+  //output state variables----------(Q   VFA FBSO BPO UPO      USO   iSS      FSA      PO4  NOx  OHO    )
   let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae_fxt, Pse, Nne, 0      );
   let wastage  = new State_Variables(Qw, 0,  S_b, 0,  UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nne, OHO_was);
 
@@ -173,7 +172,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   };
 
   //hide description (debug)
-  Object.values(process_variables).forEach(obj=>delete obj.descr);
+  //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     as_process_variables: as.process_variables,

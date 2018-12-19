@@ -250,8 +250,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   };
 
   //hide description (debug)
-  Object.values(process_variables).forEach(obj=>delete obj.descr);
-  Object.values(cpr).forEach(obj=>delete obj.descr);
+  //Object.values(process_variables).forEach(obj=>delete obj.descr);
+  //Object.values(cpr).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     cpr,
@@ -263,19 +263,16 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
 /*test*/
 (function(){
-  //return
-  //new influent
+  return
   //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx OHO)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0,  0  ); //settled ww
   //syntax---------------------(T   Vp      Rs  RAS  waste_from mass_FeCl3)
   let as = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000);
   //show results
   console.log("=== AS process variables");   console.log(as.process_variables);
-  return
-  //console.log("=== AS chemical P removal "); console.log(as.cpr);
+  console.log("=== AS chemical P removal "); console.log(as.cpr);
   console.log("=== Effluent summary");       console.log(as.effluent.summary);
   console.log("=== Effluent summary");       console.log(as.effluent.components);
-  return
   console.log("=== Wastage summary");        console.log(as.wastage.components);
   console.log("=== Wastage totals");         console.log(as.wastage.totals);
   console.log("=== Effluent summary");       console.log(as.effluent.components);
