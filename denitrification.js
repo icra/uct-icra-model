@@ -170,7 +170,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     //K3T          :{value:K3T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 3"},
     //K4T          :{value:K4T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 4"},
     fSb_s        :{value:fSb_s        ,unit:"gBSO/gBO"   ,descr:"BSO/(BSO+BPO) ratio"},
-    Dp1          :{value:Dp1          ,unit:"mgNOx/L"    ,descr:"Denitrification potential"},
+    Dp1          :{value:Dp1          ,unit:"mgN/L"      ,descr:"Denitrification potential"},
     a            :{value:a            ,unit:"ø"          ,descr:"IR (internal recirculation ratio)"},
     a_opt        :{value:a_opt        ,unit:"ø"          ,descr:"optimal IR"},
     Nne          :{value:Nne          ,unit:"mgN/L"      ,descr:"Effluent nitrate"},
@@ -191,7 +191,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   };
 
   //hide description (debug)
-  Object.values(process_variables).forEach(obj=>delete obj.descr);
+  //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
     process_variables,
     nit_process_variables: nit.process_variables,
@@ -206,18 +206,18 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 /*test*/
 (function(){
   return
-  //syntax--------------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx  OHO)
-  let influent = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 10,   0  );
+  //syntax--------------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx OHO)
+  let influent = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 10, 0  );
 
   //as+n+dn syntax-----------------(T   Vp      Rs  RAS  waste_from mass_FeCl3 SF    fxt   DO   pH   IR   DO_RAS influent_alk)
-  let dn = influent.denitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2, 5.0, 1.0,   250         );
+  let dn=influent.denitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2, 5.0, 1.0,   250         );
 
   //show process variables
-  //console.log("=== Influent summary");           console.log(influent.summary);
-  //console.log("=== AS+NIT+DN effluent summary"); console.log(dn.effluent.summary);
-  //console.log("=== AS+NIT+DN wastage summary");  console.log(dn.wastage.summary);
-  //console.log("=== AS process");                 console.log(dn.as_process_variables);
-  //console.log("=== NIT process");                console.log(dn.nit_process_variables);
+  console.log("=== Influent summary");           console.log(influent.summary);
+  console.log("=== AS+NIT+DN effluent summary"); console.log(dn.effluent.summary);
+  console.log("=== AS+NIT+DN wastage summary");  console.log(dn.wastage.summary);
+  console.log("=== AS process");                 console.log(dn.as_process_variables);
+  console.log("=== NIT process");                console.log(dn.nit_process_variables);
   console.log("=== DN process");                 console.log(dn.process_variables);
-  //console.log("=== DN chemical P removal");      console.log(dn.cpr);
+  console.log("=== DN chemical P removal");      console.log(dn.cpr);
 })();
