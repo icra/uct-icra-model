@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt     # function for plotting
 plt.ion()                           # turn interactive mode on
 
 ##################################################################################
-# Stoichiometric & Kinetic Parameters (20 ºC), as in page 9 of ASM1 description) #
+# Stoichiometric & Kinetic Parameters (20 C), as in page 9 of ASM1 description) #
 ##################################################################################
 YH     = 0.67  # Heterotrophic yield
 YA     = 0.24  # Autotrophic yield
@@ -82,8 +82,8 @@ def f(y,t):
 ######################
 # INITIAL CONDITIONS #
 ######################
-XBH_0 = 1      # Active mass COD Heterotrophs
-XBA_0 = 1      # Active mass COD Autotrophs
+XBH_0 = 1000   # Active mass COD Heterotrophs
+XBA_0 = 50     # Active mass COD Autotrophs
 Ss_0  = 165    # Biodegradable COD Soluble (VFA + FBSO)
 Xs_0  = 255    # Biodegradable COD Particulate
 XP_0  = 10     # Nonbiodegradable COD Particulate

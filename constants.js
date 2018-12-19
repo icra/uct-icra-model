@@ -9,9 +9,9 @@
 */
 
 //Activated sludge
+  const YH       = 0.45;  //gVSS/gCOD   | yield (does not change with temperature)
   const bH       = 0.24;  //1/d         | endogenous respiration rate at 20ºC
   const theta_bH = 1.029; //unit?       | bH temperature correction factor
-  const YH       = 0.45;  //gVSS/gCOD   | yield (does not change with temperature)
   const fH       = 0.20;  //ø           | UPO OHO fraction
   const f_iOHO   = 0.15;  //g_iSS/gX    | fraction of inert solids in biomass
   const k_v20    = 0.07;  //L/(mgVSS·d) | constant for not degraded bCOD (FBSO)
@@ -19,7 +19,7 @@
 //Nitrification
   const µAm       = 0.45;  //1/d       | max growth rate at 20ºC
   const theta_µAm = 1.123; //unit?     | T  µA correction
-  const K_O       = 0.3;   //mgDO/L    | DO µA sensitivity constant
+  const K_O       = 0.4;   //mgDO/L    | DO µA sensitivity constant (taken from asm1 example)
   const theta_pH  = 2.35;  //page 471  | ph inhibition to µA
   const Ki        = 1.13;  //page 471  | ph inhibition to µA
   const Kii       = 0.3;   //page 471  | ph inhibition to µA

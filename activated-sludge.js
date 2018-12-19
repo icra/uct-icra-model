@@ -170,7 +170,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let iSS_was = f*X_IO*1000;                //mg/L | iSS wastage (precipitation by FeCl3 already included)
   let UPO_was = f*fCV_UPO*(X_I)      *1000; //mg/L | UPO wastage
   let OHO_was = f*fCV_OHO*(X_BH+X_EH)*1000; //mg/L | OHO wastage
-  let BPO_was = 0;                          //mg/L | BPO wastage
+  let BPO_was = 0;                          //mg/L | BPO wastage | all BPO is turned into biomass
 
   //output streams------------------(Q,  VFA FBSO BPO UPO      USO   iSS      FSA  OP   NOx  OHO    )
   let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae, Pse, Nne, 0      );
@@ -263,7 +263,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
 /*test*/
 (function(){
-  return
+  //return
   //new influent
   //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx OHO)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0,  0  ); //settled ww
@@ -271,8 +271,11 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let as = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000);
   //show results
   console.log("=== AS process variables");   console.log(as.process_variables);
-  console.log("=== AS chemical P removal "); console.log(as.cpr);
+  return
+  //console.log("=== AS chemical P removal "); console.log(as.cpr);
   console.log("=== Effluent summary");       console.log(as.effluent.summary);
+  console.log("=== Effluent summary");       console.log(as.effluent.components);
+  return
   console.log("=== Wastage summary");        console.log(as.wastage.components);
   console.log("=== Wastage totals");         console.log(as.wastage.totals);
   console.log("=== Effluent summary");       console.log(as.effluent.components);
