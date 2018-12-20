@@ -54,7 +54,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let µAmT  = µAm*Math.pow(1.123,T-20); //1/d | growth rate corrected by temperature
 
   //correct µA by DO (book page 468)
-  const K_O = 0.3;              //mgDO/L | nitrifier Oxygen sensitivity constant
+  const K_O = 0.4;              //mgDO/L | nitrifier Oxygen sensitivity constant
   let µAmO  = µAmT*DO/(DO+K_O); //1/d    | growth rate corrected by temperature and DO
 
   //correct µA by pH inhibition

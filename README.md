@@ -1,38 +1,50 @@
-# about ecoadvisor 
-Backend model for Ecoadvisor project. Coded in Javascript without dependencies.
-Steady state model by George Ekama. Implemented by Lluís Bosch (lbosch@icra.cat).
+# Ecoadvisor 
+Backend model for ecoadvisor project. Coded in Javascript without dependencies.
+Steady state model by George Ekama. Implemented by Lluís Bosch
+(lbosch@icra.cat).
 
-## status: under development 
+## Status: under development 
 
 ## Model assumptions
-  - X.OHO influent is 0.
-  - S.VFA and X.BPO are 100% consumed and turned into biomass (they are 0 at the effluent).
-  - S.FBSO is not consumed 100% because it depends on the HRT, whereas the X.BPO depends on Rs (slower).
-  - Solids in effluent (X.BPO, X.UPO, X.OHO) are 0.
+  - Influent X.OHO is always 0.
+  - Influent S.VFA and X.BPO are 100% consumed and turned into biomass (they
+    are 0 at the effluent).
+  - S.FBSO is *not* 100% consumed because it depends on the HRT (fast), whereas
+    the X.BPO depends on Rs (slower).
+  - Solids in the effluent (X.iSS, X.UPO, X.OHO, X.BPO) are 0.
   - All CO2 produced is stripped out.
-  - Inorganic carbon not included (it's very small) in the carbon balance over the AS reactor.
-
-## doubts/pending/ask george ekama
-  - create item list with lluís corominas
+  - Inorganic carbon is not included in the carbon balance over the AS reactor,
+    because it's very small.
 
 ## Lluís B. tasks (ordered by priority)
   - read dynamic comparison paper.
-  - read SST capacity paper (add a limit for X.T concentration for a given reactor volume (Vp)).
-  - add a warning for effluent alkalinity below 50 mg/L as CaCO3.
-  - [not finished] write equations in pdf (file "formulas.ms").
-  - [pending]      integrate constants.js to the code.
-  - [pending]      take out balances from technologies.
-  - [pending]      add a 'see.php' source code syntax viewer for html.
-  - [pending]      API.
+  - read SST capacity paper (add a limit for X.T concentration for a given
+    reactor volume (Vp)).
+  - [pending] integrate constants.js to the code.
+  - [pending] take out balances from technologies.
+  - [pending] add a 'see.php' source code syntax viewer for html.
+  - [pending] API.
+ 
+## Doubts/pending/ask george ekama
+  - create item list with lluís corominas
+
+## Documentation
+  - the equations are in the file "formulas/formulas.ms.pdf".
+
+## Warnings module (future)
+  - effluent alkalinity below 50 mg/L as CaCO3.
+  - Reactor kgTSS (MX.T) above the limit (given a reactor volume Vp)
 
 ## Future
   - add energy consumption module.
-  - add anaerobic digestion module (will consider inorganic carbon exiting, created from TOC).
+  - add anaerobic digestion module (will consider inorganic carbon exiting,
+    created from TOC).
   - add stoichiometry for CO2 produced.
 
-## done/solved/clear/discussed
+## Done/solved/clear/discussed
   - [as model] check K.O in ASM1 = 0.4
-  - [as model] confirm final Rsm formula (min sludge age to ensure nitrification).
+  - [as model] confirm final Rsm formula (min sludge age to ensure
+    nitrification).
   - [as model] add errors in nitrification when: (1) fxt > fxm, (2) Rs  < Rsm
   - [as model] add incomplete BOD removal
   - [as model] mass of nitrifiers (MX-BA) no worry about it (<3% of MX-T)
@@ -42,7 +54,8 @@ Steady state model by George Ekama. Implemented by Lluís Bosch (lbosch@icra.cat
   - [as model] denitrification outputs (units and descriptions)
   - [as model] Qw wastage (waste from reactor or sst)
   - [as model] extra-iSS produced in CPR to wastage and MX-IO
-  - [as model] influent nitrate (NOx): if we have influent NOx, TOD balance not closing.
+  - [as model] influent nitrate (NOx): if we have influent NOx, TOD balance not
+    closing.
   - [as model] OHO as a new state variable
   - [as model] why is kg of FeCl3 added is not equal to the extra iSS produced
     (for example 3000 kg FeCl3 produces ~2500 kg iSS. The remaining ~500 kg is
