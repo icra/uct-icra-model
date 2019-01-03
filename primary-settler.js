@@ -59,6 +59,10 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   let effluent = new State_Variables(Qe, S_VFA, S_FBSO, X_BPO_e, X_UPO_e, S_USO, X_iSS_e, S_FSA, S_OP, S_NOx, X_OHO_e);
   let wastage  = new State_Variables(Qw, S_VFA, S_FBSO, X_BPO_w, X_UPO_w, S_USO, X_iSS_w, S_FSA, S_OP, S_NOx, X_OHO_w);
 
+  //copy influent mass ratios
+  effluent.mass_ratios = this.mass_ratios;
+  wastage.mass_ratios  = this.mass_ratios;
+
   //end
   return { effluent, wastage };
 };

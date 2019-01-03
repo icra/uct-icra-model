@@ -8,6 +8,7 @@
 try{
   State_Variables   =require("./state-variables.js");
   chemical_P_removal=require("./chemical-P-removal.js");
+  constants         =require("./constants.js");
 }catch(e){}
 
 State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3){
@@ -17,13 +18,13 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   /* 
-    option 'waste_from'
+    option 'waste_from':
 
-    "reactor"             || "sst"
-    ----------------------++----------------------
-    Q-->[AS]-->[SST]-->Qe || Q-->[AS]-->[SST]-->Qe
-         |                ||             |
-         v Qw             ||             v Qw
+    "reactor"       | "sst"
+    ----------------+----------------------
+    Q→[AS]→[SST]→Qe | Q→[AS]→[SST]→Qe
+        |           |          |
+        v Qw        |          v Qw
   */
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
@@ -63,23 +64,25 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let FiSS       = inf_fluxes.totals.TSS.iSS;  //kg_iSS/d  | iSS flux influent
 
   //2.2 - kinetics - page 10
-  const YH  = 0.45;                    //gVSS/gCOD | yield coefficient (does not change with temperature)
-  const bH  = 0.24;                    //1/d | endogenous respiration rate at 20ºC
-  let bHT   = bH*Math.pow(1.029,T-20); //1/d | endogenous respiration rate corrected by temperature
-  let f_XBH = (YH*Rs)/(1+bHT*Rs);      //gVSS·d/gCOD | OHO biomass production rate
+  const YH       = constants.YH;           //0.45 gVSS/gCOD | heterotrophic yield coefficient (does not change with temperature)
+  const bH       = constants.bH;           //0.24 1/d       | endogenous respiration rate at 20ºC
+  const theta_bH = constants.theta_bH;     //1.029 ø        | bH temperature correction factor
+  let bHT   = bH*Math.pow(theta_bH, T-20); //1/d            | endogenous respiration rate corrected by temperature
+  let f_XBH = (YH*Rs)/(1+bHT*Rs);          //gVSS·d/gCOD    | OHO biomass production rate
 
   //bCOD not degraded (FBSO)
-  const k_v20 = 0.07;                       //note: a high value (~1000) makes FBSO effluent ~0
-  let k_vT    = k_v20*Math.pow(1.035,T-20); //L/(mgVSS·d)
-  let S_b     = 1/(f_XBH*k_vT);             //mgCOD/L
-  let FdSbi   = FSbi - Q*S_b;               //kg/d COD
+  const k_v20       = constants.k_v20;       //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
+  const theta_k_v20 = constants.theta_k_v20; //1.035 ø        | k_v20 temperature correction factor
+  let k_vT    = k_v20*Math.pow(1.035,T-20);  //L/mgVSS·d
+  let S_b     = 1/(f_XBH*k_vT);              //mgCOD/L
+  let FdSbi   = FSbi - Q*S_b;                //kg/d COD
 
   //total VSS solids
-  let MX_BH = FdSbi * f_XBH;         //kgVSS | OHO live biomass
-  const fH  = 0.20;                  //ø     | UPO OHO fraction
-  let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS | endogenous residue OHOs
-  let MX_I  = FXti * Rs;             //kgVSS | influent UPO
-  let MX_V  = MX_BH + MX_EH + MX_I;  //kgVSS | total VSS
+  let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass
+  const fH  = constants.fH           //0.20 ø | endogenous OHO fraction
+  let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS  | endogenous residue OHOs
+  let MX_I  = FXti * Rs;             //kgVSS  | influent UPO
+  let MX_V  = MX_BH + MX_EH + MX_I;  //kgVSS  | total VSS
 
   //2.8 - effluent Phosphorus 
   let Ps    = (f_P_OHO*(MX_BH+MX_EH)+f_P_UPO*MX_I)/(Rs*Q); //mgP/L | P influent required for sludge production
@@ -95,8 +98,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Pse         = cpr.PO4e.value;                         //mgP/L | PO4 effluent after chemical P removal
 
   //total inert solids
-  const f_iOHO = 0.15;                                 //giSS/gVSS | fraction of inert solids in biomass
-  let MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS*Rs; //kgiSS | total inert solids
+  const f_iOHO = constants.f_iOHO;                     //0.15 giSS/gVSS | fraction of inert solids in biomass
+  let MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS*Rs; //kgiSS          | total inert solids
 
   //total solids TSS = VSS + iSS
   let MX_T = MX_V + MX_IO; //kgTSS | MX_BH + MX_EH + MX_I + MX_IO
@@ -175,6 +178,10 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //output streams------------------(Q,  VFA FBSO BPO UPO      USO   iSS      FSA  OP   NOx  OHO    )
   let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae, Pse, Nne, 0      );
   let wastage  = new State_Variables(Qw, 0,  S_b, 0,  UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was); 
+
+  //copy influent mass ratios
+  effluent.mass_ratios = this.mass_ratios;
+  wastage.mass_ratios  = this.mass_ratios;
 
   //get output fluxes
   let eff_fluxes = effluent.fluxes; //object
@@ -278,3 +285,4 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Effluent totals");        console.log(as.effluent.totals);
 })();
+

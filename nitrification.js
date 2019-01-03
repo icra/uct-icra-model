@@ -9,6 +9,7 @@
 //import files
 try{
   State_Variables=require("./state-variables.js");
+  constants      =require("./constants.js");
   require("./activated-sludge.js");
 }catch(e){}
 
@@ -50,26 +51,29 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Ns   = as.process_variables.Ns.value;   //mg/L | N required from sludge production
 
   //3 - nitrification kinetics
-  const µAm = 0.45;                     //1/d | growth rate at 20ºC (maximum specific growth rate)
-  let µAmT  = µAm*Math.pow(1.123,T-20); //1/d | growth rate corrected by temperature
+  const µAm = constants.µAm;                //0.450 1/d | auth. max specific growth rate at 20ºC
+  const theta_µAm = constants.theta_µAm;    //1.123 1/d | temperature correction factor
+  let µAmT  = µAm*Math.pow(theta_µAm,T-20); //1/d       | growth rate corrected by temperature
 
   //correct µA by DO (book page 468)
-  const K_O = 0.4;              //mgDO/L | nitrifier Oxygen sensitivity constant
+  const K_O = constants.K_O;    //0.4 mgDO/L | nitrifier Oxygen sensitivity constant
   let µAmO  = µAmT*DO/(DO+K_O); //1/d    | growth rate corrected by temperature and DO
 
   //correct µA by pH inhibition
-  const Ki   = 1.13; //page 471
-  const Kii  = 0.3;  //page 471
-  const Kmax = 9.5;  //page 471
-  let µAm_pH = µAmO*Math.pow(2.35, pH-7.2)*Ki*(Kmax-pH)/(Kmax+Kii-pH); //page 471
+  const theta_pH = constants.theta_pH; //2.35 page 471 and 113
+  const Ki       = constants.Ki;       //1.13 page 471 and 113
+  const Kii      = constants.Kii;      //0.3  page 471 and 113
+  const Kmax     = constants.Kmax;     //9.5  page 471 and 113
+  let µAm_pH = µAmO*Math.pow(theta_pH, pH-7.2)*Ki*(Kmax-pH)/(Kmax+Kii-pH); //page 471 and 113
 
-  //K's and endogenous respiration kinetics
-  const YA = 0.1;                     //gVSS/gFSA | yield coefficient at 20ºC
-  let YAT  = YA*Math.pow(1, T-20);    //gVSS/gFSA | yield coefficient corrected by temperature
-  const Kn = 1.0;                     //mg/L as N at 20ºC (half saturation coefficient)
-  let KnT  = Kn*Math.pow(1.123,T-20); //mg/L as N corrected by temperature
-  const bA = 0.04;                    //1/d at 20ºC (endogenous respiration rate)
-  let bAT  = bA*Math.pow(1.029,T-20); //1/d | growth rate corrected by temperature
+  const YA = constants.YA;              //0.100 gVSS/gFSA | yield coefficient at 20ºC
+  const Kn = constants.Kn;              //1.000 mgN/L     | ammonia half saturation coefficient at 20ºC
+  const theta_Kn = constants.theta_Kn;  //1.123 mgN/L     | Kn temperature correction factor
+  let KnT = Kn*Math.pow(theta_Kn,T-20); //mgN/L           | Kn corrected by temperature
+
+  const bA = constants.bA;               //1/d at 20ºC (endogenous respiration rate)
+  const theta_bA = constants.theta_bA;   //bA temperature correction factor
+  let bAT  = bA*Math.pow(theta_bA,T-20); //1/d | growth rate corrected by temperature
 
   //page 17
   //maximum design unaerated sludge mass fraction
@@ -114,7 +118,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let OUR_fxm = FOt_fxm*1000/(Vp*(1-fxm)*24); //mgO/L·h
 
   //page 475 4.14.22.3 book: calculate mass of nitrifiers
-  let f_XBA = YAT*Rs/(1+bAT*Rs); //gVSS·d/gFSA
+  let f_XBA = YA*Rs/(1+bAT*Rs); //gVSS·d/gFSA
   let MX_BA = Q*Nc_fxt*f_XBA;    //kg VSS
   let X_BA  = MX_BA/Vp;          //kgVSS/m3
   //end nitrification ---------------------
@@ -139,6 +143,10 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //output state variables----------(Q   VFA FBSO BPO UPO      USO   iSS      FSA      PO4  NOx  OHO    )
   let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae_fxt, Pse, Nne, 0      );
   let wastage  = new State_Variables(Qw, 0,  S_b, 0,  UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nne, OHO_was);
+
+  //copy influent mass ratios
+  effluent.mass_ratios = this.mass_ratios;
+  wastage.mass_ratios  = this.mass_ratios;
 
   //pack nitrification process variables
   let process_variables={

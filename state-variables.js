@@ -43,8 +43,7 @@ class State_Variables {
       S_FSA : isNaN(S_FSA ) ? 39.1 : S_FSA , //mg/L | Inorganic Free Saline Ammonia (NH4)
       S_OP  : isNaN(S_OP  ) ? 7.28 : S_OP  , //mg/L | Inorganic OrthoPhosphate (PO4)
       S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
-      X_OHO : isNaN(X_OHO ) ? 0    : X_OHO , //mg/L | Ordinary Heterotrophic Organisms (expressed as COD)
-                                             //influent OHO should always be 0 (model assumption)
+      X_OHO : isNaN(X_OHO ) ? 0    : X_OHO , //mg/L | Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
     };
     this.mass_ratios={
       /*----+------------------+----------------+-----------------+-----------------+
@@ -237,6 +236,7 @@ class State_Variables {
   combine(sv){
     //new empty object
     let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);
+    //TODO problem which mass ratios?
     //new flowrate
     let Q = this.Q + sv.Q;
     new_sv.Q = Q;

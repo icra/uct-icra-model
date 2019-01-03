@@ -9,7 +9,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   PO4i       = isNaN(PO4i)       ? 7  : PO4i;       //mg/L as P (calculated as "Pse" in 'activated-sludge.js')
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added 
 
-  //molecular weights (constants)
+  //molecular weights
   const M_Fe        = 55.845;   //g/mol (Fe molecular weight)
   const M_P         = 30.974;   //g/mol (P molecular weight)
   const M_FeCl3     = 162.195;  //g/mol (FeCl3 molecular weight)

@@ -9,6 +9,7 @@
 //import files
 try{
   State_Variables=require("./state-variables.js");
+  constants      =require("./constants.js");
   require("./nitrification.js");
 }catch(e){}
 
@@ -50,14 +51,14 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
   //denitrification starts at page 19
   //3.2 - denitrification kinetics
-  const K1_20 = 0.72;                       //mgNO3-N/mgOHOVSS·d | at 20ºC page 482
-  const K2_20 = 0.10;                       //mgNO3-N/mgOHOVSS·d | at 20ºC page 482
-  const K3_20 = 0.10;                       //mgNO3-N/mgOHOVSS·d | at 20ºC page 482
-  const K4_20 = 0.00;                       //mgNO3-N/mgOHOVSS·d | at 20ºC page 482
-  const K1T   = K1_20*Math.pow(1.200,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
-  const K2T   = K2_20*Math.pow(1.080,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
-  const K3T   = K3_20*Math.pow(1.029,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
-  const K4T   = K4_20*Math.pow(1.029,T-20); //mgNO3-N/mgOHOVSS·d | corrected by temperature
+  //const K1_20 = constants.K1_20;                         //0.720 gN/gVSS·d | at 20ºC page 482 and 113
+  const K2_20 = constants.K2_20;                         //0.101 gN/gVSS·d | at 20ºC page 482 and 113
+  //const K3_20 = constants.K3_20;                         //0.072 gN/gVSS·d | at 20ºC page 482 and 113
+  //const K4_20 = constants.K4_20;                         //0.048 gN/gVSS·d | at 20ºC page 482 and 113
+  //const K1T   = K1_20*Math.pow(constants.theta_K1,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.200)
+  const K2T   = K2_20*Math.pow(constants.theta_K2,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.080)
+  //const K3T   = K3_20*Math.pow(constants.theta_K3,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.029)
+  //const K4T   = K4_20*Math.pow(constants.theta_K4,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.029)
 
   //3.2
   let Sbsi  = inf_frac.COD.bsCOD;             //mg/L | biodegradable soluble COD
@@ -67,7 +68,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
   //Denitrification potential
   const fCV   = this.mass_ratios.f_CV_OHO;            //1.481 gUPO/gVSS
-  const YH    = 0.45;                                 //gVSS/gCOD
+  const YH    = constants.YH;                         //0.450 gVSS/gCOD
   let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YH*Rs/(1+bHT*Rs)
   let Dp1RBSO = Sbsi*(1-fCV*YH)/2.86;                 //mgNO3-N/L   | influent
   let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgNO3-N/L   | influent
@@ -120,13 +121,13 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let TODe = Qe*(eff_frac.COD.total + 4.57*eff_frac.TKN.total); //kgO/d
 
   //calculate TOD wastage (TODw)
-  const fH = 0.20; //UPO OHO fraction
-  const fCV_OHO = this.mass_ratios.f_CV_OHO;
-  const fCV_UPO = this.mass_ratios.f_CV_UPO;
-  const fCV_BPO = this.mass_ratios.f_CV_BPO;
-  const f_N_OHO = this.mass_ratios.f_N_OHO;
-  const f_N_UPO = this.mass_ratios.f_N_UPO;
-  const f_N_BPO = this.mass_ratios.f_N_BPO;
+  const fH = constants.fH;                   //ø | 0.20 (endogenous residue fraction)
+  const fCV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
+  const fCV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
+  const fCV_BPO = this.mass_ratios.f_CV_BPO; //gCOD/gVSS
+  const f_N_OHO = this.mass_ratios.f_N_OHO;  //gVSS/gN
+  const f_N_UPO = this.mass_ratios.f_N_UPO;  //gVSS/gN
+  const f_N_BPO = this.mass_ratios.f_N_BPO;  //gVSS/gN
   let Qw    = nit.wastage.Q;                                          //ML/d   | wastage flowrate
   let Nae   = nit.effluent.components.S_FSA;                          //mg/L   | effluent ammonia
   let f     = nit.as_process_variables.f.value;                       //ø      | (1+RAS)/RAS (or 1 if we waste from reactor)
@@ -163,6 +164,10 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae, Pse, Nne, 0      );
   let wastage  = new State_Variables(Qw, 0,  S_b, 0,  UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was);
 
+  //copy influent mass ratios
+  effluent.mass_ratios = this.mass_ratios;
+  wastage.mass_ratios  = this.mass_ratios;
+
   //denitrification results
   let process_variables = {
     //K1T          :{value:K1T          ,unit:"gN/gVSS"    ,descr:"K denitrification rate 1"},
@@ -180,7 +185,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     FOt          :{value:FOt          ,unit:"kgO/d"      ,descr:"Total oxygen demand (FOc + FOn - FOd)"},
     OUR          :{value:OUR          ,unit:"mgO/L·h"    ,descr:"Oxygen Uptake Rate"},
     effluent_alk :{value:effluent_alk ,unit:"mgCaCO3/L"  ,descr:"Effluent alkalinity"},
-    N2g          :{value:N2g          ,unit:"mgN/L"      ,descr:"N2 gas production (concentration)"},           
+    //N2g          :{value:N2g          ,unit:"mgN/L"      ,descr:"N2 gas production (concentration)"},           
     FN2g         :{value:FN2g         ,unit:"kgN/d"      ,descr:"N2 gas production (mass flux)"},           
     //TODi         :{value:TODi         ,unit:"kgO/d"      ,descr:"Total oxygen demand (influent)"},
     //TODe         :{value:TODe         ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent)"},
@@ -209,7 +214,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //syntax--------------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx OHO)
   let influent = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 10, 0  );
 
-  //as+n+dn syntax-----------------(T   Vp      Rs  RAS  waste_from mass_FeCl3 SF    fxt   DO   pH   IR   DO_RAS influent_alk)
+  //as+n+dn syntax---------------(T   Vp      Rs  RAS  waste_from mass_FeCl3 SF    fxt   DO   pH   IR   DO_RAS influent_alk)
   let dn=influent.denitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2, 5.0, 1.0,   250         );
 
   //show process variables
