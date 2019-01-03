@@ -57,11 +57,9 @@
     <!--run button-->
     <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
   </h3>
-  <ul style=font-size:smaller>
-    <li><a target=_blank href="//github.com/icra/ecoadvisor">github</a>
-    <li><a target=_blank href="../state-variables.js">all mass ratios</a>
-    <li><a target=_blank href="../constants.js">all constants</a>
-  </ul>
+  <div style=font-size:smaller>
+    <a target=_blank href="//github.com/icra/ecoadvisor">github</a>
+  </div>
 </div>
 
 <!--main-->
@@ -118,7 +116,7 @@
       </table> 
 
       <!--mass ratios--><div><code onclick=toggle_visibility('#mass_ratios')>[+] Mass ratios</code></div>
-      <table id=mass_ratios>
+      <table id=mass_ratios style=display:none>
         <tr><td><td>COD<div class=unit>gCOD/gVSS<td>C<div class=unit>gVSS/gC<td>N<div class=unit>gVSS/gN<td>P<div class=unit>gVSS/gP
         <tr><td>S<sub>VFA</sub>
           <td><input id=f_CV_VFA type=number value=1.0667 step=0.0001>
@@ -155,8 +153,8 @@
           <td><input id=f_P_OHO  type=number value=0.0250 step=0.0010>
       </table>
 
-      <!--constants--><div><code onclick=toggle_visibility('#constants')>[+] Kinetic constants</code></div>
-      <table id=constants>
+      <!--constants--><div><code onclick=toggle_visibility('#constants')>[+] Kinetic parameters</code></div>
+      <table id=constants style=display:none>
         <tr><td colspan=3>Activated sludge
         <tr title="heterotrophic VSS/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.450 step=0.01 ><td class=unit>gVSS/gCOD
         <tr title="heterotrophic endogenous respiration rate at 20ºC"><td>bH                      <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
