@@ -14,15 +14,13 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
   - All CO2 produced is stripped out.
   - Inorganic carbon is not included in the carbon balance over the AS reactor,
     because it's very small.
-  - FeCl3 solution volume added for chemical P removal is considered ~0.
+  - The additional FeCl3 volume added for chemical P removal is considered ~0.
 
 ## Lluís B. tasks (ordered by priority)
-  - https://docs.google.com/document/d/1SB_aU166oTju9D4K1m4tUuoW-Lbto_uHtzzMINb-CJs/edit#
-  - numerar versions model
   - esquema arquitectura draw.io diagrama de classes.
+  - https://docs.google.com/document/d/1SB_aU166oTju9D4K1m4tUuoW-Lbto_uHtzzMINb-CJs/edit#
+  - read SST capacity paper (add a limit for X.T concentration for a given reactor volume (Vp)).
   - read dynamic comparison paper.
-  - read SST capacity paper (add a limit for X.T concentration for a given
-    reactor volume (Vp)).
   - [pending] integrate constants.js to the code.
   - [pending] take out balances from technologies.
   - [pending] add a 'see.php' source code syntax viewer for html.
@@ -32,7 +30,7 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
   - create item list with lluís corominas
 
 ## Documentation
-  - the equations are in the file "formulas/formulas.ms".
+  - the equations are in "formulas/formulas.ms" which is compiled to "formulas/formulas.ms.pdf".
 
 ## Future
   - new warnings module
