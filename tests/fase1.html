@@ -105,7 +105,7 @@
 
       <!--mass ratios--><div><code onclick=toggle_visibility('#mass_ratios')>[+] Mass ratios</code></div>
       <table id=mass_ratios style=display:none>
-        <tr><td><td>COD<div class=unit>gCOD/gVSS<td>C<div class=unit>gVSS/gC<td>N<div class=unit>gVSS/gN<td>P<div class=unit>gVSS/gP
+        <tr><td><td>fcv<div class=unit>gCOD/gVSS<td>fC<div class=unit>gVSS/gC<td>fN<div class=unit>gVSS/gN<td>fP<div class=unit>gVSS/gP
         <tr><td>S<sub>VFA</sub>
           <td><input id=f_CV_VFA type=number value=1.0667 step=0.0001>
           <td><input id=f_C_VFA  type=number value=0.4000 step=0.1000>
@@ -147,14 +147,14 @@
         <tr title="heterotrophic VSS/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.450 step=0.01 ><td class=unit>gVSS/gCOD
         <tr title="heterotrophic endogenous respiration rate at 20ºC"><td>bH                      <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
         <tr title="bH temperature correction factor"                 ><td>&theta;<sub>bH</sub>    <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
-        <tr title="not degraded bCOD (FBSO)"                         ><td>k_v20                   <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/(mgVSS·d)
+        <tr title="not degraded bCOD (FBSO)"                         ><td>k_v20                   <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
         <tr title="k_v20 temperature correction factor"              ><td>&theta;<sub>k_v20</sub> <td><input id="theta_k_v20" type=number value=1.035 step=0.001><td class=unit>ø
         <tr title="endogenous residue fraction"                      ><td>fH                      <td><input id="fH"          type=number value=0.200 step=0.1  ><td class=unit>ø
         <tr title="iSS content of OHOs"                              ><td>f_iOHO                  <td><input id="f_iOHO"      type=number value=0.150 step=0.01 ><td class=unit>giSS/gVSS
         <tr><td colspan=3>Nitrification
         <tr title="autotrophic max specific growth rate at 20ºC"     ><td>µAm                  <td><input id="µAm"       type=number value=0.450 step=0.01 ><td class=unit>1/d
         <tr title="µAm temperature correction factor"                ><td>&theta;<sub>µAm</sub><td><input id="theta_µAm" type=number value=1.123 step=0.001><td class=unit>ø
-        <tr title="autotrophic oxygen half saturation coefficient"   ><td>K_O                  <td><input id="K_O"       type=number value=0.400 step=0.1  ><td class=unit>mgDO/L
+        <tr title="autotrophic oxygen half saturation coefficient"   ><td>K_O                  <td><input id="K_O"       type=number value=0.400 step=0.1  ><td class=unit>mgO/L
         <tr title="autotrophic pH sensitivity coefficient"           ><td>&theta;<sub>pH</sub> <td><input id="theta_pH"  type=number value=2.350 step=0.01 ><td class=unit>ø
         <tr title="autotrophic pH inhibition Ki"                     ><td>Ki                   <td><input id="Ki"        type=number value=1.130 step=0.01 ><td class=unit>ø
         <tr title="autotrophic pH inhibition Kii"                    ><td>Kii                  <td><input id="Kii"       type=number value=0.300 step=0.1  ><td class=unit>ø
