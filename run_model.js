@@ -86,7 +86,7 @@ function run_model(influent, tram, conf, i, deg){
 try{module.exports=run_model;}catch(e){}
 
 (function(){
-  return
+  return;
 
   //nou influent------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );

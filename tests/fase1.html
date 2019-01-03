@@ -26,18 +26,6 @@
     [onclick]{cursor:pointer}
 
     #influent input,
-    #river input[type=number], 
-    #degradation input
-    {
-      display:block;
-      width:48px;
-    }
-    #river input[type=number]{
-      width:60px;
-    }
-    #degradation input{
-      width:70px;
-    }
     #edar input[type=number], #edar select, #mass_ratios input, #constants input{
       display:block;
       max-width:70px;
@@ -190,7 +178,7 @@
       <!--summaries-->
       <div>
         <code onclick="toggle_visibility('#outputs #summaries')">
-          [+] Summaries
+          [+] Summary
         </code>
         <span>
           <label onclick=""><input type=radio name=summary_units value=both>         all </label>
