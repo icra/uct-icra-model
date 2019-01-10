@@ -29,7 +29,7 @@ function run_model(influent, tram, conf, i, deg){
   //chemical P removal
   if(conf.cpr==false){ i.mass_FeCl3=0; }
 
-  //AS + ( NIT + (DN) )
+  //call AS + ( NIT + (DN) )
   let as;
   if(conf.dn)       as = pst.effluent.denitrification (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH,i.IR,i.DO_RAS,i.influent_alk);
   else if(conf.nit) as = pst.effluent.nitrification   (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH);
@@ -59,34 +59,29 @@ function run_model(influent, tram, conf, i, deg){
   let nit_process_variables = conf.dn ? as.nit_process_variables : (conf.nit ? as.process_variables    : null);
   let dn_process_variables  = conf.dn ? as.process_variables     : null;
 
-  //get TSS (total solids, kg/d) and FOt (oxygen demand, kg/d)
-  let FOt = conf.dn ? dn_process_variables.FOt.value : (conf.nit ? nit_process_variables.FOt_fxt.value : as_process_variables.FOt.value); //kgO/d | oxygen demand
-  let TSS = as.wastage.fluxes.totals.TSS.total;             //kgTSS/d | secondary sludge produced in sst
-  if(conf.pst) TSS += pst.wastage.fluxes.totals.TSS.total;  //kgTSS/d | primary   sludge produced in pst
-
-  //get NH4 and PO4 (plant and river)
-  let NH4_plant = as.effluent.components.S_FSA; //mgN/L NH4 at plant effluent
-  let PO4_plant = as.effluent.components.S_OP;  //mgP/L PO4 al plant effluent
-  let NH4_river = river_end.components.S_FSA;   //mgN/L NH4 at river end
-  let PO4_river = river_end.components.S_OP;    //mgP/L PO4 al river end
-
-  //results
+  //results for a single run: process variables, streams and errors
   return {
-    FOt,               //kgO/d
-    TSS,               //kgTSS/d
-    NH4_plant,         //mgN/L
-    NH4_river,         //mgN/L
-    PO4_plant,         //mgP/L
-    PO4_river,         //mgP/L
-    errors: as.errors, //errors (Rs<Rsm and/or fxt>fxm)
-  };
+    process_variables:{
+      as:  as_process_variables,  //object - activated sludge
+      nit: nit_process_variables, //object - nitrification
+      dn:  dn_process_variables,  //object - denitrification
+    },
+    streams:{
+      pst_wastage: pst.wastage, //state variables - primary wastage
+      sst_wastage: as.wastage,  //state variables - secondary wastage
+      effluent:    as.effluent, //state variables - plant effluent
+      river_mixed,              //state variables - river mixed
+      river_end,                //state variables - river end
+    },
+    errors: as.errors, //array
+  }
 }
 
 //export
 try{module.exports=run_model;}catch(e){}
 
+//test
 (function(){
-  return;
 
   //nou influent------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );
@@ -124,7 +119,35 @@ try{module.exports=run_model;}catch(e){}
     k    :{ NH4:1,         PO4:1         },
   };
 
-  //run model 1 time
+  //run model
   let r = run_model(influent, tram, conf, i, deg);
-  console.log(r);
+  //console.log(r);
+  //return;
+
+  //--------------------------------------------------------------
+
+  //get FOt (oxygen demand, kg/d)
+  let FOt = (function(){
+    let key = conf.dn ? 'dn' : (conf.nit ? 'nit' : 'as');
+    return r.process_variables[key].FOt.value; //kgO/d | oxygen demand
+  })();
+
+  //get TSS (total solids, kg/d)
+  let TSS = r.streams.sst_wastage.fluxes.totals.TSS.total;                      //kgTSS/d | secondary sludge produced in sst
+  if(conf.pst) TSS += r.streams.pst_wastage.fluxes.totals.TSS.total;            //kgTSS/d | primary   sludge produced in pst
+
+  //get NH4 and PO4 (plant and river)
+  let NH4_plant = r.streams.effluent.components.S_FSA;  //mgN/L NH4 at plant effluent
+  let PO4_plant = r.streams.effluent.components.S_OP;   //mgP/L PO4 al plant effluent
+  let NH4_river = r.streams.river_end.components.S_FSA; //mgN/L NH4 at river end
+  let PO4_river = r.streams.river_end.components.S_OP;  //mgP/L PO4 al river end
+
+  console.log({
+    FOt,
+    TSS,
+    NH4_plant,
+    PO4_plant,
+    NH4_river,
+    PO4_river,
+  });
 })();
