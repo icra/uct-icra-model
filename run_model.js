@@ -1,44 +1,32 @@
-/*Run model 1 time*/
+/*run phase 1 model (1 plant + 1 river)*/
 
-//import files
+//import model
 try{
   State_Variables = require('./state-variables.js');    //class State_Variables
-  Tram            = require('./tram.js');               //class Tram
-                    require('./primary-settler.js');    //tech primary_settler  (inside State Variables)
-                    require('./activated-sludge.js');   //tech activated_sludge (inside State Variables)
-                    require('./nitrification.js');      //tech nitrification    (inside State Variables)
-                    require('./denitrification.js');    //tech denitrification  (inside State Variables)
-                    require('./chemical-P-removal.js'); //tech chemical P rem   (inside State Variables)
+  Plant           = require('./plant.js');              //class Plant
+  Tram            = require('./tram.js');               //class Tram (river)
 }catch(e){}
 
-function run_model(influent, tram, conf, i, deg){
+function run_model(influent, configuration, parameters, tram, deg){
   /*
     inputs
     - influent: state variables object
-    - tram:     tram object
-    - conf:     dictionary for plant configuration
-    - i:        dictionary for plant inputs
+    - conf:     object for plant configuration
+    - plant:    object for plant inputs (=parameters)
+    - tram:     river (tram object)
     - deg:      dictionary for river degradation 
   */
 
-  //primary settler
-  let pst;
-  if(conf.pst) pst = influent.primary_settler(i.fw, i.removal_BPO, i.removal_UPO, i.removal_iSS);
-  else         pst = { effluent:influent, wastage:null };
+  //create plant and run model
+  let plant = new Plant(influent, configuration, parameters);
+  let run = plant.run();
 
-  //chemical P removal
-  if(conf.cpr==false){ i.mass_FeCl3=0; }
+  //get plant effluent
+  let effluent = run.streams.effluent;
 
-  //call AS + ( NIT + (DN) )
-  let as;
-  if(conf.dn)       as = pst.effluent.denitrification (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH,i.IR,i.DO_RAS,i.influent_alk);
-  else if(conf.nit) as = pst.effluent.nitrification   (i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,i.SF,i.fxt,i.DO,i.pH);
-  else              as = pst.effluent.activated_sludge(i.T,i.Vp,i.Rs,i.RAS,i.waste_from,i.mass_FeCl3,);
+  //combine plant effluent + river upstream
+  let river_mixed = effluent.combine(tram.state_variables);
 
-  //new sv object: plant effluent + river upstream
-  let river_mixed = tram.state_variables.combine(as.effluent);
-
-  //new sv object: river end
   //NH4 and PO4 concentration at river end
   let river_end = new State_Variables(
     river_mixed.Q, //Q
@@ -54,26 +42,14 @@ function run_model(influent, tram, conf, i, deg){
     0,             //OHO
   );
 
-  //pack process variables
-  let as_process_variables  = conf.dn ? as.as_process_variables  : (conf.nit ? as.as_process_variables : as.process_variables);
-  let nit_process_variables = conf.dn ? as.nit_process_variables : (conf.nit ? as.process_variables    : null);
-  let dn_process_variables  = conf.dn ? as.process_variables     : null;
-
   //results for a single run: process variables, streams and errors
+  //TODO this structure is only for a fixed network with only 1 plant and 1 river 
   return {
-    process_variables:{
-      as:  as_process_variables,  //object - activated sludge
-      nit: nit_process_variables, //object - nitrification
-      dn:  dn_process_variables,  //object - denitrification
+    plant: run,
+    river:{
+      mix: river_mixed,
+      end: river_end,
     },
-    streams:{
-      pst_wastage: pst.wastage, //state variables - primary wastage
-      sst_wastage: as.wastage,  //state variables - secondary wastage
-      effluent:    as.effluent, //state variables - plant effluent
-      river_mixed,              //state variables - river mixed
-      river_end,                //state variables - river end
-    },
-    errors: as.errors, //array
   }
 }
 
@@ -82,15 +58,19 @@ try{module.exports=run_model;}catch(e){}
 
 //test
 (function(){
+  /*
+    run phase 1 model (1 plant + 1 river)
+    syntax: run_model(influent, conf, parameters, river, deg)
+  */
 
-  //nou influent------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
+  //new influent------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );
 
-  //configuració edar {primary_settler, nitrification, denitrification, chemical P removal, river}
+  //config edar {pst, nit, dn, cpr, river}
   let conf={pst:true, nit:true, dn:true, cpr:true, river:true};
 
-  //paràmetres edar (i=inputs)
-  let i={
+  //paràmetres edar (i=inputs, canviar nom "i" a "plant_parameters")
+  let parameters={
     fw           : 0.005,     //ø     | PST | fraction of Q that goes to wastage
     removal_BPO  : 42.3352,   //%     | PST | removal of the component X_BPO
     removal_UPO  : 90.05,     //%     | PST | removal of the component X_UPO
@@ -110,8 +90,8 @@ try{module.exports=run_model;}catch(e){}
     influent_alk : 250,       //mg/L  | DN  | influent alkalinity (mg/L CaCO3)
   };
 
-  //riu upstream---(wb      wt      Db        S          n       Li    Di   Ti)
-  let tram=new Tram(25.880, 62.274, 18.45841, 0.0010055, 0.0358, 2000, 0.6, 15);
+  //riu upstream--(wb      wt      Db        S          n       Li    Di   Ti)
+  let river=new Tram(25.880, 62.274, 18.45841, 0.0010055, 0.0358, 2000, 0.6, 15);
 
   //degradació riu
   let deg={
@@ -120,28 +100,25 @@ try{module.exports=run_model;}catch(e){}
   };
 
   //run model
-  let r = run_model(influent, tram, conf, i, deg);
-  //console.log(r);
-  //return;
+  let result = run_model(influent, conf, parameters, river, deg);
 
-  //--------------------------------------------------------------
+  /*from now on we will look inside result object to fetch for desired outputs*/
 
   //get FOt (oxygen demand, kg/d)
   let FOt = (function(){
     let key = conf.dn ? 'dn' : (conf.nit ? 'nit' : 'as');
-    return r.process_variables[key].FOt.value; //kgO/d | oxygen demand
+    return result.plant.process_variables[key].FOt.value; //kgO/d | oxygen demand
   })();
 
   //get TSS (total solids, kg/d)
-  let TSS = r.streams.sst_wastage.fluxes.totals.TSS.total;                      //kgTSS/d | secondary sludge produced in sst
-  if(conf.pst) TSS += r.streams.pst_wastage.fluxes.totals.TSS.total;            //kgTSS/d | primary   sludge produced in pst
+  let TSS           = result.plant.streams.sst_wastage.fluxes.totals.TSS.total; //kgTSS/d | secondary sludge produced in sst
+  if(conf.pst) TSS += result.plant.streams.pst_wastage.fluxes.totals.TSS.total; //kgTSS/d | primary   sludge produced in pst
 
-  //get NH4 and PO4 (plant and river)
-  let NH4_plant = r.streams.effluent.components.S_FSA;  //mgN/L NH4 at plant effluent
-  let PO4_plant = r.streams.effluent.components.S_OP;   //mgP/L PO4 al plant effluent
-  let NH4_river = r.streams.river_end.components.S_FSA; //mgN/L NH4 at river end
-  let PO4_river = r.streams.river_end.components.S_OP;  //mgP/L PO4 al river end
-
+  //get output NH4 and PO4 (plant and river end)
+  let NH4_plant = result.plant.streams.effluent.components.S_FSA;  //mgN/L NH4 at plant effluent
+  let PO4_plant = result.plant.streams.effluent.components.S_OP;   //mgP/L PO4 al plant effluent
+  let NH4_river = result.river.end.components.S_FSA;               //mgN/L NH4 at river end
+  let PO4_river = result.river.end.components.S_OP;                //mgP/L PO4 al river end
   console.log({
     FOt,
     TSS,

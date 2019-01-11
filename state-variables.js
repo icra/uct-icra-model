@@ -12,8 +12,8 @@
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
     Qi → [PST] → [AS] → [nitrification] → Qe
-          ↓      ↓            ↓
-          Qw     Qw           Qw
+          ↓       ↓           ↓
+          Qw      Qw          Qw
 
   Summary of this file:
     1. class data structure
@@ -73,36 +73,7 @@ class State_Variables {
     let mr = this.mass_ratios; //alias for code reduction
     let co = this.components;  //alias for code reduction
 
-    //all totals
-      let Total_COD = co.S_VFA + co.S_FBSO + co.S_USO + co.X_BPO + co.X_UPO + co.X_OHO;
-      let Total_TOC = 
-        co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA  +
-        co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO +
-        co.S_USO  * mr.f_C_USO  / mr.f_CV_USO  +
-        co.X_BPO  * mr.f_C_BPO  / mr.f_CV_BPO  +
-        co.X_UPO  * mr.f_C_UPO  / mr.f_CV_UPO  +
-        co.X_OHO  * mr.f_C_OHO  / mr.f_CV_OHO  ;
-      let Total_TKN = co.S_FSA  + 
-        co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA  +
-        co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO +
-        co.S_USO  * mr.f_N_USO  / mr.f_CV_USO  +
-        co.X_BPO  * mr.f_N_BPO  / mr.f_CV_BPO  +
-        co.X_UPO  * mr.f_N_UPO  / mr.f_CV_UPO  +
-        co.X_OHO  * mr.f_N_OHO  / mr.f_CV_OHO  ;
-      let Total_TP = co.S_OP    +
-        co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA  +
-        co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO +
-        co.S_USO  * mr.f_P_USO  / mr.f_CV_USO  +
-        co.X_BPO  * mr.f_P_BPO  / mr.f_CV_BPO  +
-        co.X_UPO  * mr.f_P_UPO  / mr.f_CV_UPO  +
-        co.X_OHO  * mr.f_P_OHO  / mr.f_CV_OHO  ;
-      let Total_VSS =
-        co.X_BPO / mr.f_CV_BPO + 
-        co.X_UPO / mr.f_CV_UPO +
-        co.X_OHO / mr.f_CV_OHO ;
-      let Total_TSS = Total_VSS + co.X_iSS;
-
-    //COD all subfractions
+    //COD all fractions
       let bsCOD = co.S_VFA + co.S_FBSO;
       let usCOD = co.S_USO;
       let bpCOD = co.X_BPO;
@@ -111,6 +82,7 @@ class State_Variables {
       let uCOD = usCOD + upCOD;
       let sCOD = bsCOD + usCOD;
       let pCOD = bpCOD + upCOD;
+      let Total_COD = bsCOD + usCOD + bpCOD + upCOD;
       let COD={
         total: Total_COD, 
         bCOD,  uCOD,  sCOD,  pCOD,
@@ -118,7 +90,7 @@ class State_Variables {
         active: co.X_OHO,
       };
 
-    //TOC all subfractions
+    //TOC all fractions
       let bsOC = 
         co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO;
@@ -129,6 +101,7 @@ class State_Variables {
       let uOC = usOC + upOC;
       let sOC = bsOC + usOC;
       let pOC = bpOC + upOC;
+      let Total_TOC = bsOC + usOC + bpOC + upOC;
       let TOC={
         total:Total_TOC,
         bOC,  uOC,  sOC,  pOC,
@@ -136,7 +109,7 @@ class State_Variables {
         active: co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO,
       };
 
-    //ON all subfractions (TKN=ON+NH4)
+    //ON all fractions (TKN=ON+NH4)
       let bsON = 
         co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO;
@@ -147,6 +120,7 @@ class State_Variables {
       let uON = usON + upON;
       let sON = bsON + usON;
       let pON = bpON + upON;
+      let Total_TKN = co.S_FSA + bsON + usON + bpON + upON;
       let TKN={
         total:Total_TKN,
         FSA:co.S_FSA,
@@ -156,7 +130,7 @@ class State_Variables {
         active: co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO,
       }
 
-    //OP all subfractions (TP=OP+PO4)
+    //OP all fractions (TP=OP+PO4)
       let bsOP = 
         co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA +
         co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO;
@@ -167,6 +141,7 @@ class State_Variables {
       let uOP = usOP + upOP;
       let sOP = bsOP + usOP;
       let pOP = bpOP + upOP;
+      let Total_TP = co.S_OP + bsOP + usOP + bpOP + upOP;
       let TP={
         total:Total_TP,
         PO4:co.S_OP,
@@ -176,9 +151,11 @@ class State_Variables {
         active: co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO,
       };
 
-    //TSS all subfractions
+    //TSS all fractions
       let bVSS = co.X_BPO / mr.f_CV_BPO;
       let uVSS = co.X_UPO / mr.f_CV_UPO;
+      let Total_VSS = bVSS + uVSS;
+      let Total_TSS = Total_VSS + co.X_iSS;
       let TSS={
         total:Total_TSS,
         iSS:co.X_iSS,
@@ -236,7 +213,7 @@ class State_Variables {
   combine(sv){
     //new empty object
     let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);
-    //TODO problem which mass ratios?
+    //TODO problem with state variables with diferent mass ratios
     //new flowrate
     let Q = this.Q + sv.Q;
     new_sv.Q = Q;
