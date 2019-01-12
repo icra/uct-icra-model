@@ -21,28 +21,29 @@
   <script src="../nitrification.js"></script>
   <script src="../denitrification.js"></script>
   <script src="../chemical-P-removal.js"></script>
+  <script src="../plant.js"></script>
   <script src="../tram.js"></script>
   <script src="../run_model.js"></script>
   <script src="../recomanador.js"></script>
 </head>
 
 <!--gui-->
-<h2>Recomanador</h2>
+<h2 onclick=window.location=window.location.pathname>Recomanador</h2>
 <div>
   <table id=info border=1 style=font-size:smaller>
     <tr><th colspan=5>Execució del model amb variació del següents paràmetres:
-    <tr><th>Input                 <th>Unitat <th>Valors provats              <th>Descripció
-    <tr><td>Rs                    <td>d      <td id=Rs        >[6 - 40]      <td>Temps de residència
-    <tr><td>RAS                   <td>ø      <td id=RAS       >[0.75 - 1.25] <td>Ratio recirculació externa
-    <tr><td>DO                    <td>mgO/L  <td id=DO        >[1.00 - 2.50] <td>Oxigen dissolt al reactor
-    <tr><td>mass FeCl<sub>3</sub> <td>kg/d   <td id=mass_FeCl3>[500 - 600]   <td>Clorur fèrric afegit (eliminació fosfat)
-    <tr><th>Output                <th>Unitat <th>Valors desitjats            <th>Descripció
-    <tr><td>FOt                   <td>kgO/d  <td>                            <td>Demanda total oxigen
-    <tr><td>TSS                   <td>kg/d   <td>                            <td>Producció fangs total
-    <tr><td>NH<sub>4</sub>plant   <td>mg/L   <td>&lt;15                      <td>Amoni  efluent planta
-    <tr><td>PO<sub>4</sub>plant   <td>mg/L   <td>&lt;2                       <td>Fosfat efluent planta
-    <tr><td>NH<sub>4</sub>river   <td>mg/L   <td>&lt;0.5                     <td>Amoni  final riu
-    <tr><td>PO<sub>4</sub>river   <td>mg/L   <td>&lt;0.5                     <td>Fosfat final riu
+    <tr><th>Input                <th>Unitat <th>Valors provats              <th>Descripció
+    <tr><td>Rs                   <td>d      <td id=Rs        >[6 - 40]      <td>Temps de residència
+    <tr><td>RAS                  <td>ø      <td id=RAS       >[0.75 - 1.25] <td>Ratio recirculació externa
+    <tr><td>DO                   <td>mgO/L  <td id=DO        >[1.00 - 2.50] <td>Oxigen dissolt al reactor
+    <tr><td>FeCl<sub>3</sub>     <td>kg/d   <td id=mass_FeCl3>[500 - 600]   <td>Clorur fèrric afegit (eliminació fosfat)
+    <tr><th>Output               <th>Unitat <th>Valors desitjats            <th>Descripció
+    <tr><td>FOt                  <td>kgO/d  <td>                            <td>Demanda total oxigen
+    <tr><td>TSS                  <td>kg/d   <td>                            <td>Producció fangs total
+    <tr><td>NH<sub>4</sub> plant <td>mg/L   <td>&lt;<span NH4_plant></span> <td>Amoni  efluent planta
+    <tr><td>PO<sub>4</sub> plant <td>mg/L   <td>&lt;<span PO4_plant></span> <td>Fosfat efluent planta
+    <tr><td>NH<sub>4</sub> river <td>mg/L   <td>&lt;<span NH4_river></span> <td>Amoni  final riu
+    <tr><td>PO<sub>4</sub> river <td>mg/L   <td>&lt;<span PO4_river></span> <td>Fosfat final riu
   </table>
 </div>
 <button id=run style="margin:5px 0;font-size:18px">Generar combinacions</button>
@@ -58,38 +59,58 @@
     let conf     = JSON.parse(url.searchParams.get('conf'));       //object | example {pst:false, nit:true, dn:true, cpr:true, river:true}
     let inputs   = JSON.parse(url.searchParams.get('inputs'));     //object | wwtp parameters {fw,removal_BPO,removal_UPO,removal_iSS,T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH,IR,DO_RAS,influent_alk}
     let deg      = JSON.parse(url.searchParams.get('deg'));        //object | river degradation { R_20:{NH4,PO4}, k:{NH4,PO4} }
-    variacions   = JSON.parse(url.searchParams.get('variacions')); //object | variations of wwtp parameters. example [Rs:[1,2],RAS:[2,3]]
 
     //run n simulations
-    combinacions = run_simulacions(
-      new State_Variables(...influent), 
-      new Tram(...tram), 
+    plant = new Plant(
+      new State_Variables(...influent),
       conf,
       inputs, 
+    );
+    combinacions = run_simulacions(
+      plant, 
+      new Tram(...tram), 
       deg,
       variacions,
     );
 
-    //draw parameter variations
-    Object.entries(variacions).forEach(([key,arr])=>{
-      document.querySelector(`#info #${key}`).innerHTML=`[${arr.join(', ')}]`;
+    variacions = JSON.parse(url.searchParams.get('variacions')); //object | variations of wwtp parameters. example [Rs:[1,2],RAS:[2,3]]
+    limits     = JSON.parse(url.searchParams.get('limits'))||limits;     //object | limits als outputs per acceptar una combinacio d'inputs
+
+  }catch(e){
+    //console.log(e);
+    console.log("No s'han especificat inputs personalitzats. Utilitzant valors per defecte (Ekama)");
+  }
+
+  //draw parameter variations
+  Object.entries(variacions).forEach(([key,arr])=>{
+    document.querySelector(`#info #${key}`).innerHTML=`[${arr.join(', ')}]`;
+  });
+  //draw limits
+  ['plant','river'].forEach(part=>{
+    Object.entries(limits[part]).forEach(([substance,limit])=>{
+      document.querySelector(`span[${substance}_${part}]`).innerHTML=format(limit);
     });
-  }catch(e){console.log("No s'han especificat inputs personalitzats. Utilitzant valors per defecte (Ekama)");}
+  });
+
+  //filtra les combinacions
+  let solucions = combinacions.filter(c=>{
+    let NH4_plant = c.plant.secondary.effluent.components.S_FSA;
+    let PO4_plant = c.plant.secondary.effluent.components.S_OP;
+    let NH4_river = c.river.end.components.S_FSA;
+    let PO4_river = c.river.end.components.S_OP;
+    return (
+      NH4_plant>0 && NH4_plant < limits.plant.NH4 && //limits NH4 plant
+      PO4_plant>0 && PO4_plant < limits.plant.PO4 && //limits PO4 plant
+      NH4_river>0 && NH4_river < limits.river.NH4 && //limits NH4 riu
+      PO4_river>0 && PO4_river < limits.river.PO4 && //limits PO4 riu
+      c.plant.errors.length==0                       //errors allowed (max value: 2 (Rsm and fxm related)
+    )
+  });
 
   //click run button listener
   document.querySelector('#run').addEventListener('click',function(){
     //taula combinacions
     let t = document.querySelector("#combinacions"); t.innerHTML="";
-
-    //la variable combinacions ve definida 'recomanador.js' conté TOTES les combinacions sense filtrar
-    //filtra les combinacinos que compleixen amb els limits
-    let solucions = combinacions.filter(obj=>(
-      obj.NH4_plant>0 && obj.NH4_plant<15  && //limits NH4 plant
-      obj.PO4_plant>0 && obj.PO4_plant<2   && //limits PO4 plant
-      obj.NH4_river>0 && obj.NH4_river<0.5 && //limits NH4 riu
-      obj.PO4_river>0 && obj.PO4_river<0.5 && //limits PO4 riu
-      obj.errors.length==0                    //errors allowed (max value: 2 (Rsm and fxm related)
-    )); 
 
     /*dibuixa taula solucions*/
 
@@ -99,20 +120,52 @@
     if(solucions.length==0)return;
 
     //headers columnes
-    newRow=t.insertRow(-1);Object.keys(solucions[0]).forEach(key=>{newRow.insertCell(-1).outerHTML="<th>"+key.prettifyUnit();});
+    newRow=t.insertRow(-1);
+    newRow.insertCell(-1).outerHTML="<th>Rs";
+    newRow.insertCell(-1).outerHTML="<th>RAS";
+    newRow.insertCell(-1).outerHTML="<th>DO";
+    newRow.insertCell(-1).outerHTML="<th>FeCl<sub>3</sub>";
+
+    //headers outputs
+    newRow.insertCell(-1).outerHTML="<th>FOt";
+    newRow.insertCell(-1).outerHTML="<th>TSS";
+    newRow.insertCell(-1).outerHTML="<th>NH4 plant";
+    newRow.insertCell(-1).outerHTML="<th>PO4 plant";
+    newRow.insertCell(-1).outerHTML="<th>NH4 river";
+    newRow.insertCell(-1).outerHTML="<th>PO4 river";
 
     //itera solucions
-    solucions.forEach((obj,i)=>{
+    solucions.forEach((solucio,i)=>{
       let newRow = t.insertRow(-1);
-      newRow.setAttribute('combinacio',i);
-      newRow.title=`combinacio ${i+1}`;
-      Object.entries(obj).forEach(([key,val])=>{
-        if(typeof(val)=='object'){
-          newRow.insertCell(-1).innerHTML=val.join(', '); //mostra els errors
-        }else{
+      newRow.setAttribute('solucio',i);
+      newRow.title=`solució ${i+1}`;
+
+      //write inputs current combination
+      Object.entries(solucio).forEach(([key,val])=>{
+        if(typeof(val)=='number'){
           newRow.insertCell(-1).outerHTML=`<td key=${key} value=${val}>${format(val)}`;
         }
       });
+
+      //get results
+      let FOt = (function(){
+        if(plant.configuration.dn)  return solucio.plant.process_variables.dn.FOt.value; 
+        if(plant.configuration.nit) return solucio.plant.process_variables.nit.FOt.value;
+        else                        return solucio.plant.process_variables.as.FOt.value;
+      })();
+      let TSS                          = solucio.plant.secondary.wastage.fluxes.totals.TSS.total; //kgTSS/d
+      if(plant.configuration.pst) TSS += solucio.plant.primary  .wastage.fluxes.totals.TSS.total; //kgTSS/d
+      let NH4_plant = solucio.plant.secondary.effluent.components.S_FSA; //mgN/L NH4 at plant effluent
+      let PO4_plant = solucio.plant.secondary.effluent.components.S_OP;  //mgP/L PO4 al plant effluent
+      let NH4_river = solucio.river.end.components.S_FSA;                //mgN/L NH4 at river end
+      let PO4_river = solucio.river.end.components.S_OP;                 //mgP/L PO4 al river end
+
+      newRow.insertCell(-1).innerHTML=format(FOt);
+      newRow.insertCell(-1).innerHTML=format(TSS);
+      newRow.insertCell(-1).innerHTML=format(NH4_plant);
+      newRow.insertCell(-1).innerHTML=format(PO4_plant);
+      newRow.insertCell(-1).innerHTML=format(NH4_river);
+      newRow.insertCell(-1).innerHTML=format(PO4_river);
     });
   });
 </script>

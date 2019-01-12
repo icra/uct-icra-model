@@ -75,7 +75,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let Dp1     = Dp1RBSO + Dp1BPO;                     //mgNO3-N/L   | influent
 
   //Nitrate generated in nitrification (does not include influent nitrate)
-  let Nc = nit.process_variables.Nc_fxt.value; //mgN/L
+  let Nc = nit.process_variables.Nc.value; //mgN/L
 
   //optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
@@ -105,7 +105,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //oxygen recovered by denitrification
   let FOd = 2.86*Q*(Nc-Nne);                     //kgO/d
   let FOc = nit.as_process_variables.FOc.value;  //kgO/d
-  let FOn = nit.process_variables.FOn_fxt.value; //kgO/d
+  let FOn = nit.process_variables.FOn.value; //kgO/d
   let FOt = FOc + FOn - FOd;                     //kgO/d
   let OUR = FOt*1000/(Vp*(1-fxt)*24);            //mgO/L·h
 

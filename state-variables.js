@@ -82,7 +82,7 @@ class State_Variables {
       let uCOD = usCOD + upCOD;
       let sCOD = bsCOD + usCOD;
       let pCOD = bpCOD + upCOD;
-      let Total_COD = bsCOD + usCOD + bpCOD + upCOD;
+      let Total_COD = bsCOD + usCOD + bpCOD + upCOD + co.X_OHO;
       let COD={
         total: Total_COD, 
         bCOD,  uCOD,  sCOD,  pCOD,
@@ -101,12 +101,13 @@ class State_Variables {
       let uOC = usOC + upOC;
       let sOC = bsOC + usOC;
       let pOC = bpOC + upOC;
-      let Total_TOC = bsOC + usOC + bpOC + upOC;
+      let actOC = co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO;
+      let Total_TOC = bsOC + usOC + bpOC + upOC + actOC;
       let TOC={
         total:Total_TOC,
         bOC,  uOC,  sOC,  pOC,
         bsOC, usOC, bpOC, upOC,
-        active: co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO,
+        active: actOC,
       };
 
     //ON all fractions (TKN=ON+NH4)
@@ -120,14 +121,15 @@ class State_Variables {
       let uON = usON + upON;
       let sON = bsON + usON;
       let pON = bpON + upON;
-      let Total_TKN = co.S_FSA + bsON + usON + bpON + upON;
+      let actON = co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO;
+      let Total_TKN = co.S_FSA + bsON + usON + bpON + upON + actON;
       let TKN={
         total:Total_TKN,
         FSA:co.S_FSA,
         ON:sON+pON, 
         bON,  uON,  sON,  pON,
         bsON, usON, bpON, upON,
-        active: co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO,
+        active: actON,
       }
 
     //OP all fractions (TP=OP+PO4)
@@ -141,20 +143,22 @@ class State_Variables {
       let uOP = usOP + upOP;
       let sOP = bsOP + usOP;
       let pOP = bpOP + upOP;
-      let Total_TP = co.S_OP + bsOP + usOP + bpOP + upOP;
+      let actOP = co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO;
+      let Total_TP = co.S_OP + bsOP + usOP + bpOP + upOP + actOP;
       let TP={
         total:Total_TP,
         PO4:co.S_OP,
         OP:sOP+pOP,
         bOP,  uOP,  sOP,  pOP,
         bsOP, usOP, bpOP, upOP,
-        active: co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO,
+        active: actOP,
       };
 
     //TSS all fractions
       let bVSS = co.X_BPO / mr.f_CV_BPO;
       let uVSS = co.X_UPO / mr.f_CV_UPO;
-      let Total_VSS = bVSS + uVSS;
+      let actVSS = co.X_OHO / mr.f_CV_OHO;
+      let Total_VSS = bVSS + uVSS + actVSS;
       let Total_TSS = Total_VSS + co.X_iSS;
       let TSS={
         total:Total_TSS,
@@ -162,7 +166,7 @@ class State_Variables {
         VSS:Total_VSS, 
         bVSS,
         uVSS,
-        active: co.X_OHO / mr.f_CV_OHO,
+        active: actVSS,
       };
 
     //pack results

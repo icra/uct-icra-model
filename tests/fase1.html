@@ -210,7 +210,7 @@
 <script src="../activated-sludge.js"></script>
 <script src="../nitrification.js"></script>
 <script src="../denitrification.js"></script>
-<script src="../tram.js"></script>
+<script src="../plant.js"></script>
 
 <!--model backend and gui integration-->
 <script>
@@ -248,7 +248,7 @@
       parseFloat(document.querySelector('#influent #S_NOx').value),
     );
 
-    //read mass ratios from screen
+    //read mass ratios from screen and modify influent
     ['CV','C','N','P'].forEach(c1=>{
       ['VFA','FBSO','BPO','UPO','USO','OHO'].forEach(c2=>{
         influent.mass_ratios[`f_${c1}_${c2}`] =
@@ -261,94 +261,58 @@
       constants[input.id]=parseFloat(input.value);
     });
 
-    /*backend plant*/
-    //get scenario configuration
+    //get plant configuration
     let conf={
       pst:document.querySelector('#edar #pst').checked,
       nit:document.querySelector('#edar #nit').checked,
       dn :document.querySelector('#edar #dn').checked,
       cpr:document.querySelector('#edar #cpr').checked,
-      river:false,
     };
 
-    //call primary settler
-    let pst;
-    if(conf.pst){
-      pst = influent.primary_settler(
-        parseFloat(document.querySelector('#edar #fw').value),
-        parseFloat(document.querySelector('#edar #removal_BPO').value),
-        parseFloat(document.querySelector('#edar #removal_UPO').value),
-        parseFloat(document.querySelector('#edar #removal_iSS').value)
-      );
-    }else{ pst = { effluent:influent, wastage:null }; }
+    //get plant parameters
+    let parameters={
+      fw          : parseFloat(document.querySelector('#edar #fw').value),
+      removal_BPO : parseFloat(document.querySelector('#edar #removal_BPO').value),
+      removal_UPO : parseFloat(document.querySelector('#edar #removal_UPO').value),
+      removal_iSS : parseFloat(document.querySelector('#edar #removal_iSS').value),
+      T           : parseFloat(document.querySelector('#edar #T').value),
+      Vp          : parseFloat(document.querySelector('#edar #Vp').value),
+      Rs          : parseFloat(document.querySelector('#edar #Rs').value),
+      RAS         : parseFloat(document.querySelector('#edar #RAS').value),
+      waste_from  :            document.querySelector('#edar #waste_from').value,
+      mass_FeCl3  : parseFloat(document.querySelector('#edar #mass_FeCl3').value),
+      SF          : parseFloat(document.querySelector('#edar #SF').value),
+      fxt         : parseFloat(document.querySelector('#edar #fxt').value),
+      DO          : parseFloat(document.querySelector('#edar #DO').value),
+      pH          : parseFloat(document.querySelector('#edar #pH').value),
+      IR          : parseFloat(document.querySelector('#edar #IR').value),
+      DO_RAS      : parseFloat(document.querySelector('#edar #DO_RAS').value),
+      influent_alk: parseFloat(document.querySelector('#edar #influent_alk').value),
+    };
 
-    //check if there is chemical P removal
-    let mass_FeCl3 = parseFloat(document.querySelector('#edar #mass_FeCl3').value);
-    if(conf.cpr==false){ mass_FeCl3 = 0; }
-
-    //call AS+(NIT)+(DN)
-    let as;
-    if(conf.dn){
-      as = pst.effluent.denitrification(
-        parseFloat(document.querySelector('#edar #T').value),
-        parseFloat(document.querySelector('#edar #Vp').value),
-        parseFloat(document.querySelector('#edar #Rs').value),
-        parseFloat(document.querySelector('#edar #RAS').value),
-        document.querySelector('#edar #waste_from').value,
-        mass_FeCl3,
-        parseFloat(document.querySelector('#edar #SF').value),
-        parseFloat(document.querySelector('#edar #fxt').value),
-        parseFloat(document.querySelector('#edar #DO').value),
-        parseFloat(document.querySelector('#edar #pH').value),
-        parseFloat(document.querySelector('#edar #IR').value),
-        parseFloat(document.querySelector('#edar #DO_RAS').value),
-        parseFloat(document.querySelector('#edar #influent_alk').value),
-      );
-    }else if(conf.nit){
-      as = pst.effluent.nitrification(
-        parseFloat(document.querySelector('#edar #T').value),
-        parseFloat(document.querySelector('#edar #Vp').value),
-        parseFloat(document.querySelector('#edar #Rs').value),
-        parseFloat(document.querySelector('#edar #RAS').value),
-        document.querySelector('#edar #waste_from').value,
-        mass_FeCl3,
-        parseFloat(document.querySelector('#edar #SF').value),
-        parseFloat(document.querySelector('#edar #fxt').value),
-        parseFloat(document.querySelector('#edar #DO').value),
-        parseFloat(document.querySelector('#edar #pH').value),
-      );
-    }else{
-      as = pst.effluent.activated_sludge(
-        parseFloat(document.querySelector('#edar #T').value),
-        parseFloat(document.querySelector('#edar #Vp').value),
-        parseFloat(document.querySelector('#edar #Rs').value),
-        parseFloat(document.querySelector('#edar #RAS').value),
-        document.querySelector('#edar #waste_from').value,
-        mass_FeCl3,
-      );
-    }
-    /*backend end--------------------------------*/
+    //create new plant and run model
+    let plant = new Plant(influent, conf, parameters);
+    let run = plant.run();
+    /*backend end-------*/
 
     /*GUI integration*/
     //recopila summaries variables d'estat (per ordre)
-    let svs = {};
+    let summaries = {};
+                 summaries.Influent           = plant.influent.summary;
+    if(conf.pst) summaries.Primary_wastage    = run.primary.wastage.summary;
+    if(conf.pst) summaries.Primary_effluent   = run.primary.effluent.summary;
+                 summaries.Secondary_wastage  = run.secondary.wastage.summary;
+                 summaries.Secondary_effluent = run.secondary.effluent.summary;
 
-    //afegeix summaries a "svs"
-    svs.Influent = influent.summary;
-    if(conf.pst) svs.Primary_wastage    = pst.wastage.summary;
-    if(conf.pst) svs.Primary_effluent   = pst.effluent.summary;
-                 svs.Secondary_wastage  = as.wastage.summary;
-                 svs.Secondary_effluent = as.effluent.summary;
-
-    //dibuixa summaries (svs) en columnes
-    (function draw_summaries(svs){
-      if(Object.keys(svs).length==0)return;
+    //dibuixa summaries en columnes
+    (function draw_summaries(summaries){
+      if(Object.keys(summaries).length==0)return;
       let div   = document.querySelector('div#summaries'); div.innerHTML=""; //buida div summaries
       let table = document.createElement('table');div.appendChild(table);    //crea nova taula
       let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML="";   //posa els noms de les variables d'estat
-      Object.keys(svs).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller stream>"+key.replace('_','<br>');});
+      Object.keys(summaries).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller stream>"+key.replace('_','<br>');});
       //itera keys del primer objecte (Q,COD,TKN...)
-      Object.keys(Object.values(svs)[0]).forEach(key=>{
+      Object.keys(Object.values(summaries)[0]).forEach(key=>{
         let newRow = table.insertRow(-1);
         if(key=="Q"){
           newRow.insertCell(-1).innerHTML=`${key} <span class=unit>(ML/d)</span>`;
@@ -356,7 +320,7 @@
           newRow.insertCell(-1).innerHTML=`${key} <span unit class=unit>(mg/L, kg/d)</span>`;
         }
         //itera cada variable d'estat
-        Object.entries(svs).forEach(([name,sv])=>{
+        Object.entries(summaries).forEach(([name,sv])=>{
           if(key=="Q"){
             let Q = sv.Q;
             newRow.insertCell(-1).outerHTML=`<td class=number colspan=2 flow value=${Q}>${format(Q)}</td>`;
@@ -371,24 +335,15 @@
           }
         });
       });
-    })(svs);
+    })(summaries);
 
     //recopila process_variables
     let processes = document.querySelector('#processes'); processes.innerHTML="";
     let pvs = {};
-    if(conf.dn){
-      pvs.Activated_sludge = as.as_process_variables;
-      pvs.Nitrification    = as.nit_process_variables;
-      pvs.Denitrification  = as.process_variables;
-    }else if(conf.nit){
-      pvs.Activated_sludge = as.as_process_variables;
-      pvs.Nitrification    = as.process_variables;
-    }else{
-      pvs.Activated_sludge = as.process_variables;
-    }
-    if(conf.cpr){
-      pvs.Chemical_P_removal = as.cpr;
-    };
+                 pvs.Activated_sludge   = run.process_variables.as;
+    if(conf.nit) pvs.Nitrification      = run.process_variables.nit;
+    if(conf.dn)  pvs.Denitrification    = run.process_variables.dn;
+    if(conf.cpr) pvs.Chemical_P_removal = run.process_variables.cpr;
 
     //dibuixa process variables (pvs)
     Object.entries(pvs).forEach(([key,pv])=>{
@@ -409,6 +364,7 @@
     //clica les unitats que toquen
     document.querySelector('input[name=summary_units]:checked').click();
 
+    //debug info
     console.log('model execution finished');
   });
 
