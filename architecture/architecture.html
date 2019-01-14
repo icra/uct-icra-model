@@ -1,0 +1,1068 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>architecture</title>
+<!-- 2019-01-14 lun 17:24 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Lluís Bosch" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">architecture</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Class: State Variables</a>
+<ul>
+<li><a href="#sec-1-1">1.1. Inputs</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. Q (ML/d, flowrate)</a></li>
+<li><a href="#sec-1-1-2">1.1.2. Components (mg/L)</a></li>
+<li><a href="#sec-1-1-3">1.1.3. Mass ratios</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. Technologies</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. Primary settler</a></li>
+<li><a href="#sec-1-2-2">1.2.2. Activated Sludge</a></li>
+<li><a href="#sec-1-2-3">1.2.3. Chemical P removal</a></li>
+<li><a href="#sec-1-2-4">1.2.4. Nitrification</a></li>
+<li><a href="#sec-1-2-5">1.2.5. Denitrification</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. Outputs</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. Totals</a></li>
+<li><a href="#sec-1-3-2">1.3.2. Fluxes</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. Kinetic constants</a>
+<ul>
+<li><a href="#sec-2-1">2.1. Activated sludge</a></li>
+<li><a href="#sec-2-2">2.2. Nitrification</a></li>
+<li><a href="#sec-2-3">2.3. Denitrification</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Class: Plant</a>
+<ul>
+<li><a href="#sec-3-1">3.1. Inputs</a>
+<ul>
+<li><a href="#sec-3-1-1">3.1.1. Influent (state variables object)</a></li>
+<li><a href="#sec-3-1-2">3.1.2. Configuration object</a></li>
+<li><a href="#sec-3-1-3">3.1.3. Parameters object</a></li>
+</ul>
+</li>
+<li><a href="#sec-3-2">3.2. Outputs</a>
+<ul>
+<li><a href="#sec-3-2-1">3.2.1. Process variables (varies with configuration, depending on the technologies activated)</a></li>
+<li><a href="#sec-3-2-2">3.2.2. Effluents</a></li>
+<li><a href="#sec-3-2-3">3.2.3. Wastages</a></li>
+<li><a href="#sec-3-2-4">3.2.4. Possible errors (array of strings)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<p>
+This file describes the main data structures for the ASM model (but not the actual syntax for using the model and neither the equations)
+</p>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Class: State Variables</h2>
+<div class="outline-text-2" id="text-1">
+</div><div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> Inputs</h3>
+<div class="outline-text-3" id="text-1-1">
+</div><div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> Q (ML/d, flowrate)</h4>
+</div>
+<div id="outline-container-sec-1-1-2" class="outline-4">
+<h4 id="sec-1-1-2"><span class="section-number-4">1.1.2</span> Components (mg/L)</h4>
+<div class="outline-text-4" id="text-1-1-2">
+<ul class="org-ul">
+<li>S<sub>VFA</sub>  - Biodegradable Soluble Organics (BSO) (volatile fatty acids)
+</li>
+<li>S<sub>FBSO</sub> - Biodegradable Soluble Organics (BSO) (fermentable organics)
+</li>
+<li>X<sub>BPO</sub>  - Biodegradable Particulate Organics (BPO)
+</li>
+<li>X<sub>UPO</sub>  - Unbiodegradable Particulate Organics (UPO)
+</li>
+<li>S<sub>USO</sub>  - Unbiodegradable Soluble Organics (USO)
+</li>
+<li>X<sub>iSS</sub>  - Inert Suspended Solids (sand)
+</li>
+<li>S<sub>FSA</sub>  - Inorganic Free Saline Ammonia (NH<sub>4</sub>)
+</li>
+<li>S<sub>OP</sub>   - Inorganic OrthoPhosphate (PO<sub>4</sub>)
+</li>
+<li>S<sub>NOx</sub>  - Inorganic Nitrite and Nitrate (NO<sub>2</sub> + NO<sub>3</sub>) (not part of TKN)
+</li>
+<li>X<sub>OHO</sub>  - Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-1-1-3" class="outline-4">
+<h4 id="sec-1-1-3"><span class="section-number-4">1.1.3</span> Mass ratios</h4>
+<div class="outline-text-4" id="text-1-1-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">component</th>
+<th scope="col" class="left">COD</th>
+<th scope="col" class="left">C</th>
+<th scope="col" class="left">N</th>
+<th scope="col" class="left">P</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">S<sub>VFA</sub></td>
+<td class="left">f<sub>CV</sub><sub>VFA</sub></td>
+<td class="left">f<sub>C</sub><sub>VFA</sub></td>
+<td class="left">f<sub>N</sub><sub>VFA</sub></td>
+<td class="left">f<sub>P</sub><sub>VFA</sub></td>
+</tr>
+
+<tr>
+<td class="left">S<sub>FBSO</sub></td>
+<td class="left">f<sub>CV</sub><sub>FBSO</sub></td>
+<td class="left">f<sub>C</sub><sub>FBSO</sub></td>
+<td class="left">f<sub>N</sub><sub>FBSO</sub></td>
+<td class="left">f<sub>P</sub><sub>FBSO</sub></td>
+</tr>
+
+<tr>
+<td class="left">X<sub>BPO</sub></td>
+<td class="left">f<sub>CV</sub><sub>BPO</sub></td>
+<td class="left">f<sub>C</sub><sub>BPO</sub></td>
+<td class="left">f<sub>N</sub><sub>BPO</sub></td>
+<td class="left">f<sub>P</sub><sub>BPO</sub></td>
+</tr>
+
+<tr>
+<td class="left">S<sub>UPO</sub></td>
+<td class="left">f<sub>CV</sub><sub>UPO</sub></td>
+<td class="left">f<sub>C</sub><sub>UPO</sub></td>
+<td class="left">f<sub>N</sub><sub>UPO</sub></td>
+<td class="left">f<sub>P</sub><sub>UPO</sub></td>
+</tr>
+
+<tr>
+<td class="left">S<sub>USO</sub></td>
+<td class="left">f<sub>CV</sub><sub>USO</sub></td>
+<td class="left">f<sub>C</sub><sub>USO</sub></td>
+<td class="left">f<sub>N</sub><sub>USO</sub></td>
+<td class="left">f<sub>P</sub><sub>USO</sub></td>
+</tr>
+
+<tr>
+<td class="left">X<sub>OHO</sub></td>
+<td class="left">f<sub>CV</sub><sub>OHO</sub></td>
+<td class="left">f<sub>C</sub><sub>OHO</sub></td>
+<td class="left">f<sub>N</sub><sub>OHO</sub></td>
+<td class="left">f<sub>P</sub><sub>OHO</sub></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> Technologies</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+"Technologies" are methods of the state variables class. Each technology call creates an effluent and a wastage objects which are "state variables", and another object called "process variables".
+</p>
+</div>
+<div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> Primary settler</h4>
+<div class="outline-text-4" id="text-1-2-1">
+</div><ol class="org-ol"><li><a id="sec-1-2-1-1" name="sec-1-2-1-1"></a>Inputs<br  /><div class="outline-text-5" id="text-1-2-1-1">
+<ul class="org-ul">
+<li>fw          (ø, fraction of input Q that goes to wastage)
+</li>
+<li>removal<sub>BPO</sub> (%, removal of X<sub>BPO</sub>)
+</li>
+<li>removal<sub>UPO</sub> (%, removal of X<sub>UPO</sub>)
+</li>
+<li>removal<sub>iSS</sub> (%, removal of X<sub>iSS</sub>)
+</li>
+</ul>
+</div>
+</li>
+<li><a id="sec-1-2-1-2" name="sec-1-2-1-2"></a>Outputs<br  /><div class="outline-text-5" id="text-1-2-1-2">
+<ul class="org-ul">
+<li>Primary effluent (state variables object)
+</li>
+<li>Primary wastage (state variables object)
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Activated Sludge</h4>
+<div class="outline-text-4" id="text-1-2-2">
+</div><ol class="org-ol"><li><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a>Inputs<br  /><div class="outline-text-5" id="text-1-2-2-1">
+<ul class="org-ul">
+<li>T (ºC, temperature)
+</li>
+<li>Vp (m<sup>3</sup>, reactor volume)
+</li>
+<li>Rs (days, solids retention time or sludge age)
+</li>
+<li>RAS (ø, SST underflow recycle ratio)
+</li>
+<li>waste<sub>from</sub> (string, 'reactor' or 'sst')
+</li>
+<li>mass<sub>FeCl3</sub> (kgFeCl3, mass of FeCl3 added for chemical P removal)
+</li>
+</ul>
+</div>
+</li>
+<li><a id="sec-1-2-2-2" name="sec-1-2-2-2"></a>Outputs (process variables)<br  /><div class="outline-text-5" id="text-1-2-2-2">
+<ul class="org-ul">
+<li>fSus        (gUSO/gCOD,   USO/COD ratio (influent))
+</li>
+<li>fSup        (gUPO/gCOD,   UPO/COD ratio (influent))
+</li>
+<li>Ns          (mgN/L,       N required for sludge production)
+</li>
+<li>Ps          (mgN/L,       P required for sludge production)
+</li>
+<li>HRT         (hour,        Nominal Hydraulic Retention Time)
+</li>
+<li>bHT         (1/d,         OHO Endogenous respiration rate corrected by temperature)
+</li>
+<li>f<sub>XBH</sub>       (gVSS·d/gCOD, OHO Biomass production rate)
+</li>
+<li>MX<sub>BH</sub>       (kgVSS,       OHO Biomass produced VSS)
+</li>
+<li>MX<sub>EH</sub>       (kgVSS,       OHO Endogenous residue VSS)
+</li>
+<li>MX<sub>I</sub>        (kgVSS,       Unbiodegradable organics VSS)
+</li>
+<li>MX<sub>V</sub>        (kgVSS,       Volatile Suspended Solids)
+</li>
+<li>MX<sub>IO</sub>       (kgiSS,       Inert Solids (influent+biomass))
+</li>
+<li>MX<sub>T</sub>        (kgTSS,       Total Suspended Solids)
+</li>
+<li>X<sub>V</sub>         (kgVSS/m3,    VSS concentration in SST)
+</li>
+<li>X<sub>T</sub>         (kgTSS/m3,    TSS concentration in SST)
+</li>
+<li>fi          (gVSS/gTSS,   VSS/TSS ratio)
+</li>
+<li>f<sub>avOHO</sub>     (gOHO/gVSS,   Active fraction of the sludge (VSS))
+</li>
+<li>f<sub>atOHO</sub>     (gOHO/gTSS,   Active fraction of the sludge (TSS))
+</li>
+<li>FOc         (kgO/d,       Carbonaceous Oxygen Demand)
+</li>
+<li>FOn         (kgO/d,       Nitrogenous Oxygen Demand)
+</li>
+<li>FOt         (kgO/d,       Total Oxygen Demand)
+</li>
+<li>OUR         (mgO/L·h,     Oxygen Uptake Rate)
+</li>
+<li>Qr          (ML/d,        SST recycle flowrate)
+</li>
+<li>f<sub>RAS</sub>       (ø,           SST concentrating factor)
+</li>
+<li>X<sub>RAS</sub>       (kg/m3,       SST recycle flow TSS concentration)
+</li>
+<li>f           (ø,           Wastage concentrating factor)
+</li>
+<li>COD<sub>balance</sub> (%,           COD balance)
+</li>
+<li>N<sub>balance</sub>   (%,           N balance)
+</li>
+<li>Nae<sub>balance</sub> (%,           Ammonia balance)
+</li>
+<li>P<sub>balance</sub>   (%,           P balance)
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-2-3" class="outline-4">
+<h4 id="sec-1-2-3"><span class="section-number-4">1.2.3</span> Chemical P removal</h4>
+<div class="outline-text-4" id="text-1-2-3">
+</div><ol class="org-ol"><li><a id="sec-1-2-3-1" name="sec-1-2-3-1"></a>Inputs<br  /><div class="outline-text-5" id="text-1-2-3-1">
+<ul class="org-ul">
+<li>Q (ML/d, flowrate)
+</li>
+<li>PO4i (mg/L, P available for chemical P removal, (calculated automatically in activated sludge function))
+</li>
+<li>mass<sub>FeCl3</sub> (kg/d FeCl3 added)
+</li>
+</ul>
+</div>
+</li>
+<li><a id="sec-1-2-3-2" name="sec-1-2-3-2"></a>Outputs<br  /><div class="outline-text-5" id="text-1-2-3-2">
+<ul class="org-ul">
+<li>Fe<sub>P</sub><sub>mole</sub><sub>ratio</sub>  (molFe/molP, Fe/P mole ratio (Fe added for P available))
+</li>
+<li>PO4e             (mgP/L,      PO4 effluent)
+</li>
+<li>PO4<sub>removed</sub>      (kgP/d,      P removed)
+</li>
+<li>extra<sub>iSS</sub>        (kgiSS/d,    iSS produced by FeCl3 coprecipitation (Fe(OH)3 and Fe(1.6)H2PO4(OH)3.8))
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-2-4" class="outline-4">
+<h4 id="sec-1-2-4"><span class="section-number-4">1.2.4</span> Nitrification</h4>
+<div class="outline-text-4" id="text-1-2-4">
+</div><ol class="org-ol"><li><a id="sec-1-2-4-1" name="sec-1-2-4-1"></a>Inputs<br  /><div class="outline-text-5" id="text-1-2-4-1">
+<ul class="org-ul">
+<li>SF  (ø, safety factor)
+</li>
+<li>fxt (ø, current unaerated sludge mass fraction)
+</li>
+<li>DO  (mg/L, DO in the aerobic reactor)
+</li>
+<li>pH  (pH units)
+</li>
+</ul>
+</div>
+</li>
+<li><a id="sec-1-2-4-2" name="sec-1-2-4-2"></a>Outputs<br  /><div class="outline-text-5" id="text-1-2-4-2">
+<ul class="org-ul">
+<li>uAmT   (1/d,         Growth rate corrected by temperature)
+</li>
+<li>uAmO   (1/d,         Growth rate corrected by: temperature + DO available)
+</li>
+<li>uAm<sub>pH</sub> (1/d,         Growth rate corrected by: temperature + DO available + pH)
+</li>
+<li>KnT    (mg/L,        Half saturation constant corrected by temperature)
+</li>
+<li>bAT    (1/d,         Growth rate corrected by temperature)
+</li>
+<li>f<sub>XBA</sub>  (gVSS·d/gCOD, Nitrifiers Biomass production rate)
+</li>
+<li>MX<sub>BA</sub>  (kgVSS,       Mass of Nitrifiers)
+</li>
+<li>X<sub>BA</sub>   (kgVSS/m3,    Concentration of Nitrifiers)
+</li>
+<li>fxt    (ø,           Current unaerated sludge mass fraction)
+</li>
+<li>fxm    (ø,           Maximum design unaerated sludge mass fraction)
+</li>
+<li>Rs     (d,           Current sludge age)
+</li>
+<li>Rsm    (d,           Minimum sludge age for nitrification (below which theoretically nitrification cannot be achiveved))
+</li>
+<li>Nae    (mgN/L,       Effluent ammonia concentration (if fxt &lt; fxm))
+</li>
+<li>Nte    (mgN/L,       Effluent TKN concentration (if fxt &lt; fxm))
+</li>
+<li>Nc     (mgN/L,       Nitrification capacity (if fxt &lt; fxm))
+</li>
+<li>FOn    (kgO/d,       Nitrogenous Oxygen demand (if fxt &lt; fxm))
+</li>
+<li>FOt    (kgO/d,       Total Oxygen demand (if fxt &lt; fxm))
+</li>
+<li>OUR    (mgO/L·h,     Oxygen Uptake Rate (if fxt &lt; fxm))
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-2-5" class="outline-4">
+<h4 id="sec-1-2-5"><span class="section-number-4">1.2.5</span> Denitrification</h4>
+<div class="outline-text-4" id="text-1-2-5">
+</div><ol class="org-ol"><li><a id="sec-1-2-5-1" name="sec-1-2-5-1"></a>Inputs<br  /><div class="outline-text-5" id="text-1-2-5-1">
+<ul class="org-ul">
+<li>IR           (ø, internal recirculation ratio)
+</li>
+<li>DO<sub>RAS</sub>       (mgO/L, DO in the underflow recycle)
+</li>
+<li>influent<sub>alk</sub> (mg/L as CaCO3, influent alkalinity)
+</li>
+</ul>
+</div>
+</li>
+<li><a id="sec-1-2-5-2" name="sec-1-2-5-2"></a>Outputs (process variables)<br  /><div class="outline-text-5" id="text-1-2-5-2">
+<ul class="org-ul">
+<li>K2T          (gN/gVSS  , K denitrification rate 2)
+</li>
+<li>fSb<sub>s</sub>        (gBSO/gBO , BSO/(BSO+BPO) ratio)
+</li>
+<li>Dp1          (mgN/L    , Denitrification potential)
+</li>
+<li>a            (ø        , IR (internal recirculation ratio))
+</li>
+<li>a<sub>opt</sub>        (ø        , optimal IR)
+</li>
+<li>Nne          (mgN/L    , Effluent nitrate)
+</li>
+<li>Nne<sub>opt</sub>      (mgN/L    , Lowest effluent nitrate (using a<sub>opt</sub>))
+</li>
+<li>TNe          (mgN/L    , Effluent total nitrogen)
+</li>
+<li>FOd          (kgO/d    , Oxygen recovered by denitrification)
+</li>
+<li>FOt          (kgO/d    , Total oxygen demand (FOc + FOn - FOd))
+</li>
+<li>OUR          (mgO/L·h  , Oxygen Uptake Rate)
+</li>
+<li>effluent<sub>alk</sub> (mgCaCO3/L, Effluent alkalinity)
+</li>
+<li>FN2g         (kgN/d    , N2 gas production (mass flux))
+</li>
+<li>TOD<sub>balance</sub>  (%        , Total oxygen demand balance (out/in))
+</li>
+<li>N<sub>balance</sub>    (%        , Nitrogen balance (out/in))
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> Outputs</h3>
+<div class="outline-text-3" id="text-1-3">
+</div><div id="outline-container-sec-1-3-1" class="outline-4">
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> Totals</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<p>
+Totals are calculated using input state variables and mass ratios.
+</p>
+</div>
+<ol class="org-ol"><li><a id="sec-1-3-1-1" name="sec-1-3-1-1"></a>COD (chemical oxygen demand)<br  /><ol class="org-ol"><li><a id="sec-1-3-1-1-1" name="sec-1-3-1-1-1"></a>COD fractions<br  /><div class="outline-text-6" id="text-1-3-1-1-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">Biodegradable</th>
+<th scope="col" class="left">Unbiodegradable</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">(bCOD)</th>
+<th scope="col" class="left">(uCOD)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">Soluble (sCOD)</td>
+<td class="left">bsCOD</td>
+<td class="left">usCOD</td>
+</tr>
+
+<tr>
+<td class="left">Particulated (pCOD)</td>
+<td class="left">bpCOD</td>
+<td class="left">upCOD</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li><a id="sec-1-3-1-1-2" name="sec-1-3-1-1-2"></a>Active COD (COD in X<sub>OHO</sub>)<br  /></li></ol>
+</li>
+<li><a id="sec-1-3-1-2" name="sec-1-3-1-2"></a>TOC (total organic carbon)<br  /><div class="outline-text-5" id="text-1-3-1-2">
+<p>
+All carbon considered in this model is organic (model assumption).
+</p>
+</div>
+<ol class="org-ol"><li><a id="sec-1-3-1-2-1" name="sec-1-3-1-2-1"></a>Organic C (OC) fractions<br  /><div class="outline-text-6" id="text-1-3-1-2-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">Biodegradable</th>
+<th scope="col" class="left">Unbiodegradable</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">(bOC)</th>
+<th scope="col" class="left">(uOC)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">Soluble (sOC)</td>
+<td class="left">bsOC</td>
+<td class="left">usOC</td>
+</tr>
+
+<tr>
+<td class="left">Particulated (pOC)</td>
+<td class="left">bpOC</td>
+<td class="left">upOC</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li><a id="sec-1-3-1-2-2" name="sec-1-3-1-2-2"></a>Active OC (OC in X<sub>OHO</sub>)<br  /></li></ol>
+</li>
+<li><a id="sec-1-3-1-3" name="sec-1-3-1-3"></a>TKN (total kjeldahl nitrogen)<br  /><ol class="org-ol"><li><a id="sec-1-3-1-3-1" name="sec-1-3-1-3-1"></a>Inorganic N (NH<sub>4</sub>, Free Saline Ammonia, S<sub>FSA</sub>)<br  /></li>
+<li><a id="sec-1-3-1-3-2" name="sec-1-3-1-3-2"></a>Organic N (ON) fractions<br  /><div class="outline-text-6" id="text-1-3-1-3-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">Biodegradable</th>
+<th scope="col" class="left">Unbiodegradable</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">(bON)</th>
+<th scope="col" class="left">(uON)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">Soluble (sON)</td>
+<td class="left">bsON</td>
+<td class="left">usON</td>
+</tr>
+
+<tr>
+<td class="left">Particulated (pON)</td>
+<td class="left">bpON</td>
+<td class="left">upON</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li><a id="sec-1-3-1-3-3" name="sec-1-3-1-3-3"></a>Active N (ON in X<sub>OHO</sub>)<br  /></li></ol>
+</li>
+<li><a id="sec-1-3-1-4" name="sec-1-3-1-4"></a>TP (total phosphorus)<br  /><ol class="org-ol"><li><a id="sec-1-3-1-4-1" name="sec-1-3-1-4-1"></a>Inorganic P (PO<sub>4</sub>, Orthophosphate, S<sub>OP</sub>)<br  /></li>
+<li><a id="sec-1-3-1-4-2" name="sec-1-3-1-4-2"></a>Organic P (OP) fractions<br  /><div class="outline-text-6" id="text-1-3-1-4-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">Biodegradable</th>
+<th scope="col" class="left">Unbiodegradable</th>
+</tr>
+
+<tr>
+<th scope="col" class="left">&#xa0;</th>
+<th scope="col" class="left">(bOP)</th>
+<th scope="col" class="left">(uOP)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">Soluble (sOP)</td>
+<td class="left">bsOP</td>
+<td class="left">usOP</td>
+</tr>
+
+<tr>
+<td class="left">Particulated (pOP)</td>
+<td class="left">bpOP</td>
+<td class="left">upOP</td>
+</tr>
+</tbody>
+</table>
+</div>
+</li>
+<li><a id="sec-1-3-1-4-3" name="sec-1-3-1-4-3"></a>Active P (OP in X<sub>OHO</sub>)<br  /></li></ol>
+</li>
+<li><a id="sec-1-3-1-5" name="sec-1-3-1-5"></a>TSS (total suspended solids)<br  /><ol class="org-ol"><li><a id="sec-1-3-1-5-1" name="sec-1-3-1-5-1"></a>iSS (inorganic/inert SS)<br  /></li>
+<li><a id="sec-1-3-1-5-2" name="sec-1-3-1-5-2"></a>VSS (volatile suspended solids)<br  /><div class="outline-text-6" id="text-1-3-1-5-2">
+<ul class="org-ul">
+<li>bVSS (biodegradable VSS)
+</li>
+<li>uVSS (unbiodegradable VSS)
+</li>
+<li>Active SS (X<sub>OHO</sub> VSS)
+</li>
+</ul>
+</div>
+</li></ol>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-3-2" class="outline-4">
+<h4 id="sec-1-3-2"><span class="section-number-4">1.3.2</span> Fluxes</h4>
+<div class="outline-text-4" id="text-1-3-2">
+<p>
+This function takes all concentrations (mg/L, inputs and outputs) and converts them to mass fluxes (kg/d) using the flowrate (Q).
+</p>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> Kinetic constants</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> Activated sludge</h3>
+<div class="outline-text-3" id="text-2-1">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">YH</td>
+<td class="left">0.450 gVSS/gCOD</td>
+<td class="left">heterotrophic yield (not affected by temperature)</td>
+</tr>
+
+<tr>
+<td class="left">bH</td>
+<td class="left">0.240 1/d</td>
+<td class="left">heterotrophic endogenous respiration rate at 20ºC</td>
+</tr>
+
+<tr>
+<td class="left">theta<sub>bH</sub></td>
+<td class="left">1.029 ø</td>
+<td class="left">bH temperature correction factor</td>
+</tr>
+
+<tr>
+<td class="left">k<sub>v20</sub></td>
+<td class="left">0.070 L/mgVSS·d</td>
+<td class="left">constant for not degraded bCOD (FBSO)</td>
+</tr>
+
+<tr>
+<td class="left">theta<sub>k</sub><sub>v20</sub></td>
+<td class="left">1.035 ø</td>
+<td class="left">k<sub>v20</sub> temperature correction factor</td>
+</tr>
+
+<tr>
+<td class="left">fH</td>
+<td class="left">0.200 ø</td>
+<td class="left">heterotrophic endogenous residue fraction</td>
+</tr>
+
+<tr>
+<td class="left">f<sub>iOHO</sub></td>
+<td class="left">0.150 giSS/gVSS</td>
+<td class="left">iSS content of OHOs</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> Nitrification</h3>
+<div class="outline-text-3" id="text-2-2">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">uAm</td>
+<td class="left">0.450 1/d</td>
+<td class="left">autotrophic max specific growth rate at 20ºC</td>
+</tr>
+
+<tr>
+<td class="left">theta<sub>uAm</sub></td>
+<td class="left">1.123 ø</td>
+<td class="left">uAm temperature correction factor</td>
+</tr>
+
+<tr>
+<td class="left">K<sub>O</sub></td>
+<td class="left">0.400 mgDO/L</td>
+<td class="left">autotrophic DO uA sensitivity constant</td>
+</tr>
+
+<tr>
+<td class="left">theta<sub>pH</sub></td>
+<td class="left">2.350 ø</td>
+<td class="left">autotrophic ph sensitivity coefficient</td>
+</tr>
+
+<tr>
+<td class="left">Ki</td>
+<td class="left">1.130 ø</td>
+<td class="left">autotrophic ph inhibition to uA</td>
+</tr>
+
+<tr>
+<td class="left">Kii</td>
+<td class="left">0.300 ø</td>
+<td class="left">autotrophic ph inhibition to uA</td>
+</tr>
+
+<tr>
+<td class="left">Kmax</td>
+<td class="left">9.500 ø</td>
+<td class="left">autotrophic ph inhibition to uA</td>
+</tr>
+
+<tr>
+<td class="left">YA</td>
+<td class="left">0.100 gVSS/gFSA</td>
+<td class="left">autotrophic yield</td>
+</tr>
+
+<tr>
+<td class="left">Kn</td>
+<td class="left">1.000 mgN/L</td>
+<td class="left">ammonia half saturation coefficient at 20ºC</td>
+</tr>
+
+<tr>
+<td class="left">theta<sub>Kn</sub></td>
+<td class="left">1.123 ø</td>
+<td class="left">Kn temperature correction factor</td>
+</tr>
+
+<tr>
+<td class="left">bA</td>
+<td class="left">0.040 1/d</td>
+<td class="left">autotrophic endogenous respiration rate at 20ºC</td>
+</tr>
+
+<tr>
+<td class="left">theta<sub>bA</sub></td>
+<td class="left">1.029 ø</td>
+<td class="left">bA temperature correction factor</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="outline-container-sec-2-3" class="outline-3">
+<h3 id="sec-2-3"><span class="section-number-3">2.3</span> Denitrification</h3>
+<div class="outline-text-3" id="text-2-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<tbody>
+<tr>
+<td class="left">K2<sub>20</sub></td>
+<td class="left">0.101 gN/gVSS·d</td>
+<td class="left">at 20ºC page 482 and 113</td>
+</tr>
+
+<tr>
+<td class="left">theta<sub>K2</sub></td>
+<td class="left">1.080 ø</td>
+<td class="left">temperature correction factor for K2<sub>20</sub></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Class: Plant</h2>
+<div class="outline-text-2" id="text-3">
+</div><div id="outline-container-sec-3-1" class="outline-3">
+<h3 id="sec-3-1"><span class="section-number-3">3.1</span> Inputs</h3>
+<div class="outline-text-3" id="text-3-1">
+</div><div id="outline-container-sec-3-1-1" class="outline-4">
+<h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> Influent (state variables object)</h4>
+</div>
+<div id="outline-container-sec-3-1-2" class="outline-4">
+<h4 id="sec-3-1-2"><span class="section-number-4">3.1.2</span> Configuration object</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<p>
+for example: {pst:true, nit:true, dn:true, cpr:true}
+</p>
+<ul class="org-ul">
+<li>"pst" stands for primary settler
+</li>
+<li>"nit" stands for nitrification
+</li>
+<li>"dn"  stands for denitrification
+</li>
+<li>"cpr" stands for chemical P removal
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-3-1-3" class="outline-4">
+<h4 id="sec-3-1-3"><span class="section-number-4">3.1.3</span> Parameters object</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<p>
+Object with all inputs for each technology (see State Variables/Technologies)
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-3-2" class="outline-3">
+<h3 id="sec-3-2"><span class="section-number-3">3.2</span> Outputs</h3>
+<div class="outline-text-3" id="text-3-2">
+</div><div id="outline-container-sec-3-2-1" class="outline-4">
+<h4 id="sec-3-2-1"><span class="section-number-4">3.2.1</span> Process variables (varies with configuration, depending on the technologies activated)</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+Object
+</p>
+</div>
+</div>
+<div id="outline-container-sec-3-2-2" class="outline-4">
+<h4 id="sec-3-2-2"><span class="section-number-4">3.2.2</span> Effluents</h4>
+<div class="outline-text-4" id="text-3-2-2">
+</div><ol class="org-ol"><li><a id="sec-3-2-2-1" name="sec-3-2-2-1"></a>Primary effluent<br  /><div class="outline-text-5" id="text-3-2-2-1">
+<p>
+State variables object (it is equal to influent if configuration.pst==false).
+</p>
+</div>
+</li>
+<li><a id="sec-3-2-2-2" name="sec-3-2-2-2"></a>Secondary effluent<br  /><div class="outline-text-5" id="text-3-2-2-2">
+<p>
+State variables object
+</p>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-3-2-3" class="outline-4">
+<h4 id="sec-3-2-3"><span class="section-number-4">3.2.3</span> Wastages</h4>
+<div class="outline-text-4" id="text-3-2-3">
+</div><ol class="org-ol"><li><a id="sec-3-2-3-1" name="sec-3-2-3-1"></a>Primary wastage<br  /><div class="outline-text-5" id="text-3-2-3-1">
+<p>
+State variables object (it is null if configuration.pst==false)
+</p>
+</div>
+</li>
+<li><a id="sec-3-2-3-2" name="sec-3-2-3-2"></a>Secondary wastage<br  /><div class="outline-text-5" id="text-3-2-3-2">
+<p>
+State variables object
+</p>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-3-2-4" class="outline-4">
+<h4 id="sec-3-2-4"><span class="section-number-4">3.2.4</span> Possible errors (array of strings)</h4>
+<div class="outline-text-4" id="text-3-2-4">
+<ul class="org-ul">
+<li>Certain combinations of inputs could generate not desired process variables (results).
+</li>
+<li>For example:
+</li>
+</ul>
+<p>
+['fxt &gt; fxm', 'Rs &lt; Rsm'].
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Lluís Bosch</p>
+<p class="date">Created: 2019-01-14 lun 17:24</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

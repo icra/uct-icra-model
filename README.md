@@ -21,13 +21,14 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
   - https://docs.google.com/document/d/1SB_aU166oTju9D4K1m4tUuoW-Lbto_uHtzzMINb-CJs/edit#
   - read SST capacity paper (add a limit for X.T concentration for a given reactor volume (Vp)).
   - read dynamic comparison paper.
-  - [pending] integrate constants.js to the code.
   - [pending] take out balances from technologies.
-  - [pending] add a 'see.php' source code syntax viewer for html.
   - [pending] API.
+  - [pending] add a 'see.php' source code syntax viewer for html.
+  - [done] integrate constants.js to the code.
  
-## Doubts/pending/ask george ekama
-  - create item list with lluís corominas
+## next call george ekama
+  - check numbers with george
+  - integrate TSS limit given a reactor volume Vp
 
 ## Documentation
   - the equations are in "formulas/formulas.ms" which is compiled to "formulas/formulas.ms.pdf".

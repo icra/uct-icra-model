@@ -26,7 +26,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
   //nitrification inputs
   SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
-                                 //choose a high value for high influent ammonia concentration variation
+  //choose a high value for high influent ammonia concentration variation
   fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
   DO  = isNaN(DO ) ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
   pH  = isNaN(pH ) ? 7.2  : pH ; //pH units
