@@ -33,6 +33,8 @@ class Plant{
 
   //run the plant model
   run(){
+    //console.time('run');
+
     let conf = this.configuration; //make variable name shorter
     let p    = this.parameters;    //make variable name shorter
 
@@ -51,6 +53,7 @@ class Plant{
     else              as = pst.effluent.activated_sludge(p.T,p.Vp,p.Rs,p.RAS,p.waste_from,p.mass_FeCl3,);
 
     //all plant results {process_variables, streams, errors}
+    //console.timeEnd('run');
     return {
       process_variables:{
         as  : conf.dn ? as.as_process_variables  : (conf.nit ? as.as_process_variables : as.process_variables),

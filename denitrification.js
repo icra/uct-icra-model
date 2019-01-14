@@ -113,7 +113,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let bON  = inf_frac.TKN.bON;                  //mg/L | biodegradable TKN influent
   let Ns   = nit.as_process_variables.Ns.value; //mg/L | N required for sludge production
   let upON = inf_frac.TKN.upON;                 //mg/L | N unbiodegradable particulated
+
   let effluent_alk = influent_alk + 3.57*(bON-(Ns-upON)) - 7.14*Nc + 2.86*(Nc-Nne); //mg/L as CaCO3
+  console.log({influent_alk, bON, Ns, upON, Nc, Nne, effluent_alk});
 
   //TOD balance (TOD=COD+4.57*TKN)
   let Qe   = nit.effluent.Q;                                    //ML/d | effluent flowrate

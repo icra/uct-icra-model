@@ -40,6 +40,8 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
     //min and max values are: 0.0001 and 5
     inp=Math.min(5,Math.max(0.0001,inp));
 
+    console.log({inp});
+
     //Figure 6-13 (Fe_P_mole ratio vs PO4_eff)
     let Figure=[
       {inp:8.00  , out:0.01},
@@ -95,7 +97,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   };
 
   //get PO4 effluent and PO4 removed
-  let PO4e        = get_PO4_eff(Fe_P_mole_ratio); //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function below 'get_PO4_eff')
+  let PO4e        = mass_FeCl3 ? get_PO4_eff(Fe_P_mole_ratio) : PO4i; //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function 'get_PO4_eff')
   PO4e            = Math.min(PO4i, PO4e);         //PO4e cannot be higher than PO4i (i.e. if mass of FeCl3 = 0)
   let PO4_removed = Q*(PO4i - PO4e);              //kgP/d
 
