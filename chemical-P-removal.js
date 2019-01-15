@@ -40,8 +40,6 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
     //min and max values are: 0.0001 and 5
     inp=Math.min(5,Math.max(0.0001,inp));
 
-    console.log({inp});
-
     //Figure 6-13 (Fe_P_mole ratio vs PO4_eff)
     let Figure=[
       {inp:8.00  , out:0.01},
@@ -126,5 +124,4 @@ try{
   let mass_FeCl3 = 3145; //kg
   let cpr  = chemical_P_removal(Q, PO4i, mass_FeCl3);
   let extra_iSS = cpr.extra_iSS.value/Q;
-  console.log({extra_iSS});
 })();

@@ -136,7 +136,7 @@ function get_rbCOD_P_ratio(VFA_rbCOD_ratio){
 function density_of_air(temperature,pressure) {
   let R=8314;//universal gas constant (J/K·kmol)
   let M=28.97;//molecular weight of air (g/mol)
-  let density = pressure*M/(R*(273.15+temperature));
+  let density=pressure*M/(R*(273.15+temperature));
   return density;//kg/m3
   /*tests:
     console.log(density_of_air(20,1.01325e5)) //1.2043845867047405 kg/m3

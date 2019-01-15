@@ -5,7 +5,11 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
 
 ## Status: under development 
 
-## Model assumptions
+## Documentation
+  - equations: "formulas/formulas.ms" file is compiled to "formulas/formulas.ms.pdf" using groff.
+  - architecture: "architecture/architecture.org" file is compiled to "architecture/architecture.html" using emacs org-mode export function.
+
+## Model assumptions compilation
   - Influent X.OHO is always 0.
   - Influent S.VFA and X.BPO are 100% consumed into biomass.
   - S.FBSO is *not* 100% consumed because it depends on the HRT (fast), whereas
@@ -16,26 +20,19 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
     because it's very small.
   - The additional FeCl3 volume added for chemical P removal is considered ~0.
 
+## next call george ekama
+  - finish integration of previous call (15/1/2019)
+
 ## Lluís B. tasks (ordered by priority)
-  - esquema arquitectura draw.io diagrama de classes.
-  - https://docs.google.com/document/d/1SB_aU166oTju9D4K1m4tUuoW-Lbto_uHtzzMINb-CJs/edit#
-  - read SST capacity paper (add a limit for X.T concentration for a given reactor volume (Vp)).
-  - read dynamic comparison paper.
+  - [in process] read SST capacity paper (add a limit for X.T concentration for a given reactor volume (Vp)).
   - [pending] take out balances from technologies.
   - [pending] API.
   - [pending] add a 'see.php' source code syntax viewer for html.
-  - [done] integrate constants.js to the code.
  
-## next call george ekama
-  - check numbers with george
-  - integrate TSS limit given a reactor volume Vp
-
-## Documentation
-  - the equations are in "formulas/formulas.ms" which is compiled to "formulas/formulas.ms.pdf".
-
 ## Future
   - new warnings module
-    - fxt and Rs compared to fxm and Rsm.
+    - fxt > fxm.
+    - Rs < Rsm.
     - effluent alkalinity below 50 mg/L as CaCO3.
     - Reactor kgTSS (MX.T) above the limit (given a reactor volume Vp)
   - new energy consumption module.
@@ -63,3 +60,5 @@ Steady state model by George Ekama. Implemented by Lluís Bosch
   - [river] R20 and k for NH4 and PO4
   - [river] names S-OP and S-FSA to PO4 and NH4 in the interface only
   - [gui] generate links for fase1.html
+  - [done] architecture class diagram.
+  - [done] integrate constants.js to the code.

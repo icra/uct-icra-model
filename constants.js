@@ -2,7 +2,7 @@
   All kinetic constants.
   The user can modify these numbers in the GUI.
 
-  object integrated into:
+  This object is used in the following files:
     "activated-sludge.js"
     "nitrification.js"
     "denitrification.js"
@@ -31,11 +31,11 @@ let constants={
   bA       : 0.040, //1/d       | autotrophic endogenous respiration rate at 20ºC
   theta_bA : 1.029, //ø         | bA temperature correction factor
   //denitrification
-  //K1_20   : 0.720, //gN/gVSS·d | at 20ºC page 482 and 113
+  K1_20   : 0.720, //gN/gVSS·d | at 20ºC page 482 and 113
   K2_20   : 0.101, //gN/gVSS·d | at 20ºC page 482 and 113
   //K3_20   : 0.072, //gN/gVSS·d | at 20ºC page 482 and 113
   //K4_20   : 0.048, //gN/gVSS·d | at 20ºC page 482 and 113
-  //theta_K1: 1.200, //ø         | temperature correction factor for K1_20
+  theta_K1: 1.200, //ø         | temperature correction factor for K1_20
   theta_K2: 1.080, //ø         | temperature correction factor for K2_20
   //theta_K3: 1.029, //ø         | temperature correction factor for K3_20
   //theta_K4: 1.029, //ø         | temperature correction factor for K4_20

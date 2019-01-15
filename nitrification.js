@@ -96,7 +96,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Nae_fxm = KnT/(SF-1);                                 //mg/L as N | effluent ammonia concentration if fxt == fxm
 
   //2 checks for effluent ammonia concentration
-  let Nae_max = Nti - Ns - Nouse - Nobse;
+  let Nae_max = Math.max(0, Nti - Ns - Nouse - Nobse); //will be 0 if Ns > Nti
   if(Nae_fxt < 0)       Nae_fxt = Nae_max;
   if(Nae_fxt > Nae_max) Nae_fxt = Nae_max;
 

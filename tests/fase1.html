@@ -192,7 +192,7 @@
       <div id=summaries style="display:"></div>
 
       <!--plant-->
-      <div><code onclick="toggle_visibility('#outputs #processes')">[+] Plant process variables</code></div>
+      <div><code onclick="toggle_visibility('#outputs #processes')">[+] Process variables</code></div>
       <div id=processes class=flex style="flex-wrap:wrap;display:none"></div>
 
       <!--export-->
@@ -301,11 +301,11 @@
     /*GUI integration*/
     //recopila summaries variables d'estat (per ordre)
     let summaries = {};
-                 summaries.Influent           = plant.influent.summary;
-    if(conf.pst) summaries.Primary_wastage    = run.primary.wastage.summary;
-    if(conf.pst) summaries.Primary_effluent   = run.primary.effluent.summary;
-                 summaries.Secondary_wastage  = run.secondary.wastage.summary;
-                 summaries.Secondary_effluent = run.secondary.effluent.summary;
+    summaries.Influent                      = plant.influent.summary;
+    if(conf.pst) summaries.Primary_wastage  = run.primary.wastage.summary;
+    if(conf.pst) summaries.Primary_effluent = run.primary.effluent.summary;
+    summaries.Secondary_wastage             = run.secondary.wastage.summary;
+    summaries.Secondary_effluent            = run.secondary.effluent.summary;
 
     //dibuixa summaries en columnes
     (function draw_summaries(summaries){
@@ -350,8 +350,17 @@
 
     //dibuixa process variables (pvs)
     Object.entries(pvs).forEach(([key,pv])=>{
-      let table = document.createElement('table'); processes.appendChild(table);
-      table.insertRow(-1).innerHTML=key.replace(/_/g,' ');
+
+      //container pel key i la taula: <div><div>key</div><table></table></div>
+      let div = document.createElement('div'); processes.appendChild(div);
+
+      //nom tecnologia
+      let nom = document.createElement('code'); div.appendChild(nom);
+      nom.style.fontSize='small';
+      nom.innerHTML=`${key.replace(/_/g,' ')}&nbsp;`;
+
+      //taula process variables
+      let table = document.createElement('table'); div.appendChild(table);
       Object.entries(pv).forEach(([key,obj])=>{
         let newRow = table.insertRow(-1);
         newRow.id=key;
@@ -359,7 +368,7 @@
         newRow.value=value;
         newRow.setAttribute('title',obj.descr);
         newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).outerHTML=`<td class=number><small>${format(value)}</small>`;
+        newRow.insertCell(-1).outerHTML=`<td class=number title='${value}'><small>${format(value)}</small>`;
         newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
       });
     });
