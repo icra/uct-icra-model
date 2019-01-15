@@ -1,5 +1,3 @@
-//capacity estimation
-
 //inputs
   let DSVI = 120;    //mL/gTSS
   let L    = 2.9615; //LTSS in pdf (eq 10)
@@ -39,19 +37,16 @@ let x  = 1;                  //initial value for x
 let x0 = x;                  //current value for x
 let x1 = newton_raphson(x0); //next value for x
 let iterations = 0;          //iterations counter
-
 while(true){
+  console.log({x0,x1});
   //check if solution has been found or didn't converge
   if(Math.abs(x0-x1) < 0.0000001 || iterations > 1000){ 
     console.log({iterations}); 
     break; //exit the loop
   }else{
-    console.log({x0,x1});
     x0 = newton_raphson(x1); //update x0
     x1 = newton_raphson(x0); //update x1
     iterations++;            //add 1 to iterations
   }
 }
 console.log({X_tave:x1});
-
-
