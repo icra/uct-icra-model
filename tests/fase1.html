@@ -2,7 +2,7 @@
   <title>Phase 1</title>
   <style>
     @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
-    body {
+    body{
       font-family: 'Roboto', verdana;
       color: #5C5C5C;
       overflow-y:scroll;
@@ -11,7 +11,7 @@
       border-collapse:collapse;
       margin-bottom:5px;
     }
-    td,th {
+    td,th{
       border:1px solid #ccc;
     }
     input[type=number]{
@@ -25,16 +25,23 @@
     .number{ text-align:right; }
     [onclick]{cursor:pointer}
 
-    #edar input[type=number], #edar select, #mass_ratios input, #constants input{
+    #inputs #edar input[type=number], 
+    #inputs #edar select, 
+    #inputs #mass_ratios input, 
+    #inputs #constants input{
       display:block;
       max-width:70px;
     }
-    #influent input{
+    #inputs #influent input{
       display:block;
       max-width:50px;
     }
-    #processes table {
+
+    #outputs #processes table{
       margin-right:3px;
+    }
+    #outputs #fractionation td.number{
+      font-size:smaller;
     }
   </style>
 </head><body>
@@ -191,6 +198,14 @@
       </div>
       <div id=summaries style="display:"></div>
 
+      <!--fractionation-->
+      <div>
+        <code onclick="toggle_visibility('#outputs #fractionation')">
+          [+] Complete fractionation
+        </code>
+      </div>
+      <div id=fractionation style="display:none"></div>
+
       <!--plant-->
       <div><code onclick="toggle_visibility('#outputs #processes')">[+] Process variables</code></div>
       <div id=processes class=flex style="flex-wrap:wrap;display:none"></div>
@@ -307,6 +322,118 @@
     summaries.Secondary_wastage             = run.secondary.wastage.summary;
     summaries.Secondary_effluent            = run.secondary.effluent.summary;
 
+    //recopila variables d'estat (per ordre)
+    let svs = {};
+    svs.Influent                      = plant.influent;         //state variables object
+    if(conf.pst) svs.Primary_wastage  = run.primary.wastage;    //state variables object
+    if(conf.pst) svs.Primary_effluent = run.primary.effluent;   //state variables object
+    svs.Secondary_wastage             = run.secondary.wastage;  //state variables object
+    svs.Secondary_effluent            = run.secondary.effluent; //state variables object
+
+    //dibuixa fractionation columnes
+    (function draw_fractionation(svs){
+      if(Object.keys(svs).length==0)return;
+      let div   = document.querySelector('div#fractionation');div.innerHTML=""; //buida div summaries
+      let table = document.createElement('table');div.appendChild(table);       //crea nova taula
+      let newRow=table.insertRow(-1);
+      newRow.insertCell(-1).outerHTML="<td colspan=2>";
+
+      //posa noms variables d'estat
+      Object.keys(svs).forEach(nom=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller stream>"+nom.replace('_','<br>');});
+
+      //calcula tots els fraccionaments de cop
+      let totals={};
+      Object.entries(svs).forEach(([nom,sv])=>{totals[nom]=sv.totals;});
+
+      //agafa el primer fraccionament per posar noms de les variables
+      let primer_fraccionament=Object.values(totals).find(e=>e);
+
+      //itera COD,TKN,TP,TOC,TSS
+      Object.entries(primer_fraccionament).forEach(([key,fraccions])=>{
+        let newRow = table.insertRow(-1);
+        let newCell = newRow.insertCell(-1);
+        newCell.innerHTML=key;                           //COD,TKN,TP,TOC,TSS
+        newCell.rowSpan=Object.keys(fraccions).length+1; //bsCOD,usCOD,bpCOD,upCOD...
+
+        //itera cada fraccions dins de cada key
+        Object.keys(fraccions).forEach(fraction=>{
+          let newRow=table.insertRow(-1);
+
+          //posa la mateixa nomenclatura d'en George Ekama
+          let nomenclatura={
+            "FSA":"N<sub>a</sub>",
+            "PO4":"PO<sub>4</sub>",
+            "bCOD":"S<sub>b</sub>",
+            "uCOD":"S<sub>u</sub>",
+            "sCOD":"S<sub>s</sub>",
+            "pCOD":"S<sub>p</sub>",
+            "bsCOD":"S<sub>bs</sub>",
+            "usCOD":"S<sub>us</sub>",
+            "bpCOD":"S<sub>bp</sub>",
+            "upCOD":"S<sub>up</sub>",
+            "ON":"N<sub>o</sub>",
+            "bON":"N<sub>ob</sub>",
+            "uON":"N<sub>ou</sub>",
+            "sON":"N<sub>os</sub>",
+            "pON":"N<sub>op</sub>",
+            "bsON":"N<sub>obs</sub>",
+            "usON":"N<sub>ous</sub>",
+            "bpON":"N<sub>obp</sub>",
+            "upON":"N<sub>oup</sub>",
+            "OP":"P<sub>o</sub>",
+            "bOP":"P<sub>ob</sub>",
+            "uOP":"P<sub>ou</sub>",
+            "sOP":"P<sub>os</sub>",
+            "pOP":"P<sub>op</sub>",
+            "bsOP":"P<sub>obs</sub>",
+            "usOP":"P<sub>ous</sub>",
+            "bpOP":"P<sub>obp</sub>",
+            "upOP":"P<sub>oup</sub>",
+            "OC":"C<sub>o</sub>",
+            "bOC":"C<sub>ob</sub>",
+            "uOC":"C<sub>ou</sub>",
+            "sOC":"C<sub>os</sub>",
+            "pOC":"C<sub>op</sub>",
+            "bsOC":"C<sub>obs</sub>",
+            "usOC":"C<sub>ous</sub>",
+            "bpOC":"C<sub>obp</sub>",
+            "upOC":"C<sub>oup</sub>",
+          }[fraction]||fraction;
+
+          if(fraction=='total'){
+            if(key=='COD') nomenclatura='S<sub>t</sub>';
+            if(key=='TOC') nomenclatura='C<sub>t</sub>';
+            if(key=='TKN') nomenclatura='N<sub>t</sub>';
+            if(key=='TP' ) nomenclatura='P<sub>t</sub>';
+          }
+          if(fraction=='active'){
+            if(key=='COD') nomenclatura='S<sub>BH</sub>';
+            if(key=='TOC') nomenclatura='C<sub>BH</sub>';
+            if(key=='TKN') nomenclatura='N<sub>BH</sub>';
+            if(key=='TP' ) nomenclatura='P<sub>BH</sub>';
+          }
+          if(key=='TSS'){
+            if(fraction=='total')  nomenclatura='X<sub>t</sub>';
+            if(fraction=='iSS')    nomenclatura='X<sub>IO</sub>';
+            if(fraction=='VSS')    nomenclatura='X<sub>v</sub>';
+            if(fraction=='bVSS')   nomenclatura='X<sub>vb</sub>';
+            if(fraction=='uVSS')   nomenclatura='X<sub>vu</sub>';
+            if(fraction=='active') nomenclatura='X<sub>BH</sub>';
+          }
+
+          newRow.insertCell(-1).innerHTML=nomenclatura;
+
+          //itera variables d'estat
+          Object.entries(svs).forEach(([nom,sv])=>{
+            let mgL = totals[nom][key][fraction]; //concentració
+            let kgd = sv.Q*mgL;                   //flux
+            newRow.insertCell(-1).outerHTML=`<td class=number conc>${format(mgL)}</td>`;
+            newRow.insertCell(-1).outerHTML=`<td class=number flux>${format(kgd)}</td>`;
+          });
+        });
+      });
+    })(svs);
+
     //dibuixa summaries en columnes
     (function draw_summaries(summaries){
       if(Object.keys(summaries).length==0)return;
@@ -350,7 +477,6 @@
 
     //dibuixa process variables (pvs)
     Object.entries(pvs).forEach(([key,pv])=>{
-
       //container pel key i la taula: <div><div>key</div><table></table></div>
       let div = document.createElement('div'); processes.appendChild(div);
 
@@ -398,28 +524,28 @@
   //select unit in summaries
   document.querySelectorAll('input[name=summary_units]').forEach(input=>{
     input.addEventListener('click',function(){
-      let summaries = document.querySelector('#outputs #summaries');
+      let outputs = document.querySelector('#outputs');
       switch(this.value){
         case "conc": 
-          summaries.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
-          summaries.querySelectorAll('td[flux]').forEach(td=>td.style.display='none');
-          summaries.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
-          summaries.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
-          summaries.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L)");
+          outputs.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
+          outputs.querySelectorAll('td[flux]').forEach(td=>td.style.display='none');
+          outputs.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
+          outputs.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
+          outputs.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L)");
           break;
         case "flux": 
-          summaries.querySelectorAll('td[conc]').forEach(td=>td.style.display='none');
-          summaries.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
-          summaries.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
-          summaries.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
-          summaries.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(kg/d)");
+          outputs.querySelectorAll('td[conc]').forEach(td=>td.style.display='none');
+          outputs.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
+          outputs.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
+          outputs.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
+          outputs.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(kg/d)");
           break;
         case "both":
-          summaries.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
-          summaries.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
-          summaries.querySelectorAll('td[flow]').forEach(td=>td.colSpan=2);
-          summaries.querySelectorAll('td[stream]').forEach(td=>td.colSpan=2);
-          summaries.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L, kg/d)");
+          outputs.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
+          outputs.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
+          outputs.querySelectorAll('td[flow]').forEach(td=>td.colSpan=2);
+          outputs.querySelectorAll('td[stream]').forEach(td=>td.colSpan=2);
+          outputs.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L, kg/d)");
           break;
       }
     });
