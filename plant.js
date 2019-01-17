@@ -1,5 +1,5 @@
 /* 
-  WASTEWATER TREATMENT PLANT CLASS
+  WASTEWATER TREATMENT PLANT CLASS FOR MLE
 
              configuration, parameters 
                ↓ ↓     
@@ -35,8 +35,9 @@ class Plant{
   run(){
     //console.time('run');
 
-    let conf = this.configuration; //make variable name shorter
-    let p    = this.parameters;    //make variable name shorter
+    //shorten object names
+    let conf = this.configuration;
+    let p    = this.parameters;
 
     //apply primary settler
     let pst;
@@ -46,7 +47,7 @@ class Plant{
     //chemical P removal
     if(conf.cpr==false){ p.mass_FeCl3=0; }
 
-    //apply AS + ( NIT + (DN) )
+    //apply MLE: AS + ( NIT + (DN) )
     let as;
     if(conf.dn)       as = pst.effluent.denitrification (p.T,p.Vp,p.Rs,p.RAS,p.waste_from,p.mass_FeCl3,p.SF,p.fxt,p.DO,p.pH,p.IR,p.DO_RAS,p.influent_alk);
     else if(conf.nit) as = pst.effluent.nitrification   (p.T,p.Vp,p.Rs,p.RAS,p.waste_from,p.mass_FeCl3,p.SF,p.fxt,p.DO,p.pH);

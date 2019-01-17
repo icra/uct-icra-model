@@ -273,7 +273,7 @@ try{module.exports=State_Variables;}catch(e){}
     X_UPO_set_inf:     130,     Total_TKN_set:  71.8958,
     X_iSS_raw_inf:     100,     Total_TP_set:   16.4455,
     X_iSS_set_inf:     34,      Total_VSS_set:  211.1406,
-                                Total_TSS_set:  245.1406 */
+    ............................Total_TSS_set:  245.1406 */
 
     //create 2 manual scenarios: (1) raw ww, (2) settled ww
     //syntax--------------------(Q   VFA  FBSO  BPO  UPO  USO  iSS  FSA   OP     NOx OHO)
