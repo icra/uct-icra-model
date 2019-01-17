@@ -35,6 +35,8 @@
   - finish integration of previous call (15/1/2019)
 
 ## Lluís B. tasks (ordered by priority)
+  - integrate X.tave loop in a new process
+  - add a.prac as new input for denitrification
   - [in process] read SST capacity paper (add a limit for X.T concentration for
     a given reactor volume (Vp)).
   - [pending] take out balances from technologies.
