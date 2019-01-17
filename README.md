@@ -9,6 +9,8 @@
   - MLE (Modified Ludzack Ettinger) <-- *this model*
   - JHB (Johannesburg process)
   - UCT (University of Cape Town process)
+  - MUCT (Modified University of Cape Town process)
+  - VIP (Virginia initiative plant process)
   - ?
 
 ## Documentation
