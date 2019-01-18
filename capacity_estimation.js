@@ -1,3 +1,6 @@
+//status: still not integrated to the main code TODO
+//reference pdf: "docs/edar/Capacity_estimation/BalancedMLEEquations.pdf"
+
 //inputs
   let DSVI = 120;    //mL/gTSS
   let L    = 2.9615; //LTSS in pdf (eq 10)
@@ -13,17 +16,9 @@
   let V0   = n*V0_n;                        //m/h
   let H    = L*Sti*A_ST*0.8*V0*24/(fq*VR*1000);
 
-//solution
-  let Xt_solution     = 4.1; //kg/m3
-  let Q_ADWF_solution = 15;  //ML/d
-
-//loop
-let Xt = H*Math.exp(-n*Xt_solution); //average TSS concentration in reactor
-
 //average dry weather flow capacity
 //if the plant is tretating more than Q_ADWF, is overloaded. if is less, the plant is underloaded
-let Q_ADWF = VR*Xt/(L*Sti); //ML/d | capacity of the treatment plant. 
-console.log({ SSVI, V0_n, n, V0, H, Xt, Q_ADWF });
+console.log({ SSVI, V0_n, n, V0, H});
 
 //f(Xt) = Xt - H*e^(-n*Xt)
 //can be also expressed as: H = Xt*e^(n*Xt)
@@ -49,4 +44,6 @@ while(true){
     iterations++;            //add 1 to iterations
   }
 }
-console.log({X_tave:x1});
+let X_tave = x1;
+let Q_ADWF = VR*X_tave/(L*Sti); //ML/d | capacity of the treatment plant. 
+console.log({X_tave,Q_ADWF});
