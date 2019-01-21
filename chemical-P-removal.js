@@ -37,13 +37,13 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
     //rename input to "inp"
     let inp = Fe_P_mole_ratio || 0;
 
-    //min and max values are: 0.0001 and 5
-    inp=Math.min(5,Math.max(0.0001,inp));
+    //min and max values are: 0.0001 and 8
+    inp=Math.min(8,Math.max(0.0001,inp));
 
     //Figure 6-13 (Fe_P_mole ratio vs PO4_eff)
     let Figure=[
       {inp:8.00  , out:0.01},
-      {inp:4.90  , out:0.02}, //if output is less than 0.02 is not linear
+      {inp:4.90  , out:0.02}, //if PO4e is less than 0.02 is not linear
       {inp:4.50  , out:0.03},
       {inp:4.20  , out:0.04},
       {inp:3.90  , out:0.05},
@@ -51,7 +51,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
       {inp:3.70  , out:0.07},
       {inp:3.50  , out:0.08},
       {inp:3.35  , out:0.09},
-      {inp:3.30  , out:0.10}, //book example has this value {PO4_eff:0.1, Fe_P_mole_ratio:3.3)
+      {inp:3.30  , out:0.10}, //the example in the book has this value {PO4_eff:0.1, Fe_P_mole_ratio:3.3)
       {inp:2.60  , out:0.20},
       {inp:2.10  , out:0.30},
       {inp:2.00  , out:0.40},
@@ -60,7 +60,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
       {inp:1.20  , out:0.70},
       {inp:1.10  , out:0.80},
       {inp:1.00  , out:0.90},
-      {inp:1.00  , out:1.00}, //if input is greater than 1, it's no more linear
+      {inp:1.00  , out:1.00}, //if PO4e is greater than 1, it's not linear anymore
       {inp:0.20  , out:2.00},
       {inp:0.10  , out:3.00},
       {inp:0.10  , out:4.00},
