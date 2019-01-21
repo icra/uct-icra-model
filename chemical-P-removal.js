@@ -112,16 +112,16 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   };
 };
 
-try{
-  module.exports=chemical_P_removal;
-}catch(e){}
+//export function
+try{module.exports=chemical_P_removal;}catch(e){}
 
 /*test*/
 (function(){
-  return
+  //return;
   let Q    = 25; //ML/d
   let PO4i = 8;  //mg/L
   let mass_FeCl3 = 3145; //kg
   let cpr  = chemical_P_removal(Q, PO4i, mass_FeCl3);
   let extra_iSS = cpr.extra_iSS.value/Q;
+  console.log({extra_iSS}); //101.7 kgiss/d
 })();
