@@ -13,7 +13,7 @@ try{
   require("./nitrification.js");
 }catch(e){}
 
-State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3, SF,fxt,DO,pH, IR,DO_RAS,influent_alk){
+State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH, IR,DO_RAS,influent_alk){
   /*inputs and default values*/
   //as inputs
   T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
@@ -170,7 +170,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3, between equation 11 and 12
   let Rs_bal = (function(){
     //inputs
-    let a_prac = a_opt;
+    let a_prac = a_opt; //this might need to be its own input instead TODO check with George
     //necessary variables for computing Rs_bal
     let Oa   = DO;                                  //mgO/L
     let Os   = DO_RAS;                              //mgO/L

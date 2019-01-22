@@ -6,17 +6,18 @@
 */
 //import files
 try{
-  State_Variables   =require("./state-variables.js");
-  chemical_P_removal=require("./chemical-P-removal.js");
-  constants         =require("./constants.js");
+  State_Variables     = require("./state-variables.js");
+  chemical_P_removal  = require("./chemical-P-removal.js");
+  capacity_estimation = require("./capacity-estimation.js");
+  constants           = require("./constants.js");
 }catch(e){}
 
-State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3){
+State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq){
   //inputs and default values
-  T   = isNaN(T )  ? 16     : T ;  //ºC   | Temperature
-  Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume
-  Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
-  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
+  T   = isNaN(T  )? 16     : T ;  //ºC   | Temperature
+  Vp  = isNaN(Vp )? 8473.3 : Vp;  //m3   | Volume
+  Rs  = isNaN(Rs )? 15     : Rs;  //days | Solids Retention Time or Sludge Age
+  RAS = isNaN(RAS)? 1.0    : RAS; //ø    | SST underflow recycle ratio
   /* 
     option 'waste_from':
 
@@ -28,7 +29,14 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   */
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
-  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
+
+  //inputs for chemical P removal
+  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for P precipitation
+
+  //inputs for capacity estimation module
+  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability 
+  A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
+  fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
   //get necessary mass ratios
   const f_N_OHO  = this.mass_ratios.f_N_OHO;   //gN/gVSS
@@ -49,13 +57,13 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
   //2 - page 9
   let frac = this.totals;    //object: influent fractionation (COD,TOC,TKN,TP,TSS)
-  let COD  = frac.COD.total; //mg_COD/L influent "Sti"
+  let Sti  = frac.COD.total; //mg_COD/L | total influent COD "Sti"
 
   //fSus and fSup ratios
   let Suse = frac.COD.usCOD; //mg/L | USO influent == USO effluent
   let Supi = frac.COD.upCOD; //mg/L | UPO influent
-  let fSus = Suse/COD;       //gUSO/gCOD influent
-  let fSup = Supi/COD;       //gUPO/gCOD influent
+  let fSus = Suse/Sti;       //gUSO/gCOD influent
+  let fSup = Supi/Sti;       //gUPO/gCOD influent
 
   //2.1 - influent mass fluxes (kg/d)
   let inf_fluxes = this.fluxes;                //object: all mass fluxes. structure: {components, totals}
@@ -222,6 +230,17 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let FPout     = FPte + FPw + FPremoved;     //kg/d as P | total TP out
   let P_balance = 100*FPout/FPti;             //percentage
 
+  /*call capacity estimation module*/
+  //------capacity_estimation(DSVI, L,         Sti, A_ST, VR, fq);
+  let cap=capacity_estimation(DSVI, MX_T/FSti, Sti, A_ST, Vp, fq); //object
+  console.log(cap);
+
+  //check if plant is overloaded
+  let errors=[];
+
+  if(Q   > cap.Q_ADWF.value) errors.push("Q > Q_ADWF: plant overloaded");
+  if(X_T > cap.X_tave.value) errors.push("X_T > X_tave: plant overloaded");
+
   //process_variables
   let process_variables={
     fSus    :{value:fSus,      unit:"gUSO/gCOD",   descr:"USO/COD ratio (influent)"},
@@ -239,6 +258,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
     MX_T    :{value:MX_T,      unit:"kgTSS",       descr:"Total Suspended Solids"},
     X_V     :{value:X_V,       unit:"kgVSS/m3",    descr:"VSS concentration in SST"},
     X_T     :{value:X_T,       unit:"kgTSS/m3",    descr:"TSS concentration in SST"},
+    X_tave  :cap.X_tave,
+    Q_ADWF  :cap.Q_ADWF,
     fi      :{value:fi,        unit:"gVSS/gTSS",   descr:"VSS/TSS ratio"},
     f_avOHO :{value:f_avOHO,   unit:"gOHO/gVSS",   descr:"Active fraction of the sludge (VSS)"},
     f_atOHO :{value:f_atOHO,   unit:"gOHO/gTSS",   descr:"Active fraction of the sludge (TSS)"},
@@ -260,11 +281,12 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //Object.values(process_variables).forEach(obj=>delete obj.descr);
   //Object.values(cpr).forEach(obj=>delete obj.descr);
   return {
-    process_variables,
-    cpr,
-    errors:[], //no error checking in AS
-    effluent, 
-    wastage,
+    process_variables, //AS process variables
+    cpr,               //chemical P removal variables
+    cap,               //capacity estimation variables
+    errors,            //error checking in AS
+    effluent,          //State_Variables object
+    wastage,           //State_Variables object
   };
 };
 
@@ -285,4 +307,3 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Effluent totals");        console.log(as.effluent.totals);
 })();
-

@@ -13,7 +13,7 @@ try{
   require("./activated-sludge.js");
 }catch(e){}
 
-State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH){
+State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH){
   /*inputs and default values*/
   //as inputs
   T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
@@ -23,6 +23,11 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
+
+  //capacity estimation inputs
+  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability 
+  A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
+  fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
   //nitrification inputs
   SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation

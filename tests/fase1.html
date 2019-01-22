@@ -66,7 +66,7 @@
   <div style="border-right:1px solid #ccc;padding-right:4px;margin-right:4px">
     <div><strong onclick=toggle_visibility("#inputs")>Inputs</strong></div>
     <div id=inputs>
-      <!--influent--><div><code onclick=toggle_visibility('#influent')>[+] Influent</code></div>
+      <!--influent--><div><code onclick=toggle_visibility('#influent')>[+] Influent inputs</code></div>
       <table id=influent><tr>
         <td title="Flowrate"                            >Q               <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
         <td title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
@@ -81,7 +81,7 @@
         <td title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0   ><span class=unit>mg/L</span>
       </table> 
 
-      <!--plant--><div><code onclick=toggle_visibility('#edar')>[+] Plant</code></div>
+      <!--plant--><div><code onclick=toggle_visibility('#edar')>[+] Plant inputs</code></div>
       <table id=edar style=font-size:smaller>
         <tr>
           <td><label><input type=checkbox id=pst> Primary settler</label>
@@ -90,12 +90,16 @@
           <td>removal<sub>UPO</sub> <span class=unit>(%)</span> <input type=number id=removal_UPO value=90.0500> 
           <td>removal<sub>iSS</sub> <span class=unit>(%)</span> <input type=number id=removal_iSS value=75.1250> 
         </tr><tr>
-          <td><label><input type=checkbox id=as checked=true disabled> Activated sludge</label>
+          <td rowspan=2><label><input type=checkbox id=as checked=true disabled> Activated sludge</label>
           <td>T          <span class=unit>(ºC)</span>           <input type=number id=T   value=16    >   
           <td>Vp         <span class=unit>(m<sup>3</sup>)</span><input type=number id=Vp  value=8473.3> 
           <td>Rs         <span class=unit>(d)</span>            <input type=number id=Rs  value=15    >   
           <td>RAS        <span class=unit>(ø)</span>            <input type=number id=RAS value=1.0   >   
           <td>waste from <select id=waste_from><option>reactor<option>sst</select>
+        </tr><tr>
+          <td>DSVI <span class=unit>(mL/gTSS)      </span><input type=number id=DSVI value=120>
+          <td>A_ST <span class=unit>(m<sup>2</sup>)</span><input type=number id=A_ST value=1248.6>
+          <td>fq   <span class=unit>(ø)            </span><input type=number id=fq   value=2.4>
         </tr><tr>
           <td><label><input type=checkbox id=nit> Nitrification</label>
           <td>SF  <span class=unit>(ø)</span>   <input type=number id=SF  value=1.25> 
@@ -206,9 +210,13 @@
       </div>
       <div id=fractionation style="display:none"></div>
 
-      <!--plant-->
+      <!--process variables-->
       <div><code onclick="toggle_visibility('#outputs #processes')">[+] Process variables</code></div>
       <div id=processes class=flex style="flex-wrap:wrap;display:none"></div>
+
+      <!--errors-->
+      <div><code onclick="toggle_visibility('#outputs #errors')">[+] Warnings/Errors</code></div>
+      <div id=errors class=flex style="display:none">under development</div>
 
       <!--export-->
       <div><code onclick="toggle_visibility('#outputs #export')">[+] Export</code></div>
@@ -225,6 +233,7 @@
 <script src="../constants.js"></script>
 <script src="../primary-settler.js"></script>
 <script src="../chemical-P-removal.js"></script>
+<script src="../capacity-estimation.js"></script>
 <script src="../activated-sludge.js"></script>
 <script src="../nitrification.js"></script>
 <script src="../denitrification.js"></script>
@@ -274,12 +283,12 @@
       });
     });
 
-    //read constants from screen
+    //read constants from DOM
     document.querySelectorAll('#inputs #constants input[id]').forEach(input=>{
       constants[input.id]=parseFloat(input.value);
     });
 
-    //get plant configuration
+    //get plant configuration from DOM
     let conf={
       pst:document.querySelector('#edar #pst').checked,
       nit:document.querySelector('#edar #nit').checked,
@@ -287,7 +296,7 @@
       cpr:document.querySelector('#edar #cpr').checked,
     };
 
-    //get plant parameters
+    //get plant parameters from DOM
     let parameters={
       fw          : parseFloat(document.querySelector('#edar #fw').value),
       removal_BPO : parseFloat(document.querySelector('#edar #removal_BPO').value),
@@ -299,6 +308,9 @@
       RAS         : parseFloat(document.querySelector('#edar #RAS').value),
       waste_from  :            document.querySelector('#edar #waste_from').value,
       mass_FeCl3  : parseFloat(document.querySelector('#edar #mass_FeCl3').value),
+      DSVI        : parseFloat(document.querySelector('#edar #DSVI').value),
+      A_ST        : parseFloat(document.querySelector('#edar #A_ST').value),
+      fq          : parseFloat(document.querySelector('#edar #fq').value),
       SF          : parseFloat(document.querySelector('#edar #SF').value),
       fxt         : parseFloat(document.querySelector('#edar #fxt').value),
       DO          : parseFloat(document.querySelector('#edar #DO').value),
@@ -407,10 +419,10 @@
             if(key=='TP' ) nomenclatura='P<sub>t</sub>';
           }
           if(fraction=='active'){
-            if(key=='COD') nomenclatura='S<sub>BH</sub>';
-            if(key=='TOC') nomenclatura='C<sub>BH</sub>';
-            if(key=='TKN') nomenclatura='N<sub>BH</sub>';
-            if(key=='TP' ) nomenclatura='P<sub>BH</sub>';
+            if(key=='COD') nomenclatura='S<sub>OHO</sub>';
+            if(key=='TOC') nomenclatura='C<sub>OHO</sub>';
+            if(key=='TKN') nomenclatura='N<sub>OHO</sub>';
+            if(key=='TP' ) nomenclatura='P<sub>OHO</sub>';
           }
           if(key=='TSS'){
             if(fraction=='total')  nomenclatura='X<sub>t</sub>';
