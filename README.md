@@ -11,10 +11,11 @@ Implemented by Lluís Bosch.
   - discuss pH effect on chemical P removal
 
 ## Lluís B. tasks (ordered by priority)
-  - add a.prac as new input for denitrification.
-  - take out balances code from technologies and calculate after processes.
-  - refactor plant model into its own repository.
-  - warnings module:
+  - [interface] add check for exported URL above 2k characters.
+  - [model]     add a.prac as new input for denitrification.
+  - [model]     take out balances code from technologies and calculate after processes.
+  - [model]     refactor plant model into its own repository.
+  - [model] warnings module:
     - Reactor kgTSS (MX.T) above the limit (given a reactor volume Vp)
     - fxt > fxm.
     - Rs  < Rsm.
