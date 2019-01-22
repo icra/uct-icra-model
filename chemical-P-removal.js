@@ -1,6 +1,9 @@
 /*
   Chemical P removal
   Metcalf & Eddy, Wastewater Engineering, 5th ed., 2014, page 484
+
+  TODO: discuss with george the effect of the pH in FePO4 formation
+  (Szabo et al 2008)
 */
 
 function chemical_P_removal(Q, PO4i, mass_FeCl3){
@@ -95,9 +98,9 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   };
 
   //get PO4 effluent and PO4 removed
-  let PO4e        = mass_FeCl3 ? get_PO4_eff(Fe_P_mole_ratio) : PO4i; //mg/L (Fig 6-13, page 484, M&EA, 5th ed, see function 'get_PO4_eff')
-  PO4e            = Math.min(PO4i, PO4e);         //PO4e cannot be higher than PO4i (i.e. if mass of FeCl3 = 0)
-  let PO4_removed = Q*(PO4i - PO4e);              //kgP/d
+  let PO4e = mass_FeCl3 ? get_PO4_eff(Fe_P_mole_ratio) : PO4i; //mgP/L (Fig 6-13, page 484, M&EA, 5th ed, see function 'get_PO4_eff')
+  PO4e     = Math.min(PO4i, PO4e);                             //ensure PO4e < PO4i
+  let PO4_removed = Q*(PO4i - PO4e);                           //kgP/d
 
   //get extra iSS sludge produced
   let extra_iSS = PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d

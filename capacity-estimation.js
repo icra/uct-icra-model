@@ -20,7 +20,7 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   let H    = L*Sti*A_ST*0.8*V0*24/(fq*VR*1000); //unit?        | eq 18
 
   //debug
-  console.log({DSVI,A_ST,fq});
+  //console.log({DSVI,A_ST,fq});
   //console.log({SSVI,V0_n,n,V0,H});
 
   //calculation of Q_ADWF, average dry weather flow capacity

@@ -7,19 +7,18 @@ Implemented by Lluís Bosch.
 ## Status: under development 
 
 ## next call george ekama
-  - finish integration of previous call (15/1/2019)
   - discuss with lluís corominas EBPR.
+  - discuss pH effect on chemical P removal
 
 ## Lluís B. tasks (ordered by priority)
   - add a.prac as new input for denitrification.
-  - integrate X.tave loop + Q.ADWF.max in a new process.
   - take out balances code from technologies and calculate after processes.
   - refactor plant model into its own repository.
   - warnings module:
-    - fxt > fxm.
-    - Rs < Rsm.
-    - effluent alkalinity below 50 mg/L as CaCO3.
     - Reactor kgTSS (MX.T) above the limit (given a reactor volume Vp)
+    - fxt > fxm.
+    - Rs  < Rsm.
+    - effluent alkalinity < 50 mg/L as CaCO3.
 
 ## Future
   - new energy consumption module.
@@ -52,6 +51,7 @@ Implemented by Lluís Bosch.
   - [gui] generate links for fase1.html
   - [done] architecture class diagram.
   - [done] integrate constants.js to the code.
+  - [done] integrate X.tave loop + Q.ADWF.max in a new process.
 
 ## List of process types
   - MLE (Modified Ludzack Ettinger) <-- **this model**

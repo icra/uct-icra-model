@@ -13,7 +13,7 @@ try{
   require("./activated-sludge.js");
 }catch(e){}
 
-State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH){
+State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq, SF,fxt,DO,pH){
   /*inputs and default values*/
   //as inputs
   T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
@@ -40,7 +40,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let frac = this.totals;
 
   //execute activated sludge without nitrification
-  let as = this.activated_sludge(T,Vp,Rs,RAS,waste_from,mass_FeCl3); //object
+  let as = this.activated_sludge(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq); //object
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -88,7 +88,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Rsm = 1/(µAm_pH/SF*(1-fxt)-bAT); //days | reorganized equation for fxm
 
   //compile Rsm and fxm errors
-  let errors=[];
+  let errors=as.errors;
   if(Rs  < Rsm) errors.push("Rs  < Rsm");
   if(fxt > fxm) errors.push("fxt > fxm");
 

@@ -13,7 +13,7 @@ try{
   require("./nitrification.js");
 }catch(e){}
 
-State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH, IR,DO_RAS,influent_alk){
+State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq, SF,fxt,DO,pH, IR,DO_RAS,influent_alk){
   /*inputs and default values*/
   //as inputs
   T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
@@ -23,6 +23,11 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
+
+  //capacity estimation inputs
+  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability 
+  A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
+  fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
   //nitrification inputs
   SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
@@ -36,7 +41,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
 
   //execute as+nitrification
-  let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH); //object
+  let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH); //object
 
   //get fractionations
   let inf_frac = this.totals;         //object | influent fractionation
@@ -94,12 +99,8 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   if(a < a_opt) Nne = Nc/(a+RAS+1);                              //mgN/L
   else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L
 
-  //N2 gas produced
-  let N2g  = Nni + Nc - Nne; //mgN/L
-  let FN2g = Q*N2g;          //kgN/d
-
-  //total nitrogen (TN) effluent (TKN+NOx)
-  let TNe  = Nte + Nne;         //mg/L
+  let FN2g = Q*(Nni + Nc - Nne); //kgN/d | N2 gas produced
+  let TNe  = Nte + Nne;          //mgN/L | total nitrogen (TN) effluent (TKN+NOx)
 
   //oxygen recovered by denitrification
   let FOd = 2.86*Q*(Nc-Nne);                     //kgO/d
@@ -113,7 +114,10 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let Ns    = nit.as_process_variables.Ns.value; //mg/L | N required for sludge production
   let Noupi = inf_frac.TKN.upON;                 //mg/L | N unbiodegradable particulated (Noupi)
   let effluent_alk = influent_alk + 3.57*Nobi - 3.57*(Ns-Noupi) - 7.14*Nc + 3.57*(Nc-Nne); //mg/L as CaCO3
-  //add error if alkalinity is below 50? TODO
+
+  //check if alkalinity is below 50
+  let errors=nit.errors;
+  if(effluent_alk<50)errors.push("effluent_alk < 50 mgCaCO3/L");
 
   //TOD balance (TOD=COD+4.57*TKN)
   let Qe   = nit.effluent.Q;                                    //ML/d | effluent flowrate
@@ -210,7 +214,6 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     FOt          :{value:FOt          ,unit:"kgO/d"      ,descr:"Total oxygen demand (FOc + FOn - FOd)"},
     OUR          :{value:OUR          ,unit:"mgO/L·h"    ,descr:"Oxygen Uptake Rate"},
     effluent_alk :{value:effluent_alk ,unit:"mgCaCO3/L"  ,descr:"Effluent alkalinity"},
-    //N2g          :{value:N2g          ,unit:"mgN/L"      ,descr:"N2 gas production (concentration)"},           
     FN2g         :{value:FN2g         ,unit:"kgN/d"      ,descr:"N2 gas production (mass flux)"},           
     //TODi         :{value:TODi         ,unit:"kgO/d"      ,descr:"Total oxygen demand (influent)"},
     //TODe         :{value:TODe         ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent)"},
@@ -227,7 +230,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     nit_process_variables: nit.process_variables,
     as_process_variables:  nit.as_process_variables,
     cpr:                   nit.cpr,
-    errors:                nit.errors,
+    errors,
     effluent,
     wastage,
   };
