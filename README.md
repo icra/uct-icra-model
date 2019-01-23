@@ -1,25 +1,24 @@
-# Ecoadviso
-Backend model for ecoadvisor project.
-Coded in Javascript without dependencies.
-MLE steady state model by George Ekama.
-Implemented by Lluís Bosch.
+# Ecoadvisor
+  Backend model for ecoadvisor project.
+  Coded in Javascript without dependencies.
+  MLE steady state model by George Ekama.
+  Implemented by Lluís Bosch.
 
 ## Status: under development 
 
 ## next call george ekama
   - discuss with lluís corominas EBPR.
-  - discuss pH effect on chemical P removal
+  - pH effect on chemical P removal.
 
 ## Lluís B. tasks (ordered by priority)
-  - [interface] add check for exported URL above 2k characters.
-  - [model]     add a.prac as new input for denitrification.
-  - [model]     take out balances code from technologies and calculate after processes.
-  - [model]     refactor plant model into its own repository.
+  - [done]  add check for exported URL above 2k characters.
+  - [model] add a.prac as new input for denitrification.
+  - [model] refactor plant model into its own repository.
+  - [model] take out balances code from technologies and calculate after processes.
 
 ## Future / new functionality to be added
   - energy consumption module.
-  - anaerobic digestion module (will consider inorganic carbon exiting,
-    created from TOC).
+  - anaerobic digestion module (will consider inorganic carbon exiting, created from TOC).
   - stoichiometry for CO2 produced.
   - [GUI] add a source code viewer to see equations.
   - [GUI] API.
@@ -39,7 +38,7 @@ Implemented by Lluís Bosch.
   - [model] influent nitrate (NOx): if we have influent NOx, TOD balance not closing.
   - [model] OHO as a new state variable
   - [model] kg of FeCl3 added is not equal to the extra iSS produced (for example 3000 kg FeCl3 produces ~2500 kg iSS. The remaining ~500 kg is Cl(-) ion?).
-  - [as model] let Dp1RBSO = Sbsi·(1-fCV·YH)/2.86;
+  - [denitri] let Dp1RBSO = Sbsi·(1-fCV·YH)/2.86;
   - [river] R20 and k for NH4 and PO4
   - [river] names S-OP and S-FSA to PO4 and NH4 in the interface only
   - [gui] generate links for fase1.html
@@ -65,10 +64,8 @@ Implemented by Lluís Bosch.
   - Influent X.OHO is always 0.
   - Mass of nitrifiers (MX.BA) is 0 (==not added to MX.T)
   - Influent S.VFA and X.BPO are 100% consumed into biomass during the 'activated sludge' process.
-  - S.FBSO is *not* 100% consumed because it depends on the HRT (fast), whereas
-    the X.BPO depends on Rs (slower).
+  - S.FBSO is *not* 100% consumed because it depends on the HRT (fast), whereas the X.BPO depends on Rs (slower).
   - Solids in the effluent (X.iSS, X.UPO, X.OHO, X.BPO) are 0.
   - All CO2 produced is stripped out.
-  - Inorganic carbon is not included in the carbon balance over the AS reactor,
-    because it's very small.
+  - Inorganic carbon is not included in the carbon balance over the AS reactor, because it's very small.
   - The volume of added FeCl3 solution for chemical P removal is ~0.

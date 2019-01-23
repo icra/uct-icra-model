@@ -54,7 +54,7 @@
 <div style="border-bottom:1px solid #ccc;margin-bottom:4px;justify-content:space-between" class=flex>
   <h3>
     <span id=title onclick>
-      Phase 1: Influent &rarr; plant
+      Phase 1 - Plant (MLE process)
     </span>
     <!--run button-->
     <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
@@ -72,7 +72,7 @@
     <div id=inputs>
       <!--influent--><div><code onclick=toggle_visibility('#influent',this)>[-] Influent inputs</code></div>
       <table id=influent><tr>
-        <td title="Flowrate"                            >Q               <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
+        <td title="Flowrate"                            >Q<sub> </sub>    <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
         <td title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
         <td title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span>
         <td title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=X_BPO  value=440 ><span class=unit>mg/L</span>
@@ -87,37 +87,37 @@
 
       <!--plant--><div><code onclick=toggle_visibility('#edar',this)>[-] Plant inputs</code></div>
       <table id=edar style=font-size:smaller>
-        <tr>
+        <tr id=pst>
           <td><label><input type=checkbox id=pst> Primary settler</label>
-          <td>fw                    <span class=unit>(ø)</span> <input type=number id=fw          value=0.005  > 
-          <td>removal<sub>BPO</sub> <span class=unit>(%)</span> <input type=number id=removal_BPO value=42.3352> 
-          <td>removal<sub>UPO</sub> <span class=unit>(%)</span> <input type=number id=removal_UPO value=90.0500> 
-          <td>removal<sub>iSS</sub> <span class=unit>(%)</span> <input type=number id=removal_iSS value=75.1250> 
-        </tr><tr>
+          <td title="Fraction of Q that goes to wastage">fw                   <span class=unit>(ø)</span><input type=number id=fw          value=0.005>
+          <td title="Removal of X_BPO"                  >removal<sub>BPO</sub><span class=unit>(%)</span><input type=number id=removal_BPO value=42.3352>
+          <td title="Removal of X_UPO"                  >removal<sub>UPO</sub><span class=unit>(%)</span><input type=number id=removal_UPO value=90.0500>
+          <td title="Removal of X_iSS"                  >removal<sub>iSS</sub><span class=unit>(%)</span><input type=number id=removal_iSS value=75.1250>
+        </tr><tr id=as>
           <td rowspan=2><label><input type=checkbox id=as checked=true disabled> Activated sludge</label>
-          <td>T          <span class=unit>(ºC)</span>           <input type=number id=T   value=16    >   
-          <td>Vp         <span class=unit>(m<sup>3</sup>)</span><input type=number id=Vp  value=8473.3> 
-          <td>Rs         <span class=unit>(d)</span>            <input type=number id=Rs  value=15    >   
-          <td>RAS        <span class=unit>(ø)</span>            <input type=number id=RAS value=1.0   >   
-          <td>waste from <select id=waste_from><option>reactor<option>sst</select>
+          <td title="Temperature"                        >T  <span class=unit>(ºC)</span>           <input type=number id=T   value=16>
+          <td title="Reactor volume"                     >Vp <span class=unit>(m<sup>3</sup>)</span><input type=number id=Vp  value=8473.3>
+          <td title="Sludge retention time or sludge age">Rs <span class=unit>(d)</span>            <input type=number id=Rs  value=15>
+          <td title="Underflow recycle ratio"            >RAS<span class=unit>(ø)</span>            <input type=number id=RAS value=1.0>
         </tr><tr>
-          <td>DSVI <span class=unit>(mL/gTSS)      </span><input type=number id=DSVI value=120>
-          <td>A_ST <span class=unit>(m<sup>2</sup>)</span><input type=number id=A_ST value=30000>
-          <td>fq   <span class=unit>(ø)            </span><input type=number id=fq   value=2.4>
-        </tr><tr>
+          <td title="Sludge settleability"     >DSVI<span class=unit>(mL/gTSS)      </span><input type=number id=DSVI value=120>
+          <td title="Area of secondary settler">A_ST<span class=unit>(m<sup>2</sup>)</span><input type=number id=A_ST value=30000>
+          <td title="Peak flow (Qmax/Qavg)"    >fq  <span class=unit>(ø)            </span><input type=number id=fq   value=2.4>
+          <td title="Origin of wastage"        >waste from<select id=waste_from><option>reactor<option>sst</select>
+        </tr><tr id=nit>
           <td><label><input type=checkbox id=nit> Nitrification</label>
-          <td>SF  <span class=unit>(ø)</span>   <input type=number id=SF  value=1.25> 
-          <td>fxt <span class=unit>(ø)</span>   <input type=number id=fxt value=0.39> 
-          <td>DO  <span class=unit>(mg/L)</span><input type=number id=DO  value=2.0 > 
-          <td>pH  <span class=unit>(ø)</span>   <input type=number id=pH  value=7.2 > 
-        </tr><tr>
+          <td title="Safety factor"               >SF  <span class=unit>(ø)</span>   <input type=number id=SF  value=1.25>
+          <td title="Fraction of unaerated sludge">fxt <span class=unit>(ø)</span>   <input type=number id=fxt value=0.39>
+          <td title="Dissolved oxygen (reactor)"  >DO  <span class=unit>(mg/L)</span><input type=number id=DO  value=2.0 >
+          <td title="pH"                          >pH  <span class=unit>(ø)</span>   <input type=number id=pH  value=7.2 >
+        </tr><tr id=dn>
           <td><label><input type=checkbox id=dn> Denitrification</label>
-          <td>IR                     <span class=unit>(ø)   </span><input type=number id=IR           value=5.4> 
-          <td>DO<sub>RAS</sub>       <span class=unit>(mg/L)</span><input type=number id=DO_RAS       value=1.0> 
-          <td>influent<sub>alk</sub> <span class=unit>(mg/L)</span><input type=number id=influent_alk value=250> 
-        </tr><tr>
+          <td title="Internal Recycle Ratio"                   >IR                    <span class=unit>(ø)   </span><input type=number id=IR           value=5.4>
+          <td title="Oxygen dissolved in the underflow recycle">DO<sub>RAS</sub>      <span class=unit>(mg/L)</span><input type=number id=DO_RAS       value=1.0>
+          <td title="Influent alkalinity"                      >influent<sub>alk</sub><span class=unit>(mg/L)</span><input type=number id=influent_alk value=250>
+        </tr><tr id=cpr>
           <td><label><input type=checkbox id=cpr> Chemical P removal</label>
-          <td>FeCl<sub>3</sub> <span class=unit>(kg/d)</span> <input type=number id=mass_FeCl3 value=3000>
+          <td title="Mass of FeCl3 added for P removal">FeCl<sub>3</sub> <span class=unit>(kg/d)</span> <input type=number id=mass_FeCl3 value=3000>
         </tr>
       </table> 
 
@@ -125,10 +125,10 @@
       <table id=mass_ratios style=display:none>
         <tr><td><td>fcv<div class=unit>gCOD/gVSS<td>fC<div class=unit>gVSS/gC<td>fN<div class=unit>gVSS/gN<td>fP<div class=unit>gVSS/gP
         <tr><td>S<sub>VFA</sub>
-          <td><input id=f_CV_VFA type=number value=1.0667 step=0.0001>
-          <td><input id=f_C_VFA  type=number value=0.4000 step=0.1000>
-          <td><input id=f_N_VFA  type=number value=0.0000 step=0.1000>
-          <td><input id=f_P_VFA  type=number value=0.0000 step=0.1000>
+          <td><input id=f_CV_VFA  type=number value=1.0667 step=0.0001>
+          <td><input id=f_C_VFA   type=number value=0.4000 step=0.1000>
+          <td><input id=f_N_VFA   type=number value=0.0000 step=0.1000>
+          <td><input id=f_P_VFA   type=number value=0.0000 step=0.1000>
         </tr>
         <tr><td>S<sub>FBSO</sub>
           <td><input id=f_CV_FBSO type=number value=1.4200 step=0.0100>
@@ -136,27 +136,27 @@
           <td><input id=f_N_FBSO  type=number value=0.0464 step=0.0001>
           <td><input id=f_P_FBSO  type=number value=0.0118 step=0.0001>
         <tr><td>X<sub>BPO</sub>
-          <td><input id=f_CV_BPO type=number value=1.5230 step=0.0010>
-          <td><input id=f_C_BPO  type=number value=0.4980 step=0.0010>
-          <td><input id=f_N_BPO  type=number value=0.0323 step=0.0001>
-          <td><input id=f_P_BPO  type=number value=0.0072 step=0.0001>
+          <td><input id=f_CV_BPO  type=number value=1.5230 step=0.0010>
+          <td><input id=f_C_BPO   type=number value=0.4980 step=0.0010>
+          <td><input id=f_N_BPO   type=number value=0.0323 step=0.0001>
+          <td><input id=f_P_BPO   type=number value=0.0072 step=0.0001>
         </tr>
         <tr><td>X<sub>UPO</sub>
-          <td><input id=f_CV_UPO type=number value=1.4810 step=0.0010>
-          <td><input id=f_C_UPO  type=number value=0.5180 step=0.0010>
-          <td><input id=f_N_UPO  type=number value=0.1000 step=0.1000>
-          <td><input id=f_P_UPO  type=number value=0.0250 step=0.0010>
+          <td><input id=f_CV_UPO  type=number value=1.4810 step=0.0010>
+          <td><input id=f_C_UPO   type=number value=0.5180 step=0.0010>
+          <td><input id=f_N_UPO   type=number value=0.1000 step=0.1000>
+          <td><input id=f_P_UPO   type=number value=0.0250 step=0.0010>
         </tr>
         <tr><td>S<sub>USO</sub>
-          <td><input id=f_CV_USO type=number value=1.4930 step=0.0010>
-          <td><input id=f_C_USO  type=number value=0.4980 step=0.0010>
-          <td><input id=f_N_USO  type=number value=0.0366 step=0.0001>
-          <td><input id=f_P_USO  type=number value=0.0000 step=0.1000>
+          <td><input id=f_CV_USO  type=number value=1.4930 step=0.0010>
+          <td><input id=f_C_USO   type=number value=0.4980 step=0.0010>
+          <td><input id=f_N_USO   type=number value=0.0366 step=0.0001>
+          <td><input id=f_P_USO   type=number value=0.0000 step=0.1000>
         <tr><td>X<sub>OHO</sub>
-          <td><input id=f_CV_OHO type=number value=1.4810 step=0.0010>
-          <td><input id=f_C_OHO  type=number value=0.5180 step=0.0010>
-          <td><input id=f_N_OHO  type=number value=0.1000 step=0.1000>
-          <td><input id=f_P_OHO  type=number value=0.0250 step=0.0010>
+          <td><input id=f_CV_OHO  type=number value=1.4810 step=0.0010>
+          <td><input id=f_C_OHO   type=number value=0.5180 step=0.0010>
+          <td><input id=f_N_OHO   type=number value=0.1000 step=0.1000>
+          <td><input id=f_P_OHO   type=number value=0.0250 step=0.0010>
         </tr>
       </table>
 
@@ -286,7 +286,7 @@
       parseFloat(document.querySelector('#influent #S_NOx').value),
     );
 
-    //read mass ratios from screen and modify influent
+    //read mass ratios from screen and modify influent object
     ['CV','C','N','P'].forEach(c1=>{
       ['VFA','FBSO','BPO','UPO','USO','OHO'].forEach(c2=>{
         influent.mass_ratios[`f_${c1}_${c2}`] =
@@ -331,16 +331,16 @@
       influent_alk: parseFloat(document.querySelector('#edar #influent_alk').value),
     };
 
-    //create new plant and run model
+    /*create new plant and run model*/
     let plant = new Plant(influent, conf, parameters);
     let run = plant.run();
     /*backend end-------*/
 
-    /*GUI integration*/
+    /*GUI integration (means consuming the run object)*/
 
-    //dibuixa fractionation columnes
+    //draw fractionation columns
     (function draw_fractionation(){
-      //recopila variables d'estat (per ordre)
+      //state variables (per ordre)
       let svs = {};
       svs.Influent                      = plant.influent;         //state variables object
       if(conf.pst) svs.Primary_wastage  = run.primary.wastage;    //state variables object
@@ -436,7 +436,6 @@
             if(fraction=='uVSS')   nomenclatura='X<sub>vu</sub>';
             if(fraction=='active') nomenclatura='X<sub>OHO</sub>';
           }
-
           newRow.insertCell(-1).innerHTML=nomenclatura;
 
           //itera variables d'estat
@@ -540,7 +539,7 @@
       });
     })(run.errors);
 
-    //clica les unitats que toquen
+    //clica unitats marcades
     document.querySelector('input[name=summary_units]:checked').click();
   });
 
@@ -559,7 +558,11 @@
     //delete last '&' character
     newUrl = newUrl.substring(0,newUrl.length-1);
     //write newUrl to GUI
-    document.querySelector('#outputs #export').value=newUrl;
+    if(newUrl.length<2083){
+      document.querySelector('#outputs #export').value=newUrl;
+    }else{
+      document.querySelector('#outputs #export').value="url too long (unsolved error, please contact developers)";
+    }
   });
 
   //select unit in summaries
@@ -609,13 +612,29 @@
 
   //click run button
   document.querySelector('button#run').click();
+
+  //disable plant inputs when technology checkbox is not enabled
+  document.querySelectorAll('#inputs #edar input[type=checkbox][id]').forEach(input=>{
+    function disable_inner_inputs(el){
+      document.querySelectorAll(`#inputs #edar tr#${el.id} input[id]`).forEach(inp=>{
+        if(inp.id==el.id)return;
+        inp.disabled=!el.checked;
+      });
+    }
+    disable_inner_inputs(input);
+    input.addEventListener('click',function(){
+      disable_inner_inputs(this);
+    });
+  });
 </script>
 
 <!--gui utils-->
 <script>
   function toggle_visibility(selector,btn){
     let el=document.querySelector(selector);
+    //hide or show element
     if(el)el.style.display=el.style.display=='none'?'':'none';
+    //modify [+]/[-] text
     if(btn){
       if(btn.innerHTML.search('[+]')+1){
         btn.innerHTML=btn.innerHTML.replace('[+]','[-]');

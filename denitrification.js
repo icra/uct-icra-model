@@ -209,7 +209,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     Rs_bal       :{value:Rs_bal       ,unit:"d"          ,descr:"SRT balanced (misssing more accurate description)"}, //TODO
     Nne          :{value:Nne          ,unit:"mgN/L"      ,descr:"Effluent nitrate"},
     Nne_opt      :{value:Nne_opt      ,unit:"mgN/L"      ,descr:"Lowest effluent nitrate (using a_opt)"},
-    TNe          :{value:TNe          ,unit:"mgN/L"      ,descr:"Effluent total nitrogen"},
+    TNe          :{value:TNe          ,unit:"mgN/L"      ,descr:"Effluent total nitrogen (TKN+NOx)"},
     FOd          :{value:FOd          ,unit:"kgO/d"      ,descr:"Oxygen recovered by denitrification"},
     FOt          :{value:FOt          ,unit:"kgO/d"      ,descr:"Total oxygen demand (FOc + FOn - FOd)"},
     OUR          :{value:OUR          ,unit:"mgO/L·h"    ,descr:"Oxygen Uptake Rate"},
