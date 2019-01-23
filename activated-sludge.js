@@ -8,8 +8,8 @@
 try{
   State_Variables     = require("./state-variables.js");
   chemical_P_removal  = require("./chemical-P-removal.js");
-  capacity_estimation = require("./capacity-estimation.js");
   constants           = require("./constants.js");
+  capacity_estimation = require("./capacity-estimation.js");
 }catch(e){}
 
 State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq){
@@ -96,10 +96,9 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //2.8 - effluent Phosphorus 
   let Ps    = (f_P_OHO*(MX_BH+MX_EH)+f_P_UPO*MX_I)/(Rs*Q); //mgP/L | P influent required for sludge production
   let Pti   = frac.TP.total;                               //mgP/L | total P influent
-  let Pte   = Pti - Ps;                                    //mgP/L | total P effluent
   let Pouse = frac.TP.usOP;                                //mgP/L | P organic unbiodegradable soluble effluent
   let Pobse = S_b*f_P_FBSO/fCV_FBSO;                       //mgP/L | P organic biodegradable soluble effluent
-  let Psa   = Pte - Pouse - Pobse;                         //mgP/L | inorganic soluble P available for chemical P removal
+  let Psa   = Pti - Ps - Pouse - Pobse;                    //mgP/L | inorganic soluble P available for chemical P removal
 
   /*chemical P removal*/
   let cpr         = chemical_P_removal(Q, Psa, mass_FeCl3); //object
@@ -134,7 +133,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   })(RAS);
 
   //2.4 - page 12 | get the correct wastage flowrate according to "waste_from" input
-  let Qw = (function(){ //ML/d | wastage flowrate
+  let Qw=(function(){ //ML/d | wastage flowrate
     if     (waste_from=='reactor') return (Vp/Rs)/1000;
     else if(waste_from=='sst')     return SST.Qw;
     else                           throw {waste_from};
@@ -144,7 +143,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Qe = Q - Qw; //ML/d
 
   /*calculate BPO, UPO, and iSS concentrating factor in the recycle underflow*/
-  let f = waste_from=='sst' ? SST.f : 1;
+  let f=(waste_from=='sst')? SST.f : 1;
 
   //2.5
   let fi      = MX_V/MX_T;  //VSS/TSS ratio
@@ -154,15 +153,14 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //2.6 - Nitrogen - page 12 
   let Ns    = (f_N_OHO*(MX_BH+MX_EH)+f_N_UPO*MX_I)/(Rs*Q); //mgN/L | N in influent required for sludge production
   let Nti   = frac.TKN.total;                              //mgN/L | total TKN influent
-  let Nte   = Nti - Ns;                                    //mgN/L | total TKN effluent
   let Nobsi = frac.TKN.bsON;                               //mgN/L | bsON influent (VFA + FBSO)
   let Nouse = frac.TKN.usON;                               //mgN/L | usON influent = effluent
   let Nobpi = frac.TKN.bpON;                               //mgN/L | bpON influent
   let Noupi = frac.TKN.upON;                               //mgN/L | upON influent
   let Nobse = S_b*f_N_FBSO/fCV_FBSO;                       //mgN/L | bsON effluent (not all FBSO is degraded)
 
-  //effluent ammonia = total TKN - usON - bsON
-  let Nae = Nte - Nouse - Nobse; //mg/L
+  //effluent ammonia = total TKN - Ns - usON - bsON
+  let Nae = Nti - Ns - Nouse - Nobse; //mg/L
 
   //ammonia balance
   let Nae_balance = 100*Nae/(this.components.S_FSA + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
@@ -233,7 +231,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   /*call capacity estimation module*/
   //------capacity_estimation(DSVI, L,         Sti, A_ST, VR, fq);
   let cap=capacity_estimation(DSVI, MX_T/FSti, Sti, A_ST, Vp, fq); //object
-  console.log(cap);
+  //console.log(cap);//debug
 
   //check if plant is overloaded
   let errors=[];
@@ -281,10 +279,9 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //Object.values(process_variables).forEach(obj=>delete obj.descr);
   //Object.values(cpr).forEach(obj=>delete obj.descr);
   return {
-    process_variables, //AS process variables
-    cpr,               //chemical P removal variables
-    cap,               //capacity estimation variables
-    errors,            //errors found in AS
+    process_variables, //object: AS process variables
+    cpr,               //object: chemical P removal variables
+    errors,            //array: errors found
     effluent,          //State_Variables object
     wastage,           //State_Variables object
   };
@@ -306,4 +303,5 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   console.log("=== Wastage totals");         console.log(as.wastage.totals);
   console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Effluent totals");        console.log(as.effluent.totals);
+  console.log("=== errors ");                console.log(as.errors);
 })();

@@ -1,4 +1,4 @@
-# Ecoadvisor 
+# Ecoadviso
 Backend model for ecoadvisor project.
 Coded in Javascript without dependencies.
 MLE steady state model by George Ekama.
@@ -21,11 +21,11 @@ Implemented by Lluís Bosch.
     - Rs  < Rsm.
     - effluent alkalinity < 50 mg/L as CaCO3.
 
-## Future
-  - new energy consumption module.
-  - new anaerobic digestion module (will consider inorganic carbon exiting,
+## Future / new functionality to be added
+  - energy consumption module.
+  - anaerobic digestion module (will consider inorganic carbon exiting,
     created from TOC).
-  - new stoichiometry for CO2 produced.
+  - stoichiometry for CO2 produced.
   - [GUI] add a source code viewer to see equations.
   - [GUI] API.
 
@@ -69,6 +69,7 @@ Implemented by Lluís Bosch.
 ## Model assumptions
   - Process is MLE (Modified Ludzack Ettinger).
   - Influent X.OHO is always 0.
+  - Mass of nitrifiers (MX.BA) is 0 (==not added to MX.T)
   - Influent S.VFA and X.BPO are 100% consumed into biomass during the 'activated sludge' process.
   - S.FBSO is *not* 100% consumed because it depends on the HRT (fast), whereas
     the X.BPO depends on Rs (slower).
@@ -76,4 +77,4 @@ Implemented by Lluís Bosch.
   - All CO2 produced is stripped out.
   - Inorganic carbon is not included in the carbon balance over the AS reactor,
     because it's very small.
-  - The additional FeCl3 solution volume added for chemical P removal is considered ~0.
+  - The volume of added FeCl3 solution for chemical P removal is ~0.

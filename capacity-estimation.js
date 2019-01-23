@@ -1,6 +1,12 @@
 /*
-  capacity estimation of the plant
+  CAPACITY ESTIMATION MODULE
   reference: "docs/edar/Capacity_estimation/BalancedMLEEquations.pdf"
+  Calculates max flowrate (Q_ADWF) and total solids concentration (X_tave) that
+  the plant can process before being overloaded
+  - Q_ADWF: average dry weather flow capacity
+  - X_tave: average total solids concentration
+  if the plant is tretating more than Q_ADWF, is overloaded. if is less, the
+  plant is underloaded
 */
 
 function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
@@ -19,15 +25,12 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   let V0   = n*V0_n;                            //m/h          | eq 15
   let H    = L*Sti*A_ST*0.8*V0*24/(fq*VR*1000); //unit?        | eq 18
 
-  //debug
-  //console.log({DSVI,A_ST,fq});
-  //console.log({SSVI,V0_n,n,V0,H});
+  //console.log({DSVI,A_ST,fq});//debug
+  //console.log({SSVI,V0_n,n,V0,H});//debug
 
-  //calculation of Q_ADWF, average dry weather flow capacity
-  //if the plant is tretating more than Q_ADWF, is overloaded. if is less, the plant is underloaded
-
-  //f(Xt) = Xt - H*e^(-n*Xt)
-  //can be also expressed as: H = Xt*e^(n*Xt)
+  //X_tave (=x) is found using the newton-raphson method
+  //f(x) = x - H*e^(-n*x)
+  //can be also expressed as: H = x*e^(n*x)
   function newton_raphson(x){       //1 iteration of newton-raphson method
     let fx = x*Math.exp(n*x)-H;     //f(x)  = x*e^(n*x)-H
     let dx = Math.exp(n*x)*(1+x*n); //f'(x) = e^(n*x)*(1+x*n) (derivative)
