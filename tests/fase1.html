@@ -102,7 +102,7 @@
           <td>waste from <select id=waste_from><option>reactor<option>sst</select>
         </tr><tr>
           <td>DSVI <span class=unit>(mL/gTSS)      </span><input type=number id=DSVI value=120>
-          <td>A_ST <span class=unit>(m<sup>2</sup>)</span><input type=number id=A_ST value=1248.6>
+          <td>A_ST <span class=unit>(m<sup>2</sup>)</span><input type=number id=A_ST value=30000>
           <td>fq   <span class=unit>(ø)            </span><input type=number id=fq   value=2.4>
         </tr><tr>
           <td><label><input type=checkbox id=nit> Nitrification</label>
@@ -434,7 +434,7 @@
             if(fraction=='VSS')    nomenclatura='X<sub>v</sub>';
             if(fraction=='bVSS')   nomenclatura='X<sub>vb</sub>';
             if(fraction=='uVSS')   nomenclatura='X<sub>vu</sub>';
-            if(fraction=='active') nomenclatura='X<sub>BH</sub>';
+            if(fraction=='active') nomenclatura='X<sub>OHO</sub>';
           }
 
           newRow.insertCell(-1).innerHTML=nomenclatura;
@@ -529,7 +529,7 @@
     (function draw_errors(errors){
       document.querySelector('#error_counter').innerHTML=errors.length ? `(<b>${errors.length}</b>)`:'(0)';
       let div=document.querySelector('#outputs #errors');
-      div.innerHTML="";
+      div.innerHTML=errors.length?"":"<li class=error>no errors";
       errors.forEach(error=>{
         div.appendChild((function(){
           let li=document.createElement('li');

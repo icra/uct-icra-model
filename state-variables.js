@@ -85,8 +85,8 @@ class State_Variables {
       let Total_COD = bsCOD + usCOD + bpCOD + upCOD + co.X_OHO;
       let COD={
         total: Total_COD, 
-        bsCOD, usCOD, bpCOD, upCOD,
         bCOD,  uCOD,  sCOD,  pCOD,
+        bsCOD, usCOD, bpCOD, upCOD,
         active: co.X_OHO,
       };
 
@@ -105,8 +105,8 @@ class State_Variables {
       let Total_TOC = bsOC + usOC + bpOC + upOC + actOC;
       let TOC={
         total:Total_TOC,
-        bsOC, usOC, bpOC, upOC,
         bOC,  uOC,  sOC,  pOC,
+        bsOC, usOC, bpOC, upOC,
         active: actOC,
       };
 
@@ -127,8 +127,8 @@ class State_Variables {
         total:Total_TKN,
         FSA:co.S_FSA,
         ON:sON+pON, 
-        bsON, usON, bpON, upON,
         bON,  uON,  sON,  pON,
+        bsON, usON, bpON, upON,
         active: actON,
       }
 
@@ -149,8 +149,8 @@ class State_Variables {
         total:Total_TP,
         PO4:co.S_OP,
         OP:sOP+pOP,
-        bsOP, usOP, bpOP, upOP,
         bOP,  uOP,  sOP,  pOP,
+        bsOP, usOP, bpOP, upOP,
         active: actOP,
       };
 

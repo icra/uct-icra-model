@@ -15,11 +15,6 @@ Implemented by Lluís Bosch.
   - [model]     add a.prac as new input for denitrification.
   - [model]     take out balances code from technologies and calculate after processes.
   - [model]     refactor plant model into its own repository.
-  - [model] warnings module:
-    - Reactor kgTSS (MX.T) above the limit (given a reactor volume Vp)
-    - fxt > fxm.
-    - Rs  < Rsm.
-    - effluent alkalinity < 50 mg/L as CaCO3.
 
 ## Future / new functionality to be added
   - energy consumption module.
@@ -43,9 +38,7 @@ Implemented by Lluís Bosch.
   - [model] extra-iSS produced in CPR to wastage and MX-IO
   - [model] influent nitrate (NOx): if we have influent NOx, TOD balance not closing.
   - [model] OHO as a new state variable
-  - [model] kg of FeCl3 added is not equal to the extra iSS produced
-    (for example 3000 kg FeCl3 produces ~2500 kg iSS. The remaining ~500 kg is
-    Cl(-) ion?).
+  - [model] kg of FeCl3 added is not equal to the extra iSS produced (for example 3000 kg FeCl3 produces ~2500 kg iSS. The remaining ~500 kg is Cl(-) ion?).
   - [as model] let Dp1RBSO = Sbsi·(1-fCV·YH)/2.86;
   - [river] R20 and k for NH4 and PO4
   - [river] names S-OP and S-FSA to PO4 and NH4 in the interface only
@@ -53,6 +46,7 @@ Implemented by Lluís Bosch.
   - [done] architecture class diagram.
   - [done] integrate constants.js to the code.
   - [done] integrate X.tave loop + Q.ADWF.max in a new process.
+  - [done] warnings module
 
 ## List of process types
   - MLE (Modified Ludzack Ettinger) <-- **this model**
