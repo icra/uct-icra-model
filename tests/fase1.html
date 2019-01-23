@@ -157,34 +157,41 @@
           <td><input id=f_C_OHO  type=number value=0.5180 step=0.0010>
           <td><input id=f_N_OHO  type=number value=0.1000 step=0.1000>
           <td><input id=f_P_OHO  type=number value=0.0250 step=0.0010>
+        </tr>
       </table>
 
       <!--constants--><div><code onclick=toggle_visibility('#constants',this)>[+] Kinetic parameters</code></div>
       <table id=constants style=display:none>
-        <tr><td colspan=3>Activated sludge
-        <tr title="heterotrophic VSS/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.450 step=0.01 ><td class=unit>gVSS/gCOD
-        <tr title="heterotrophic endogenous respiration rate at 20ºC"><td>bH                      <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
-        <tr title="bH temperature correction factor"                 ><td>&theta;<sub>bH</sub>    <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
-        <tr title="not degraded bCOD (FBSO)"                         ><td>k_v20                   <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
-        <tr title="k_v20 temperature correction factor"              ><td>&theta;<sub>k_v20</sub> <td><input id="theta_k_v20" type=number value=1.035 step=0.001><td class=unit>ø
-        <tr title="endogenous residue fraction"                      ><td>fH                      <td><input id="fH"          type=number value=0.200 step=0.1  ><td class=unit>ø
-        <tr title="iSS content of OHOs"                              ><td>f_iOHO                  <td><input id="f_iOHO"      type=number value=0.150 step=0.01 ><td class=unit>giSS/gVSS
-        <tr><td colspan=3>Nitrification
-        <tr title="autotrophic max specific growth rate at 20ºC"     ><td>µAm                  <td><input id="µAm"       type=number value=0.450 step=0.01 ><td class=unit>1/d
-        <tr title="µAm temperature correction factor"                ><td>&theta;<sub>µAm</sub><td><input id="theta_µAm" type=number value=1.123 step=0.001><td class=unit>ø
-        <tr title="autotrophic oxygen half saturation coefficient"   ><td>K_O                  <td><input id="K_O"       type=number value=0.400 step=0.1  ><td class=unit>mgO/L
-        <tr title="autotrophic pH sensitivity coefficient"           ><td>&theta;<sub>pH</sub> <td><input id="theta_pH"  type=number value=2.350 step=0.01 ><td class=unit>ø
-        <tr title="autotrophic pH inhibition Ki"                     ><td>Ki                   <td><input id="Ki"        type=number value=1.130 step=0.01 ><td class=unit>ø
-        <tr title="autotrophic pH inhibition Kii"                    ><td>Kii                  <td><input id="Kii"       type=number value=0.300 step=0.1  ><td class=unit>ø
-        <tr title="autotrophic pH inhibition Kmax"                   ><td>Kmax                 <td><input id="Kmax"      type=number value=9.500 step=0.1  ><td class=unit>ø
-        <tr title="autotrophic VSS/FSA yield at 20ºC"                ><td>YA                   <td><input id="YA"        type=number value=0.100 step=0.1  ><td class=unit>gVSS/gFSA
-        <tr title="ammonia half saturation coefficient at 20ºC"      ><td>Kn                   <td><input id="Kn"        type=number value=1.000 step=0.1  ><td class=unit>mg/L
-        <tr title="Kn temperature correction factor"                 ><td>&theta;<sub>Kn</sub> <td><input id="theta_Kn"  type=number value=1.123 step=0.001><td class=unit>ø
-        <tr title="autotrophic endogenous respiration rate at 20ºC"  ><td>bA                   <td><input id="bA"        type=number value=0.040 step=0.01 ><td class=unit>1/d
-        <tr title="bA temperature correction factor"                 ><td>&theta;<sub>bA</sub> <td><input id="theta_bA"  type=number value=1.029 step=0.001><td class=unit>ø
-        <tr><td colspan=3>Denitrification
-        <tr title="K denitrification rate 2 at 20ºC"                 ><td>K2_20                <td><input id="K2_20"     type=number value=0.101 step=0.001><td class=unit>gN/gVSS·d
-        <tr title="K2_20 temperature correction factor"              ><td>&theta;<sub>K2</sub> <td><input id="theta_K2"  type=number value=1.080 step=0.001><td class=unit>ø
+        <tr><td colspan=3><code onclick="toggle_visibility('#constants #as',this)">[-] Activated sludge</code>
+        <tbody id=as>
+          <tr title="heterotrophic VSS/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.450 step=0.01 ><td class=unit>gVSS/gCOD
+          <tr title="heterotrophic endogenous respiration rate at 20ºC"><td>bH                      <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
+          <tr title="bH temperature correction factor"                 ><td>&theta;<sub>bH</sub>    <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
+          <tr title="not degraded bCOD (FBSO)"                         ><td>k_v20                   <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
+          <tr title="k_v20 temperature correction factor"              ><td>&theta;<sub>k_v20</sub> <td><input id="theta_k_v20" type=number value=1.035 step=0.001><td class=unit>ø
+          <tr title="endogenous residue fraction"                      ><td>fH                      <td><input id="fH"          type=number value=0.200 step=0.1  ><td class=unit>ø
+          <tr title="iSS content of OHOs"                              ><td>f_iOHO                  <td><input id="f_iOHO"      type=number value=0.150 step=0.01 ><td class=unit>giSS/gVSS
+        </tbody>
+        <tr><td colspan=3><code onclick="toggle_visibility('#constants #nit',this)">[-] Nitrification</code>
+        <tbody id=nit>
+          <tr title="autotrophic max specific growth rate at 20ºC"     ><td>µAm                  <td><input id="µAm"       type=number value=0.450 step=0.01 ><td class=unit>1/d
+          <tr title="µAm temperature correction factor"                ><td>&theta;<sub>µAm</sub><td><input id="theta_µAm" type=number value=1.123 step=0.001><td class=unit>ø
+          <tr title="autotrophic oxygen half saturation coefficient"   ><td>K_O                  <td><input id="K_O"       type=number value=0.400 step=0.1  ><td class=unit>mgO/L
+          <tr title="autotrophic pH sensitivity coefficient"           ><td>&theta;<sub>pH</sub> <td><input id="theta_pH"  type=number value=2.350 step=0.01 ><td class=unit>ø
+          <tr title="autotrophic pH inhibition Ki"                     ><td>Ki                   <td><input id="Ki"        type=number value=1.130 step=0.01 ><td class=unit>ø
+          <tr title="autotrophic pH inhibition Kii"                    ><td>Kii                  <td><input id="Kii"       type=number value=0.300 step=0.1  ><td class=unit>ø
+          <tr title="autotrophic pH inhibition Kmax"                   ><td>Kmax                 <td><input id="Kmax"      type=number value=9.500 step=0.1  ><td class=unit>ø
+          <tr title="autotrophic VSS/FSA yield at 20ºC"                ><td>YA                   <td><input id="YA"        type=number value=0.100 step=0.1  ><td class=unit>gVSS/gFSA
+          <tr title="ammonia half saturation coefficient at 20ºC"      ><td>Kn                   <td><input id="Kn"        type=number value=1.000 step=0.1  ><td class=unit>mg/L
+          <tr title="Kn temperature correction factor"                 ><td>&theta;<sub>Kn</sub> <td><input id="theta_Kn"  type=number value=1.123 step=0.001><td class=unit>ø
+          <tr title="autotrophic endogenous respiration rate at 20ºC"  ><td>bA                   <td><input id="bA"        type=number value=0.040 step=0.01 ><td class=unit>1/d
+          <tr title="bA temperature correction factor"                 ><td>&theta;<sub>bA</sub> <td><input id="theta_bA"  type=number value=1.029 step=0.001><td class=unit>ø
+        </tbody>
+        <tr><td colspan=3><code onclick="toggle_visibility('#constants #dn',this)">[-] Denitrification</code>
+        <tbody id=dn>
+          <tr title="K denitrification rate 2 at 20ºC"                 ><td>K2_20                <td><input id="K2_20"     type=number value=0.101 step=0.001><td class=unit>gN/gVSS·d
+          <tr title="K2_20 temperature correction factor"              ><td>&theta;<sub>K2</sub> <td><input id="theta_K2"  type=number value=1.080 step=0.001><td class=unit>ø
+        </tbody>
       </table>
     </div>
   </div>
@@ -209,7 +216,7 @@
       <!--fractionation-->
       <div>
         <code onclick="toggle_visibility('#outputs #fractionation',this)">
-          [+] Fractionation <b style=background:#af0>&nbsp;new!&nbsp;</b>
+          [+] Fractionation
         </code>
       </div>
       <div id=fractionation style="display:none"></div>
@@ -330,24 +337,17 @@
     /*backend end-------*/
 
     /*GUI integration*/
-    //recopila summaries variables d'estat (per ordre)
-    let summaries = {};
-    summaries.Influent                      = plant.influent.summary;
-    if(conf.pst) summaries.Primary_wastage  = run.primary.wastage.summary;
-    if(conf.pst) summaries.Primary_effluent = run.primary.effluent.summary;
-    summaries.Secondary_wastage             = run.secondary.wastage.summary;
-    summaries.Secondary_effluent            = run.secondary.effluent.summary;
-
-    //recopila variables d'estat (per ordre)
-    let svs = {};
-    svs.Influent                      = plant.influent;         //state variables object
-    if(conf.pst) svs.Primary_wastage  = run.primary.wastage;    //state variables object
-    if(conf.pst) svs.Primary_effluent = run.primary.effluent;   //state variables object
-    svs.Secondary_wastage             = run.secondary.wastage;  //state variables object
-    svs.Secondary_effluent            = run.secondary.effluent; //state variables object
 
     //dibuixa fractionation columnes
-    (function draw_fractionation(svs){
+    (function draw_fractionation(){
+      //recopila variables d'estat (per ordre)
+      let svs = {};
+      svs.Influent                      = plant.influent;         //state variables object
+      if(conf.pst) svs.Primary_wastage  = run.primary.wastage;    //state variables object
+      if(conf.pst) svs.Primary_effluent = run.primary.effluent;   //state variables object
+      svs.Secondary_wastage             = run.secondary.wastage;  //state variables object
+      svs.Secondary_effluent            = run.secondary.effluent; //state variables object
+
       if(Object.keys(svs).length==0)return;
       let div   = document.querySelector('div#fractionation');div.innerHTML=""; //buida div summaries
       let table = document.createElement('table');div.appendChild(table);       //crea nova taula
@@ -448,10 +448,18 @@
           });
         });
       });
-    })(svs);
+    })();
 
     //dibuixa summaries en columnes
-    (function draw_summaries(summaries){
+    (function draw_summaries(){
+      //recopila summaries variables d'estat (per ordre)
+      let summaries = {};
+      summaries.Influent                      = plant.influent.summary;
+      if(conf.pst) summaries.Primary_wastage  = run.primary.wastage.summary;
+      if(conf.pst) summaries.Primary_effluent = run.primary.effluent.summary;
+      summaries.Secondary_wastage             = run.secondary.wastage.summary;
+      summaries.Secondary_effluent            = run.secondary.effluent.summary;
+
       if(Object.keys(summaries).length==0)return;
       let div   = document.querySelector('div#summaries'); div.innerHTML=""; //buida div summaries
       let table = document.createElement('table');div.appendChild(table);    //crea nova taula
@@ -476,49 +484,50 @@
             let conc_txt = format(conc);
             let flux_txt = format(flux);
             if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc_txt = flux_txt = "<span style=color:#ccc>ø</span>"; }
-            newRow.insertCell(-1).outerHTML=`<td class=number conc value=${conc}>${conc_txt}</td>`;
-            newRow.insertCell(-1).outerHTML=`<td class=number flux value=${flux}>${flux_txt}</td>`;
+            newRow.insertCell(-1).outerHTML=`<td class=number conc title=${conc}>${conc_txt}</td>`;
+            newRow.insertCell(-1).outerHTML=`<td class=number flux title=${flux}>${flux_txt}</td>`;
           }
         });
       });
-    })(summaries);
-
-    //recopila process_variables
-    let processes = document.querySelector('#processes'); processes.innerHTML="";
-    let pvs = {};
-                 pvs.Activated_sludge   = run.process_variables.as;
-    if(conf.nit) pvs.Nitrification      = run.process_variables.nit;
-    if(conf.dn)  pvs.Denitrification    = run.process_variables.dn;
-    if(conf.cpr) pvs.Chemical_P_removal = run.process_variables.cpr;
+    })();
 
     //dibuixa process variables (pvs)
-    Object.entries(pvs).forEach(([key,pv])=>{
-      //container pel key i la taula: <div><div>key</div><table></table></div>
-      let div = document.createElement('div'); processes.appendChild(div);
+    (function draw_pvs(){
+      //recopila process_variables
+      let processes = document.querySelector('#processes'); processes.innerHTML="";
+      let pvs = {};
+                   pvs.Activated_sludge   = run.process_variables.as;
+      if(conf.nit) pvs.Nitrification      = run.process_variables.nit;
+      if(conf.dn)  pvs.Denitrification    = run.process_variables.dn;
+      if(conf.cpr) pvs.Chemical_P_removal = run.process_variables.cpr;
 
-      //nom tecnologia
-      let nom = document.createElement('code'); div.appendChild(nom);
-      nom.style.fontSize='small';
-      nom.innerHTML=`${key.replace(/_/g,' ')}&nbsp;`;
+      Object.entries(pvs).forEach(([key,pv])=>{
+        //container pel key i la taula: <div><div>key</div><table></table></div>
+        let div = document.createElement('div'); processes.appendChild(div);
 
-      //taula process variables
-      let table = document.createElement('table'); div.appendChild(table);
-      Object.entries(pv).forEach(([key,obj])=>{
-        let newRow = table.insertRow(-1);
-        newRow.id=key;
-        let value = obj.value;
-        newRow.value=value;
-        newRow.setAttribute('title',obj.descr);
-        newRow.insertCell(-1).innerHTML=key;
-        newRow.insertCell(-1).outerHTML=`<td class=number title='${value}'><small>${format(value)}</small>`;
-        newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
+        //nom tecnologia
+        let nom = document.createElement('code'); div.appendChild(nom);
+        nom.style.fontSize='small';
+        nom.innerHTML=`${key.replace(/_/g,' ')}&nbsp;`;
+
+        //taula process variables
+        let table = document.createElement('table'); div.appendChild(table);
+        Object.entries(pv).forEach(([key,obj])=>{
+          let newRow = table.insertRow(-1);
+          newRow.id=key;
+          let value = obj.value;
+          newRow.value=value;
+          newRow.setAttribute('title',obj.descr);
+          newRow.insertCell(-1).innerHTML=key;
+          newRow.insertCell(-1).outerHTML=`<td class=number title='${value}'><small>${format(value)}</small>`;
+          newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
+        });
       });
-    });
+    })();
 
     //dibuixa errors
-    //dibuixa summaries en columnes
     (function draw_errors(errors){
-      document.querySelector('#error_counter').innerHTML=errors.length ? `<span style=background:yellow>(${errors.length})</span>`:'(0)';
+      document.querySelector('#error_counter').innerHTML=errors.length ? `(<b>${errors.length}</b>)`:'(0)';
       let div=document.querySelector('#outputs #errors');
       div.innerHTML="";
       errors.forEach(error=>{
