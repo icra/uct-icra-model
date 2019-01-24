@@ -7,6 +7,7 @@
 ## Status: under development 
 
 ## next call george ekama
+  - interaction between Rs/Rsm/Rs.bal/IR/a.opt/a.prac.
   - discuss with lluís corominas EBPR.
   - discuss pH effect on chemical P removal.
 
