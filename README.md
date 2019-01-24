@@ -7,7 +7,8 @@
 ## Status: under development 
 
 ## next call george ekama
-  - interaction between Rs/Rsm/Rs.bal/IR/a.opt/a.prac.
+  - validate test values of X.tave and Q.ADWF in the user interface
+  - validate test values of Rs/Rsm/Rs.bal/IR/a.opt/a.prac
   - discuss with lluís corominas EBPR.
   - discuss pH effect on chemical P removal.
 
@@ -26,7 +27,7 @@
 ## Done/solved/clear/discussed
   - [model] K.O in ASM1 = 0.4
   - [model] confirm final Rsm formula (min sludge age to ensure nitrification).
-  - [model] add errors in nitrification when: (1) fxt > fxm, (2) Rs  < Rsm
+  - [model] add errors in nitrification when: (1) fxt > fxm, (2) Rs < Rsm
   - [model] add incomplete BOD removal
   - [model] mass of nitrifiers (MX-BA) no worry about it (<3% of MX-T)
   - [model] anoxic volume (fxt related)

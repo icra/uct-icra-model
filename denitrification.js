@@ -171,6 +171,14 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   effluent.mass_ratios = this.mass_ratios;
   wastage.mass_ratios  = this.mass_ratios;
 
+  let bHT = nit.as_process_variables.bHT.value; //1/d
+
+  //calculate fx1min: minimum primary anoxic sludge mass fraction required to utilitze all the readily biodegradable organics (BSO)
+  let fx1min = fSb_s*(1-fCV*YH)*(1+bHT*Rs)/(2.86*K1T*YH*Rs);
+
+  //check if fxt is lower than fx1min and raise an error
+  if(fxt<fx1min) errors.push("fxt < fx1min");
+
   //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3, between equation 11 and 12
   let Rs_bal = (function(){
     //inputs
@@ -181,17 +189,15 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     let s    = RAS;                                 //ø
     let µA   = nit.process_variables.µAm_pH.value;  //1/d
     let fSup = nit.as_process_variables.fSup.value; //ø | gUPO/gCOD
-    let bHT  = nit.as_process_variables.bHT.value;  //1/d
     let bAT  = nit.process_variables.bAT.value;     //1/d
     //intermediate calculations necessary for computing Rs_bal
-    let A      = Sbi;                       //mgCOD/L | VFA + FBSO + BPO
-    let B      = fSb_s*(1-fCV_OHO*YH)/2.86; //mg/L
-    let C      = Nti - Nte;                 //mgN/L
-    let D      = (a_prac*Oa + s*Os)/2.86;   //unit missing
-    let E      = (a_prac+s)/(a_prac+s+1);   //unit missing
+    let A      = Sbi;                     //mgCOD/L | VFA + FBSO + BPO
+    let B      = fSb_s*(1-fCV*YH)/2.86;   //mg/L
+    let C      = Nti - Nte;               //mgN/L
+    let D      = (a_prac*Oa + s*Os)/2.86; //unit missing
+    let E      = (a_prac+s)/(a_prac+s+1); //unit missing
     let Rs_top = C*E+D-A*B+A*SF*K2T*YH/µA-E*(f_N_OHO*A*YH+f_N_UPO*Sti*fSup/fCV_UPO);                               //numerator
     let Rs_bot = A*(B*bHT+K2T*YH)-A*SF*bAT*K2T*YH/µA-bHT*(C*E+D)+E*bHT*(f_N_OHO*A*YH*fH+f_N_UPO*Sti*fSup/fCV_UPO); //denominator
-    //Rs balanced
     let Rs_bal = Rs_top/Rs_bot;
     return Rs_bal;
   })();
@@ -206,6 +212,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     Dp1          :{value:Dp1          ,unit:"mgN/L"      ,descr:"Denitrification potential"},
     a            :{value:a            ,unit:"ø"          ,descr:"IR (internal recirculation ratio)"},
     a_opt        :{value:a_opt        ,unit:"ø"          ,descr:"optimal IR"},
+    fx1min       :{value:fx1min,       unit:"ø",          descr:"minimum primary anoxic sludge mass fraction required to utilize all readily biodegradable organics (VFA and FBSO)"},
     Rs_bal       :{value:Rs_bal       ,unit:"d"          ,descr:"SRT balanced (misssing more accurate description)"}, //TODO
     Nne          :{value:Nne          ,unit:"mgN/L"      ,descr:"Effluent nitrate"},
     Nne_opt      :{value:Nne_opt      ,unit:"mgN/L"      ,descr:"Lowest effluent nitrate (using a_opt)"},

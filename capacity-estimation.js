@@ -27,7 +27,6 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
 
   //console.log({DSVI,A_ST,fq});//debug
   //console.log({SSVI,V0_n,n,V0,H});//debug
-
   //X_tave (=x) is found using the newton-raphson method
   //f(x) = x - H*e^(-n*x)
   //can be also expressed as: H = x*e^(n*x)
@@ -38,12 +37,12 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   }
 
   //start at X_tave=1
-  let x  = 1;                  //initial value for x
+  let x  = 10;                 //initial value for x
   let x0 = x;                  //current value for x
   let x1 = newton_raphson(x0); //next value for x
   let iterations = 0;          //iterations counter
   while(true){
-    //console.log({x0,x1}); //debug
+    //console.log({x0,x1});//debug
     //check if solution has been found or didn't converge
     if(Math.abs(x0-x1) < 0.0000001 || iterations > 1000){ 
       //console.log({iterations}); //debug
@@ -51,16 +50,19 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
     }else{
       x0 = newton_raphson(x1); //update x0
       x1 = newton_raphson(x0); //update x1
+      if(isNaN(x1)) x1 = Math.random()*100;
       iterations++;            //add 1 to iterations
     }
   }
   let X_tave = x1;                //kgTSS/m3 | take the last iteration of x1
   let Q_ADWF = VR*X_tave/(L*Sti); //ML/d     | capacity of the treatment plant
-  return {
+  let results={
     iterations, //iterations done to compute X_tave
     X_tave:{value:X_tave, unit:"kgTSS/m3", descr:"Average TSS conccentration in reactor"},
     Q_ADWF:{value:Q_ADWF, unit:"ML/d",     descr:"Average dry weather flow"},
   }
+  console.log(results);
+  return results;
 }
 
 //export function
