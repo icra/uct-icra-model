@@ -87,13 +87,13 @@
 
       <!--plant--><div><code onclick=toggle_visibility('#edar',this)>[-] Plant inputs</code></div>
       <table id=edar style=font-size:smaller>
-        <tr id=pst>
+        <tr id=tr_pst>
           <td><label><input type=checkbox id=pst> Primary settler</label>
           <td title="Fraction of Q that goes to wastage">fw                   <span class=unit>(ø)</span><input type=number id=fw          value=0.005>
           <td title="Removal of X_BPO"                  >removal<sub>BPO</sub><span class=unit>(%)</span><input type=number id=removal_BPO value=42.3352>
           <td title="Removal of X_UPO"                  >removal<sub>UPO</sub><span class=unit>(%)</span><input type=number id=removal_UPO value=90.0500>
           <td title="Removal of X_iSS"                  >removal<sub>iSS</sub><span class=unit>(%)</span><input type=number id=removal_iSS value=75.1250>
-        </tr><tr id=as>
+        </tr><tr id=tr_as>
           <td rowspan=2><label><input type=checkbox id=as checked=true disabled> Activated sludge</label>
           <td title="Temperature"                        >T  <span class=unit>(ºC)</span>           <input type=number id=T   value=16>
           <td title="Reactor volume"                     >Vp <span class=unit>(m<sup>3</sup>)</span><input type=number id=Vp  value=8473.3>
@@ -104,18 +104,18 @@
           <td title="Area of secondary settler">A_ST<span class=unit>(m<sup>2</sup>)</span><input type=number id=A_ST value=30000>
           <td title="Peak flow (Qmax/Qavg)"    >fq  <span class=unit>(ø)            </span><input type=number id=fq   value=2.4>
           <td title="Origin of wastage"        >waste from<select id=waste_from><option>reactor<option>sst</select>
-        </tr><tr id=nit>
+        </tr><tr id=tr_nit>
           <td><label><input type=checkbox id=nit> Nitrification</label>
           <td title="Safety factor"               >SF  <span class=unit>(ø)</span>   <input type=number id=SF  value=1.25>
           <td title="Fraction of unaerated sludge">fxt <span class=unit>(ø)</span>   <input type=number id=fxt value=0.39>
           <td title="Dissolved oxygen (reactor)"  >DO  <span class=unit>(mg/L)</span><input type=number id=DO  value=2.0 >
           <td title="pH"                          >pH  <span class=unit>(ø)</span>   <input type=number id=pH  value=7.2 >
-        </tr><tr id=dn>
+        </tr><tr id=tr_dn>
           <td><label><input type=checkbox id=dn> Denitrification</label>
           <td title="Internal Recycle Ratio"                   >IR                    <span class=unit>(ø)   </span><input type=number id=IR           value=5.4>
           <td title="Oxygen dissolved in the underflow recycle">DO<sub>RAS</sub>      <span class=unit>(mg/L)</span><input type=number id=DO_RAS       value=1.0>
           <td title="Influent alkalinity"                      >influent<sub>alk</sub><span class=unit>(mg/L)</span><input type=number id=influent_alk value=250>
-        </tr><tr id=cpr>
+        </tr><tr id=tr_cpr>
           <td><label><input type=checkbox id=cpr> Chemical P removal</label>
           <td title="Mass of FeCl3 added for P removal">FeCl<sub>3</sub> <span class=unit>(kg/d)</span> <input type=number id=mass_FeCl3 value=3000>
         </tr>
@@ -616,7 +616,7 @@
   //disable plant inputs when technology checkbox is not enabled
   document.querySelectorAll('#inputs #edar input[type=checkbox][id]').forEach(input=>{
     function disable_inner_inputs(el){
-      document.querySelectorAll(`#inputs #edar tr#${el.id} input[id]`).forEach(inp=>{
+      document.querySelectorAll(`#inputs #edar tr#tr_${el.id} input[id]`).forEach(inp=>{
         if(inp.id==el.id)return;
         inp.disabled=!el.checked;
       });
