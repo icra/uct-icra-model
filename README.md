@@ -8,13 +8,12 @@
 
 ## next call george ekama
   - discuss with lluís corominas EBPR.
-  - pH effect on chemical P removal.
+  - discuss pH effect on chemical P removal.
 
 ## Lluís B. tasks (ordered by priority)
-  - [done]  add check for exported URL above 2k characters.
   - [model] add a.prac as new input for denitrification.
   - [model] refactor plant model into its own repository.
-  - [model] take out balances code from technologies and calculate after processes.
+  - [model] take out balances code from technologies and calculate after processes (pst+as+cpr+nit+dn).
 
 ## Future / new functionality to be added
   - energy consumption module.
@@ -46,6 +45,7 @@
   - [done] integrate constants.js to the code.
   - [done] integrate X.tave loop + Q.ADWF.max in a new process.
   - [done] warnings module
+  - [done] add check for exported URL above 2k characters.
 
 ## List of process types
   - MLE (Modified Ludzack Ettinger) <-- **this model**

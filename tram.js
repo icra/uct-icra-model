@@ -15,14 +15,14 @@ class Tram {
     this.Ti = isNaN(Ti)  ? 12    : Ti; //ºC | temperatura
 
     //trams connectats upstream (pares). Definits per l'usuari.
-    this.pares=[]; /*array <Tram>*/
+    this.pares=[];/*[<Tram>]*/
 
     //State Variables(Q, VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx, OHO) (inici del tram)
     //convert flowrate to ML/d (converted from m3/s)
-    this.state_variables = new State_Variables(this.Qi*86.4,0,0,0,0,0,0,0,0,0,0);
+    this.state_variables=new State_Variables(this.Qi*86.4,0,0,0,0,0,0,0,0,0,0);
 
-    //EDAR que aboca al tram (per defecte no n'hi ha)
-    this.wwtp = null; //<State_Variables>
+    //Planta que aboca al tram (per defecte no n'hi ha)
+    this.plant=null;//<Plant>
   }
 
   /*Resultats*/

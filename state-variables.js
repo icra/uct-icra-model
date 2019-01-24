@@ -6,9 +6,9 @@
   technologies are: 
     "primary-settler", 
     "activated-sludge", 
+    "chemical-P-removal"
     "nitrification", 
     "denitrification",
-    "chemical-P-removal"
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
     Qi → [PST] → [AS] → [nitrification] → Qe
@@ -70,18 +70,18 @@ class State_Variables {
 
   //calculate totals and complete fractionation for [COD, TKN, TP, TOC,TSS]
   get totals(){
-    let mr = this.mass_ratios; //alias for code reduction
-    let co = this.components;  //alias for code reduction
+    let mr=this.mass_ratios;//alias for code reduction
+    let co=this.components; //alias for code reduction
 
-    //COD all fractions
-      let bsCOD = co.S_VFA + co.S_FBSO;
-      let usCOD = co.S_USO;
-      let bpCOD = co.X_BPO;
-      let upCOD = co.X_UPO;
-      let bCOD = bsCOD + bpCOD;
-      let uCOD = usCOD + upCOD;
-      let sCOD = bsCOD + usCOD;
-      let pCOD = bpCOD + upCOD;
+    //COD all fractions (Chemical Oxygen Demand)
+      let bsCOD = co.S_VFA + co.S_FBSO; //bio   + soluble COD
+      let usCOD = co.S_USO;             //unbio + soluble COD
+      let bpCOD = co.X_BPO;             //bio   + partic  COD
+      let upCOD = co.X_UPO;             //unbio + partic  COD
+      let  bCOD = bsCOD + bpCOD;        //bio             COD
+      let  uCOD = usCOD + upCOD;        //unbio           COD
+      let  sCOD = bsCOD + usCOD;        //soluble         COD
+      let  pCOD = bpCOD + upCOD;        //partic          COD
       let Total_COD = bsCOD + usCOD + bpCOD + upCOD + co.X_OHO;
       let COD={
         total: Total_COD, 
@@ -90,18 +90,16 @@ class State_Variables {
         active: co.X_OHO,
       };
 
-    //TOC all fractions
-      let bsOC = 
-        co.S_VFA  * mr.f_C_VFA  / mr.f_CV_VFA +
-        co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO;
-      let usOC = co.S_USO * mr.f_C_USO / mr.f_CV_USO;
-      let bpOC = co.X_BPO * mr.f_C_BPO / mr.f_CV_BPO;
-      let upOC = co.X_UPO * mr.f_C_UPO / mr.f_CV_UPO;
-      let bOC = bsOC + bpOC;
-      let uOC = usOC + upOC;
-      let sOC = bsOC + usOC;
-      let pOC = bpOC + upOC;
-      let actOC = co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO;
+    //TOC all fractions (Total Organic Carbon)
+      let bsOC = co.S_VFA * mr.f_C_VFA / mr.f_CV_VFA + co.S_FBSO * mr.f_C_FBSO / mr.f_CV_FBSO; //bio   + soluble OC
+      let usOC = co.S_USO * mr.f_C_USO / mr.f_CV_USO;                                          //unbio + soluble OC
+      let bpOC = co.X_BPO * mr.f_C_BPO / mr.f_CV_BPO;                                          //bio   + partic  OC
+      let upOC = co.X_UPO * mr.f_C_UPO / mr.f_CV_UPO;                                          //unbio + partic  OC
+      let  bOC = bsOC + bpOC;                                                                  //bio             OC
+      let  uOC = usOC + upOC;                                                                  //unbio           OC
+      let  sOC = bsOC + usOC;                                                                  //soluble         OC
+      let  pOC = bpOC + upOC;                                                                  //partic          OC
+      let actOC = co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO;                                         //OC in active biomass (OHO)
       let Total_TOC = bsOC + usOC + bpOC + upOC + actOC;
       let TOC={
         total:Total_TOC,
@@ -110,40 +108,36 @@ class State_Variables {
         active: actOC,
       };
 
-    //ON all fractions (TKN=ON+NH4)
-      let bsON = 
-        co.S_VFA  * mr.f_N_VFA  / mr.f_CV_VFA +
-        co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO;
-      let usON = co.S_USO * mr.f_N_USO / mr.f_CV_USO;
-      let bpON = co.X_BPO * mr.f_N_BPO / mr.f_CV_BPO;
-      let upON = co.X_UPO * mr.f_N_UPO / mr.f_CV_UPO;
-      let bON = bsON + bpON;
-      let uON = usON + upON;
-      let sON = bsON + usON;
-      let pON = bpON + upON;
-      let actON = co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO;
+    //TKN all fractions (Organic Nitrogen (ON) + Inorganic Free Saline Ammonia (FSA))
+      let bsON = co.S_VFA * mr.f_N_VFA / mr.f_CV_VFA + co.S_FBSO * mr.f_N_FBSO / mr.f_CV_FBSO; //bio   + soluble ON
+      let usON = co.S_USO * mr.f_N_USO / mr.f_CV_USO;                                          //unbio + soluble ON
+      let bpON = co.X_BPO * mr.f_N_BPO / mr.f_CV_BPO;                                          //bio   + partic  ON
+      let upON = co.X_UPO * mr.f_N_UPO / mr.f_CV_UPO;                                          //unbio + partic  ON
+      let  bON = bsON + bpON;                                                                  //bio             ON
+      let  uON = usON + upON;                                                                  //unbio           ON
+      let  sON = bsON + usON;                                                                  //soluble         ON
+      let  pON = bpON + upON;                                                                  //partic          ON
+      let actON = co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO;                                         //ON in active biomass (OHO)
       let Total_TKN = co.S_FSA + bsON + usON + bpON + upON + actON;
       let TKN={
         total:Total_TKN,
         FSA:co.S_FSA,
-        ON:sON+pON, 
+        ON:sON+pON,
         bON,  uON,  sON,  pON,
         bsON, usON, bpON, upON,
         active: actON,
       }
 
-    //OP all fractions (TP=OP+PO4)
-      let bsOP = 
-        co.S_VFA  * mr.f_P_VFA  / mr.f_CV_VFA +
-        co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO;
-      let usOP = co.S_USO * mr.f_P_USO / mr.f_CV_USO;
-      let bpOP = co.X_BPO * mr.f_P_BPO / mr.f_CV_BPO;
-      let upOP = co.X_UPO * mr.f_P_UPO / mr.f_CV_UPO;
-      let bOP = bsOP + bpOP;
-      let uOP = usOP + upOP;
-      let sOP = bsOP + usOP;
-      let pOP = bpOP + upOP;
-      let actOP = co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO;
+    //TP all fractions (Organic P (OP) + Inorganic Phosphate (PO4))
+      let bsOP = co.S_VFA * mr.f_P_VFA / mr.f_CV_VFA + co.S_FBSO * mr.f_P_FBSO / mr.f_CV_FBSO; //bio   + soluble OP
+      let usOP = co.S_USO * mr.f_P_USO / mr.f_CV_USO;                                          //unbio + soluble OP
+      let bpOP = co.X_BPO * mr.f_P_BPO / mr.f_CV_BPO;                                          //bio   + partic  OP
+      let upOP = co.X_UPO * mr.f_P_UPO / mr.f_CV_UPO;                                          //unbio + partic  OP
+      let  bOP = bsOP + bpOP;                                                                  //bio             OP
+      let  uOP = usOP + upOP;                                                                  //unbio           OP
+      let  sOP = bsOP + usOP;                                                                  //soluble         OP
+      let  pOP = bpOP + upOP;                                                                  //partic          OP
+      let actOP = co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO;                                         //OP in active biomass (OHO)
       let Total_TP = co.S_OP + bsOP + usOP + bpOP + upOP + actOP;
       let TP={
         total:Total_TP,
@@ -154,12 +148,12 @@ class State_Variables {
         active: actOP,
       };
 
-    //TSS all fractions
-      let bVSS = co.X_BPO / mr.f_CV_BPO;
-      let uVSS = co.X_UPO / mr.f_CV_UPO;
-      let actVSS = co.X_OHO / mr.f_CV_OHO;
-      let Total_VSS = bVSS + uVSS + actVSS;
-      let Total_TSS = Total_VSS + co.X_iSS;
+    //TSS all fractions (Volatile Suspended Solids (VSS) + inert Suspended Solids (iSS))
+      let bVSS   = co.X_BPO / mr.f_CV_BPO;  //bio   VSS
+      let uVSS   = co.X_UPO / mr.f_CV_UPO;  //unbio VSS
+      let actVSS = co.X_OHO / mr.f_CV_OHO;  //OHO   VSS
+      let Total_VSS = bVSS + uVSS + actVSS; //total VSS
+      let Total_TSS = Total_VSS + co.X_iSS; //total TSS
       let TSS={
         total:Total_TSS,
         iSS:co.X_iSS,
@@ -217,11 +211,10 @@ class State_Variables {
   combine(sv){
     //new empty object
     let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);
-    //TODO problem with state variables with diferent mass ratios
     //new flowrate
     let Q = this.Q + sv.Q;
     new_sv.Q = Q;
-    //new concentrations: fluxes divided by new Q
+    //new concentrations: fluxes / new Q
     Object.keys(this.components).forEach(key=>{
       let mass=0;
       mass += this.Q * this.components[key];

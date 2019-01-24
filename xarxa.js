@@ -72,9 +72,9 @@ class Xarxa {
         tram_actual.state_variables.Q = 
         tram_actual.state_variables.Q = tram_actual.pares.map(p=>p.state_variables.Q).reduce((p,c)=>p+c); //g/s
 
-        //si hi ha una wwtp:
-        if(tram_actual.wwtp){
-          Mi += tram_actual.wwtp.fluxes.components[key];
+        //si hi ha una plant:
+        if(tram_actual.plant){
+          Mi += tram_actual.plant.fluxes.components[key];
         }
 
         //Massa final.  Tram.Mf(Mi, R_20,k,T)
@@ -99,18 +99,17 @@ try{
 
 /*test*/
 (function(){
-  return
+  return;
   /* 
     Exemple xarxa:
 
       t1--+
           |--> t5--+
       t2--+        |
-                  +--> t7
+                   +--> t7
       t3--+        |
           |--> t6--+
       t4--+
-
   */
   let xarxa = new Xarxa();
   let t1 = new Tram(); t1.state_variables.Q = 10; t1.state_variables.set('S_VFA',1);
