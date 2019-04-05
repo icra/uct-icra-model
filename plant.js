@@ -1,10 +1,10 @@
-/* 
+/*
   WASTEWATER TREATMENT PLANT CLASS FOR MLE
 
-             configuration, parameters 
-               ↓ ↓     
+             configuration, parameters
+               ↓ ↓
   influent → [Plant] → effluent
-               ↓ ↓     
+               ↓ ↓
              wastages (primary and secondary)
 */
 
@@ -22,9 +22,9 @@ class Plant{
   constructor(influent, configuration, parameters){
     /*
       inputs
-        - influent:      state variables object for influent
-        - configuration: object for plant configuration
-        - parameters:    object for plant parameters
+        - influent:      influent object (state variables class)
+        - configuration: plant configuration object
+        - parameters:    plant parameters object
     */
     this.influent      = influent;      //state variables object
     this.configuration = configuration; //object {pst,nit,dn,cpr}
@@ -83,10 +83,10 @@ try{module.exports=Plant;}catch(e){}
   return;
   /*
     CREATE A NEW PLANT AND RUN MODEL
-    syntax: 
+    syntax:
       let p = new Plant(influent, configuration, parameters)
       let r = p.run();
-  */ 
+  */
 
   //------------------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
   let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );

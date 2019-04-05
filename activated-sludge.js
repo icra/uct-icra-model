@@ -1,8 +1,8 @@
 /*
   AS + SST implementation from G. Ekama notes
   Qi → [Activated Sludge + SST] → Qe
-                  ↓ 
-                  Qw
+               ↓
+               Qw
 */
 //import files
 try{
@@ -18,7 +18,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   Vp  = isNaN(Vp )? 8473.3 : Vp;  //m3   | Volume
   Rs  = isNaN(Rs )? 15     : Rs;  //days | Solids Retention Time or Sludge Age
   RAS = isNaN(RAS)? 1.0    : RAS; //ø    | SST underflow recycle ratio
-  /* 
+  /*
     option 'waste_from':
 
     "reactor"       | "sst"
@@ -34,7 +34,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for P precipitation
 
   //inputs for capacity estimation module
-  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability 
+  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability
   A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
   fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
@@ -93,7 +93,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let MX_I  = FXti * Rs;             //kgVSS  | influent uVSS
   let MX_V  = MX_BH + MX_EH + MX_I;  //kgVSS  | total VSS
 
-  //2.8 - effluent Phosphorus 
+  //2.8 - effluent Phosphorus
   let Ps    = (f_P_OHO*(MX_BH+MX_EH)+f_P_UPO*MX_I)/(Rs*Q); //mgP/L | P influent required for sludge production
   let Pti   = frac.TP.total;                               //mgP/L | total P influent
   let Pouse = frac.TP.usOP;                                //mgP/L | P organic unbiodegradable soluble effluent
@@ -150,7 +150,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let f_avOHO = MX_BH/MX_V; //gOHOVSS/gVSS | fraction of active biomass in VSS
   let f_atOHO = fi*f_avOHO; //gOHOVSS/gTSS | fraction of active biomass in TSS
 
-  //2.6 - Nitrogen - page 12 
+  //2.6 - Nitrogen - page 12
   let Ns    = (f_N_OHO*(MX_BH+MX_EH)+f_N_UPO*MX_I)/(Rs*Q); //mgN/L | N in influent required for sludge production
   let Nti   = frac.TKN.total;                              //mgN/L | total TKN influent
   let Nobsi = frac.TKN.bsON;                               //mgN/L | bsON influent (VFA + FBSO)
@@ -184,7 +184,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
   //output streams------------------(Q,  VFA FBSO BPO      UPO      USO   iSS      FSA  OP   NOx  OHO    )
   let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae, Pse, Nne, 0      );
-  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was); 
+  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was);
 
   //copy influent mass ratios
   effluent.mass_ratios = this.mass_ratios;
@@ -242,7 +242,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //process_variables
   let process_variables={
     fSus    :{value:fSus,      unit:"gUSO/gCOD",   descr:"USO/COD ratio (influent)"},
-    fSup    :{value:fSup,      unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"}, 
+    fSup    :{value:fSup,      unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"},
     Ns      :{value:Ns,        unit:"mgN/L",       descr:"N required for sludge production"},
     Ps      :{value:Ps,        unit:"mgN/L",       descr:"P required for sludge production"},
     HRT     :{value:HRT,       unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
@@ -290,10 +290,10 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 /*test*/
 (function(){
   return
-  //syntax---------------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx OHO)
-  let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0,  0  ); //settled ww
-  //syntax---------------------(T   Vp      Rs  RAS  waste_from mass_FeCl3)
-  let as = inf.activated_sludge(16, 8473.3, 15, 1.0, 'reactor', 3000);
+  //---------------------------(     Q  VFA FBSO  BPO  UPO USO iSS   FSA    OP  NOx OHO)
+  let inf = new State_Variables(24.875,  50, 115, 255,  10, 45, 15, 39.1, 7.28,   0,  0);
+  //---------------------------(T       Vp  Rs  RAS  waste_from mass_FeCl3)
+  let as = inf.activated_sludge(16, 8473.3, 15, 1.0,  'reactor',      3000);
   //show results
   console.log("=== AS process variables");   console.log(as.process_variables);
   console.log("=== AS chemical P removal "); console.log(as.cpr);

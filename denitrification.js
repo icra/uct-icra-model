@@ -182,7 +182,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3, between equation 11 and 12
   let Rs_bal = (function(){
     //inputs
-    let a_prac = a_opt; //this might need to be its own input instead TODO check with George
+    let a_prac = IR; //this might need to be its own input instead TODO check with George
     //necessary variables for computing Rs_bal
     let Oa   = DO;                                  //mgO/L
     let Os   = DO_RAS;                              //mgO/L
@@ -213,7 +213,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     a            :{value:a            ,unit:"ø"          ,descr:"IR (internal recirculation ratio)"},
     a_opt        :{value:a_opt        ,unit:"ø"          ,descr:"optimal IR"},
     fx1min       :{value:fx1min,       unit:"ø",          descr:"minimum primary anoxic sludge mass fraction required to utilize all readily biodegradable organics (VFA and FBSO)"},
-    Rs_bal       :{value:Rs_bal       ,unit:"d"          ,descr:"SRT balanced (misssing more accurate description)"}, //TODO
+    Rs_bal       :{value:Rs_bal       ,unit:"d"          ,descr:"SRT balanced (shortest sludge age for input wastewater characteristics that sets the size of the anoxic reactor so that it can exact denitrify the nitrate load at the maximum practical recycle ratio (IR) - Henze et al 2008, IWA Biological Wastewater Treatment, Ch 5.)"},
     Nne          :{value:Nne          ,unit:"mgN/L"      ,descr:"Effluent nitrate"},
     Nne_opt      :{value:Nne_opt      ,unit:"mgN/L"      ,descr:"Lowest effluent nitrate (using a_opt)"},
     TNe          :{value:TNe          ,unit:"mgN/L"      ,descr:"Effluent total nitrogen (TKN+NOx)"},

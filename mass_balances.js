@@ -47,7 +47,7 @@ let sTODw = Qw*(was_frac.COD.sCOD + 4.57*(was_frac.TKN.sON + Nae)); //kg/d   | s
 let pTODw = Qw*(
   f*(
     (fCV_OHO + 4.57*f_N_OHO)*(X_BH+X_EH) +
-    (fCV_UPO + 4.57*f_N_UPO)*(X_I) 
+    (fCV_UPO + 4.57*f_N_UPO)*(X_I)
   )*1000);                                                          //kg/d | particulated TODw
 let TODw   = sTODw + pTODw;                                         //kg/d | total TOD in wastage
 let TODout = TODw + TODe + FOt + FOd;                               //kg/d | total TOD out

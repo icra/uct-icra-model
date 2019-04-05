@@ -11,7 +11,7 @@
 
 function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   //inputs
-  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS       | sludge settleability 
+  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS       | sludge settleability
   L    = isNaN(L   )? 2.9615 : L   ; //kgTSS·d/kgCOD | LTSS (eq 10) = MX_T/FSti
   Sti  = isNaN(Sti )? 1150   : Sti ; //mgCOD/L       | influent total COD
   A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2            | area of the settler
@@ -44,7 +44,7 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   while(true){
     //console.log({x0,x1});//debug
     //check if solution has been found or didn't converge
-    if(Math.abs(x0-x1) < 0.0000001 || iterations > 1000){ 
+    if(Math.abs(x0-x1) < 0.0000001 || iterations > 1000){
       //console.log({iterations}); //debug
       break; //exit the loop
     }else{

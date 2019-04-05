@@ -1,13 +1,13 @@
-/* 
+/*
   STATE VARIABLES AND MASS RATIOS ENCAPSULATION
   Each removal technology is be a method inside state variables, implemented in
   its own file (e.g. nitrification.js) as
   "State_Variables.prototype.technology_name=function(){implementation}"
-  technologies are: 
-    "primary-settler", 
-    "activated-sludge", 
+  technologies are:
+    "primary-settler",
+    "activated-sludge",
     "chemical-P-removal"
-    "nitrification", 
+    "nitrification",
     "denitrification",
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
@@ -16,10 +16,10 @@
           Qw      Qw          Qw
 
   Summary of this file:
-    1. class data structure
-      - Q
-      - components
-      - mass ratios
+    1. data structure
+      - Q value
+      - components substructure
+      - mass ratios substructure
     2. class methods
       - set
       - totals
@@ -32,8 +32,8 @@
 class State_Variables {
   constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx, X_OHO){
     //inputs and default values
-    this.Q = isNaN(Q) ? 25 : Q; //ML/d | flowrate 
-    this.components={ 
+    this.Q = isNaN(Q) ? 25 : Q; //ML/d | flowrate
+    this.components={
       S_VFA : isNaN(S_VFA ) ? 50   : S_VFA , //mg/L | Biodegradable   Soluble     Organics (BSO) (volatile fatty acids)
       S_FBSO: isNaN(S_FBSO) ? 115  : S_FBSO, //mg/L | Biodegradable   Soluble     Organics (BSO) (fermentable organics)
       X_BPO : isNaN(X_BPO ) ? 440  : X_BPO , //mg/L | Biodegradable   Particulate Organics (BPO)
@@ -49,8 +49,8 @@ class State_Variables {
       /*----+------------------+----------------+-----------------+-----------------+
       |     | COD              | C              | N               | P               |
       +-----+------------------+----------------+-----------------+-----------------*/
-      /*VFA*/ f_CV_VFA : 1.0667, f_C_VFA : 0.400, f_N_VFA : 0.0000, f_P_VFA : 0.0000, // part of BSO (VFA)
-      /*FBS*/ f_CV_FBSO: 1.4200, f_C_FBSO: 0.471, f_N_FBSO: 0.0464, f_P_FBSO: 0.0118, // part of BSO (FBSO)
+      /*VFA*/ f_CV_VFA : 1.0667, f_C_VFA : 0.400, f_N_VFA : 0.0000, f_P_VFA : 0.0000, // part of BSO
+      /*FBS*/ f_CV_FBSO: 1.4200, f_C_FBSO: 0.471, f_N_FBSO: 0.0464, f_P_FBSO: 0.0118, // part of BSO
       /*BPO*/ f_CV_BPO : 1.5230, f_C_BPO : 0.498, f_N_BPO : 0.0323, f_P_BPO : 0.0072, // BPO
       /*UPO*/ f_CV_UPO : 1.4810, f_C_UPO : 0.518, f_N_UPO : 0.1000, f_P_UPO : 0.0250, // UPO
       /*USO*/ f_CV_USO : 1.4930, f_C_USO : 0.498, f_N_USO : 0.0366, f_P_USO : 0.0000, // USO
@@ -68,12 +68,12 @@ class State_Variables {
     this.components[key]=newValue;
   };
 
-  //calculate totals and complete fractionation for [COD, TKN, TP, TOC,TSS]
+  //calculate complete fractionation for [COD, TKN, TP, TOC,TSS]
   get totals(){
     let mr=this.mass_ratios;//alias for code reduction
     let co=this.components; //alias for code reduction
 
-    //COD all fractions (Chemical Oxygen Demand)
+    //COD fractions (Chemical Oxygen Demand)
       let bsCOD = co.S_VFA + co.S_FBSO; //bio   + soluble COD
       let usCOD = co.S_USO;             //unbio + soluble COD
       let bpCOD = co.X_BPO;             //bio   + partic  COD
@@ -84,7 +84,7 @@ class State_Variables {
       let  pCOD = bpCOD + upCOD;        //partic          COD
       let Total_COD = bsCOD + usCOD + bpCOD + upCOD + co.X_OHO;
       let COD={
-        total: Total_COD, 
+        total: Total_COD,
         bCOD,  uCOD,  sCOD,  pCOD,
         bsCOD, usCOD, bpCOD, upCOD,
         active: co.X_OHO,
@@ -149,35 +149,35 @@ class State_Variables {
       };
 
     //TSS all fractions (Volatile Suspended Solids (VSS) + inert Suspended Solids (iSS))
-      let bVSS   = co.X_BPO / mr.f_CV_BPO;  //bio   VSS
-      let uVSS   = co.X_UPO / mr.f_CV_UPO;  //unbio VSS
-      let actVSS = co.X_OHO / mr.f_CV_OHO;  //OHO   VSS
-      let Total_VSS = bVSS + uVSS + actVSS; //total VSS
-      let Total_TSS = Total_VSS + co.X_iSS; //total TSS
+      let bVSS      = co.X_BPO / mr.f_CV_BPO; //bio   VSS
+      let uVSS      = co.X_UPO / mr.f_CV_UPO; //unbio VSS
+      let actVSS    = co.X_OHO / mr.f_CV_OHO; //OHO   VSS active biomass
+      let Total_VSS = bVSS + uVSS + actVSS;   //total VSS
+      let Total_TSS = Total_VSS + co.X_iSS;   //total TSS
       let TSS={
-        total:Total_TSS,
-        iSS:co.X_iSS,
-        VSS:Total_VSS, 
+        total: Total_TSS,
+        iSS:   co.X_iSS,
+        VSS:   Total_VSS,
         bVSS,
         uVSS,
         active: actVSS,
       };
 
-    //pack results
+    //pack components
     return {COD,TKN,TP,TOC,TSS};
   };
 
-  //convert components and totals to mass fluxes (kg/d)
+  //convert components and totals (mg/L) to mass fluxes (kg/d)
   get fluxes(){
     let components={};
     let totals={};
 
-    //convert components
+    //components
     Object.entries(this.components).forEach(([key,value])=>{
       components[key]=this.Q*value;
     });
 
-    //convert totals
+    //totals
     Object.entries(this.totals).forEach(([group_name,group])=>{
       totals[group_name]={};
       Object.entries(group).forEach(([key,val])=>{
@@ -188,33 +188,33 @@ class State_Variables {
     return {components, totals};
   }
 
-  //get summary table (concentrations and fluxes combined)
+  //create summary table (concentrations and fluxes) for important components
   get summary(){
     let totals = this.totals;
     let fluxes = this.fluxes;
     return {
       Q: this.Q,
-      COD: [totals.COD.total,      fluxes.totals.COD.total],
-      TKN: [totals.TKN.total,      fluxes.totals.TKN.total],
-      NH4: [totals.TKN.FSA,        fluxes.totals.TKN.FSA],
-      NOx: [this.components.S_NOx, fluxes.components.S_NOx],
-      TP:  [totals.TP.total,       fluxes.totals.TP.total],
-      PO4: [totals.TP.PO4,         fluxes.totals.TP.PO4],
-      VSS: [totals.TSS.VSS,        fluxes.totals.TSS.VSS],
-      iSS: [totals.TSS.iSS,        fluxes.totals.TSS.iSS],
-      TSS: [totals.TSS.total,      fluxes.totals.TSS.total],
-      TOC: [totals.TOC.total,      fluxes.totals.TOC.total],
+      COD: [totals.COD.total,      fluxes.totals.COD.total],  //chemical oxygen demand
+      TKN: [totals.TKN.total,      fluxes.totals.TKN.total],  //total kjeldahl nitrogen
+      NH4: [totals.TKN.FSA,        fluxes.totals.TKN.FSA],    //inorganic nitrogen (NH4, ammonia)
+      NOx: [this.components.S_NOx, fluxes.components.S_NOx],  //nitrate (NO3) and nitrite (NO2)
+      TP:  [totals.TP.total,       fluxes.totals.TP.total],   //total phosphorus
+      PO4: [totals.TP.PO4,         fluxes.totals.TP.PO4],     //inorganic phosphorus
+      VSS: [totals.TSS.VSS,        fluxes.totals.TSS.VSS],    //volatile suspended solids
+      iSS: [totals.TSS.iSS,        fluxes.totals.TSS.iSS],    //inorganic suspended solids
+      TSS: [totals.TSS.total,      fluxes.totals.TSS.total],  //total suspended solids
+      TOC: [totals.TOC.total,      fluxes.totals.TOC.total],  //total organic carbon
     }
   }
 
   //combine 2 state variable objects
   combine(sv){
-    //new empty object
+    //new state variables empty object
     let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);
     //new flowrate
     let Q = this.Q + sv.Q;
     new_sv.Q = Q;
-    //new concentrations: fluxes / new Q
+    //new concentrations: mass flux divided by the new Q
     Object.keys(this.components).forEach(key=>{
       let mass=0;
       mass += this.Q * this.components[key];
@@ -226,20 +226,22 @@ class State_Variables {
 }
 
 //export
-try{module.exports=State_Variables;}catch(e){}
+try{module.exports=State_Variables}catch(e){}
 
 /*tests*/
 (function(){
-  //check totals and fluxes
+  //test 1: print totals and fluxes
   (function(){
     return
     let s = new State_Variables(25);
-    console.log("=== Components (mg/L) ===");     console.log(s.components);
-    console.log("=== Summary (mg/L & kg/d) ==="); console.log(s.summary);
-    console.log("=== Totals (mg/L) ===");         console.log(s.totals);
-    console.log("=== Fluxes (kg/d) ===");         console.log(s.fluxes);
+    console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
+    //console.log("=== Inputs (mass ratios) ===");       console.log(s.mass_ratios);
+    console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
+    console.log("=== Totals (mg/L) ===");              console.log(s.totals);
+    console.log("=== Fluxes (kg/d) ===");              console.log(s.fluxes);
   })();
-  //combine 2 state variables and check summary
+
+  //test 2: combine 2 state variables and check result
   (function(){
     return
     let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2);
@@ -250,7 +252,8 @@ try{module.exports=State_Variables;}catch(e){}
     console.log(s3.summary);
     console.log(s3.components);
   })();
-  //example from george ekama (raw ww + set ww)
+
+  //test 3: example from george ekama (raw ww + set ww)
   (function(){
     return
     /*
@@ -267,11 +270,10 @@ try{module.exports=State_Variables;}catch(e){}
     X_iSS_raw_inf:     100,     Total_TP_set:   16.4455,
     X_iSS_set_inf:     34,      Total_VSS_set:  211.1406,
     ............................Total_TSS_set:  245.1406 */
-
     //create 2 manual scenarios: (1) raw ww, (2) settled ww
-    //syntax--------------------(Q   VFA  FBSO  BPO  UPO  USO  iSS  FSA   OP     NOx OHO)
-    let sv = new State_Variables(25, 50,  186,  0,   0,   58,  0,   59.6, 14.15, 0,  0  );
-    sv.set("X_BPO", 707); sv.set("X_UPO", 150); sv.set("X_iSS", 100); console.log(sv.summary);
-    sv.set('X_BPO', 301); sv.set('X_UPO', 20);  sv.set('X_iSS', 34);  console.log(sv.summary);
+    //syntax--------------------(Q   VFA FBSO  BPO UPO USO iSS   FSA     OP NOx OHO)
+    let sv = new State_Variables(25,  50, 186, 707,  0, 58,  0, 59.6, 14.15,  0,  0);
+    console.log('---raw ww---'); sv.set("X_BPO",707); sv.set("X_UPO",150); sv.set("X_iSS",100); console.log(sv.summary);
+    console.log('---set ww---'); sv.set('X_BPO',301); sv.set('X_UPO',20);  sv.set('X_iSS',34);  console.log(sv.summary);
   })();
 })();

@@ -7,24 +7,29 @@
 ## Status: under development 
 
 ## next call george ekama
-  - validate test values of X.tave and Q.ADWF in the user interface
-  - validate test values of Rs/Rsm/Rs.bal/IR/a.opt/a.prac
-  - discuss with lluís corominas EBPR.
-  - discuss pH effect on chemical P removal.
+  - name the model ("UCT-ND steady state model")
+  - create table with validation results.
+    - this code generates the same numbers as the examples as Henze et al 2008 IWA book
 
 ## Lluís B. tasks (ordered by priority)
-  - [model] add a.prac as new input for denitrification.
-  - [model] refactor plant model into its own repository.
-  - [model] take out balances code from technologies and calculate after processes (pst+as+cpr+nit+dn).
+  - separate capacity estimation and Rs balanced and performance of the plant at the Rs balanced.
+    - "theoretical" values vs "actual"
+  - refactor plant model into its own repository.
+  - take out balances code from technologies and calculate after processes (pst+as+cpr+nit+dn).
 
 ## Future / new functionality to be added
-  - energy consumption module.
-  - anaerobic digestion module (will consider inorganic carbon exiting, created from TOC).
-  - stoichiometry for CO2 produced.
-  - [GUI] add a source code viewer to see equations.
-  - [GUI] API.
+  - energy consumption module (reimplement ecoinvent equations)
+  - implement limitation oxygen (reimplement ecoinvent equations)
+  - bio P removal EBPR
+  - pH effect on chemical P removal (as found on Szabo et al)
+  - anaerobic digestion module (will consider inorganic carbon exiting, created from TOC)
+  - stoichiometry for CO2 produced
+  - [GUI] add a source code viewer to see equations
+  - [GUI] API
 
 ## Done/solved/clear/discussed
+  - [model] validate test values of X.tave and Q.ADWF in the user interface.
+  - [model] validate test values of Rs/Rsm/Rs.bal/IR/a.opt/a.prac.
   - [model] K.O in ASM1 = 0.4
   - [model] confirm final Rsm formula (min sludge age to ensure nitrification).
   - [model] add errors in nitrification when: (1) fxt > fxm, (2) Rs < Rsm
