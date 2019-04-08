@@ -9,8 +9,8 @@ UCT-ICRA wastewater MLE model
 Implementation in Javascript
 
 .AU
-University of Cape Town
-Institut Català de Recerca de l'Aigua (ICRA)
+University of Cape Town (UCT)
+Catalan Institute for Water Research (ICRA)
 
 .SH
 .ce
