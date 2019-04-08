@@ -36,15 +36,19 @@ anaerobic digester (AD) and the biological nutrient removal activated sludge
 quality was investigated (Ekama, 2017) (Table 2). These are features that will
 be added in future versions of the UCT-ICRA steady state model.  
 
-Table 1a: Organic component mass ratios and molar compositions used in this investigation to align with raw and settled wastewater concentrations used in previous papers (WRC, 1984; Ekama, 2009, 2011).
-Group COD C H O N P
-Composition in CxHyOzNaPb (x=1)
-Ratio fcv fC fH fO fN fP x y z a b
-VFA 1.067 0.400 0.067 0.533 0.0 0.0 1.0 2.0 1.0 0.0 0.0
-FBSO 1.420 0.470 0.076 0.427 0.017 0.010 1.0 1.942 0.681 0.030 0.008
-USO 1.420 0.470 0.074 0.370 0.049 0.000 1.0 1.833 0.600 0.086 0.000
-BPO* 1.500 0.510 0.069 0.392 0.019 0.010 1.0 1.623 0.577 0.032 0.008
-UPO* 1.481 0.518 0.066 0.291 0.100 0.025 1.0 1.534 0.421 0.166 0.019
+Table 1a: Organic component mass ratios and molar compositions used in this
+investigation to align with raw and settled wastewater concentrations used in
+previous papers (WRC, 1984; Ekama, 2009, 2011).
+
+<table>
+  <tr><th>Group<th>COD<th> C<th> H<th> O<th> N<th> P<th colspan=5> Composition in CxHyOzNaPb (x=1)
+  <tr><th>Ratio<th> fcv<th> fC<th> fH<th> fO<th> fN<th> fP<th> x<th> y<th> z<th> a<th> b
+  <tr><td>VFA <td>1.067 <td>0.400 <td>0.067 <td>0.533 <td>0.0 <td>0.0 <td>1.0 <td>2.0 <td>1.0 <td>0.0 <td>0.0
+  <tr><td>FBSO <td>1.420 <td>0.470 <td>0.076 <td>0.427 <td>0.017 <td>0.010 <td>1.0 <td>1.942 <td>0.681 <td>0.030 <td>0.008
+  <tr><td>USO <td>1.420 <td>0.470 <td>0.074 <td>0.370 <td>0.049 <td>0.000 <td>1.0 <td>1.833 <td>0.600 <td>0.086 <td>0.000
+  <tr><td>BPO <td>1.500 <td>0.510 <td>0.069 <td>0.392 <td>0.019 <td>0.010 <td>1.0 <td>1.623 <td>0.577 <td>0.032 <td>0.008
+  <tr><td>UPO <td>1.481 <td>0.518 <td>0.066 <td>0.291 <td>0.100 <td>0.025 <td>1.0 <td>1.534 <td>0.421 <td>0.166 <td>0.019
+</table>
 
 In this UCT-ICRA SSM, settleable and non-settleable organics have the same composition. While this affects the split of N and P between the BNRAS and AD by the PSU, methods of measuring the compositions of settleable and non-settleable BPO and UPO are currently under investigation. 
   
