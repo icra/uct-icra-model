@@ -70,14 +70,15 @@ removed in greater proportion (84%, 80%) than BPO (47%) (Wentzel et al., 2006;
 Ikumi et al., 2014). Overall COD, N and P removals in PSU for given
 concentrations are 40.3%, 15.3% and 21.5%.   
 
-Raw WW Settleable Settled WW Non-settleable Dissolved
-
-BPO UPO InOrg BPO UPO InOrg VFA FBSO USO InOrg
-COD 750 206 94 --- 450 233 18 --- 0 147 52 ---
-SuspS 416 137 64 38 177 155 12 10 --- --- --- ---
-TKN 60.0 2.6 6.4 --- 51.1 3.0 1.2 --- 0 1.7 1.8 43.3
-TP 14.0 1.4 1.6 --- 11.0 1.6 0.3 --- --- 1.0 0.0 8.2
-TOC 255 70.0 32.9 --- 152.1 79.3 6.3 --- 0.0 48.7 17.8 ---
+<table>
+  <tr><td><td>Raw WW <td colspan=3>Settleable <td>Settled WW <td colspan=3>Non-settleable <td colspan=3>Dissolved
+  <tr><td><td>BPO UPO InOrg BPO UPO InOrg VFA FBSO USO InOrg
+  <tr><td>COD   <td>750  <td>206  <td>94   <td>--- <td>450   <td>233  <td>18  <td>--- <td>0   <td>147  <td>52   <td>---
+  <tr><td>SuspS <td>416  <td>137  <td>64   <td>38  <td>177   <td>155  <td>12  <td>10  <td>--- <td>---  <td>---  <td>---
+  <tr><td>TKN   <td>60.0 <td>2.6  <td>6.4  <td>--- <td>51.1  <td>3.0  <td>1.2 <td>--- <td>0   <td>1.7  <td>1.8  <td>43.3
+  <tr><td>TP    <td>14.0 <td>1.4  <td>1.6  <td>--- <td>11.0  <td>1.6  <td>0.3 <td>--- <td>--- <td>1.0  <td>0.0  <td>8.2
+  <tr><td>TOC   <td>255  <td>70.0 <td>32.9 <td>--- <td>152.1 <td>79.3 <td>6.3 <td>--- <td>0.0 <td>48.7 <td>17.8 <td>---
+</table>
 
 ## SOME PRELIMINARY CONSIDERATIONS
 ### The balanced BNRAS system sludge age (SRT)
