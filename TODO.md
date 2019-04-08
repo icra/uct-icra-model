@@ -1,7 +1,6 @@
 ## Pending Tasks
+  - [doing] refactor plant model into its own repository.
   - separate capacity estimation and Rs balanced and performance of the plant at the Rs balanced ("theoretical" values vs "actual")
-  - refactor plant model into its own repository.
-  - take out balances code from technologies and calculate after processes (pst+as+cpr+nit+dn).
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al 2008)
 
 ## Future / new modules to be added
