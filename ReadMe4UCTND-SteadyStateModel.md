@@ -1,4 +1,4 @@
-# Extracted and adapted from Ekama (2017) “Optimizing water and resource recovery facilities (WRRF) for energy generation without compromising effluent quality”. IWA joint nutrient removal and recovery (NRR) and large wastewater treatment plant (LWWTP) conference “Sustainable Wastewater Treatment and Resource Recovery: Research, Planning, Design and Operation”, 6-8 November, 2017. 
+### Extracted and adapted from Ekama (2017) “Optimizing water and resource recovery facilities (WRRF) for energy generation without compromising effluent quality”. IWA joint nutrient removal and recovery (NRR) and large wastewater treatment plant (LWWTP) conference “Sustainable Wastewater Treatment and Resource Recovery: Research, Planning, Design and Operation”, 6-8 November, 2017. 
 
 ## INFLUENT WASTEWATER CHARACTERISTICS 
 For validation of the UCT-ICRA steady state model, wastewater (WW)
