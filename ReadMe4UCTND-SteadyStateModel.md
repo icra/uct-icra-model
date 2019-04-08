@@ -72,7 +72,7 @@ concentrations are 40.3%, 15.3% and 21.5%.
 
 <table>
   <tr><td><th rowspan=2>Raw WW <th colspan=3>Settleable <th>Settled WW <th colspan=3>Non-settleable <th colspan=4>Dissolved
-  <tr><td><td><td>BPO <td>UPO <td>InOrg <td><td>BPO <td>UPO <td>InOrg <td>VFA <td>FBSO <td>USO<td>InOrg
+  <tr><td><td>BPO <td>UPO <td>InOrg <td><td>BPO <td>UPO <td>InOrg <td>VFA <td>FBSO <td>USO<td>InOrg
   <tr><td>COD   <td>750  <td>206  <td>94   <td>--- <td>450   <td>233  <td>18  <td>--- <td>0   <td>147  <td>52   <td>---
   <tr><td>SuspS <td>416  <td>137  <td>64   <td>38  <td>177   <td>155  <td>12  <td>10  <td>--- <td>---  <td>---  <td>---
   <tr><td>TKN   <td>60.0 <td>2.6  <td>6.4  <td>--- <td>51.1  <td>3.0  <td>1.2 <td>--- <td>0   <td>1.7  <td>1.8  <td>43.3
