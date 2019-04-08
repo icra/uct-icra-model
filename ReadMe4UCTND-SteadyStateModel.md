@@ -53,12 +53,14 @@ previous papers (WRC, 1984; Ekama, 2009, 2011).
 In this UCT-ICRA SSM, settleable and non-settleable organics have the same composition. While this affects the split of N and P between the BNRAS and AD by the PSU, methods of measuring the compositions of settleable and non-settleable BPO and UPO are currently under investigation. 
   
 Table 1b: Default raw and settled wastewater fractions in UCT-ICRA SSM.
-Fraction Raw Settled Fraction Raw Settled 
-Unbiod. soluble COD (fS’us) 0.050 0.076 Unbio COD of settleable COD 0.319 0.000
-Unbiod. particulate COD (fS’up)	0.130 0.029 FSA/TKN ratio 0.611 0.734
-RBCOD of total COD (fS’bs) 0.134 0.206 OP/TP ratio 0.600 0.721
-RBCOD of biodeg COD (fSb’s) 0.163 0.230 VSetS/TSetS ratio 0.789 0.000
-Settleable COD of total COD 0.349 0.000 ISS to total COD ratio (XIoi/Sti) 0.087 0.045
+<table>
+<tr><th>Fraction<th> Raw <th>Settled <th>Fraction <th>Raw <th>Settled 
+<tr>Unbiod. soluble COD (fS’us)    <td> 0.050<td> 0.076<td> Unbio COD of settleable COD       <td>0.319 <td>0.000
+<tr>Unbiod. particulate COD (fS’up)<td>	0.130<td> 0.029<td> FSA/TKN ratio                     <td>0.611 <td>0.734
+<tr>RBCOD of total COD (fS’bs)     <td> 0.134<td> 0.206<td> OP/TP ratio                       <td>0.600 <td>0.721
+<tr>RBCOD of biodeg COD (fSb’s)    <td> 0.163<td> 0.230<td> VSetS/TSetS ratio                 <td>0.789 <td>0.000
+<tr>Settleable COD of total COD    <td> 0.349<td> 0.000<td> ISS to total COD ratio (XIoi/Sti) <td>0.087 <td>0.045
+</table>
 
 Table 2c: Wastewater concentrations calculated from total COD concentrations
 (Raw 750, Settled 450) and mass ratios in Table 1a and fractions in Table 1b.
