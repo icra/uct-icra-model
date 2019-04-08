@@ -1,4 +1,9 @@
-### Extracted and adapted from Ekama (2017) “Optimizing water and resource recovery facilities (WRRF) for energy generation without compromising effluent quality”. IWA joint nutrient removal and recovery (NRR) and large wastewater treatment plant (LWWTP) conference “Sustainable Wastewater Treatment and Resource Recovery: Research, Planning, Design and Operation”, 6-8 November, 2017. 
+### Extracted and adapted from Ekama (2017) “Optimizing water and resource
+recovery facilities (WRRF) for energy generation without compromising effluent
+quality”. IWA joint nutrient removal and recovery (NRR) and large wastewater
+treatment plant (LWWTP) conference “Sustainable Wastewater Treatment and
+Resource Recovery: Research, Planning, Design and Operation”, 6-8 November,
+2017. 
 
 ## INFLUENT WASTEWATER CHARACTERISTICS 
 For validation of the UCT-ICRA steady state model, wastewater (WW)
@@ -54,12 +59,12 @@ In this UCT-ICRA SSM, settleable and non-settleable organics have the same compo
   
 Table 1b: Default raw and settled wastewater fractions in UCT-ICRA SSM.
 <table>
-<tr><th>Fraction<th> Raw <th>Settled <th>Fraction <th>Raw <th>Settled 
-<tr><td>Unbiod. soluble COD (fS’us)    <td> 0.050<td> 0.076<td> Unbio COD of settleable COD       <td>0.319 <td>0.000
-<tr><td>Unbiod. particulate COD (fS’up)<td>	0.130<td> 0.029<td> FSA/TKN ratio                     <td>0.611 <td>0.734
-<tr><td>RBCOD of total COD (fS’bs)     <td> 0.134<td> 0.206<td> OP/TP ratio                       <td>0.600 <td>0.721
-<tr><td>RBCOD of biodeg COD (fSb’s)    <td> 0.163<td> 0.230<td> VSetS/TSetS ratio                 <td>0.789 <td>0.000
-<tr><td>Settleable COD of total COD    <td> 0.349<td> 0.000<td> ISS to total COD ratio (XIoi/Sti) <td>0.087 <td>0.045
+  <tr><th>Fraction<th> Raw <th>Settled <th>Fraction <th>Raw <th>Settled 
+  <tr><td>Unbiod. soluble COD (fS’us)    <td> 0.050<td> 0.076<td> Unbio COD of settleable COD       <td>0.319 <td>0.000
+  <tr><td>Unbiod. particulate COD (fS’up)<td>	0.130<td> 0.029<td> FSA/TKN ratio                     <td>0.611 <td>0.734
+  <tr><td>RBCOD of total COD (fS’bs)     <td> 0.134<td> 0.206<td> OP/TP ratio                       <td>0.600 <td>0.721
+  <tr><td>RBCOD of biodeg COD (fSb’s)    <td> 0.163<td> 0.230<td> VSetS/TSetS ratio                 <td>0.789 <td>0.000
+  <tr><td>Settleable COD of total COD    <td> 0.349<td> 0.000<td> ISS to total COD ratio (XIoi/Sti) <td>0.087 <td>0.045
 </table>
 
 Table 2c: Wastewater concentrations calculated from total COD concentrations
