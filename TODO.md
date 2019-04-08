@@ -1,20 +1,19 @@
-## Lluís B. tasks (ordered by priority)
-  - separate capacity estimation and Rs balanced and performance of the plant at the Rs balanced.
-    - "theoretical" values vs "actual"
+## Tasks
+  - separate capacity estimation and Rs balanced and performance of the plant at the Rs balanced ("theoretical" values vs "actual")
   - refactor plant model into its own repository.
   - take out balances code from technologies and calculate after processes (pst+as+cpr+nit+dn).
 
 ## Future / new functionality to be added
-  - energy consumption module (reimplement ecoinvent equations)
-  - implement limitation oxygen (reimplement ecoinvent equations)
-  - bio P removal EBPR
+  - energy consumption module (reuse ecoinvent equations)
+  - oxygen limitation module (reuse ecoinvent equations)
+  - bio P removal EBPR module
   - pH effect on chemical P removal (as found on Szabo et al)
   - anaerobic digestion module (will consider inorganic carbon exiting, created from TOC)
   - stoichiometry for CO2 produced
   - [GUI] add a source code viewer to see equations
   - [GUI] API
 
-## Done/solved/clear/discussed
+## Tasks done/solved/clear/discussed
   - [model] validate test values of X.tave and Q.ADWF in the user interface.
   - [model] validate test values of Rs/Rsm/Rs.bal/IR/a.opt/a.prac.
   - [model] K.O in ASM1 = 0.4
@@ -40,18 +39,3 @@
   - [done] integrate X.tave loop + Q.ADWF.max in a new process.
   - [done] warnings module
   - [done] add check for exported URL above 2k characters.
-
-## Documentation
-  - docs/equations: "formulas/formulas.ms" file is compiled into "formulas/formulas.ms.pdf" using groff(1).
-  - docs/architecture: "architecture/architecture.org" file is compiled into "architecture/architecture.html" using emacs(1) org-mode export function.
-
-## Model assumptions
-  - The modelled WWTP process is MLE (Modified Ludzack Ettinger).
-  - Influent X.OHO is always 0.
-  - Mass of nitrifiers (MX.BA) is not considered into total solids mass MX.T.
-  - Influent S.VFA and X.BPO are 100% consumed (converted to biomass) during the 'activated sludge' process.
-  - S.FBSO is *not* entirely consumed because it depends on the HRT (fast), whereas the X.BPO depends on Rs (slower).
-  - The solids in the effluent (X.iSS, X.UPO, X.OHO, X.BPO) are 0 (they all go to the wastage "Qw").
-  - All CO<sub>2</sub> produced is stripped out.
-  - Inorganic carbon is not included in the carbon balance over the AS reactor, because it's very small.
-  - The volume of added FeCl3 solution for chemical P removal is ~0.

@@ -240,15 +240,15 @@
 <script src=format.js></script>
 
 <!--load backend-->
-<script src="../state-variables.js"></script>
-<script src="../constants.js"></script>
-<script src="../primary-settler.js"></script>
-<script src="../chemical-P-removal.js"></script>
-<script src="../capacity-estimation.js"></script>
-<script src="../activated-sludge.js"></script>
-<script src="../nitrification.js"></script>
-<script src="../denitrification.js"></script>
-<script src="../plant.js"></script>
+<script src="../src/state-variables.js"></script>
+<script src="../src/constants.js"></script>
+<script src="../src/primary-settler.js"></script>
+<script src="../src/chemical-P-removal.js"></script>
+<script src="../src/capacity-estimation.js"></script>
+<script src="../src/activated-sludge.js"></script>
+<script src="../src/nitrification.js"></script>
+<script src="../src/denitrification.js"></script>
+<script src="../src/plant.js"></script>
 
 <!--model backend and gui integration-->
 <script>
@@ -595,7 +595,7 @@
     });
   });
 
-  //enter key listener: execute model
+  //execute model by hitting enter key
   document.querySelectorAll('#inputs input').forEach(input=>{
     input.addEventListener('keypress',function(e){
       if(e.key=="Enter"){
