@@ -1,6 +1,8 @@
-## UCT-ICRA wastewater treatment plant model implementation in Javascript
-
 Status: Under refactorization (April 2019)
+
+# UCT-ICRA model
+
+## Wastewater treatment plant model implementation in Javascript
 
 Extracted and adapted from Ekama (2017) “Optimizing water and resource recovery
 facilities (WRRF) for energy generation without compromising effluent quality”.
