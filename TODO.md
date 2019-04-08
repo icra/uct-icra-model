@@ -1,10 +1,3 @@
-## Status: under development 
-
-## next call george ekama
-  - name the model ("UCT-ND steady state model")
-  - create table with validation results.
-    - this code generates the same numbers as the examples as Henze et al 2008 IWA book
-
 ## Lluís B. tasks (ordered by priority)
   - separate capacity estimation and Rs balanced and performance of the plant at the Rs balanced.
     - "theoretical" values vs "actual"
@@ -48,25 +41,17 @@
   - [done] warnings module
   - [done] add check for exported URL above 2k characters.
 
-## List of process types
-  - MLE (Modified Ludzack Ettinger) <-- **this model**
-  - JHB (Johannesburg process)
-  - UCT (University of Cape Town process)
-  - MUCT (Modified University of Cape Town process)
-  - VIP (Virginia initiative plant process)
-  - ? (finish list TODO)
-
 ## Documentation
-  - equations: "formulas/formulas.ms" file is compiled into "formulas/formulas.ms.pdf" using groff(1).
-  - architecture: "architecture/architecture.org" file is compiled into "architecture/architecture.html" using emacs(1) org-mode export function.
+  - docs/equations: "formulas/formulas.ms" file is compiled into "formulas/formulas.ms.pdf" using groff(1).
+  - docs/architecture: "architecture/architecture.org" file is compiled into "architecture/architecture.html" using emacs(1) org-mode export function.
 
 ## Model assumptions
-  - Process is MLE (Modified Ludzack Ettinger).
+  - The modelled WWTP process is MLE (Modified Ludzack Ettinger).
   - Influent X.OHO is always 0.
-  - Mass of nitrifiers (MX.BA) is 0 (==not added to MX.T)
-  - Influent S.VFA and X.BPO are 100% consumed into biomass during the 'activated sludge' process.
-  - S.FBSO is *not* 100% consumed because it depends on the HRT (fast), whereas the X.BPO depends on Rs (slower).
-  - Solids in the effluent (X.iSS, X.UPO, X.OHO, X.BPO) are 0.
-  - All CO2 produced is stripped out.
+  - Mass of nitrifiers (MX.BA) is not considered into total solids mass MX.T.
+  - Influent S.VFA and X.BPO are 100% consumed (converted to biomass) during the 'activated sludge' process.
+  - S.FBSO is *not* entirely consumed because it depends on the HRT (fast), whereas the X.BPO depends on Rs (slower).
+  - The solids in the effluent (X.iSS, X.UPO, X.OHO, X.BPO) are 0 (they all go to the wastage "Qw").
+  - All CO<sub>2</sub> produced is stripped out.
   - Inorganic carbon is not included in the carbon balance over the AS reactor, because it's very small.
   - The volume of added FeCl3 solution for chemical P removal is ~0.
