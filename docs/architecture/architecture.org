@@ -23,7 +23,7 @@ This file describes the main data structures for the ASM model (but not the actu
 | S_UPO     | f_CV_UPO  | f_C_UPO  | f_N_UPO  | f_P_UPO  |
 | S_USO     | f_CV_USO  | f_C_USO  | f_N_USO  | f_P_USO  |
 | X_OHO     | f_CV_OHO  | f_C_OHO  | f_N_OHO  | f_P_OHO  |
-+-----------+-----------+----------+----------+----------+
+
 ** Technologies
 "Technologies" are methods of the state variables class. Each technology call creates an effluent and a wastage objects which are "state variables", and another object called "process variables".
 *** Primary settler
