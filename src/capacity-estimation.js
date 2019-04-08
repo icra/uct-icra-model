@@ -1,6 +1,6 @@
 /*
   CAPACITY ESTIMATION MODULE
-  reference: "docs/edar/Capacity_estimation/BalancedMLEEquations.pdf"
+  reference: "BalancedMLEEquations.pdf"
   Calculates max flowrate (Q_ADWF) and total solids concentration (X_tave) that
   the plant can process before being overloaded
   - Q_ADWF: average dry weather flow capacity

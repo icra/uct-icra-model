@@ -1,1 +1,1 @@
-under development and refactorization (April 2019)
+Under refactorization (April 2019)

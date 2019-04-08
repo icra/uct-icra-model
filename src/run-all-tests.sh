@@ -2,7 +2,7 @@
 
 #execute all js files
 for file in $(ls *.js);do
-  echo -n "$file: | "
+  echo -n "$file | "
   node $file
   s=$? #exit status of last command
   if [[ $s == 0 ]];then

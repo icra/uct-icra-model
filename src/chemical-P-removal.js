@@ -1,9 +1,6 @@
 /*
   Chemical P removal
   Metcalf & Eddy, Wastewater Engineering, 5th ed., 2014, page 484
-
-  TODO: discuss with george the effect of the pH in FePO4 formation
-  (Szabo et al 2008)
 */
 
 function chemical_P_removal(Q, PO4i, mass_FeCl3){

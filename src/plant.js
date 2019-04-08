@@ -1,11 +1,11 @@
 /*
-  WASTEWATER TREATMENT PLANT CLASS FOR MLE
+  WASTEWATER TREATMENT PLANT CLASS
 
-             configuration, parameters
-               ↓ ↓
-  influent → [Plant] → effluent
-               ↓ ↓
-             wastages (primary and secondary)
+             {configuration}, {parameters}
+                ↓ ↓
+  {influent} → [Plant] → {effluent}
+                ↓ ↓
+             {wastages} (primary and secondary)
 */
 
 //import files
@@ -75,8 +75,8 @@ class Plant{
   };
 }
 
-//export
-try{module.exports=Plant;}catch(e){}
+//export class
+try{module.exports=Plant}catch(e){}
 
 /*test*/
 (function(){
