@@ -71,7 +71,7 @@ Ikumi et al., 2014). Overall COD, N and P removals in PSU for given
 concentrations are 40.3%, 15.3% and 21.5%.   
 
 <table>
-  <tr><td><td>Raw WW <td colspan=3>Settleable <td>Settled WW <td colspan=3>Non-settleable <td colspan=3>Dissolved
+  <tr><td><td>Raw WW <td colspan=3>Settleable <td>Settled WW <td colspan=3>Non-settleable <td colspan=4>Dissolved
   <tr><td><td><td>BPO <td>UPO <td>InOrg <td>BPO <td>UPO <td>InOrg <td>VFA <td>FBSO <td>USO<td> <td>InOrg
   <tr><td>COD   <td>750  <td>206  <td>94   <td>--- <td>450   <td>233  <td>18  <td>--- <td>0   <td>147  <td>52   <td>---
   <tr><td>SuspS <td>416  <td>137  <td>64   <td>38  <td>177   <td>155  <td>12  <td>10  <td>--- <td>---  <td>---  <td>---
