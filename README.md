@@ -1,4 +1,4 @@
-# UCT-ICRA MLE WWTP model implementation
+## UCT-ICRA wastewater treatment plant model implementation in Javascript
 Extracted and adapted from Ekama (2017) “Optimizing water and resource recovery
 facilities (WRRF) for energy generation without compromising effluent quality”.
 IWA joint nutrient removal and recovery (NRR) and large wastewater treatment
