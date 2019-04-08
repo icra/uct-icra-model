@@ -1,10 +1,10 @@
-# Ecoadvisor
+## Status: under development 
+
+# UCT-ICRA MLE model implementation
   Backend model for ecoadvisor project.
   Coded in Javascript without dependencies.
   MLE steady state model by George Ekama.
   Implemented by Lluís Bosch.
-
-## Status: under development 
 
 ## next call george ekama
   - name the model ("UCT-ND steady state model")
