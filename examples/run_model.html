@@ -51,13 +51,24 @@
 </head><body>
 
 <!--title-->
-<div style="border-bottom:1px solid #ccc;margin-bottom:4px;justify-content:space-between" class=flex>
+<div style="border-bottom:1px solid black;margin-bottom:4px;justify-content:space-between" class=flex>
   <h3>
     <span id=title onclick>
-      Phase 1 - Plant (MLE process)
+      UCT-ICRA model | WWTP | MLE process
     </span>
     <!--run button-->
     <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
+    <style>
+      button#run {
+        background:#af0;
+        border-radius:3px;
+        border:1px solid #ccc;
+        box-shadow:2px 2px 7px 0px #ccc;
+      }
+      button#run:active{
+        box-shadow:inset 2px 2px 7px 0px #ccc;
+      }
+    </style>
   </h3>
   <div style=font-size:smaller>
     <a target=_blank href="//github.com/icra/ecoadvisor">github</a>
@@ -65,13 +76,48 @@
 </div>
 
 <!--main-->
-<div class=flex>
+<main>
+  <style>
+    main{
+      display:grid;
+      grid-template-columns:58% 42%;
+      grid-gap:5px;
+    }
+    main div.card {
+      border-bottom:1px solid black;
+      margin-bottom:5px;
+      margin-top:5px;
+      padding-bottom:5px;
+    }
+    main code[onclick]{
+      display:block;
+    }
+    main code[onclick]:hover{
+      color:black;
+      background:#eee;
+    }
+  </style>
+
+  <!--first row-->
+  <div class=card>
+    <strong>Inputs</strong>
+  </div>
+  <div class=card>
+    <strong>Outputs</strong>
+    <span>
+      <label onclick=""><input type=radio name=summary_units value=both>         all </label>
+      <label onclick=""><input type=radio name=summary_units value=conc checked> mg/L</label>
+      <label onclick=""><input type=radio name=summary_units value=flux>         kg/d</label>
+    </span>
+  </div>
+
+  <!--second row-->
+
   <!--inputs-->
-  <div style="border-right:1px solid #ccc;padding-right:4px;margin-right:4px">
-    <div><strong onclick=toggle_visibility("#inputs")>Inputs</strong></div>
-    <div id=inputs>
-      <!--influent--><div><code onclick=toggle_visibility('#influent',this)>[-] Influent inputs</code></div>
-      <table id=influent><tr>
+  <div id=inputs>
+    <!--influent--><div><code onclick=toggle_visibility('#influent',this)>[-] Influent composition</code></div>
+    <div class=card>
+      <table id=influent class=card><tr>
         <td title="Flowrate"                            >Q<sub> </sub>    <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
         <td title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
         <td title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span>
@@ -84,8 +130,10 @@
         <td title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span>
         <td title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0   ><span class=unit>mg/L</span>
       </table> 
+    </div>
 
-      <!--plant--><div><code onclick=toggle_visibility('#edar',this)>[-] Plant inputs</code></div>
+    <!--plant--><div><code onclick=toggle_visibility('#edar',this)>[-] Plant configuration</code></div>
+    <div class=card>
       <table id=edar style=font-size:smaller>
         <tr id=tr_pst>
           <td><label><input type=checkbox id=pst> Primary settler</label>
@@ -120,8 +168,10 @@
           <td title="Mass of FeCl3 added for P removal">FeCl<sub>3</sub> <span class=unit>(kg/d)</span> <input type=number id=mass_FeCl3 value=3000>
         </tr>
       </table> 
+    </div>
 
-      <!--mass ratios--><div><code onclick=toggle_visibility('#mass_ratios',this)>[+] Mass ratios</code></div>
+    <!--mass ratios--><div><code onclick=toggle_visibility('#mass_ratios',this)>[+] Mass ratios</code></div>
+    <div class=card>
       <table id=mass_ratios style=display:none>
         <tr><td><td>fcv<div class=unit>gCOD/gVSS<td>fC<div class=unit>gVSS/gC<td>fN<div class=unit>gVSS/gN<td>fP<div class=unit>gVSS/gP
         <tr><td>S<sub>VFA</sub>
@@ -159,8 +209,10 @@
           <td><input id=f_P_OHO   type=number value=0.0250 step=0.0010>
         </tr>
       </table>
+    </div>
 
-      <!--constants--><div><code onclick=toggle_visibility('#constants',this)>[+] Kinetic parameters</code></div>
+    <!--constants--><div><code onclick=toggle_visibility('#constants',this)>[+] Kinetic parameters</code></div>
+    <div class=card>
       <table id=constants style=display:none>
         <tr><td colspan=3><code onclick="toggle_visibility('#constants #as',this)">[-] Activated sludge</code>
         <tbody id=as>
@@ -197,58 +249,85 @@
   </div>
 
   <!--outputs-->
-  <div>
-    <div><strong onclick=toggle_visibility('#outputs')>Outputs</strong></div>
-    <div id=outputs>
-      <!--summaries-->
-      <div>
-        <code onclick="toggle_visibility('#outputs #summaries',this)">
-          [-] Summary
-        </code>
-        <span>
-          <label onclick=""><input type=radio name=summary_units value=both>         all </label>
-          <label onclick=""><input type=radio name=summary_units value=conc checked> mg/L</label>
-          <label onclick=""><input type=radio name=summary_units value=flux>         kg/d</label>
-        </span>
-      </div>
+  <div id=outputs>
+    <!--summaries-->
+    <div>
+      <code onclick="toggle_visibility('#outputs #summaries',this)">
+        [-] Summary
+      </code>
+    </div>
+    <div class=card>
       <div id=summaries style="display:"></div>
+    </div>
 
-      <!--fractionation-->
-      <div>
-        <code onclick="toggle_visibility('#outputs #fractionation',this)">
-          [+] Fractionation
-        </code>
-      </div>
+    <!--fractionation-->
+    <div>
+      <code onclick="toggle_visibility('#outputs #fractionation',this)">
+        [+] Fractionation
+      </code>
+    </div>
+    <div class=card>
       <div id=fractionation style="display:none"></div>
+    </div>
 
-      <!--errors-->
-      <div><code onclick="toggle_visibility('#outputs #errors',this)">[-] Warnings/Errors <span id=error_counter>0</span></code></div>
-      <div id=errors style="display:">under development</div>
+    <!--errors-->
+    <div><code onclick="toggle_visibility('#outputs #errors',this)">[-] Warnings/Errors <span id=error_counter>0</span></code></div>
+    <div class=card>
+      <div id=errors style="display:"><small>loading...</small></div>
+    </div>
 
-      <!--process variables-->
-      <div><code onclick="toggle_visibility('#outputs #processes',this)">[+] Process variables</code></div>
+    <!--process variables-->
+    <div><code onclick="toggle_visibility('#outputs #processes',this)">[+] Process variables</code></div>
+    <div class=card>
       <div id=processes class=flex style="flex-wrap:wrap;display:none"></div>
+    </div>
 
-      <!--export-->
-      <div><code onclick="toggle_visibility('#outputs #export',this)">[+] Export</code></div>
+    <!--export-->
+    <div><code onclick="toggle_visibility('#outputs #export',this)">[+] Export</code></div>
+    <div class=card>
       <textarea id=export style="display:none;width:100%;height:200px"></textarea>
     </div>
   </div>
-</div>
+</main>
 
 <!--gui decimal number formatter-->
-<script src=format.js></script>
+<script>
+  /*convert a number to a string: i.e. 3999.4 turns into "3,999.4"*/
+  function format(number,digits){
+    digits=digits||0;
+    let abs_number = Math.abs(number);
+    if(abs_number< 100   )digits=1;
+    if(abs_number<  10   )digits=2;
+    if(abs_number<   1   )digits=3;
+    if(abs_number<   0.1 )digits=4;
+    if(abs_number<   0.01)digits=5;
+    let str=new Intl.NumberFormat('en-EN',{maximumFractionDigits:digits}).format(number);
+    return str;
+  }
+
+  String.prototype.prettifyUnit=function(){
+    return this
+      .replace('CO3','CO<sub>3</sub>')
+      .replace('FeCl3','FeCl<sub>3</sub>')
+      .replace('NH4','NH<sub>4</sub>')
+      .replace('NOx','NO<sub>x</sub>')
+      .replace('PO4','PO<sub>4</sub>')
+      .replace('m2','m<sup>2</sup>')
+      .replace('m3','m<sup>3</sup>')
+      .replace(/_/g,' ')
+  }
+</script>
 
 <!--load backend-->
-<script src="../state-variables.js"></script>
-<script src="../constants.js"></script>
-<script src="../primary-settler.js"></script>
-<script src="../chemical-P-removal.js"></script>
-<script src="../capacity-estimation.js"></script>
-<script src="../activated-sludge.js"></script>
-<script src="../nitrification.js"></script>
-<script src="../denitrification.js"></script>
-<script src="../plant.js"></script>
+<script src="../src/state-variables.js"></script>
+<script src="../src/constants.js"></script>
+<script src="../src/primary-settler.js"></script>
+<script src="../src/chemical-P-removal.js"></script>
+<script src="../src/capacity-estimation.js"></script>
+<script src="../src/activated-sludge.js"></script>
+<script src="../src/nitrification.js"></script>
+<script src="../src/denitrification.js"></script>
+<script src="../src/plant.js"></script>
 
 <!--model backend and gui integration-->
 <script>
@@ -595,7 +674,7 @@
     });
   });
 
-  //enter key listener: execute model
+  //execute model by hitting enter key
   document.querySelectorAll('#inputs input').forEach(input=>{
     input.addEventListener('keypress',function(e){
       if(e.key=="Enter"){

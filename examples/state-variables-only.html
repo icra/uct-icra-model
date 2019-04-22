@@ -1,6 +1,6 @@
 <!doctype html><html><head>
   <meta charset=utf8>
-  <title>State variables</title>
+  <title>State varjables</title>
   <style>
     @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
     body {
@@ -22,17 +22,20 @@
     }
   </style>
 </head><body>
+
 <div style="display:flex;justify-content:space-between;border-bottom:1px solid #ccc;margin-bottom:4px">
   <h3>
-    State variables editor
-    <button onclick=add_flow()>Add flow</button>
+    State variables
+    <button onclick=add_flow()>Add new state variables</button>
     <script>
       function add_flow(){
         let sv = new State_Variables();
         sv.name="New flow";
         if(svs.length){
           sv.Q = svs[svs.length-1].Q;
-          Object.keys(sv.components).forEach(key=>{ sv.components[key]=svs[svs.length-1].components[key]; }); 
+          Object.keys(sv.components).forEach(key=>{
+            sv.components[key]=svs[svs.length-1].components[key];
+          }); 
         }
         svs.push(sv);
         populate();
@@ -55,7 +58,7 @@
 
 <!--app logic-->
 <script src="format.js"></script>
-<script src="../state-variables.js"></script>
+<script src="../src/state-variables.js"></script>
 <script>
   //create and populate all tables
   function populate(){
@@ -101,7 +104,18 @@
     Object.keys(svs[0].components).forEach(key=>{
       let newRow=inputs.insertRow(-1);
       svs.forEach((sv,i)=>{
-        newRow.insertCell(-1).innerHTML=key;
+        newRow.insertCell(-1).innerHTML=key
+          .replace('S_VFA','S<sub>VFA</sub>')
+          .replace('S_FBSO','S<sub>FBSO</sub>')
+          .replace('X_BPO','X<sub>BPO</sub>')
+          .replace('X_UPO','X<sub>UPO</sub>')
+          .replace('S_USO','S<sub>USO</sub>')
+          .replace('X_iSS','X<sub>iSS</sub>')
+          .replace('S_FSA','S<sub>FSA</sub>')
+          .replace('S_OP', 'S<sub>OP</sub>')
+          .replace('S_NOx','S<sub>NOx</sub>')
+          .replace('X_OHO','X<sub>OHO</sub>')
+          ;
         newRow.insertCell(-1).innerHTML="<input tabindex="+i+" type=number min=0 onchange=svs["+i+"].components."+key+"=parseFloat(this.value);redisplay("+i+"); value="+sv.components[key]+"> <span class=unit>mg/L</span>";
       });
     });
@@ -145,9 +159,13 @@
     initialize state variables
     create an example with with 3 scenarios: raw ww, sludge and settled ww
   */
-  let sv1 = new State_Variables(25,     50, 115, 440,     100, 45,   60, 39.1, 7.28, 0); sv1.name="Raw WW";
-  let sv2 = new State_Variables(24.875, 50, 115, 255,      10, 45,   15, 39.1, 7.28, 0); sv2.name="Settled WW";
-  let sv3 = new State_Variables(0.125,  50, 115, 37255, 18010, 45, 9015, 39.1, 7.28, 0); sv3.name="Primary Sludge";
-  let svs=[sv1, sv2, sv3];
+  let svs=[
+    new State_Variables(25,     50, 115, 440,     100, 45,   60, 39.1, 7.28, 0),
+    //new State_Variables(24.875, 50, 115, 255,      10, 45,   15, 39.1, 7.28, 0),
+    //new State_Variables(0.125,  50, 115, 37255, 18010, 45, 9015, 39.1, 7.28, 0),
+  ];
+  svs[0].name="Raw WW";
+  //svs[1].name="Settled WW";
+  //svs[2].name="Primary Sludge";
   populate();
 </script>

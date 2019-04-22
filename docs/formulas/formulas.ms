@@ -1,14 +1,24 @@
+.LP
+.ce
+Document under development
+
 .TL
-Ecoadvisor model formulas
+UCT-ICRA wastewater MLE model
+.LP
+.ce
+Implementation in Javascript
+
 .AU
-Institut Català de Recerca de l'Aigua (ICRA)
+University of Cape Town (UCT)
+Catalan Institute for Water Research (ICRA)
+
 .SH
 .ce
-Compilation command (bash)
+Makefile:
 .LP
 .ce
 .CW
-groff -e -t -ms formulas.ms -T pdf -K utf-8
+groff -t -e -ms formulas.ms -T pdf -K utf-8 > formulas.ms.pdf
 
 .nr GROWPS 3  .\conf tamanys títols
 .nr PSINCR 1p .\conf tamanys títols
@@ -38,7 +48,7 @@ Q
 .EN
 
 .NH 2
-Total chemical oxygen demand (COD = $S sub t$)
+Total chemical oxygen demand ($S sub t$)
 .EQ (mgCOD/L)
 S sub t = S sub VFA + S sub FBSO + X sub BPO + X sub UPO + S sub USO + X sub OHO
 .EN
@@ -75,7 +85,7 @@ S sub t = S sub s + S sub p + S sub active
 .EN
 
 .NH 2
-Mass ratios for COD, N, P and C
+Default Mass ratio values for COD, N, P and C
 .LP
 .TS
 tab(;) center;
@@ -93,7 +103,7 @@ $ PAO        $; 1.4810; 0.1000; 0.0250; 0.518
 .TE
 
 .NH 2
-Total Kjeldahl Nitrogen (TKN = $N sub t$)
+Total Kjeldahl Nitrogen ($N sub t$)
 .EQ (mgN/L)
 N sub t = N sub o + S sub FSA + N sub active
 .EN
@@ -110,7 +120,7 @@ $N sub active = X sub OHO f sub N sub OHO over f sub cv sub OHO $;
 .TE
 
 .NH 2
-Total Phosphorus (TP = $P sub t$)
+Total Phosphorus ($P sub t$)
 .EQ (mgP/L)
 P sub t = P sub o + S sub OP + P sub active
 .EN
@@ -127,7 +137,7 @@ $P sub active = X sub OHO f sub P sub OHO over f sub cv sub OHO$;
 .TE
 
 .NH 2
-Total Organic Carbon (TOC = $C sub t$)
+Total Organic Carbon ($C sub t$)
 .EQ (mgC/L)
 C sub t = C sub obs + C sub obp + C sub ous + C sub oup + C sub active
 .EN
@@ -143,7 +153,7 @@ $C sub active = X sub OHO f sub C sub OHO over f sub cv sub OHO$;
 .TE
 
 .NH 2
-Total suspended solids (TSS = $X sub T$)
+Total suspended solids ($X sub T$)
 .EQ (mgTSS/L)
 X sub T = X sub V + X sub iSS
 .EN
@@ -162,25 +172,28 @@ Activated sludge
 .NH 2
 Inputs
 .EQ
-T, V sub p, R sub s, RAS
+T (ºC), V sub p (m sup 3 ), R sub s (days) ,  RAS (ø)
 .EN
 
 .NH 2
 Volatile suspended solids (VSS)
-.EQ (gVSS/gCOD)
-Y sub H = 0.45
-.EN
 .EQ (1/d)
 b sub H = 0.24
 .EN
 .EQ (1/d)
-b sub {HT} = b sub H (1.029) sup { T - 20 }
+theta sub bH = 1.029
+.EN
+.EQ (1/d)
+b sub {HT} = b sub H · ({theta sub b sub H}) sup { T - 20 }
+.EN
+.EQ (gVSS/gCOD)
+Y sub H = 0.45
 .EN
 .EQ (gVSS·d/gCOD)
 f sub X sub BH = {Y sub H · R sub s} over {1 + b sub HT · R sub s}
 .EN
 .EQ (L/gVSS·d)
-  k sub vT = 0.007·(1.035) sup {T-20}
+  k sub vT = {k sub v20}·( theta sub k sub v20 ) sup {T-20}
 .EN
 .EQ (mgCOD/L)
   S sub nd = 1 over {f sub X sub BH k sub vT}
@@ -297,7 +310,7 @@ Inputs
 
 .LP
 .EQ
-mass sub FeCl sub 3
+mass sub FeCl sub 3 (kg/d)
 .EN
 
 .NH 2
@@ -395,7 +408,7 @@ Nitrification
 .NH 2
 Inputs
 .EQ
-SF, f sub xt, DO, pH
+SF (ø), f sub xt (ø), DO (mg/L), pH (ø)
 .EN
 
 .NH 2
@@ -404,7 +417,7 @@ Nitrifier kinetics
 µ sub Am = 0.45
 .EN
 .EQ (1/d)
-µ sub AmT = µ sub Am (1.123) sup {T-20}
+µ sub AmT = µ sub Am ({theta sub mu sub Am}) sup {T-20}
 .EN
 .EQ (mgO/L)
 K sub O = 0.3

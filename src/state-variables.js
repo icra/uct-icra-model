@@ -1,5 +1,5 @@
 /*
-  STATE VARIABLES AND MASS RATIOS ENCAPSULATION
+  STATE VARIABLES CLASS
   Each removal technology is be a method inside state variables, implemented in
   its own file (e.g. nitrification.js) as
   "State_Variables.prototype.technology_name=function(){implementation}"
@@ -225,17 +225,15 @@ class State_Variables {
   }
 }
 
-//export
+//export class
 try{module.exports=State_Variables}catch(e){}
 
-/*tests*/
-(function(){
+/*tests*/{
   //test 1: print totals and fluxes
   (function(){
     return
     let s = new State_Variables(25);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
-    //console.log("=== Inputs (mass ratios) ===");       console.log(s.mass_ratios);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
     console.log("=== Totals (mg/L) ===");              console.log(s.totals);
     console.log("=== Fluxes (kg/d) ===");              console.log(s.fluxes);
@@ -276,4 +274,4 @@ try{module.exports=State_Variables}catch(e){}
     console.log('---raw ww---'); sv.set("X_BPO",707); sv.set("X_UPO",150); sv.set("X_iSS",100); console.log(sv.summary);
     console.log('---set ww---'); sv.set('X_BPO',301); sv.set('X_UPO',20);  sv.set('X_iSS',34);  console.log(sv.summary);
   })();
-})();
+}

@@ -1,5 +1,7 @@
 /*
-  AS + SST implementation from G. Ekama notes
+  AS + SST implementation
+  from G. Ekama notes
+
   Qi → [Activated Sludge + SST] → Qe
                ↓
                Qw

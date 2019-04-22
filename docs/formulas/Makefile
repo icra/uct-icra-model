@@ -10,4 +10,3 @@ formulas.ms.pdf: formulas.ms
 	groff -t -e -ms formulas.ms -T pdf -K utf-8 > formulas.ms.pdf
 
 # vim: noexpandtab
-
