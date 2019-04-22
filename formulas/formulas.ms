@@ -12,7 +12,7 @@ groff -e -t -ms formulas.ms -T pdf -K utf-8
 
 .nr GROWPS 3  .\conf tamanys títols
 .nr PSINCR 1p .\conf tamanys títols
-.EQ           .\conf equacions 
+.EQ           .\conf equacions
 delim $$
 .EN
 
@@ -149,9 +149,9 @@ X sub T = X sub V + X sub iSS
 .EN
 where:
 .EQ (mgVSS/L)
-X sub V = 
-  X sub BPO over f sub cv sub BPO + 
-  X sub UPO over f sub cv sub UPO + 
+X sub V =
+  X sub BPO over f sub cv sub BPO +
+  X sub UPO over f sub cv sub UPO +
   X sub OHO over f sub cv sub OHO
 .EN
 
@@ -325,7 +325,7 @@ moles sub Fe = mass sub FeCl sub 3 over {M sub FeCl sub 3 }{ {1 mol sub Fe } ove
 .NH 2
 Moles of P available
 .EQ (mgP/L)
-P sub available = P sub ti - P sub s - P sub ouse - P sub obse 
+P sub available = P sub ti - P sub s - P sub ouse - P sub obse
 .EN
 .EQ (molFe/d)
 moles sub P = {Q · P sub available } over M sub P
@@ -461,7 +461,7 @@ Nitrification capacity
 N sub c = N sub ti - N sub s - (N sub ae + N sub ouse)
 .EN
 
-.NH 2 
+.NH 2
 ANO biomass
 .EQ (gVSS·d/gNH4)
 f sub X sub BA = {Y sub AT R sub s } over {1 + b sub AT · R sub s}
@@ -541,13 +541,13 @@ N sub ne_opt = N sub c over {a sub opt + RAS + 1}
 .NH 2
 Effluent nitrate ($N sub ne$)
 .EQ L
-if(a < a sub opt ) 
+if(a < a sub opt )
 .EN
 .EQ (mgN/L)
 N sub ne = N sub c over {a+RAS+1}
 .EN
 .EQ L
-if(a > a sub opt ) 
+if(a > a sub opt )
 .EN
 .EQ (mgN/L)
 N sub ne = N sub c - D sub p1 + { a·DO + RAS·DO sub RAS } over 2.86
