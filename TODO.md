@@ -1,8 +1,11 @@
 ## Pending Tasks
-  - separate capacity estimation and Rs balanced and performance of the plant
-    at the Rs balanced ("theoretical" values vs "actual")
+  - output in a new object the capacity estimation results ("theoretical"
+    values vs "actual")
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al
     2008)
+  - ask george whether if YH = 0.45 = 0.66/1.481, then
+    if f_CV_OHO changes, YH changes as well.
+    so we should ask for YH=0.66 (as gCOD/gCOD), instead of YH=0.45 (as gVSS/gCOD)
 
 ## Future / new modules to be added
   - energy consumption module (reuse ecoinvent equations)

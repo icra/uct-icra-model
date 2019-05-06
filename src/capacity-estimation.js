@@ -61,7 +61,7 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
     X_tave:{value:X_tave, unit:"kgTSS/m3", descr:"Average TSS conccentration in reactor"},
     Q_ADWF:{value:Q_ADWF, unit:"ML/d",     descr:"Average dry weather flow"},
   }
-  console.log(results);
+  //console.log(results);
   return results;
 }
 

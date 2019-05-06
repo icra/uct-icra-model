@@ -23,11 +23,11 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   /*
     option 'waste_from':
 
-    "reactor"       | "sst"
-    ----------------+----------------------
-    Q→[AS]→[SST]→Qe | Q→[AS]→[SST]→Qe
-        |           |          |
-        v Qw        |          v Qw
+    "reactor"        | "sst"
+    -----------------+-----------------
+     Q→[AS]→[SST]→Qe | Q→[AS]→[SST]→Qe
+         |           |          |
+         v Qw        |          v Qw
   */
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;

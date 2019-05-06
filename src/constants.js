@@ -8,7 +8,7 @@
     "denitrification.js"
 */
 
-let constants={
+const constants={
   //activated sludge
   YH         : 0.450, //gVSS/gCOD | heterotrophic yield (not affected by temperature)
   bH         : 0.240, //1/d       | heterotrophic endogenous respiration rate at 20ºC
@@ -21,10 +21,10 @@ let constants={
   µAm      : 0.450, //1/d       | autotrophic max specific growth rate at 20ºC
   theta_µAm: 1.123, //ø         | µAm temperature correction factor
   K_O      : 0.400, //mgDO/L    | autotrophic DO µA sensitivity constant
-  theta_pH : 2.350, //ø         | autotrophic ph sensitivity coefficient
-  Ki       : 1.130, //ø         | autotrophic ph inhibition to µA
-  Kii      : 0.300, //ø         | autotrophic ph inhibition to µA
-  Kmax     : 9.500, //ø         | autotrophic ph inhibition to µA
+  theta_pH : 2.350, //ø         | autotrophic pH sensitivity coefficient
+  Ki       : 1.130, //ø         | autotrophic pH inhibition to µA
+  Kii      : 0.300, //ø         | autotrophic pH inhibition to µA
+  Kmax     : 9.500, //ø         | autotrophic pH inhibition to µA
   YA       : 0.100, //gVSS/gFSA | autotrophic yield
   Kn       : 1.000, //mgN/L     | ammonia half saturation coefficient at 20ºC
   theta_Kn : 1.123, //ø         | Kn temperature correction factor
