@@ -12,14 +12,6 @@ Implementation in Javascript
 University of Cape Town (UCT)
 Catalan Institute for Water Research (ICRA)
 
-.SH
-.ce
-Makefile:
-.LP
-.ce
-.CW
-groff -t -e -ms formulas.ms -T pdf -K utf-8 > formulas.ms.pdf
-
 .nr GROWPS 3  .\conf tamanys títols
 .nr PSINCR 1p .\conf tamanys títols
 .EQ           .\conf equacions
