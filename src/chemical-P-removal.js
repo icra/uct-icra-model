@@ -7,7 +7,12 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   //inputs and default values
   Q          = isNaN(Q)          ? 1  : Q;          //ML/d
   PO4i       = isNaN(PO4i)       ? 7  : PO4i;       //mg/L as P (calculated as "Pse" in 'activated-sludge.js')
-  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added 
+  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added
+
+  //input checks
+  if(Q          <= 0) throw `Error: flowrate (Q=${Q}) not allowed`;
+  if(PO4i       <  0) throw `Error: input PO4 (PO4i=${PO4i}) can't be negative `;
+  if(mass_FeCl3 <  0) throw `Error: mass of FeCl3 (mass_FeCl3=${mass_FeCl3}) can't be negative`;
 
   //molecular weights
   const M_Fe        = 55.845;   //g/mol (Fe molecular weight)
@@ -29,7 +34,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   //get the PO4 effluent concentration from the Fe/P mole ratio
   //Fig 6-13, page 484, M&EA, 5th ed
   function get_PO4_eff(Fe_P_mole_ratio){
-    /* 
+    /*
       Calculate the residual soluble P concentration (C_P_residual), [mg/L] -> range: 0.01, 0.1, 1, 10 (log scale)
       Input: Fe to initial soluble P ratio, [mole/mole] -> range: 0, 1, 2, 3, 4, 5 (lineal scale)
     */
@@ -88,7 +93,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
       let o_above = Figure.find(row=>{return row.inp==i_above}).out;
       let o_inter = o_below + (o_above-o_below)*percentage;
       return o_inter;
-    }else{ 
+    }else{
       //input is in the Figure
       return Figure.find(row=>{return inp==row.inp}).out;
     }
@@ -117,7 +122,6 @@ try{module.exports=chemical_P_removal;}catch(e){}
 
 /*standalone test*/
 (function(){
-  return;
   let Q          = 25;   //ML/d
   let PO4i       = 8;    //mg/L
   let mass_FeCl3 = 3145; //kg

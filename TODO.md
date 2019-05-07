@@ -1,4 +1,5 @@
 ## Pending Tasks
+  - add input numeric checks for all functions with "throw" statements
   - output in a new object the capacity estimation results ("theoretical"
     values vs "actual")
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al
