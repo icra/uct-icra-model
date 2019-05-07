@@ -3,6 +3,7 @@
     values vs "actual")
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al
     2008)
+  - function that pretty prints a plant.run() result for reporting.
   - ask george whether if YH = 0.45 = 0.66/1.481, then
     if f_CV_OHO changes, YH changes as well.
     so we should ask for YH=0.66 (as gCOD/gCOD), instead of YH=0.45 (as gVSS/gCOD)

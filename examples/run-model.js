@@ -1,17 +1,29 @@
 /*
-  STANDALONE SCRIPT THAT CREATES A NEW PLANT AND RUNS THE MODEL
+  standalone script that creates a new plant and runs the model
 */
 
-/*IMPORT MODEL*/
+/*load model*/
 const State_Variables = require('../src/state-variables.js'); //class
 const Plant           = require('../src/plant.js');           //class
 
 /*INPUTS: CREATE INFLUENT, CONFIGURATION AND PARAMETERS*/
 
-//influent----------------------(Q   VFA FBSO BPO  UPO  USO iSS FSA   OP    NOx OHO)
-let influent=new State_Variables(25, 50, 115, 440, 100, 45, 60, 39.1, 7.28, 0,  0  );
+//create new influent
+let influent=new State_Variables(
+  25,   //Q      (ML/d): flowrate
+  50,   //S_VFA  (mg/L): volatile fatty acids (biodegradable soluble organics)
+  115,  //S_FBSO (mg/L): fermentable biodegradable soluble organics
+  440,  //X_BPO  (mg/L): biodegradable particulated organics
+  100,  //X_UPO  (mg/L): unbiodegradable particulated organics
+  45,   //S_USO  (mg/L): unbiodegradable soluble organics
+  60,   //X_iSS  (mg/L): inert suspended solids (inorganic)
+  39.1, //S_FSA  (mg/L): inorganic free saline ammonia (NH4, part of TKN)
+  7.28, //S_OP   (mg/L): inorganic orthophosphate (PO4)
+  0,    //S_NOx  (mg/L): inorganic nitrite and nitrate (NO2 + NO3, not part of TKN)
+  0     //X_OHO  (mg/L): ordinary heterotrhophic organisms (expressed as COD)
+);
 
-//influent mass ratios
+//define influent mass ratios
 influent.mass_ratios={
   /*----+------------------+----------------+-----------------+-----------------+
   |     | COD              | C              | N               | P               |
@@ -24,7 +36,7 @@ influent.mass_ratios={
   /*OHO*/ f_CV_OHO : 1.4810, f_C_OHO : 0.518, f_N_OHO : 0.1000, f_P_OHO : 0.0250,
 };
 
-//configuration: enable modules (on=true/off=false)
+//plant configuration: enable modules (on=true/off=false)
 let configuration={
   pst:true,  //primary settler
   nit:true,  //nitrification
@@ -33,7 +45,7 @@ let configuration={
 };
 
 //parameters: plant settings
-let parameters={ //plant parameters
+let parameters={
   fw          : 0.00500,   //ø       | PST | fraction of Q that goes to wastage
   removal_BPO : 42.3352,   //%       | PST | removal of the component X_BPO
   removal_UPO : 90.0500,   //%       | PST | removal of the component X_UPO
@@ -56,8 +68,8 @@ let parameters={ //plant parameters
   mass_FeCl3  : 3000.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
 };
 
-//kinetic constants
-constants={
+//define kinetic constants
+let constants={
   //activated sludge
   YH         : 0.450, //gVSS/gCOD | heterotrophic yield (not affected by temperature)
   bH         : 0.240, //1/d       | heterotrophic endogenous respiration rate at 20ºC
@@ -93,4 +105,4 @@ constants={
 /*CREATE PLANT, RUN MODEL, DISPLAY RESULTS*/
 let plant = new Plant(influent, configuration, parameters);
 let results = plant.run();
-console.log(results.secondary.effluent.totals.TKN);
+console.log(results);
