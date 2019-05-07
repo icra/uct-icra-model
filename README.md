@@ -1,4 +1,4 @@
-Status: Under refactorization (April 2019)
+Status: Under refactorization (May 2019)
 
 # UCT-ICRA model
 
@@ -8,9 +8,9 @@ Extracted and adapted from Ekama (2017) “Optimizing water and resource recover
 facilities (WRRF) for energy generation without compromising effluent quality”.
 IWA joint nutrient removal and recovery (NRR) and large wastewater treatment
 plant (LWWTP) conference “Sustainable Wastewater Treatment and Resource
-Recovery: Research, Planning, Design and Operation”, 6-8 November, 2017. 
+Recovery: Research, Planning, Design and Operation”, 6-8 November, 2017.
 
-## INFLUENT WASTEWATER CHARACTERISTICS 
+## INFLUENT WASTEWATER CHARACTERISTICS
 For validation of the UCT-ICRA steady state model, wastewater (WW)
 characteristics used in previous studies are used (WRC, 1984; Ekama, 2009,
 2011, 2017 - Tables 1a to c). The University of Cape Town
@@ -44,7 +44,7 @@ are settleable, the effect of the split of organics and ISS between the PS
 anaerobic digester (AD) and the biological nutrient removal activated sludge
 (BNRAS) system on the WRRF energy production and consumption and effluent
 quality was investigated (Ekama, 2017) (Table 2). These are features that will
-be added in future versions of the UCT-ICRA steady state model.  
+be added in future versions of the UCT-ICRA steady state model.
 
 Table 1a: Organic component mass ratios and molar compositions used in this
 investigation to align with raw and settled wastewater concentrations used in
@@ -60,11 +60,11 @@ previous papers (WRC, 1984; Ekama, 2009, 2011).
   <tr><td>UPO <td>1.481 <td>0.518 <td>0.066 <td>0.291 <td>0.100 <td>0.025 <td>1.0 <td>1.534 <td>0.421 <td>0.166 <td>0.019
 </table>
 
-In this UCT-ICRA SSM, settleable and non-settleable organics have the same composition. While this affects the split of N and P between the BNRAS and AD by the PSU, methods of measuring the compositions of settleable and non-settleable BPO and UPO are currently under investigation. 
-  
+In this UCT-ICRA SSM, settleable and non-settleable organics have the same composition. While this affects the split of N and P between the BNRAS and AD by the PSU, methods of measuring the compositions of settleable and non-settleable BPO and UPO are currently under investigation.
+
 Table 1b: Default raw and settled wastewater fractions in UCT-ICRA SSM.
 <table>
-  <tr><th>Fraction<th> Raw <th>Settled <th>Fraction <th>Raw <th>Settled 
+  <tr><th>Fraction<th> Raw <th>Settled <th>Fraction <th>Raw <th>Settled
   <tr><td>Unbiod. soluble COD (fS’us)    <td> 0.050<td> 0.076<td> Unbio COD of settleable COD       <td>0.319 <td>0.000
   <tr><td>Unbiod. particulate COD (fS’up)<td>	0.130<td> 0.029<td> FSA/TKN ratio                     <td>0.611 <td>0.734
   <tr><td>RBCOD of total COD (fS’bs)     <td> 0.134<td> 0.206<td> OP/TP ratio                       <td>0.600 <td>0.721
@@ -78,7 +78,7 @@ Table 2c: Wastewater concentrations calculated from total COD concentrations
 settled WW concentrations conform to the observation that UPO and ISS are
 removed in greater proportion (84%, 80%) than BPO (47%) (Wentzel et al., 2006;
 Ikumi et al., 2014). Overall COD, N and P removals in PSU for given
-concentrations are 40.3%, 15.3% and 21.5%.   
+concentrations are 40.3%, 15.3% and 21.5%.
 
 <table>
   <tr><th rowspan=2>Group<th rowspan=2>Raw WW <th colspan=3>Settleable <th rowspan=2>Settled WW <th colspan=3>Non-settleable <th colspan=4>Dissolved
@@ -110,7 +110,7 @@ increases effluent nitrate (Fig 2).  The maximum practical a-recyle ratio
 (aprac) is set at around 5 to 7:1 because increasing the ratio above this
 reduces the effluent nitrate concentration by only 1 to 2 mgNO3-N/l (<2%),
 which is not worth the increase in electrical power costs from recycling 1x or
-2x ADWF more. 
+2x ADWF more.
 
 The balanced SRT for the MLE system (Fig 1a) was first proposed by van Haandel
 et al. (1982) and its determination by an iterative procedure is described in
@@ -120,7 +120,7 @@ SRT is increased incrementally and the maximum unaerated sludge mass fraction
 anoxic zone (Dp1) set equal to fxm, aopt and Nne are calculated.  An aprac is
 selected (say 6:1) and the SRT at which the aopt=aprac is the MLE system
 balanced SRT. An explicit equation for the balanced SRT of the MLE is given by
-Robertson and Ekama (2016). 
+Robertson and Ekama (2016).
 
 The UCT and JHB systems (to be included in future versions of UCT-ICRA SSM)
 also have a balanced system SRT. Explicit equations for these have not been
@@ -145,7 +145,7 @@ and for the JHB system (iv) the sum of the primary (fx1) and secondary (fx3)
 (underflow) anoxic sludge mass fractions (fx1+fx3) is the difference between
 the maximum unaerated sludge mass fraction (fxm) allowed at a particular SRT to
 ensure nitrification and the anaerobic sludge mass fraction (fxa), viz.
-fx1+fx3=fxm-fxa. 
+fx1+fx3=fxm-fxa.
 
 Subject to the above four changes, the equation for the optimum a-recycle ratio
 (aopt) for the UCT system is the same as for the MLE system and the SRT at
@@ -155,7 +155,7 @@ SRT at which the primary anoxic zone (fx1) is loaded exactly to its
 denitrification potential by the optimum a-recycle ratio (aopt) equal the
 maximum practical (aopt=aprac) and the secondary anoxic zone (fx3) in the
 underflow is exactly large enough to denitrify the nitrate entering it to
-protect the VFA uptake by PAO in the anaerobic zone. 
+protect the VFA uptake by PAO in the anaerobic zone.
 
 Setting the required SRT on a BNRAS plant is extremely important - if the SRT
 is not known accurately, the plant cannot be modelled accurately. Withdrawal of
@@ -174,10 +174,10 @@ The same applies to EBPR, except the “precipitate” is polyphosphate and Mg, 
 and Ca cations in the influent are used by PAO to form it (Ekama and Wentzel,
 2004). So for the same organic load, NDEBPR systems have larger reactors
 because (i) sludge production is higher and (ii) their balanced SRTs are longer
-to accommodate the anaerobic reactor.   
+to accommodate the anaerobic reactor.
 
 
-### Determining the volume and SST area for a BNR system 
+### Determining the volume and SST area for a BNR system
 Once the SRT of a BNRAS system is established, the mass of TSS in the reactor
 (MXt, kgTSS) is known
 from the organic (and ISS) load on the reactor (FSti = QADWFSti, kgCOD/d),
@@ -211,7 +211,7 @@ fractions of different BNR systems with SST (or membranes) of Ramphao et al.
 (2006), for the UCT system, Xtave=Xtaer[1-fxa/(1+r)] and for the JHB system,
 Xtave=Xtaer /[1+fx3/s]. So for the UCT and JHB systems, Xtave needs to be
 replaced with these Xtaer equations in the MXtave= XtaveVR because Xtaer is the
-SST feed TSS concentration in these systems.    
+SST feed TSS concentration in these systems.
 
 ### Determining the capacity of an existing BNR system
 For a given biological reactor volume VR (and anaerobic mass fraction fxa if
@@ -244,19 +244,19 @@ is given by either of the QADWF equations above.
   <li>1Clayton JA, Ekama GA, Wentzel MC and Marais GvR (1991) Denitrification kinetics in biological nitrogen and phosphorus removal systems treating municipal wastewaters. Wat. Sci. Tech., 23(4/6-2) 1025-1035.
   <li>Ekama GA and Marais GvR (1986) Sludge settleability and secondary settling tank design procedures. J. Water Pollut. Control., 85(1) 101-113.
   <li>Ekama GA, Barnard JL, Guenthert FW, Krebs P, McCorquodale JA, Parker DS and Wahlberg EJ (1997) Secondary settling tanks: Theory, design, modelling and operation. IAWQ STR No 6, pp216, International Association on Water Quality, London. ISBN 900222 03 5, ISSN 1025-0913.
-  <li>Ekama GA and Wentzel MC (1999) Denitrification kinetics in N and P removal activated sludge systems treating municipal wastewaters. Wat. Sci. Tech., 39(6) 69-77. 
-  <li>Ekama GA and Marais P (2004) Assessing the applicability of the 1D flux theory to full scale secondary settling tank design with a 2D hydrodynamic model. Wat. Res., 38(3) 495-506. 
+  <li>Ekama GA and Wentzel MC (1999) Denitrification kinetics in N and P removal activated sludge systems treating municipal wastewaters. Wat. Sci. Tech., 39(6) 69-77.
+  <li>Ekama GA and Marais P (2004) Assessing the applicability of the 1D flux theory to full scale secondary settling tank design with a 2D hydrodynamic model. Wat. Res., 38(3) 495-506.
   <li>Ekama GA and Wentzel MC (2004) A predictive model for the reactor inorganic suspended solids concentration in activated sludge systems. Wat. Res., 38(19) 4093-4106.
   <li>Ekama GA (2009) Using bio-process stoichiometry to build a steady state plant wide wastewater treatment plant model. Wat. Res., 43(8) 2101-2120.
-  <li>Ekama GA (2010) The role and control of sludge age in biological nutrient removal activated sludge systems. Wat. Sci. Tech., 61(7) 1645-1652. 
+  <li>Ekama GA (2010) The role and control of sludge age in biological nutrient removal activated sludge systems. Wat. Sci. Tech., 61(7) 1645-1652.
   <li>Ekama GA (2011) Biological nutrient removal. In: Wilderer P (ed.) Treatise on Water Science, Vol 4, pp409-528. Oxford: Academic Press.
   <li>Henze M, van Loosdrecht MCM, Ekama GA and Brdjanovic D (2008) Biological wastewater treatment: Principles, modelling and design. IWA Publishing, London. 528 pages. ISBN - 10:1843391880; 13:9781843391883.
   <li>Ikumi DS, Harding TH and Ekama GA (2014) Biodegradability of wastewater and activated sludge organics in anaerobic digestion. Wat. Res., 56(1) 267-279.
-  <li>Ramphao MC, Wentzel MC, Merritt R, Ekama GA, Young T and Buckley CA (2005) The impact of membrane solid-liquid separation on the design of biological nutrient removal activated sludge systems. Biotech & Bioeng., 89(6) 630-646. 
+  <li>Ramphao MC, Wentzel MC, Merritt R, Ekama GA, Young T and Buckley CA (2005) The impact of membrane solid-liquid separation on the design of biological nutrient removal activated sludge systems. Biotech & Bioeng., 89(6) 630-646.
   <li>2Robertson J and Ekama GA (2016) A comparison of conventional activated sludge and integrated fixed film media in MLE, UCT and JHB configurations. Procs. 14th biennial WISA conference and exhibition, Durban, 15-19 May, 2016.
   <li>Van Haandel AC, Dold PL and Marais GvR (1982) Optimization of nitrogen removal in the single sludge activated sludge process. Wat. Sci. Tech. 14, 443-446.
   <li>Wentzel MC, Dold PL, Ekama GA and Marais GvR (1985) Kinetics of biological phosphorus release. Wat. Sci. Tech., 17, 57-71.
-  <li>Wentzel MC, Ekama GA, Dold PL and Marais GvR (1990) Biological excess phosphorus removal - steady state process design. Water SA, 16(1) 29-48. 
+  <li>Wentzel MC, Ekama GA, Dold PL and Marais GvR (1990) Biological excess phosphorus removal - steady state process design. Water SA, 16(1) 29-48.
   <li>Wentzel MC, Ekama GA and Sotemann SW (2006) Mass balances based plant wide wastewater treatment plant models - Part 1: Biodegradability of wastewater organics under anaerobic conditions. Water SA, 32(3) 269-275.
   <li>WRC (1984) Theory, design and operation of nutrient removal activated sludge processes (Chs 4-6). Ed. Wiechers HNS, Water Research Commission, TT16/84 , ISBN 0 908356 13 7. (www.wrc.org.za).
 </ul>
