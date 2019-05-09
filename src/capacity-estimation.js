@@ -18,6 +18,14 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   VR   = isNaN(VR  )? 12461  : VR  ; //m3            | volume of the reactor
   fq   = isNaN(fq  )? 2.4    : fq  ; //ø             | peak flow (Qmax/Qavg)
 
+  //input checks
+  if(DSVI <= 0) throw `Error: Sludge settleability (DSVI=${DSVI}) not allowed`;
+  if(L    <  0) throw `Error: MX_T/FSti (L=${L}) not allowed`;
+  if(Sti  <  0) throw `Error: influent COD value (Sti=${Sti}) not allowed`;
+  if(A_ST <= 0) throw `Error: area of the settler value (A_ST=${A_ST}) not allowed`;
+  if(VR   <= 0) throw `Error: reactor volume (VR=${VR}) not allowed`;
+  if(fq   <  1) throw `Error: peak flow (Qmax/Qavg) (fq=${fq}) not allowed`;
+
   //equations page 3
   let SSVI = 0.67*DSVI;                         //mg/gTSS      | eq 12
   let V0_n = 67.9*Math.exp(-0.016*SSVI);        //kgTSS/(m2·h) | eq 13

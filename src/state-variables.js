@@ -8,12 +8,12 @@
     "activated-sludge",
     "chemical-P-removal"
     "nitrification",
-    "denitrification",
+    "denitrification"
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
     Qi → [PST] → [AS] → [nitrification] → Qe
-          ↓       ↓           ↓
-          Qw      Qw          Qw
+          ↓       ↓      ↓
+          Qw      Qw     Qw
 
   Summary of this file:
     1. data structure
@@ -31,6 +31,19 @@
 
 class State_Variables {
   constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx, X_OHO){
+    //input checks
+    if(Q      <= 0) throw `Error: Flowrate (Q=${Q}) not allowed`;
+    if(S_VFA  <  0) throw `Error: volatile fatty acids (S_VFA=${S_VFA}) not allowed`;
+    if(S_FBSO <  0) throw `Error: fermentable biodegradable soluble organics (S_FBSO=${S_FBSO}) not allowed`;
+    if(X_BPO  <  0) throw `Error: biodegradable particulated organics (X_BPO=${X_BPO}) not allowed`;
+    if(X_UPO  <  0) throw `Error: unbiodegradable particulated organics (X_UPO=${X_UPO}) not allowed`;
+    if(S_USO  <  0) throw `Error: unbiodegradable soluble organics (S_USO=${S_USO}) not allowed`;
+    if(X_iSS  <  0) throw `Error: inert suspended solids (X_iSS=${X_iSS}) not allowed`;
+    if(S_FSA  <  0) throw `Error: free saline ammonia (S_FSA=${S_FSA}) not allowed`;
+    if(S_OP   <  0) throw `Error: orthophosphate (S_OP=${S_OP}) not allowed`;
+    if(S_NOx  <  0) throw `Error: nitrate and nitrite (S_NOx=${S_NOx}) not allowed`;
+    if(X_OHO  <  0) throw `Error: ordinary heterotrophic organisms (X_OHO=${X_OHO}) not allowed`;
+
     //inputs and default values
     this.Q = isNaN(Q) ? 25 : Q; //ML/d | flowrate
     this.components={

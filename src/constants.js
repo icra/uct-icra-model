@@ -1,11 +1,6 @@
 /*
   All kinetic constants.
-  The user can modify these numbers in the GUI.
-
-  This object is used in the following files:
-    "activated-sludge.js"
-    "nitrification.js"
-    "denitrification.js"
+  The user should be able to modify these values.
 */
 
 const constants={
@@ -17,6 +12,7 @@ const constants={
   theta_k_v20: 1.035, //ø         | k_v20 temperature correction factor
   fH         : 0.200, //ø         | heterotrophic endogenous residue fraction
   f_iOHO     : 0.150, //giSS/gVSS | iSS content of OHOs
+
   //nitrification
   µAm      : 0.450, //1/d       | autotrophic max specific growth rate at 20ºC
   theta_µAm: 1.123, //ø         | µAm temperature correction factor
@@ -30,6 +26,7 @@ const constants={
   theta_Kn : 1.123, //ø         | Kn temperature correction factor
   bA       : 0.040, //1/d       | autotrophic endogenous respiration rate at 20ºC
   theta_bA : 1.029, //ø         | bA temperature correction factor
+
   //denitrification
   K1_20   : 0.720, //gN/gVSS·d | at 20ºC page 482 and 113
   K2_20   : 0.101, //gN/gVSS·d | at 20ºC page 482 and 113

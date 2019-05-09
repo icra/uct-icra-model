@@ -16,6 +16,12 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   removal_UPO = isNaN(removal_UPO) ? 100-100*24.875* 10/(25*100) : removal_UPO; //% | removal of the component X_UPO
   removal_iSS = isNaN(removal_iSS) ? 100-100*24.875* 15/(25* 60) : removal_iSS; //% | removal of the component X_iSS
 
+  //input checks
+  if(fw          <  0) throw `Error: wastage fraction (fw=${fw}) not allowed`;
+  if(removal_BPO <  0) throw `Error: BPO removal (removal_BPO=${removal_BPO}) not allowed`;
+  if(removal_UPO <  0) throw `Error: UPO removal (removal_UPO=${removal_UPO}) not allowed`;
+  if(removal_iSS <  0) throw `Error: iSS removal (removal_iSS=${removal_iSS}) not allowed`;
+
   //convert percentages to rate
   removal_BPO /= 100;
   removal_UPO /= 100;
@@ -59,12 +65,12 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   let effluent = new State_Variables(Qe, S_VFA, S_FBSO, X_BPO_e, X_UPO_e, S_USO, X_iSS_e, S_FSA, S_OP, S_NOx, X_OHO_e);
   let wastage  = new State_Variables(Qw, S_VFA, S_FBSO, X_BPO_w, X_UPO_w, S_USO, X_iSS_w, S_FSA, S_OP, S_NOx, X_OHO_w);
 
-  //copy influent mass ratios
+  //copy mass ratios for the new outputs
   effluent.mass_ratios = this.mass_ratios;
   wastage.mass_ratios  = this.mass_ratios;
 
-  //end
-  return { effluent, wastage };
+  //return both output state variables objects
+  return {effluent, wastage};
 };
 
 //test

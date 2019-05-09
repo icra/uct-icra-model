@@ -1,8 +1,9 @@
 /*
-  AS + Nitrification + SST implementation from G. Ekama notes
+  AS + Nitrification + SST implementation
+  from G. Ekama notes
 
   Qi → [Activated Sludge + Nitrification + SST] → Qe
-                  ↓ 
+                  ↓
                   Qw
 */
 
@@ -25,16 +26,21 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //capacity estimation inputs
-  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability 
+  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability
   A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
   fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
   //nitrification inputs
-  SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
-  //choose a high value for high influent ammonia concentration variation
+  SF  = isNaN(SF ) ? 1.25 : SF ; /* safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
+                                    choose a high value for high influent ammonia concentration variation */
   fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
   DO  = isNaN(DO ) ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
   pH  = isNaN(pH ) ? 7.2  : pH ; //pH units
+
+  //input checks
+  if(SF  < 0) throw `Error: Safety factor (SF=${SF}) not allowed`;
+  if(fxt < 0) throw `Error: Unaerated sludge mass fraction (fxt=${fxt}) not allowed`;
+  if(DO  < 0) throw `Error: Dissolved oxygen in the aerobic reactor (DO=${DO}) not allowed`;
 
   //influent fractionation
   let frac = this.totals;

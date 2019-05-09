@@ -2,7 +2,7 @@
   AS + Nitrification + Denitrification + SST implementation from G. Ekama notes
 
   Qi → [Activated Sludge + Nitrification + Denitrification + SST] → Qe
-                  ↓ 
+                  ↓
                   Qw
 */
 
@@ -25,7 +25,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //capacity estimation inputs
-  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability 
+  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability
   A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
   fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
@@ -39,6 +39,10 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   IR           = isNaN(IR)           ? 5.4 : IR;           //ø             | internal recirculation ratio
   DO_RAS       = isNaN(DO_RAS)       ? 1.0 : DO_RAS;       //mgO/L         | DO in the underflow recycle
   influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
+
+  //input checks
+  if(IR     <= 0) throw `Error: Internal recirculation ratio (IR=${IR}) not allowed`;
+  if(DO_RAS <  0) throw `Error: Dissolved oxygen in the recycle stream (DO_RAS=${DO_RAS}) not allowed`;
 
   //execute as+nitrification
   let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH); //object
@@ -142,7 +146,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let pTODw = Qw*(
     f*(
       (fCV_OHO + 4.57*f_N_OHO)*(X_BH+X_EH) +
-      (fCV_UPO + 4.57*f_N_UPO)*(X_I) 
+      (fCV_UPO + 4.57*f_N_UPO)*(X_I)
     )*1000);                                                          //kg/d | particulated TODw
   let TODw   = sTODw + pTODw;                                         //kg/d | total TOD in wastage
   let TODout = TODw + TODe + FOt + FOd;                               //kg/d | total TOD out
@@ -221,7 +225,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     FOt          :{value:FOt          ,unit:"kgO/d"      ,descr:"Total oxygen demand (FOc + FOn - FOd)"},
     OUR          :{value:OUR          ,unit:"mgO/L·h"    ,descr:"Oxygen Uptake Rate"},
     effluent_alk :{value:effluent_alk ,unit:"mgCaCO3/L"  ,descr:"Effluent alkalinity"},
-    FN2g         :{value:FN2g         ,unit:"kgN/d"      ,descr:"N2 gas production (mass flux)"},           
+    FN2g         :{value:FN2g         ,unit:"kgN/d"      ,descr:"N2 gas production (mass flux)"},
     //TODi         :{value:TODi         ,unit:"kgO/d"      ,descr:"Total oxygen demand (influent)"},
     //TODe         :{value:TODe         ,unit:"kgO/d"      ,descr:"Total oxygen demand (effluent)"},
     //TODw         :{value:TODw         ,unit:"kgO/d"      ,descr:"Total oxygen demand (wastage)"},

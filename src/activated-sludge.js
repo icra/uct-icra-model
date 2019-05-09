@@ -1,11 +1,12 @@
 /*
-  AS + SST implementation
+  Activated Sludge (AS) + Secondary Settler (SST) implementation
   from G. Ekama notes
 
   Qi → [Activated Sludge + SST] → Qe
                ↓
                Qw
 */
+
 //import files
 try{
   State_Variables     = require("./state-variables.js");
@@ -30,7 +31,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
          v Qw        |          v Qw
   */
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
-  if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
 
   //inputs for chemical P removal
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for P precipitation
@@ -39,6 +39,12 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability
   A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
   fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
+
+  //input checks
+  if(Vp  <= 0) throw `Error: Reactor volume (Vp=${Vp}) not allowed`;
+  if(Rs  <= 0) throw `Error: Solids retention time (Rs=${Rs}) not allowed`;
+  if(RAS <= 0) throw `Error: SST recycle ratio (RAS=${RAS}) not allowed`;
+  if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`;
 
   //get necessary mass ratios
   const f_N_OHO  = this.mass_ratios.f_N_OHO;   //gN/gVSS

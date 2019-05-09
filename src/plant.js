@@ -10,12 +10,12 @@
 
 //import files
 try{
-  State_Variables = require('./state-variables.js');    //class State_Variables
-                    require('./primary-settler.js');    //tech primary_settler  (inside State Variables)
-                    require('./activated-sludge.js');   //tech activated_sludge (inside State Variables)
-                    require('./nitrification.js');      //tech nitrification    (inside State Variables)
-                    require('./denitrification.js');    //tech denitrification  (inside State Variables)
-                    require('./chemical-P-removal.js'); //tech chemical P rem   (inside activated sludge)
+  State_Variables = require('./state-variables.js'); //class State_Variables
+  require('./primary-settler.js');                   //prototype primary_settler  (in State Variables)
+  require('./activated-sludge.js');                  //prototype activated_sludge (in State Variables)
+  require('./nitrification.js');                     //prototype nitrification    (in State Variables)
+  require('./denitrification.js');                   //prototype denitrification  (in State Variables)
+  require('./chemical-P-removal.js');                //function chemical P rem   (in activated sludge)
 }catch(e){}
 
 class Plant{
