@@ -1,5 +1,6 @@
 ## Model assumptions / limitations
   - The model process is a MLE (Modified Ludzack Ettinger process).
+  - ideal settler (everything particulated goes to wastage).
   - Influent active biomass (X.OHO as COD) is always 0.
   - Mass of nitrifiers (MX.BA as suspended solids) is not considered into total
     solids mass (MX.T).
