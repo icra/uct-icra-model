@@ -1,8 +1,6 @@
 ## Pending Tasks
-  - output in a new object the capacity estimation results ("theoretical"
-    values vs "actual")
-  - discuss with george the effect of the pH in FePO4 formation (Szabo et al
-    2008)
+  - output in a new object the capacity estimation results ("theoretical" values vs "actual")
+  - discuss with george the effect of the pH in FePO4 formation (Szabo et al 2008)
   - function that pretty prints a plant.run() result for reporting.
 
 ## Future / new modules to be added

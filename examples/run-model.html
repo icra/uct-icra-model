@@ -82,7 +82,7 @@
   <style>
     main{
       display:grid;
-      grid-template-columns:58% 42%;
+      grid-template-columns:60% 40%;
       grid-gap:5px;
     }
     main div.card {
@@ -104,17 +104,17 @@
   <div class=card> <strong>Inputs</strong> </div>
   <div class=card>
     <strong>Outputs</strong>
-    <span>
-      <label onclick=""><input type=radio name=summary_units value=both>         all </label>
-      <label onclick=""><input type=radio name=summary_units value=conc checked> mg/L</label>
-      <label onclick=""><input type=radio name=summary_units value=flux>         kg/d</label>
-    </span>
+    <small>
+      <span>
+        <label onclick=""><input type=radio name=summary_units value=both>         all </label>
+        <label onclick=""><input type=radio name=summary_units value=conc checked> mg/L</label>
+        <label onclick=""><input type=radio name=summary_units value=flux>         kg/d</label>
+      </span>
+    </small>
   </div>
 
-  <!--second row-->
-
   <!--inputs-->
-  <div id=inputs>
+  <div id=inputs style=min-width:60%>
     <!--influent--><div><code onclick=toggle_visibility('#influent',this)>[-] Influent composition</code></div>
     <div class=card>
       <table id=influent class=card><tr>
@@ -216,7 +216,7 @@
       <table id=constants style=display:none>
         <tr><td colspan=3><code onclick="toggle_visibility('#constants #as',this)">[-] Activated sludge</code>
         <tbody id=as>
-          <tr title="heterotrophic VSS/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.450 step=0.01 ><td class=unit>gVSS/gCOD
+          <tr title="heterotrophic COD/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.666 step=0.01 ><td class=unit>gCOD/gCOD
           <tr title="heterotrophic endogenous respiration rate at 20ºC"><td>bH                      <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
           <tr title="bH temperature correction factor"                 ><td>&theta;<sub>bH</sub>    <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
           <tr title="not degraded bCOD (FBSO)"                         ><td>k_v20                   <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
@@ -249,12 +249,10 @@
   </div>
 
   <!--outputs-->
-  <div id=outputs>
+  <div id=outputs style=min-width:29%>
     <!--summaries-->
     <div>
-      <code onclick="toggle_visibility('#outputs #summaries',this)">
-        [-] Summary
-      </code>
+      <code onclick="toggle_visibility('#outputs #summaries',this)"> [-] Summary </code>
     </div>
     <div class=card>
       <div id=summaries style="display:"></div>
@@ -293,16 +291,24 @@
 <!--gui decimal number formatter-->
 <script>
   /*convert a number to a string: i.e. 3999.4 turns into "3,999.4"*/
+  let nf=[
+    new Intl.NumberFormat('en-EN', {maximumFractionDigits:0}),
+    new Intl.NumberFormat('en-EN', {maximumFractionDigits:1}),
+    new Intl.NumberFormat('en-EN', {maximumFractionDigits:2}),
+    new Intl.NumberFormat('en-EN', {maximumFractionDigits:3}),
+    new Intl.NumberFormat('en-EN', {maximumFractionDigits:4}),
+    new Intl.NumberFormat('en-EN', {maximumFractionDigits:5}),
+  ];//global variable because creating a NumberFormat object is slow
+
   function format(number,digits){
     digits=digits||0;
     let abs_number = Math.abs(number);
-    if(abs_number< 100   )digits=1;
-    if(abs_number<  10   )digits=2;
-    if(abs_number<   1   )digits=3;
-    if(abs_number<   0.1 )digits=4;
-    if(abs_number<   0.01)digits=5;
-    let str=new Intl.NumberFormat('en-EN',{maximumFractionDigits:digits}).format(number);
-    return str;
+    if(abs_number< 100   ) digits=1;
+    if(abs_number<  10   ) digits=2;
+    if(abs_number<   1   ) digits=3;
+    if(abs_number<   0.1 ) digits=4;
+    if(abs_number<   0.01) digits=5;
+    return nf[digits].format(number);
   }
 
   String.prototype.prettifyUnit=function(){
@@ -314,7 +320,7 @@
       .replace('PO4','PO<sub>4</sub>')
       .replace('m2','m<sup>2</sup>')
       .replace('m3','m<sup>3</sup>')
-      .replace(/_/g,' ')
+      .replace(/_/g,' ');
   }
 </script>
 
@@ -418,10 +424,12 @@
 
     /*GUI integration (read 'run' object)*/
     (function print_results(){
-      console.time('print results');
+      console.time('>> print results');
 
       //draw fractionation columns
       (function draw_fractionation(){
+        console.time('>> draw fractionation');
+
         //state variables (per ordre)
         let svs = {};
         svs.Influent                      = plant.influent;         //state variables object
@@ -446,6 +454,51 @@
         //agafa el primer fraccionament per posar noms de les variables
         let primer_fraccionament=Object.values(totals).find(e=>e);
 
+        //posa la mateixa nomenclatura de George Ekama
+        let nomenclatura_george={
+          "FSA":"N<sub>a</sub>",
+          "PO4":"P<sub>s</sub>",
+          "bCOD":"S<sub>b</sub>",
+          "uCOD":"S<sub>u</sub>",
+          "sCOD":"S<sub>s</sub>",
+          "pCOD":"S<sub>p</sub>",
+          "bsCOD":"S<sub>bs</sub>",
+          "usCOD":"S<sub>us</sub>",
+          "bpCOD":"S<sub>bp</sub>",
+          "upCOD":"S<sub>up</sub>",
+          "ON":"N<sub>o</sub>",
+          "bON":"N<sub>ob</sub>",
+          "uON":"N<sub>ou</sub>",
+          "sON":"N<sub>os</sub>",
+          "pON":"N<sub>op</sub>",
+          "bsON":"N<sub>obs</sub>",
+          "usON":"N<sub>ous</sub>",
+          "bpON":"N<sub>obp</sub>",
+          "upON":"N<sub>oup</sub>",
+          "OP":"P<sub>o</sub>",
+          "bOP":"P<sub>ob</sub>",
+          "uOP":"P<sub>ou</sub>",
+          "sOP":"P<sub>os</sub>",
+          "pOP":"P<sub>op</sub>",
+          "bsOP":"P<sub>obs</sub>",
+          "usOP":"P<sub>ous</sub>",
+          "bpOP":"P<sub>obp</sub>",
+          "upOP":"P<sub>oup</sub>",
+          "OC":"C<sub>o</sub>",
+          "bOC":"C<sub>ob</sub>",
+          "uOC":"C<sub>ou</sub>",
+          "sOC":"C<sub>os</sub>",
+          "pOC":"C<sub>op</sub>",
+          "bsOC":"C<sub>obs</sub>",
+          "usOC":"C<sub>ous</sub>",
+          "bpOC":"C<sub>obp</sub>",
+          "upOC":"C<sub>oup</sub>",
+          "iSS" :'X<sub>IO</sub>',
+          "VSS" :'X<sub>v</sub>',
+          "bVSS":'X<sub>vb</sub>',
+          "uVSS":'X<sub>vu</sub>',
+        };
+
         //itera COD,TKN,TP,TOC,TSS
         Object.entries(primer_fraccionament).forEach(([key,fraccions])=>{
           let newRow = table.insertRow(-1);
@@ -456,68 +509,25 @@
           //itera cada fracció dins de cada key
           Object.keys(fraccions).forEach(fraction=>{
             let newRow=table.insertRow(-1);
-
-            //posa la mateixa nomenclatura de George Ekama
-            let nomenclatura={
-              "FSA":"N<sub>a</sub>",
-              "PO4":"P<sub>s</sub>",
-              "bCOD":"S<sub>b</sub>",
-              "uCOD":"S<sub>u</sub>",
-              "sCOD":"S<sub>s</sub>",
-              "pCOD":"S<sub>p</sub>",
-              "bsCOD":"S<sub>bs</sub>",
-              "usCOD":"S<sub>us</sub>",
-              "bpCOD":"S<sub>bp</sub>",
-              "upCOD":"S<sub>up</sub>",
-              "ON":"N<sub>o</sub>",
-              "bON":"N<sub>ob</sub>",
-              "uON":"N<sub>ou</sub>",
-              "sON":"N<sub>os</sub>",
-              "pON":"N<sub>op</sub>",
-              "bsON":"N<sub>obs</sub>",
-              "usON":"N<sub>ous</sub>",
-              "bpON":"N<sub>obp</sub>",
-              "upON":"N<sub>oup</sub>",
-              "OP":"P<sub>o</sub>",
-              "bOP":"P<sub>ob</sub>",
-              "uOP":"P<sub>ou</sub>",
-              "sOP":"P<sub>os</sub>",
-              "pOP":"P<sub>op</sub>",
-              "bsOP":"P<sub>obs</sub>",
-              "usOP":"P<sub>ous</sub>",
-              "bpOP":"P<sub>obp</sub>",
-              "upOP":"P<sub>oup</sub>",
-              "OC":"C<sub>o</sub>",
-              "bOC":"C<sub>ob</sub>",
-              "uOC":"C<sub>ou</sub>",
-              "sOC":"C<sub>os</sub>",
-              "pOC":"C<sub>op</sub>",
-              "bsOC":"C<sub>obs</sub>",
-              "usOC":"C<sub>ous</sub>",
-              "bpOC":"C<sub>obp</sub>",
-              "upOC":"C<sub>oup</sub>",
-            }[fraction]||fraction;
+            let nomenclatura = "hola que ases";
 
             if(fraction=='total'){
-              if(key=='COD') nomenclatura='S<sub>t</sub>';
-              if(key=='TOC') nomenclatura='C<sub>t</sub>';
-              if(key=='TKN') nomenclatura='N<sub>t</sub>';
-              if(key=='TP' ) nomenclatura='P<sub>t</sub>';
+              if     (key=='COD')  nomenclatura='S<sub>t</sub>';
+              else if(key=='TOC')  nomenclatura='C<sub>t</sub>';
+              else if(key=='TKN')  nomenclatura='N<sub>t</sub>';
+              else if(key=='TP' )  nomenclatura='P<sub>t</sub>';
+              else if(key=='TSS' ) nomenclatura='X<sub>t</sub>';
             }
-            if(fraction=='active'){
-              if(key=='COD') nomenclatura='S<sub>OHO</sub>';
-              if(key=='TOC') nomenclatura='C<sub>OHO</sub>';
-              if(key=='TKN') nomenclatura='N<sub>OHO</sub>';
-              if(key=='TP' ) nomenclatura='P<sub>OHO</sub>';
+            else if(fraction=='active'){
+              if     (key=='COD')  nomenclatura='S<sub>OHO</sub>';
+              else if(key=='TOC')  nomenclatura='C<sub>OHO</sub>';
+              else if(key=='TKN')  nomenclatura='N<sub>OHO</sub>';
+              else if(key=='TP' )  nomenclatura='P<sub>OHO</sub>';
+              else if(key=='TSS' ) nomenclatura='X<sub>OHO</sub>';
+            }else{
+              nomenclatura = nomenclatura_george[fraction] || fraction;
             }
-            if(key=='TSS'){
-              if(fraction=='total')  nomenclatura='X<sub>t</sub>';
-              if(fraction=='iSS')    nomenclatura='X<sub>IO</sub>';
-              if(fraction=='VSS')    nomenclatura='X<sub>v</sub>';
-              if(fraction=='bVSS')   nomenclatura='X<sub>vb</sub>';
-              if(fraction=='uVSS')   nomenclatura='X<sub>vu</sub>';
-              if(fraction=='active') nomenclatura='X<sub>OHO</sub>';
-            }
+
             newRow.insertCell(-1).innerHTML=nomenclatura;
 
             //itera variables d'estat
@@ -529,10 +539,14 @@
             });
           });
         });
+
+        console.timeEnd('>> draw fractionation');
       })();
 
       //dibuixa summaries en columnes
       (function draw_summaries(){
+        console.time('>> draw summaries');
+
         //recopila summaries variables d'estat (per ordre)
         let summaries = {};
         summaries.Influent                      = plant.influent.summary;
@@ -570,6 +584,8 @@
             }
           });
         });
+
+        console.timeEnd('>> draw summaries');
       })();
 
       //dibuixa process variables (pvs)
@@ -624,7 +640,7 @@
       //clica unitats marcades
       document.querySelector('input[name=summary_units]:checked').click();
 
-      console.timeEnd('print results');
+      console.timeEnd('>> print results');
     })();
   });
 

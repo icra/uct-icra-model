@@ -40,6 +40,15 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   DO_RAS       = isNaN(DO_RAS)       ? 1.0 : DO_RAS;       //mgO/L         | DO in the underflow recycle
   influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
 
+  //get mass rations
+  const fH = constants.fH;                   //ø | 0.20 (endogenous residue fraction)
+  const fCV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
+  const fCV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
+  const fCV_BPO = this.mass_ratios.f_CV_BPO; //gCOD/gVSS
+  const f_N_OHO = this.mass_ratios.f_N_OHO;  //gVSS/gN
+  const f_N_UPO = this.mass_ratios.f_N_UPO;  //gVSS/gN
+  const f_N_BPO = this.mass_ratios.f_N_BPO;  //gVSS/gN
+
   //execute as+nitrification
   let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH); //object
 
@@ -125,13 +134,6 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let TODe = Qe*(eff_frac.COD.total + 4.57*eff_frac.TKN.total); //kgO/d
 
   //calculate TOD wastage (TODw)
-  const fH = constants.fH;                   //ø | 0.20 (endogenous residue fraction)
-  const fCV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
-  const fCV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
-  const fCV_BPO = this.mass_ratios.f_CV_BPO; //gCOD/gVSS
-  const f_N_OHO = this.mass_ratios.f_N_OHO;  //gVSS/gN
-  const f_N_UPO = this.mass_ratios.f_N_UPO;  //gVSS/gN
-  const f_N_BPO = this.mass_ratios.f_N_BPO;  //gVSS/gN
   let Qw    = nit.wastage.Q;                                          //ML/d   | wastage flowrate
   let f     = nit.as_process_variables.f.value;                       //ø      | (1+RAS)/RAS (or 1 if we waste from reactor)
   let X_BH  = nit.as_process_variables.MX_BH.value/Vp;                //kg/m3  | OHO
