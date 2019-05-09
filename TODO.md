@@ -1,13 +1,9 @@
 ## Pending Tasks
-  - add input numeric checks for all functions with "throw" statements
   - output in a new object the capacity estimation results ("theoretical"
     values vs "actual")
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al
     2008)
   - function that pretty prints a plant.run() result for reporting.
-  - ask george whether if YH = 0.45 = 0.66/1.481, then
-    if f_CV_OHO changes, YH changes as well.
-    so we should ask for YH=0.66 (as gCOD/gCOD), instead of YH=0.45 (as gVSS/gCOD)
 
 ## Future / new modules to be added
   - energy consumption module (reuse ecoinvent equations)
@@ -47,3 +43,5 @@
   - [done] warnings module in "tests/fase1.html"
   - [done] add check for exported URL above 2k characters.
   - [done] refactor plant model into its own repository.
+  - [done] add input numeric checks for all functions with "throw" statements
+  - [done] change YH = 0.45 gVSS/gCOD to YH = 0.666 gCOD/gCOD

@@ -75,10 +75,10 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let fSb_s = Sbsi/Sbi; //ratio BSO/(BSO+BPO)
 
   //denitrification potential
-  const fCV   = this.mass_ratios.f_CV_OHO;            //1.481 gUPO/gVSS
-  const YH    = constants.YH;                         //0.450 gVSS/gCOD
-  let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YH*Rs/(1+bHT*Rs)
-  let Dp1RBSO = Sbsi*(1-fCV*YH)/2.86;                 //mgN/L | influent
+  const YH    = constants.YH;                         //0.666 gCOD/gCOD
+  const YHvss = YH/fCV_OHO;                           //0.45  gVSS/gCOD
+  let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YHvss*Rs/(1+bHT*Rs)
+  let Dp1RBSO = Sbsi*(1-YH)/2.86;                     //mgN/L | influent
   let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgN/L | influent
   let Dp1     = Dp1RBSO+Dp1BPO;                       //mgN/L | influent
 
@@ -173,8 +173,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
   let bHT = nit.as_process_variables.bHT.value; //1/d
 
-  //calculate fx1min: minimum primary anoxic sludge mass fraction required to utilitze all the readily biodegradable organics (BSO)
-  let fx1min = fSb_s*(1-fCV*YH)*(1+bHT*Rs)/(2.86*K1T*YH*Rs);
+  //calculate fx1min: minimum primary anoxic sludge mass fraction required to
+  //utilitze all the readily biodegradable organics (BSO)
+  let fx1min = fSb_s*(1-YH)*(1+bHT*Rs)/(2.86*K1T*YHvss*Rs);
 
   //check if fxt is lower than fx1min and raise an error
   if(fxt<fx1min) errors.push("fxt < fx1min");
@@ -192,12 +193,12 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     let bAT  = nit.process_variables.bAT.value;     //1/d
     //intermediate calculations necessary for computing Rs_bal
     let A      = Sbi;                     //mgCOD/L | VFA + FBSO + BPO
-    let B      = fSb_s*(1-fCV*YH)/2.86;   //mg/L
+    let B      = fSb_s*(1-YH)/2.86;       //mg/L
     let C      = Nti - Nte;               //mgN/L
     let D      = (a_prac*Oa + s*Os)/2.86; //unit missing
     let E      = (a_prac+s)/(a_prac+s+1); //unit missing
-    let Rs_top = C*E+D-A*B+A*SF*K2T*YH/µA-E*(f_N_OHO*A*YH+f_N_UPO*Sti*fSup/fCV_UPO);                               //numerator
-    let Rs_bot = A*(B*bHT+K2T*YH)-A*SF*bAT*K2T*YH/µA-bHT*(C*E+D)+E*bHT*(f_N_OHO*A*YH*fH+f_N_UPO*Sti*fSup/fCV_UPO); //denominator
+    let Rs_top = C*E+D-A*B+A*SF*K2T*YHvss/µA-E*(f_N_OHO*A*YHvss+f_N_UPO*Sti*fSup/fCV_UPO);                               //numerator
+    let Rs_bot = A*(B*bHT+K2T*YHvss)-A*SF*bAT*K2T*YHvss/µA-bHT*(C*E+D)+E*bHT*(f_N_OHO*A*YHvss*fH+f_N_UPO*Sti*fSup/fCV_UPO); //denominator
     let Rs_bal = Rs_top/Rs_bot;
     return Rs_bal;
   })();
