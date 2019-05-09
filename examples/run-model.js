@@ -71,7 +71,7 @@ let parameters={
 //define kinetic constants
 let constants={
   //activated sludge
-  YH         : 0.450, //gVSS/gCOD | heterotrophic yield (not affected by temperature)
+  YH         : 0.666, //gCOD/gCOD | heterotrophic yield (not affected by temperature)
   bH         : 0.240, //1/d       | heterotrophic endogenous respiration rate at 20ºC
   theta_bH   : 1.029, //ø         | bH temperature correction factor
   k_v20      : 0.070, //L/mgVSS·d | constant for not degraded bCOD (FBSO)

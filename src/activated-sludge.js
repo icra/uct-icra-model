@@ -81,11 +81,12 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let FiSS = inf_fluxes.totals.TSS.iSS;   //kgiSS/d  | iSS flux influent
 
   //2.2 - kinetics - page 10
-  const YH       = constants.YH;           //0.45 gVSS/gCOD | heterotrophic yield coefficient (does not change with temperature)
+  const YH       = constants.YH;           //0.66 gCOD/gCOD | heterotrophic yield coefficient (does not change with temperature)
+  const YHvss    = YH/fCV_OHO;             //0.45 gVSS/gCOD | heterotrophic yield coefficient (does not change with temperature)
   const bH       = constants.bH;           //0.24 1/d       | endogenous respiration rate at 20ºC
   const theta_bH = constants.theta_bH;     //1.029 ø        | bH temperature correction factor
   let bHT   = bH*Math.pow(theta_bH, T-20); //1/d            | endogenous respiration rate corrected by temperature
-  let f_XBH = (YH*Rs)/(1+bHT*Rs);          //gVSS·d/gCOD    | OHO biomass production rate
+  let f_XBH = (YHvss*Rs)/(1+bHT*Rs);       //gVSS·d/gCOD    | OHO biomass production rate
 
   //bCOD not degraded (FBSO)
   const k_v20       = constants.k_v20;       //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
@@ -209,7 +210,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //2.7 - oxygen demand - page 13
   //carbonaceous oxygen demand
   let FOc = (function(){
-    let catabolism  = 1 - fCV_OHO*YH;           //gCOD/gCOD | electrons used for energy (catabolism)
+    let catabolism  = 1 - YH;                   //gCOD/gCOD | electrons used for energy (catabolism)
     let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | oxygen demand for endogenous respiration (O2->CO2)
     return FdSbi*(catabolism + respiration);    //kgO/d
   })();
