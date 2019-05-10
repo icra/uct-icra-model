@@ -1,10 +1,11 @@
-## Pending Tasks
+## Pending Tasks (~ new branches)
+  - fix gui example process variable section
   - refactor warnings/errors output from plant object
   - output in a new object the capacity estimation results ("theoretical" values vs "actual")
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al 2008)
   - function that pretty prints a plant.run() result for reporting.
 
-## Future / new modules to be added
+## Future / new modules TBD
   - energy consumption module (reuse ecoinvent equations)
   - oxygen limitation module (reuse ecoinvent equations)
   - bio P removal EBPR module
@@ -32,8 +33,7 @@
   - [done] influent nitrate (NOx): if we have influent NOx, TOD balance not closing.
   - [done] OHO as a new state variable
   - [done] kg of FeCl3 added is not equal to the extra iSS produced (for
-    example 3000 kg FeCl3 produces ~2500 kg iSS. The remaining ~500 kg is Cl(-)
-    ion?).
+    example 3000 kg FeCl3 produces ~2500 kg iSS. The remaining ~500 kg is Cl(-) ion?).
   - [done] let Dp1RBSO = Sbsi·(1-fCV·YH)/2.86;
   - [done] generate export and import links in "tests/fase1.html"
   - [done] architecture class diagram.

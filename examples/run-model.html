@@ -93,7 +93,7 @@
     }
     .folded arrow { transform:rotate(-45deg) }
     div:not(.folded) code[onclick]{
-      background:#fafafa;
+      background:#f9f9f9;
     }
   </style>
 
@@ -149,17 +149,19 @@
     }
     main #inputs, #outputs {
       margin-top:20px;
-      margin-right:5px;
       width:49%;
     }
-    main #inputs div:first-child, #outputs div:first-child {
+    main #inputs {
+      margin-right:5px;
+    }
+    main #inputs > div:first-child, #outputs > div:first-child {
       height:22px;
     }
   </style>
 </head><body>
 
 <!--title-->
-<div style="border-bottom:1px solid #aaa;margin-bottom:4px;justify-content:space-between" class=flex>
+<div style="border-bottom:1px solid #aaa;margin-bottom:4px;justify-content:center" class=flex>
   <h3>
     <span id=title onclick> UCT-ICRA model </span>
     <!--run button-->
@@ -177,9 +179,6 @@
       }
     </style>
   </h3>
-  <div style=font-size:smaller>
-    <a target=_blank href="//github.com/icra/uct-icra-model">github</a>
-  </div>
 </div>
 
 <main class=flex>
@@ -357,7 +356,7 @@
     </div>
 
     <!--summaries-->
-    <div class='card folded'>
+    <div class='card'>
       <code onclick="toggle_class_folded('#outputs #summaries')">
         <arrow></arrow> Summary
       </code>
@@ -397,6 +396,11 @@
     </div>
   </div>
 </main>
+
+<!--github link-->
+<footer style="border-top:1px solid #ccc;margin-top:20px;padding:1em;text-align:right">
+  <a target=_blank href="//github.com/icra/uct-icra-model">About</a>
+</footer>
 
 <!--load backend-->
 <script src="../src/state-variables.js"></script>
