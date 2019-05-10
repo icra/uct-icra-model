@@ -33,7 +33,7 @@ class Plant{
 
   //run the plant model
   run(){
-    console.time('>> run'); //measure performance
+    console.time('>> run model'); //measure performance
 
     //shorten object names
     let conf = this.configuration;
@@ -54,7 +54,7 @@ class Plant{
     else              as = pst.effluent.activated_sludge(p.T,p.Vp,p.Rs,p.RAS,p.waste_from,p.mass_FeCl3,p.DSVI,p.A_ST,p.fq,);
 
     //all plant results {process_variables, streams, errors}
-    console.timeEnd('>> run');
+    console.timeEnd('>> run model');
     return {
       process_variables:{
         as  : conf.dn ? as.as_process_variables  : (conf.nit ? as.as_process_variables : as.process_variables),

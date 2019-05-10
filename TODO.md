@@ -1,4 +1,5 @@
 ## Pending Tasks
+  - refactor warnings/errors output from plant object
   - output in a new object the capacity estimation results ("theoretical" values vs "actual")
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al 2008)
   - function that pretty prints a plant.run() result for reporting.
