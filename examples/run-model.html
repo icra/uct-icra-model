@@ -515,8 +515,9 @@
         svs.Secondary_effluent            = run.secondary.effluent; //state variables object
 
         if(Object.keys(svs).length==0)return;
-        let div   = document.querySelector('div#fractionation');div.innerHTML=""; //buida div summaries
+        let div   = document.querySelector('div#fractionation');div.innerHTML=""; //buida div fractionation
         let table = document.createElement('table');div.appendChild(table);       //crea nova taula
+        table.style.width="100%";
         let newRow=table.insertRow(-1);
         newRow.insertCell(-1).outerHTML="<td colspan=2>";
 
@@ -630,6 +631,7 @@
         if(Object.keys(summaries).length==0)return;
         let div   = document.querySelector('div#summaries'); div.innerHTML=""; //buida div summaries
         let table = document.createElement('table');div.appendChild(table);    //crea nova taula
+        table.style.width="100%";
         let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML="";   //posa els noms de les variables d'estat
         Object.keys(summaries).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller stream>"+key.replace('_','<br>');});
         //itera keys del primer objecte (Q,COD,TKN...)
