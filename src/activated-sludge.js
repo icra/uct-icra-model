@@ -246,7 +246,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let errors=[];
 
   if(Q   > cap.Q_ADWF.value) errors.push("Q > Q_ADWF: plant overloaded");
-  if(X_T > cap.X_tave.value) errors.push("X_T > X_tave: plant overloaded");
+  if(X_T > cap.X_Tave.value) errors.push("X_T > X_Tave: plant overloaded");
 
   //process_variables
   let process_variables={
@@ -265,8 +265,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
     MX_T    :{value:MX_T,      unit:"kgTSS",       descr:"Total Suspended Solids"},
     X_V     :{value:X_V,       unit:"kgVSS/m3",    descr:"VSS concentration in SST"},
     X_T     :{value:X_T,       unit:"kgTSS/m3",    descr:"TSS concentration in SST"},
-    X_tave  :cap.X_tave,
-    Q_ADWF  :cap.Q_ADWF,
     fi      :{value:fi,        unit:"gVSS/gTSS",   descr:"VSS/TSS ratio"},
     f_avOHO :{value:f_avOHO,   unit:"gOHO/gVSS",   descr:"Active fraction of the sludge (VSS)"},
     f_atOHO :{value:f_atOHO,   unit:"gOHO/gTSS",   descr:"Active fraction of the sludge (TSS)"},
@@ -290,6 +288,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   return {
     process_variables, //object: AS process variables
     cpr,               //object: chemical P removal variables
+    cap,               //object: capacity estimation results
     errors,            //array: errors found
     effluent,          //State_Variables object
     wastage,           //State_Variables object

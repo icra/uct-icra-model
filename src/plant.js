@@ -61,6 +61,7 @@ class Plant{
         nit : conf.dn ? as.nit_process_variables : (conf.nit ? as.process_variables    : null),
         dn  : conf.dn ? as.process_variables     : null,
         cpr : as.cpr,
+        cap : as.cap,
       },   
       primary:{
         effluent: pst.effluent, //primary effluent (state variables object)

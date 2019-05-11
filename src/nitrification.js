@@ -93,8 +93,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //minimum sludge age for nitrification (Rsm)
   let Rsm = 1/(µAm_pH/SF*(1-fxt)-bAT); //days | reorganized equation for fxm
 
-  //compile Rsm and fxm errors
-  let errors=as.errors;
+  //compile Rsm and fxm errors from previous module
+  let errors = as.errors;
   if(Rs  < Rsm) errors.push("Rs  < Rsm");
   if(fxt > fxm) errors.push("fxt > fxm");
 
@@ -196,6 +196,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
     process_variables,
     as_process_variables: as.process_variables,
     cpr:                  as.cpr,
+    cap:                  as.cap,
     errors,
     effluent,
     wastage,

@@ -64,9 +64,10 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   }
   let X_tave = x1;                //kgTSS/m3 | take the last iteration of x1
   let Q_ADWF = VR*X_tave/(L*Sti); //ML/d     | capacity of the treatment plant
+
   let results={
-    iterations, //iterations done to compute X_tave
-    X_tave:{value:X_tave, unit:"kgTSS/m3", descr:"Average TSS conccentration in reactor"},
+    iterations:{value:iterations, unit:'iterations', descr:'amount of newton-raphson iterations performed to compute X_tave'}, //iterations done to compute X_tave
+    X_Tave:{value:X_tave, unit:"kgTSS/m3", descr:"Average TSS conccentration in reactor"},
     Q_ADWF:{value:Q_ADWF, unit:"ML/d",     descr:"Average dry weather flow"},
   }
   //console.log(results);

@@ -1,9 +1,10 @@
 /*
-  AS + Nitrification + Denitrification + SST implementation from G. Ekama notes
+  AS + Nitrification + Denitrification + SST
+  implementation from G. Ekama notes
 
-  Qi → [Activated Sludge + Nitrification + Denitrification + SST] → Qe
-                  ↓
-                  Qw
+  Qi → [AS + N + DN + SST] → Qe
+         ↓
+         Qw
 */
 
 //import files
@@ -244,6 +245,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     nit_process_variables: nit.process_variables,
     as_process_variables:  nit.as_process_variables,
     cpr:                   nit.cpr,
+    cap:                   nit.cap,
     errors,
     effluent,
     wastage,

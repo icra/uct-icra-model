@@ -674,6 +674,7 @@
         if(conf.nit) pvs.Nitrification      = run.process_variables.nit;
         if(conf.dn)  pvs.Denitrification    = run.process_variables.dn;
         if(conf.cpr) pvs.Chemical_P_removal = run.process_variables.cpr;
+        pvs.Capacity_estimation             = run.process_variables.cap;
 
         //dibuixa una taula per cada procés
         Object.entries(pvs).forEach(([key,pv])=>{
