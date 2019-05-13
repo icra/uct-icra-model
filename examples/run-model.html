@@ -36,6 +36,7 @@
       margin-left:1em;
     }
 
+    #influent div[title]{ margin-right:1px; }
     #inputs #edar input[type=number],
     #inputs #edar select,
     #inputs #mass_ratios input,
@@ -188,29 +189,32 @@
 <main class=flex>
   <!--inputs-->
   <div id=inputs>
-    <div class=card>
-      <strong>Inputs</strong>
-    </div>
+    <div class=card> <strong>Inputs</strong> </div>
 
     <!--influent-->
     <div class=card>
       <code onclick=toggle_class_folded('#influent')>
-        <arrow></arrow>
-        Influent composition
+        <arrow></arrow> Influent composition
       </code>
-      <table id=influent class=card style=width:100%><tr>
-        <td title="Flowrate"                            >Q<sub> </sub>    <input type=number id=Q      value=25  ><span class=unit>ML/d</span>
-        <td title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span>
-        <td title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span>
-        <td title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=X_BPO  value=440 ><span class=unit>mg/L</span>
-        <td title="Unbiodegradable particulate organics">X<sub>UPO </sub><input type=number id=X_UPO  value=100 ><span class=unit>mg/L</span>
-        <td title="Unbiodegradable soluble organics"    >S<sub>USO </sub><input type=number id=S_USO  value=45  ><span class=unit>mg/L</span>
-        <td title="Inert suspended solids"              >X<sub>iSS </sub><input type=number id=X_iSS  value=60  ><span class=unit>mg/L</span>
-        <td title="Free saline ammonia"                 >S<sub>NH4 </sub><input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span>
-        <td title="Orthophosphate (PO4)"                >S<sub>PO4 </sub><input type=number id=S_OP   value=7.28><span class=unit>mg/L</span>
-        <td title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span>
-        <td title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0   ><span class=unit>mg/L</span>
-      </table>
+      <div id=influent class=flex>
+        <div class=flex>
+          <div title="Flowrate">Q<sub> </sub><input type=number id=Q value=25><span class=unit>ML/d</span></div>
+        </div>
+        <div class=flex>
+          <div title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span></div>
+          <div title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span></div>
+          <div title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=X_BPO  value=440 ><span class=unit>mg/L</span></div>
+          <div title="Unbiodegradable particulate organics">X<sub>UPO </sub><input type=number id=X_UPO  value=100 ><span class=unit>mg/L</span></div>
+          <div title="Unbiodegradable soluble organics"    >S<sub>USO </sub><input type=number id=S_USO  value=45  ><span class=unit>mg/L</span></div>
+        </div>
+        <div class=flex>
+          <div title="Inert suspended solids"              >X<sub>iSS </sub><input type=number id=X_iSS  value=60  ><span class=unit>mg/L</span></div>
+          <div title="Free saline ammonia"                 >S<sub>NH4 </sub><input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span></div>
+          <div title="Orthophosphate (PO4)"                >S<sub>PO4 </sub><input type=number id=S_OP   value=7.28><span class=unit>mg/L</span></div>
+          <div title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span></div>
+          <div title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0   ><span class=unit>mg/L</span></div>
+        </div>
+      </div>
     </div>
 
     <!--plant-->
@@ -258,8 +262,7 @@
     <!--mass ratios-->
     <div class='card folded'>
       <code onclick=toggle_class_folded('#mass_ratios')>
-        <arrow></arrow>
-        Mass ratios
+        <arrow></arrow> Mass ratios
       </code>
       <table id=mass_ratios style=width:100%>
         <tr><td><td>fcv<div class=unit>gCOD/gVSS<td>fC<div class=unit>gVSS/gC<td>fN<div class=unit>gVSS/gN<td>fP<div class=unit>gVSS/gP
@@ -348,8 +351,7 @@
 
   <!--outputs-->
   <div id=outputs>
-    <div class=card>
-      <strong>Outputs</strong>
+    <div class=card> <strong>Outputs</strong>
       <small>
         <span>
           <label onclick=""><input type=radio name=summary_units value=conc checked> mg/L</label>
@@ -403,7 +405,9 @@
 
 <!--github link-->
 <footer style="border-top:1px solid #ccc;margin-top:20px;padding:1em;text-align:right">
-  <a target=_blank href="//github.com/icra/uct-icra-model">About</a>
+  <a target=_blank href="//github.com/icra/uct-icra-model">README</a> |
+  <a target=_blank href="//github.com/icra/uct-icra-model/blob/master/TODO.md">TODO</a> |
+  <a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">ASSUMPTIONS</a>
 </footer>
 
 <!--load backend-->
@@ -500,7 +504,12 @@
 
     /*create new plant, run the model*/
     let plant = new Plant(influent, conf, parameters);
-    let run = plant.run();
+    let run; //result of plant.run()
+    try{
+      run = plant.run();
+    }catch(e){
+      alert(e);
+    }
     //console.log(run);
     /*backend end-------*/
 

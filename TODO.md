@@ -1,11 +1,9 @@
 ## Pending Tasks (~ new branches)
-  - refactor warnings/errors output from plant object
-  - output in a new object the capacity estimation results ("theoretical" values vs "actual")
+  - low values of influent COD have problems with COD balance (not 100%)
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al 2008)
+  - ask george to make skype to play with model interface and:
+    - watch out for: Rs Rsm a a_opt
   - function that pretty prints a plant.run() result for reporting.
-  - ask george to run an example play with Rs_bal and a_opt
-    - watch out for:
-      Rs Rsm a a_opt
 
 ## Future / new modules TBD
   - energy consumption module (reuse ecoinvent equations)
@@ -46,3 +44,5 @@
   - [done] refactor plant model into its own repository.
   - [done] add input numeric checks for all functions with "throw" statements
   - [done] change YH = 0.45 gVSS/gCOD to YH = 0.666 gCOD/gCOD
+  - [done] refactor warnings/errors output from plant object
+  - [done] output in a new object the capacity estimation results ("theoretical" values).

@@ -17,10 +17,10 @@ try{
 
 State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq){
   //inputs and default values
-  T   = isNaN(T  )? 16     : T ;  //ºC   | Temperature
-  Vp  = isNaN(Vp )? 8473.3 : Vp;  //m3   | Volume
-  Rs  = isNaN(Rs )? 15     : Rs;  //days | Solids Retention Time or Sludge Age
-  RAS = isNaN(RAS)? 1.0    : RAS; //ø    | SST underflow recycle ratio
+  T   = isNaN(T)   ? 16     : T;   //ºC   | Temperature
+  Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume of reactor
+  Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
+  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   /*
     option 'waste_from':
 
@@ -70,8 +70,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //fSus and fSup ratios
   let Suse = frac.COD.usCOD; //mg/L | USO influent == USO effluent (Susi==Suse)
   let Supi = frac.COD.upCOD; //mg/L | UPO influent
-  let fSus = Suse/Sti;       //gUSO/gCOD influent
-  let fSup = Supi/Sti;       //gUPO/gCOD influent
+  let fSus = Suse/Sti ||0;   //gUSO/gCOD influent
+  let fSup = Supi/Sti ||0;   //gUPO/gCOD influent
 
   //2.1 - influent mass fluxes (kg/d)
   let inf_fluxes = this.fluxes;           //object: all mass fluxes. structure: {components, totals}
@@ -93,7 +93,10 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   const theta_k_v20 = constants.theta_k_v20; //1.035 ø        | k_v20 temperature correction factor
   let k_vT    = k_v20*Math.pow(theta_k_v20,T-20);  //L/mgVSS·d
   let S_b     = 1/(f_XBH*k_vT);              //mgCOD/L
-  let FdSbi   = FSbi - Q*S_b;                //kg/d COD
+  let FdSbi   = Math.max(0, FSbi - Q*S_b);   //kg/d COD
+
+  //force 0 for S_b if FdSbi is 0
+  if(FdSbi==0) S_b = 0;
 
   //total VSS solids
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
@@ -155,9 +158,9 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let f=(waste_from=='sst')? SST.f : 1;
 
   //2.5
-  let fi      = MX_V/MX_T;  //VSS/TSS ratio
-  let f_avOHO = MX_BH/MX_V; //gOHOVSS/gVSS | fraction of active biomass in VSS
-  let f_atOHO = fi*f_avOHO; //gOHOVSS/gTSS | fraction of active biomass in TSS
+  let fi      = MX_V/MX_T  ||0; //VSS/TSS ratio
+  let f_avOHO = MX_BH/MX_V ||0; //gOHOVSS/gVSS | fraction of active biomass in VSS
+  let f_atOHO = fi*f_avOHO;     //gOHOVSS/gTSS | fraction of active biomass in TSS
 
   //2.6 - Nitrogen - page 12
   let Ns    = (f_N_OHO*(MX_BH+MX_EH)+f_N_UPO*MX_I)/(Rs*Q); //mgN/L | N in influent required for sludge production
@@ -195,11 +198,11 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae, Pse, Nne, 0      );
   let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was);
 
-  //copy influent mass ratios
+  //copy influent mass ratios for the new outputs
   effluent.mass_ratios = this.mass_ratios;
   wastage.mass_ratios  = this.mass_ratios;
 
-  //get output fluxes
+  //get output mass fluxes (kg/d)
   let eff_fluxes = effluent.fluxes; //object
   let was_fluxes = wastage.fluxes;  //object
 
@@ -214,7 +217,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
     let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | oxygen demand for endogenous respiration (O2->CO2)
     return FdSbi*(catabolism + respiration);    //kgO/d
   })();
-  let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand
+  let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand TODO problem when influent COD values are very small
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
   let OUR = FOt/(Vp*24)*1000; //mg/L·h | oxygen uptake rate
 
@@ -252,6 +255,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let process_variables={
     fSus    :{value:fSus,      unit:"gUSO/gCOD",   descr:"USO/COD ratio (influent)"},
     fSup    :{value:fSup,      unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"},
+    YHvss   :{value:YHvss,     unit:"gVSS/gCOD",   descr:"Heterotrophic yield coefficient"},
     Ns      :{value:Ns,        unit:"mgN/L",       descr:"N required for sludge production"},
     Ps      :{value:Ps,        unit:"mgN/L",       descr:"P required for sludge production"},
     HRT     :{value:HRT,       unit:"hour",        descr:"Nominal Hydraulic Retention Time"},

@@ -86,7 +86,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //const K4T   = K4_20*Math.pow(constants.theta_K4,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.029)
 
   //3.2
-  let fSb_s = Sbsi/Sbi; //ratio BSO/(BSO+BPO)
+  let fSb_s = Sbsi/Sbi||0; //ratio BSO/(BSO+BPO)
 
   //denitrification potential
   const YH    = constants.YH;                         //0.666 gCOD/gCOD
@@ -102,7 +102,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     let A = DO/2.86;
     let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/2.86;
     let C = (1+RAS)*((Dp1-Nni)-RAS*DO_RAS/2.86)-RAS*Nc;
-    return (-B+Math.sqrt(B*B+4*A*C))/(2*A);
+    return Math.max(0, (-B+Math.sqrt(B*B+4*A*C))/(2*A));
   })();
 
   //minimum effluent NOx concentration
@@ -111,13 +111,15 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //effluent nitrate (Nne)
   let Nne = 0;                                                   //mgN/L
   if(a < a_opt) Nne = Nc/(a+RAS+1);                              //mgN/L
-  else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L
+  else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L TODO what if Nc and Dp1 and Nni are 0?
 
-  let FN2g = Q*(Nni + Nc - Nne); //kgN/d | N2 gas produced
+  console.log({a, DO, RAS, DO_RAS},(a*DO+RAS*DO_RAS)/2.86);
+
+  let FN2g = Math.max(0, Q*(Nni + Nc - Nne)); //kgN/d | N2 gas produced
   let TNe  = Nte + Nne;          //mgN/L | total nitrogen (TN) effluent (TKN+NOx)
 
   //oxygen recovered by denitrification
-  let FOd = 2.86*Q*(Nc-Nne);                     //kgO/d
+  let FOd = Math.max(0, 2.86*Q*(Nc-Nne));        //kgO/d
   let FOc = nit.as_process_variables.FOc.value;  //kgO/d
   let FOn = nit.process_variables.FOn.value;     //kgO/d
   let FOt = FOc + FOn - FOd;                     //kgO/d
@@ -153,14 +155,14 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     )*1000);                                                          //kg/d | particulated TODw
   let TODw   = sTODw + pTODw;                                         //kg/d | total TOD in wastage
   let TODout = TODw + TODe + FOt + FOd;                               //kg/d | total TOD out
-  let TOD_balance = 100*TODout/TODi;                                  //percentage
+  let TOD_balance = 100*TODout/TODi || 100;                           //percentage
 
   //2.10 - N balance
   let FNti      = this.fluxes.totals.TKN.total         + Q *Nni; //kgN/d | total TN influent
   let FNte      = nit.effluent.fluxes.totals.TKN.total + Qe*Nne; //kgN/d | total TN effluent
   let FNw       = nit.wastage.fluxes.totals.TKN.total  + Qw*Nne; //kgN/d | total TN wastage
   let FNout     = FNte + FNw + FN2g;                             //kgN/d | total TN out
-  let N_balance = 100*FNout/FNti;                                //percentage
+  let N_balance = 100*FNout/FNti ||100;                          //percentage
   //denitrification end-------------------------------------------------------------
 
   //create output streams (effluent and wastage)
@@ -207,7 +209,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     let Rs_top = C*E+D-A*B+A*SF*K2T*YHvss/µA-E*(f_N_OHO*A*YHvss+f_N_UPO*Sti*fSup/fCV_UPO);                               //numerator
     let Rs_bot = A*(B*bHT+K2T*YHvss)-A*SF*bAT*K2T*YHvss/µA-bHT*(C*E+D)+E*bHT*(f_N_OHO*A*YHvss*fH+f_N_UPO*Sti*fSup/fCV_UPO); //denominator
     let Rs_bal = Rs_top/Rs_bot;
-    return Rs_bal;
+    return Math.max(0, Rs_bal);
   })();
 
   //denitrification results

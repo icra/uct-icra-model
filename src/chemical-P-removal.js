@@ -29,7 +29,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   let moles_Fe = mass_Fe*1000/M_Fe;       //moles/d Fe
 
   //get Fe/P mole ratio
-  let Fe_P_mole_ratio = moles_Fe/moles_P; //mol_Fe/mol_P
+  let Fe_P_mole_ratio = moles_Fe/moles_P || 0; //mol_Fe/mol_P
 
   //get the PO4 effluent concentration from the Fe/P mole ratio
   //Fig 6-13, page 484, M&EA, 5th ed
@@ -105,7 +105,7 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   let PO4_removed = Q*(PO4i - PO4e);                           //kgP/d
 
   //get extra iSS sludge produced
-  let extra_iSS = PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P; //kg_iSS/d
+  let extra_iSS = PO4_removed*(M_FeH2PO4OH+M_FeOH3*(Fe_P_mole_ratio-1.6))/M_P ||0; //kg_iSS/d
 
   //return cpr process variables
   return {
