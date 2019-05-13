@@ -1,5 +1,5 @@
 ## Pending Tasks (~ new branches)
-  - low values of influent COD have problems with COD balance (not 100%)
+  - low values of influent COD (~0.01) create problems with COD balance (not 100%, due to FOn) and Nne in denitrification (nitrate appears).
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al 2008)
   - ask george to make skype to play with model interface and:
     - watch out for: Rs Rsm a a_opt
