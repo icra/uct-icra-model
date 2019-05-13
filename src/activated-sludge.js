@@ -91,7 +91,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //bCOD not degraded (FBSO)
   const k_v20       = constants.k_v20;       //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
   const theta_k_v20 = constants.theta_k_v20; //1.035 ø        | k_v20 temperature correction factor
-  let k_vT    = k_v20*Math.pow(1.035,T-20);  //L/mgVSS·d
+  let k_vT    = k_v20*Math.pow(theta_k_v20,T-20);  //L/mgVSS·d
   let S_b     = 1/(f_XBH*k_vT);              //mgCOD/L
   let FdSbi   = FSbi - Q*S_b;                //kg/d COD
 

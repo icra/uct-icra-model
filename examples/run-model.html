@@ -305,13 +305,13 @@
       <code onclick=toggle_class_folded('#constants')>
         <arrow></arrow> Kinetic parameters
       </code>
-      <div id=constants class=flex>
+      <div id=constants>
         <div>
           <code>Activated sludge</code>
           <table>
             <tr title="heterotrophic COD/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.666 step=0.01 ><td class=unit>gCOD/gCOD
             <tr title="heterotrophic endogenous respiration rate at 20ºC"><td>bH                      <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
-            <tr title="bH temperature correction factor"                 ><td>&theta;<sub>bH</sub>    <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
+            <tr title="bH temperature correction factor -> bHT=bH·θ^(T-20)"><td>&theta;<sub>bH</sub>    <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
             <tr title="not degraded bCOD (FBSO)"                         ><td>k_v20                   <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
             <tr title="k_v20 temperature correction factor"              ><td>&theta;<sub>k_v20</sub> <td><input id="theta_k_v20" type=number value=1.035 step=0.001><td class=unit>ø
             <tr title="endogenous residue fraction"                      ><td>fH                      <td><input id="fH"          type=number value=0.200 step=0.1  ><td class=unit>ø
