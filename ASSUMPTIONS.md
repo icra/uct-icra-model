@@ -1,7 +1,7 @@
 ## Model assumptions / limitations
   - The model process is a MLE (Modified Ludzack Ettinger process).
   - Influent active biomass (X-OHO as mgCOD/L) is always 0.
-  - Mass of nitrifiers (MX.BA as suspended solids) is not considered into total
+  - Mass of nitrifiers (MX-BA as suspended solids) is not considered into total
     solids mass (MX-T).
   - Influent S-VFA (volatile fatty acids) and X-BPO (biodegradable
     particulated, mg/L as COD) are 100% consumed (converted to biomass VSS)
