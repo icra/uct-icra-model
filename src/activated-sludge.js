@@ -88,15 +88,17 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let bHT   = bH*Math.pow(theta_bH, T-20); //1/d            | endogenous respiration rate corrected by temperature
   let f_XBH = (YHvss*Rs)/(1+bHT*Rs);       //gVSS·d/gCOD    | OHO biomass production rate
 
-  //bCOD not degraded (FBSO)
+  //BSO not degraded (FBSO)
   const k_v20       = constants.k_v20;          //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
   const theta_k_v20 = constants.theta_k_v20;    //1.035 ø         | k_v20 temperature correction factor
-  let k_vT  = k_v20*Math.pow(theta_k_v20,T-20); //L/mgVSS·d
-  let S_b   = 1/(f_XBH*k_vT);                   //mgCOD/L
-  let FdSbi = Math.max(0, FSbi - Q*S_b);        //kg/d COD
+  /* TODO check this part again with George*/
+  let k_vT  = k_v20*Math.pow(theta_k_v20,T-20); //L/mgVSS·d       | k_v corrected by temperature
+  let S_b   = 1/(f_XBH*k_vT);                   //mgCOD/L         | BSO effluent concentration
+  let FdSbi = Math.max(0, FSbi - Q*S_b);        //kgCOD/d         | BSO effluent mass flux
 
-  //force 0 for S_b if FdSbi is 0
-  if(FdSbi==0) S_b = 0;
+  //recalc S_b, needed for small values
+  S_b = FdSbi/Q;
+  console.log({S_b,FSbi,FdSbi}); //debugging TODO
 
   //total VSS solids
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
@@ -110,7 +112,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Pti   = frac.TP.total;                               //mgP/L | total P influent
   let Pouse = frac.TP.usOP;                                //mgP/L | P organic unbiodegradable soluble effluent
   let Pobse = S_b*f_P_FBSO/fCV_FBSO;                       //mgP/L | P organic biodegradable soluble effluent
-  let Psa   = Pti - Ps - Pouse - Pobse;                    //mgP/L | inorganic soluble P available for chemical P removal
+  let Psa   = Math.max(0, Pti - Ps - Pouse - Pobse);       //mgP/L | inorganic soluble P available for chemical P removal
 
   /*chemical P removal*/
   let cpr         = chemical_P_removal(Q, Psa, mass_FeCl3); //object
@@ -173,7 +175,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Nobse = S_b*f_N_FBSO/fCV_FBSO;                       //mgN/L | bsON effluent (not all FBSO is degraded)
 
   //effluent ammonia = total TKN - Ns - usON - bsON
-  let Nae = Nti - Ns - Nouse - Nobse; //mgN/L
+  let Nae = Math.max(0, Nti - Ns - Nouse - Nobse); //mgN/L
+  console.log({Nae,Nti,Ns,Nouse,Nobse});
 
   //ammonia balance
   let Nae_balance = 100*Nae/(Nai + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
@@ -218,11 +221,16 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
     let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | electrons used for endogenous respiration (O2->CO2)
     return FdSbi*(catabolism + respiration);    //kgO/d
   })();
-  let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand
+
+  //nitrogenous oxygen demand
   /*
-    TODO problem when influent COD values are very small
+    TODO problem:
+    when influent COD values are very small
+    FOn should be ~0, cannot be 4.57*Q*Nae
   */
-  console.log({FOc,FOn});
+  const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
+  let FOn = i_COD_NO3*Q*Nae; //kgO/d
+  console.log({i_COD_NO3,FOc,FOn});
 
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
   let OUR = FOt/(Vp*24)*1000; //mg/L·h | oxygen uptake rate
@@ -230,6 +238,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //COD balance
   let FSout       = FSe + FSw + FOc; //kg/d | total COD out flux
   let COD_balance = 100*FSout/FSti;  //percentage
+  console.log({FSti,FSe,FSw,FOc});
 
   //2.10 - TKN balance
   let FNti      = inf_fluxes.totals.TKN.total; //kgN/d | total TKN influent
@@ -251,11 +260,16 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let cap=capacity_estimation(DSVI, MX_T/FSti, Sti, A_ST, Vp, fq); //object
   //console.log(cap);//debug
 
-  //check if plant is overloaded
+  //check errors
   let errors=[];
-
+  //is plant overloaded?
   if(Q   > cap.Q_ADWF.value) errors.push("Q > Q_ADWF: plant overloaded");
   if(X_T > cap.X_Tave.value) errors.push("X_T > X_Tave: plant overloaded");
+  //are balances 100%?
+  if(isNaN(COD_balance) || (COD_balance < 99.9 || COD_balance > 100.1) ) errors.push(`COD_balance is ${COD_balance}%`);
+  if(isNaN(N_balance  ) || (N_balance   < 99.9 || N_balance   > 100.1) ) errors.push(`N_balance is ${N_balance}%`);
+  if(isNaN(Nae_balance) || (Nae_balance < 99.9 || Nae_balance > 100.1) ) errors.push(`Nae_balance is ${Nae_balance}%`);
+  if(isNaN(P_balance  ) || (P_balance   < 99.9 || P_balance   > 100.1) ) errors.push(`P_balance is ${P_balance}%`);
 
   //process_variables
   let process_variables={

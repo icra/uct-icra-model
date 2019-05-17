@@ -120,8 +120,11 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Nc_fxm = Nti - Ns - Nte_fxm; //mg/L as N | Nitrification capacity if fxt = fxm
 
   //oxygen demand
-  let FOn_fxt = 4.57*Q*Nc_fxt; //kgO/d | O demand if fxt < fxm
-  let FOn_fxm = 4.57*Q*Nc_fxm; //kgO/d | O demand if fxt = fxm
+  const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
+  console.log({i_COD_NO3});
+
+  let FOn_fxt = i_COD_NO3*Q*Nc_fxt; //kgO/d | O demand if fxt < fxm
+  let FOn_fxm = i_COD_NO3*Q*Nc_fxm; //kgO/d | O demand if fxt = fxm
   let FOc     = as.process_variables.FOc.value; //kg=/d
   let FOt_fxt = FOc + FOn_fxt; //kgO/d | total O demand if fxt < fxm
   let FOt_fxm = FOc + FOn_fxm; //kgO/d | total O demand if fxt = fxm

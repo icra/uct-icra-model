@@ -50,9 +50,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   const fCV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
   const fCV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
   const fCV_BPO = this.mass_ratios.f_CV_BPO; //gCOD/gVSS
-  const f_N_OHO = this.mass_ratios.f_N_OHO;  //gVSS/gN
-  const f_N_UPO = this.mass_ratios.f_N_UPO;  //gVSS/gN
-  const f_N_BPO = this.mass_ratios.f_N_BPO;  //gVSS/gN
+  const f_N_OHO = this.mass_ratios.f_N_OHO;  //gN/gVSS
+  const f_N_UPO = this.mass_ratios.f_N_UPO;  //gN/gVSS
+  const f_N_BPO = this.mass_ratios.f_N_BPO;  //gN/gVSS
 
   //execute as+nitrification
   let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH); //object
@@ -91,17 +91,19 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //denitrification potential
   const YH    = constants.YH;                         //0.666 gCOD/gCOD
   const YHvss = YH/fCV_OHO;                           //0.45  gVSS/gCOD
+  const i_NO3_N2 = 40/14;                             //~2.86 gCOD/gN
+  console.log({i_NO3_N2});
   let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YHvss*Rs/(1+bHT*Rs)
-  let Dp1RBSO = Sbsi*(1-YH)/2.86;                     //mgN/L | influent
+  let Dp1RBSO = Sbsi*(1-YH)/i_NO3_N2;                 //mgN/L | influent
   let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgN/L | influent
   let Dp1     = Dp1RBSO+Dp1BPO;                       //mgN/L | influent
 
   //optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
   let a_opt = (function(){
-    let A = DO/2.86;
-    let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/2.86;
-    let C = (1+RAS)*((Dp1-Nni)-RAS*DO_RAS/2.86)-RAS*Nc;
+    let A = DO/i_NO3_N2;
+    let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/i_NO3_N2;
+    let C = (1+RAS)*((Dp1-Nni)-RAS*DO_RAS/i_NO3_N2)-RAS*Nc;
     return Math.max(0, (-B+Math.sqrt(B*B+4*A*C))/(2*A));
   })();
 
@@ -109,22 +111,22 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let Nne_opt = Nc/(a_opt+RAS+1); //mg/L
 
   //effluent nitrate (Nne)
-  let Nne = 0;                                                   //mgN/L
-  if(a < a_opt) Nne = Nc/(a+RAS+1);                              //mgN/L
-  else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L
+  let Nne = 0;                                                       //mgN/L
+  if(a < a_opt) Nne = Nc/(a+RAS+1);                                  //mgN/L
+  else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/i_NO3_N2; //mgN/L
   /*TODO problem description:
     if Nc and Dp1 and Nni are 0:
     Nne = (a*DO + RAS*DO_RAS)/2.86, which is impossible.
   */
 
-  //debugging TODO
-  console.log({a, DO, RAS, DO_RAS},(a*DO+RAS*DO_RAS)/2.86);
+  //debugging
+  console.log({a, DO, RAS, DO_RAS},(a*DO+RAS*DO_RAS)/i_NO3_N2);
 
   let FN2g = Math.max(0, Q*(Nni + Nc - Nne)); //kgN/d | N2 gas produced
   let TNe  = Nte + Nne;          //mgN/L | total nitrogen (TN) effluent (TKN+NOx)
 
   //oxygen recovered by denitrification
-  let FOd = Math.max(0, 2.86*Q*(Nc-Nne));        //kgO/d
+  let FOd = Math.max(0, i_NO3_N2*Q*(Nc-Nne));    //kgO/d
   let FOc = nit.as_process_variables.FOc.value;  //kgO/d
   let FOn = nit.process_variables.FOn.value;     //kgO/d
   let FOt = FOc + FOn - FOd;                     //kgO/d
@@ -140,10 +142,14 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let errors=nit.errors;
   if(effluent_alk<50)errors.push("effluent_alk < 50 mgCaCO3/L");
 
-  //TOD balance (TOD=COD+4.57*TKN)
-  let Qe   = nit.effluent.Q;                                    //ML/d | effluent flowrate
-  let TODi = Q *(inf_frac.COD.total + 4.57*inf_frac.TKN.total); //kgO/d
-  let TODe = Qe*(eff_frac.COD.total + 4.57*eff_frac.TKN.total); //kgO/d
+  //stoichiometric factor for NO3 reduction to N2
+  const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
+  console.log({i_COD_NO3});
+
+  //TOD balance (TOD = COD + i_COD_NO3*TKN)
+  let Qe   = nit.effluent.Q;                                        //ML/d | effluent flowrate
+  let TODi = Q *(inf_frac.COD.total + i_COD_NO3*inf_frac.TKN.total); //kgO/d
+  let TODe = Qe*(eff_frac.COD.total + i_COD_NO3*eff_frac.TKN.total); //kgO/d
 
   //calculate TOD wastage (TODw)
   let Qw    = nit.wastage.Q;                                          //ML/d   | wastage flowrate
@@ -152,11 +158,11 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let X_EH  = nit.as_process_variables.MX_EH.value/Vp;                //kg/m3  | endogenous residue
   let X_I   = nit.as_process_variables.MX_I .value/Vp;                //kg/m3  | UPO
   let X_IO  = nit.as_process_variables.MX_IO.value/Vp;                //kg/m3  | iSS
-  let sTODw = Qw*(was_frac.COD.sCOD + 4.57*(was_frac.TKN.sON + Nae)); //kg/d   | soluble TODw
+  let sTODw = Qw*(was_frac.COD.sCOD + i_COD_NO3*(was_frac.TKN.sON + Nae)); //kg/d   | soluble TODw
   let pTODw = Qw*(
     f*(
-      (fCV_OHO + 4.57*f_N_OHO)*(X_BH+X_EH) +
-      (fCV_UPO + 4.57*f_N_UPO)*(X_I)
+      (fCV_OHO + i_COD_NO3*f_N_OHO)*(X_BH+X_EH) +
+      (fCV_UPO + i_COD_NO3*f_N_UPO)*(X_I)
     )*1000);                                                          //kg/d | particulated TODw
   let TODw   = sTODw + pTODw;                                         //kg/d | total TOD in wastage
   let TODout = TODw + TODe + FOt + FOd;                               //kg/d | total TOD out
@@ -189,7 +195,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
   //calculate fx1min: minimum primary anoxic sludge mass fraction required to
   //utilitze all the readily biodegradable organics (BSO)
-  let fx1min = fSb_s*(1-YH)*(1+bHT*Rs)/(2.86*K1T*YHvss*Rs);
+  let fx1min = fSb_s*(1-YH)*(1+bHT*Rs)/(i_NO3_N2*K1T*YHvss*Rs);
 
   //check if fxt is lower than fx1min and raise an error
   if(fxt<fx1min) errors.push("fxt < fx1min");
@@ -206,12 +212,12 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     let fSup = nit.as_process_variables.fSup.value; //ø | gUPO/gCOD
     let bAT  = nit.process_variables.bAT.value;     //1/d
     //intermediate calculations necessary for computing Rs_bal
-    let A      = Sbi;                     //mgCOD/L | VFA + FBSO + BPO
-    let B      = fSb_s*(1-YH)/2.86;       //mg/L
-    let C      = Nti - Nte;               //mgN/L
-    let D      = (a_prac*Oa + s*Os)/2.86; //unit missing
-    let E      = (a_prac+s)/(a_prac+s+1); //unit missing
-    let Rs_top = C*E+D-A*B+A*SF*K2T*YHvss/µA-E*(f_N_OHO*A*YHvss+f_N_UPO*Sti*fSup/fCV_UPO);                               //numerator
+    let A      = Sbi;                         //mgCOD/L | VFA + FBSO + BPO
+    let B      = fSb_s*(1-YH)/i_NO3_N2;       //mg/L
+    let C      = Nti - Nte;                   //mgN/L
+    let D      = (a_prac*Oa + s*Os)/i_NO3_N2; //unit missing
+    let E      = (a_prac+s)/(a_prac+s+1);     //unit missing
+    let Rs_top = C*E+D-A*B+A*SF*K2T*YHvss/µA-E*(f_N_OHO*A*YHvss+f_N_UPO*Sti*fSup/fCV_UPO);                                  //numerator
     let Rs_bot = A*(B*bHT+K2T*YHvss)-A*SF*bAT*K2T*YHvss/µA-bHT*(C*E+D)+E*bHT*(f_N_OHO*A*YHvss*fH+f_N_UPO*Sti*fSup/fCV_UPO); //denominator
     let Rs_bal = Rs_top/Rs_bot;
     return Math.max(0, Rs_bal);
