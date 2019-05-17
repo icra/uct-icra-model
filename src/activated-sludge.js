@@ -65,7 +65,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
   //2 - page 9
   let frac = this.totals;    //object: influent fractionation (COD,TOC,TKN,TP,TSS)
-  let Sti  = frac.COD.total; //mg_COD/L | total influent COD "Sti"
+  let Sti  = frac.COD.total; //mgCOD/L | total influent COD "Sti"
+  let Sbi  = frac.COD.bCOD;  //mgCOD/L | total influent biodegradable COD "Sbi" (VFA+FBSO+BPO)
 
   //fSus and fSup ratios
   let Suse = frac.COD.usCOD; //mg/L | USO influent == USO effluent (Susi==Suse)
@@ -93,12 +94,9 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   const theta_k_v20 = constants.theta_k_v20;    //1.035 ø         | k_v20 temperature correction factor
   /* TODO check this part again with George*/
   let k_vT  = k_v20*Math.pow(theta_k_v20,T-20); //L/mgVSS·d       | k_v corrected by temperature
-  let S_b   = 1/(f_XBH*k_vT);                   //mgCOD/L         | BSO effluent concentration
+  let S_b   = Math.min(Sbi, 1/(f_XBH*k_vT));    //mgCOD/L         | BSO effluent concentration
   let FdSbi = Math.max(0, FSbi - Q*S_b);        //kgCOD/d         | BSO effluent mass flux
-
-  //recalc S_b, needed for small values
-  S_b = FdSbi/Q;
-  console.log({S_b,FSbi,FdSbi}); //debugging TODO
+  //console.log({Sbi,S_b,FSbi,FdSbi}); //debugging
 
   //total VSS solids
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
@@ -176,7 +174,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
   //effluent ammonia = total TKN - Ns - usON - bsON
   let Nae = Math.max(0, Nti - Ns - Nouse - Nobse); //mgN/L
-  console.log({Nae,Nti,Ns,Nouse,Nobse});
+  //console.log({Nae,Nti,Ns,Nouse,Nobse}); //debugging
 
   //ammonia balance
   let Nae_balance = 100*Nae/(Nai + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
@@ -230,7 +228,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   */
   const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
   let FOn = i_COD_NO3*Q*Nae; //kgO/d
-  console.log({i_COD_NO3,FOc,FOn});
+  //console.log({i_COD_NO3,FOc,FOn}); //debugging
 
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
   let OUR = FOt/(Vp*24)*1000; //mg/L·h | oxygen uptake rate
@@ -238,7 +236,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //COD balance
   let FSout       = FSe + FSw + FOc; //kg/d | total COD out flux
   let COD_balance = 100*FSout/FSti;  //percentage
-  console.log({FSti,FSe,FSw,FOc});
+  //console.log({FSti,FSe,FSw,FOc}); //debugging
 
   //2.10 - TKN balance
   let FNti      = inf_fluxes.totals.TKN.total; //kgN/d | total TKN influent

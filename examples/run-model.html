@@ -197,21 +197,21 @@
       </code>
       <div id=influent class=flex>
         <div class=flex>
-          <div title="Flowrate">Q<sub> </sub><input type=number id=Q value=25><span class=unit>ML/d</span></div>
+          <div title="Flowrate">Q<sub> </sub><input type=number id=Q value=25 min=0><span class=unit>ML/d</span></div>
         </div>
         <div class=flex>
-          <div title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50  ><span class=unit>mg/L</span></div>
-          <div title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115 ><span class=unit>mg/L</span></div>
-          <div title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=X_BPO  value=440 ><span class=unit>mg/L</span></div>
-          <div title="Unbiodegradable particulate organics">X<sub>UPO </sub><input type=number id=X_UPO  value=100 ><span class=unit>mg/L</span></div>
-          <div title="Unbiodegradable soluble organics"    >S<sub>USO </sub><input type=number id=S_USO  value=45  ><span class=unit>mg/L</span></div>
+          <div title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50   min=0><span class=unit>mg/L</span></div>
+          <div title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115  min=0><span class=unit>mg/L</span></div>
+          <div title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=X_BPO  value=440  min=0><span class=unit>mg/L</span></div>
+          <div title="Unbiodegradable particulate organics">X<sub>UPO </sub><input type=number id=X_UPO  value=100  min=0><span class=unit>mg/L</span></div>
+          <div title="Unbiodegradable soluble organics"    >S<sub>USO </sub><input type=number id=S_USO  value=45   min=0><span class=unit>mg/L</span></div>
         </div>
         <div class=flex>
-          <div title="Inert suspended solids"              >X<sub>iSS </sub><input type=number id=X_iSS  value=60  ><span class=unit>mg/L</span></div>
-          <div title="Free saline ammonia"                 >S<sub>NH4 </sub><input type=number id=S_FSA  value=39.1><span class=unit>mg/L</span></div>
-          <div title="Orthophosphate (PO4)"                >S<sub>PO4 </sub><input type=number id=S_OP   value=7.28><span class=unit>mg/L</span></div>
-          <div title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=S_NOx  value=0   ><span class=unit>mg/L</span></div>
-          <div title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0   ><span class=unit>mg/L</span></div>
+          <div title="Inert suspended solids"              >X<sub>iSS </sub><input type=number id=X_iSS  value=60   min=0><span class=unit>mg/L</span></div>
+          <div title="Free saline ammonia"                 >S<sub>NH4 </sub><input type=number id=S_FSA  value=39.1 min=0><span class=unit>mg/L</span></div>
+          <div title="Orthophosphate (PO4)"                >S<sub>PO4 </sub><input type=number id=S_OP   value=7.28 min=0><span class=unit>mg/L</span></div>
+          <div title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=S_NOx  value=0    min=0><span class=unit>mg/L</span></div>
+          <div title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0    min=0><span class=unit>mg/L</span></div>
         </div>
       </div>
     </div>
@@ -311,13 +311,13 @@
         <div>
           <code>Activated sludge</code>
           <table>
-            <tr title="heterotrophic COD/COD yield"                      ><td>YH                      <td><input id="YH"          type=number value=0.666 step=0.01 ><td class=unit>gCOD/gCOD
-            <tr title="heterotrophic endogenous respiration rate at 20ºC"><td>bH                      <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
-            <tr title="bH temperature correction factor -> bHT=bH·θ^(T-20)"><td>&theta;<sub>bH</sub>    <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
-            <tr title="not degraded bCOD (FBSO)"                         ><td>k_v20                   <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
-            <tr title="k_v20 temperature correction factor"              ><td>&theta;<sub>k_v20</sub> <td><input id="theta_k_v20" type=number value=1.035 step=0.001><td class=unit>ø
-            <tr title="endogenous residue fraction"                      ><td>fH                      <td><input id="fH"          type=number value=0.200 step=0.1  ><td class=unit>ø
-            <tr title="iSS content of OHOs"                              ><td>f_iOHO                  <td><input id="f_iOHO"      type=number value=0.150 step=0.01 ><td class=unit>giSS/gVSS
+            <tr title="heterotrophic COD/COD yield"                        ><td>YH                     <td><input id="YH"          type=number value=0.666 step=0.01 ><td class=unit>gCOD/gCOD
+            <tr title="heterotrophic endogenous respiration rate at 20ºC"  ><td>bH                     <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
+            <tr title="bH temperature correction factor -> bHT=bH·θ^(T-20)"><td>&theta;<sub>bH</sub>   <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
+            <tr title="effluent FBSO (high value means effluent FBSO~0)"   ><td>k_v20                  <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
+            <tr title="k_v20 temperature correction factor"                ><td>&theta;<sub>k_v20</sub><td><input id="theta_k_v20" type=number value=1.035 step=0.001><td class=unit>ø
+            <tr title="endogenous residue fraction"                        ><td>fH                     <td><input id="fH"          type=number value=0.200 step=0.1  ><td class=unit>ø
+            <tr title="iSS content of OHOs"                                ><td>f_iOHO                 <td><input id="f_iOHO"      type=number value=0.150 step=0.01 ><td class=unit>giSS/gVSS
           </table>
         </div>
         <div>
@@ -404,9 +404,11 @@
 
 <!--footer links-->
 <footer style="border-top:1px solid #ccc;margin-top:20px;padding:1em">
+  About
   <ul>
-    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">ASSUMPTIONS</a>
     <li><a target=_blank href="//github.com/icra/uct-icra-model">README</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">ASSUMPTIONS</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/tree/master/src">SOURCE CODE</a>
     <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/TODO.md">TODO</a>
   </ul>
 </footer>
@@ -444,19 +446,25 @@
 
   //execute model
   document.querySelector('button#run').addEventListener('click',function(){
-    //get influent
-    let influent=new State_Variables(
-      parseFloat(document.querySelector('#influent #Q').value),
-      parseFloat(document.querySelector('#influent #S_VFA').value),
-      parseFloat(document.querySelector('#influent #S_FBSO').value),
-      parseFloat(document.querySelector('#influent #X_BPO').value),
-      parseFloat(document.querySelector('#influent #X_UPO').value),
-      parseFloat(document.querySelector('#influent #S_USO').value),
-      parseFloat(document.querySelector('#influent #X_iSS').value),
-      parseFloat(document.querySelector('#influent #S_FSA').value),
-      parseFloat(document.querySelector('#influent #S_OP').value),
-      parseFloat(document.querySelector('#influent #S_NOx').value),
-    );
+    //create new  influent
+    let influent = null;
+    try{
+      influent=new State_Variables(
+        parseFloat(document.querySelector('#influent #Q').value),
+        parseFloat(document.querySelector('#influent #S_VFA').value),
+        parseFloat(document.querySelector('#influent #S_FBSO').value),
+        parseFloat(document.querySelector('#influent #X_BPO').value),
+        parseFloat(document.querySelector('#influent #X_UPO').value),
+        parseFloat(document.querySelector('#influent #S_USO').value),
+        parseFloat(document.querySelector('#influent #X_iSS').value),
+        parseFloat(document.querySelector('#influent #S_FSA').value),
+        parseFloat(document.querySelector('#influent #S_OP').value),
+        parseFloat(document.querySelector('#influent #S_NOx').value),
+      );
+    }catch(e){
+      alert(e);
+      return;
+    }
 
     //read mass ratios from screen and modify influent object
     ['CV','C','N','P'].forEach(c1=>{
@@ -510,6 +518,7 @@
       run = plant.run();
     }catch(e){
       alert(e);
+      return;
     }
     //console.log(run);
     /*backend end-------*/

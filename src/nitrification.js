@@ -121,7 +121,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
   //oxygen demand
   const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
-  console.log({i_COD_NO3});
+  //console.log({i_COD_NO3});//debugging
 
   let FOn_fxt = i_COD_NO3*Q*Nc_fxt; //kgO/d | O demand if fxt < fxm
   let FOn_fxm = i_COD_NO3*Q*Nc_fxm; //kgO/d | O demand if fxt = fxm

@@ -110,17 +110,17 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //minimum effluent NOx concentration
   let Nne_opt = Nc/(a_opt+RAS+1); //mg/L
 
-  //effluent nitrate (Nne)
-  let Nne = 0;                                                       //mgN/L
+  /*calculate effluent nitrate (Nne)*/
+  //effluent nitrate cannot be higher than the created from nitrification
+  /*TODO check with george*/
+
+  //maximum effluent nitrate coming from nitrification
+  let Nne_max = nit.effluent.components.S_NOx;
+  let Nne = null;                                                    //mgN/L
   if(a < a_opt) Nne = Nc/(a+RAS+1);                                  //mgN/L
   else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/i_NO3_N2; //mgN/L
-  /*TODO problem description:
-    if Nc and Dp1 and Nni are 0:
-    Nne = (a*DO + RAS*DO_RAS)/2.86, which is impossible.
-  */
-
-  //debugging
-  console.log({a, DO, RAS, DO_RAS},(a*DO+RAS*DO_RAS)/i_NO3_N2);
+  Nne = Math.min(Nne_max, Nne); //proposed solution TODO
+  console.log({Nne_max, Nne});
 
   let FN2g = Math.max(0, Q*(Nni + Nc - Nne)); //kgN/d | N2 gas produced
   let TNe  = Nte + Nne;          //mgN/L | total nitrogen (TN) effluent (TKN+NOx)
