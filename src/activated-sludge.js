@@ -89,11 +89,11 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let f_XBH = (YHvss*Rs)/(1+bHT*Rs);       //gVSS·d/gCOD    | OHO biomass production rate
 
   //bCOD not degraded (FBSO)
-  const k_v20       = constants.k_v20;       //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
-  const theta_k_v20 = constants.theta_k_v20; //1.035 ø        | k_v20 temperature correction factor
-  let k_vT    = k_v20*Math.pow(theta_k_v20,T-20);  //L/mgVSS·d
-  let S_b     = 1/(f_XBH*k_vT);              //mgCOD/L
-  let FdSbi   = Math.max(0, FSbi - Q*S_b);   //kg/d COD
+  const k_v20       = constants.k_v20;          //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
+  const theta_k_v20 = constants.theta_k_v20;    //1.035 ø         | k_v20 temperature correction factor
+  let k_vT  = k_v20*Math.pow(theta_k_v20,T-20); //L/mgVSS·d
+  let S_b   = 1/(f_XBH*k_vT);                   //mgCOD/L
+  let FdSbi = Math.max(0, FSbi - Q*S_b);        //kg/d COD
 
   //force 0 for S_b if FdSbi is 0
   if(FdSbi==0) S_b = 0;
@@ -165,6 +165,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //2.6 - Nitrogen - page 12
   let Ns    = (f_N_OHO*(MX_BH+MX_EH)+f_N_UPO*MX_I)/(Rs*Q); //mgN/L | N in influent required for sludge production
   let Nti   = frac.TKN.total;                              //mgN/L | total TKN influent
+  let Nai   = this.components.S_FSA;                       //mgN/L | total ammonia influent
   let Nobsi = frac.TKN.bsON;                               //mgN/L | bsON influent (VFA + FBSO)
   let Nouse = frac.TKN.usON;                               //mgN/L | usON influent = effluent
   let Nobpi = frac.TKN.bpON;                               //mgN/L | bpON influent
@@ -172,13 +173,13 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Nobse = S_b*f_N_FBSO/fCV_FBSO;                       //mgN/L | bsON effluent (not all FBSO is degraded)
 
   //effluent ammonia = total TKN - Ns - usON - bsON
-  let Nae = Nti - Ns - Nouse - Nobse; //mg/L
+  let Nae = Nti - Ns - Nouse - Nobse; //mgN/L
 
   //ammonia balance
-  let Nae_balance = 100*Nae/(this.components.S_FSA + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
+  let Nae_balance = 100*Nae/(Nai + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
 
   //in AS only: influent nitrate = effluent nitrate
-  let Nne = this.components.S_NOx;
+  let Nne = this.components.S_NOx; //mgN/L
 
   //concentration of wastage {BPO, UPO, iSS}
   //f is the concentrating factor (if we are wasting from SST) = (1+RAS)/RAS. Otherwise is 1
@@ -214,10 +215,15 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //carbonaceous oxygen demand
   let FOc = (function(){
     let catabolism  = 1 - YH;                   //gCOD/gCOD | electrons used for energy (catabolism)
-    let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | oxygen demand for endogenous respiration (O2->CO2)
+    let respiration = fCV_OHO*(1-fH)*bHT*f_XBH; //gCOD/gCOD | electrons used for endogenous respiration (O2->CO2)
     return FdSbi*(catabolism + respiration);    //kgO/d
   })();
-  let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand TODO problem when influent COD values are very small
+  let FOn = 4.57*Q*Nae;       //kgO/d  | nitrogenous oxygen demand
+  /*
+    TODO problem when influent COD values are very small
+  */
+  console.log({FOc,FOn});
+
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
   let OUR = FOt/(Vp*24)*1000; //mg/L·h | oxygen uptake rate
 

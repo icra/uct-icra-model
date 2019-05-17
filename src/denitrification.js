@@ -111,8 +111,13 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //effluent nitrate (Nne)
   let Nne = 0;                                                   //mgN/L
   if(a < a_opt) Nne = Nc/(a+RAS+1);                              //mgN/L
-  else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L TODO what if Nc and Dp1 and Nni are 0?
+  else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/2.86; //mgN/L
+  /*TODO problem description:
+    if Nc and Dp1 and Nni are 0:
+    Nne = (a*DO + RAS*DO_RAS)/2.86, which is impossible.
+  */
 
+  //debugging TODO
   console.log({a, DO, RAS, DO_RAS},(a*DO+RAS*DO_RAS)/2.86);
 
   let FN2g = Math.max(0, Q*(Nni + Nc - Nne)); //kgN/d | N2 gas produced

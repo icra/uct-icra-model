@@ -1,8 +1,14 @@
-## Pending Tasks (~ new branches)
+## Pending Tasks (~new branches)
+  - crear capa per fer
+  - replace 4.57 and 2.86 for integer division
+    32/7  = 4.57;
+    40/14 = 2.86;
+
+  - discuss if we can express the model as gujer matrix
   - low values of influent COD fractions (~0.01) create problems: COD balance is not 100%, due to FOn, and Nne also is not correct, in denitrification (nitrate "appears").
   - discuss with george the effect of the pH in FePO4 formation (Szabo et al 2008)
   - ask george to make skype to play with model interface and:
-    - watch out for: Rs Rsm a a_opt.
+    - watch out for: Rs Rsm a a-opt.
   - function that pretty prints a plant.run() result for reporting.
 
 ## Future / new modules TBD
