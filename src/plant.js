@@ -62,7 +62,7 @@ class Plant{
         dn  : conf.dn ? as.process_variables     : null,
         cpr : as.cpr,
         cap : as.cap,
-      },   
+      },
       primary:{
         effluent: pst.effluent, //primary effluent (state variables object)
         wastage : pst.wastage,  //primary wastage  (state variables object)

@@ -26,15 +26,15 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //capacity estimation inputs
-  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability
-  A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
-  fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
+  DSVI = isNaN(DSVI) ? 120    : DSVI; //mL/gTSS | sludge settleability
+  A_ST = isNaN(A_ST) ? 1248.6 : A_ST; //m2      | area of the settler
+  fq   = isNaN(fq)   ? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
   //nitrification inputs
-  SF  = isNaN(SF ) ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
+  SF  = isNaN(SF)  ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
   fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
-  DO  = isNaN(DO ) ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
-  pH  = isNaN(pH ) ? 7.2  : pH ; //pH units
+  DO  = isNaN(DO)  ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
+  pH  = isNaN(pH)  ? 7.2  : pH ; //pH units
 
   //denitrification inputs
   IR           = isNaN(IR)           ? 5.4 : IR;           //ø             | internal recirculation ratio
@@ -54,7 +54,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   const f_N_UPO = this.mass_ratios.f_N_UPO;  //gN/gVSS
   const f_N_BPO = this.mass_ratios.f_N_BPO;  //gN/gVSS
 
-  //execute as+nitrification
+  //execute as+nitrification before denitrification first
   let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH); //object
 
   //get fractionations
@@ -88,11 +88,14 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //3.2
   let fSb_s = Sbsi/Sbi||0; //ratio BSO/(BSO+BPO)
 
+  //stoichiometric constants
+  const i_NO3_N2  = 40/14; //~2.86 gCOD/gN | stoichiometric factor for NO3 reduction to N2
+  const i_COD_NO3 = 64/14; //~4.57 gCOD/gN | conversion factor for NO3 in COD
+  console.log({i_NO3_N2, i_COD_NO3});//debugging
+
   //denitrification potential
   const YH    = constants.YH;                         //0.666 gCOD/gCOD
   const YHvss = YH/fCV_OHO;                           //0.45  gVSS/gCOD
-  const i_NO3_N2 = 40/14;                             //~2.86 gCOD/gN
-  console.log({i_NO3_N2});
   let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YHvss*Rs/(1+bHT*Rs)
   let Dp1RBSO = Sbsi*(1-YH)/i_NO3_N2;                 //mgN/L | influent
   let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgN/L | influent
@@ -111,19 +114,20 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let Nne_opt = Nc/(a_opt+RAS+1); //mg/L
 
   /*calculate effluent nitrate (Nne)*/
-  //effluent nitrate cannot be higher than the created from nitrification
-  /*TODO check with george*/
-
   //maximum effluent nitrate coming from nitrification
   let Nne_max = nit.effluent.components.S_NOx;
   let Nne = null;                                                    //mgN/L
   if(a < a_opt) Nne = Nc/(a+RAS+1);                                  //mgN/L
   else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/i_NO3_N2; //mgN/L
+
+  /*TODO check with george*/
+  //effluent nitrate cannot be higher than the created from nitrification
   Nne = Math.min(Nne_max, Nne); //proposed solution TODO
   console.log({Nne_max, Nne});
 
+  //effluent total nitrogen (TKN+NOx)
   let FN2g = Math.max(0, Q*(Nni + Nc - Nne)); //kgN/d | N2 gas produced
-  let TNe  = Nte + Nne;          //mgN/L | total nitrogen (TN) effluent (TKN+NOx)
+  let TNe  = Nte + Nne;                       //mgN/L | total nitrogen (TN) effluent (TKN+NOx)
 
   //oxygen recovered by denitrification
   let FOd = Math.max(0, i_NO3_N2*Q*(Nc-Nne));    //kgO/d
@@ -136,45 +140,48 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let Nobi  = inf_frac.TKN.bON;                  //mg/L | biodegradable TKN influent "(Nobsi+Nobpi)"
   let Ns    = nit.as_process_variables.Ns.value; //mg/L | N required for sludge production
   let Noupi = inf_frac.TKN.upON;                 //mg/L | N unbiodegradable particulated (Noupi)
-  let effluent_alk = influent_alk + 3.57*Nobi - 3.57*(Ns-Noupi) - 7.14*Nc + 3.57*(Nc-Nne); //mg/L as CaCO3
 
-  //check if alkalinity is below 50
-  let errors=nit.errors;
-  if(effluent_alk<50)errors.push("effluent_alk < 50 mgCaCO3/L");
-
-  //stoichiometric factor for NO3 reduction to N2
-  const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
-  console.log({i_COD_NO3});
+  //page 25: justification of 7.14 and 3.57 stoichiometric constants
+  const i_7_14 = 100/14;
+  const i_3_57 = 50/14;
+  let effluent_alk = influent_alk + i_3_57*Nobi - i_3_57*(Ns-Noupi) - i_7_14*Nc + i_3_57*(Nc-Nne); //mg/L as CaCO3
 
   //TOD balance (TOD = COD + i_COD_NO3*TKN)
-  let Qe   = nit.effluent.Q;                                        //ML/d | effluent flowrate
+  let Qe   = nit.effluent.Q;                                         //ML/d | effluent flowrate
   let TODi = Q *(inf_frac.COD.total + i_COD_NO3*inf_frac.TKN.total); //kgO/d
   let TODe = Qe*(eff_frac.COD.total + i_COD_NO3*eff_frac.TKN.total); //kgO/d
 
   //calculate TOD wastage (TODw)
-  let Qw    = nit.wastage.Q;                                          //ML/d   | wastage flowrate
-  let f     = nit.as_process_variables.f.value;                       //ø      | (1+RAS)/RAS (or 1 if we waste from reactor)
-  let X_BH  = nit.as_process_variables.MX_BH.value/Vp;                //kg/m3  | OHO
-  let X_EH  = nit.as_process_variables.MX_EH.value/Vp;                //kg/m3  | endogenous residue
-  let X_I   = nit.as_process_variables.MX_I .value/Vp;                //kg/m3  | UPO
-  let X_IO  = nit.as_process_variables.MX_IO.value/Vp;                //kg/m3  | iSS
-  let sTODw = Qw*(was_frac.COD.sCOD + i_COD_NO3*(was_frac.TKN.sON + Nae)); //kg/d   | soluble TODw
+  let Qw    = nit.wastage.Q;                           //ML/d  | wastage flowrate
+  let f     = nit.as_process_variables.f.value;        //ø     | (1+RAS)/RAS (or 1 if we waste from reactor)
+  let X_BH  = nit.as_process_variables.MX_BH.value/Vp; //kg/m3 | OHO
+  let X_EH  = nit.as_process_variables.MX_EH.value/Vp; //kg/m3 | endogenous residue
+  let X_I   = nit.as_process_variables.MX_I .value/Vp; //kg/m3 | UPO
+  let X_IO  = nit.as_process_variables.MX_IO.value/Vp; //kg/m3 | iSS
+  let sTODw = Qw*(was_frac.COD.sCOD + i_COD_NO3*(was_frac.TKN.sON + Nae)); //kg/d | soluble TODw
   let pTODw = Qw*(
     f*(
       (fCV_OHO + i_COD_NO3*f_N_OHO)*(X_BH+X_EH) +
       (fCV_UPO + i_COD_NO3*f_N_UPO)*(X_I)
-    )*1000);                                                          //kg/d | particulated TODw
-  let TODw   = sTODw + pTODw;                                         //kg/d | total TOD in wastage
-  let TODout = TODw + TODe + FOt + FOd;                               //kg/d | total TOD out
-  let TOD_balance = 100*TODout/TODi || 100;                           //percentage
+    )*1000);                                                //kg/d | particulated TODw
+  let TODw   = sTODw + pTODw;                               //kg/d | total TOD in wastage
+  let TODout = TODw + TODe + FOt + FOd;                     //kg/d | total TOD out
+  let TOD_balance = (TODi==TODout) ? 100 : 100*TODout/TODi; //percentage
 
   //2.10 - N balance
   let FNti      = this.fluxes.totals.TKN.total         + Q *Nni; //kgN/d | total TN influent
   let FNte      = nit.effluent.fluxes.totals.TKN.total + Qe*Nne; //kgN/d | total TN effluent
   let FNw       = nit.wastage.fluxes.totals.TKN.total  + Qw*Nne; //kgN/d | total TN wastage
   let FNout     = FNte + FNw + FN2g;                             //kgN/d | total TN out
-  let N_balance = 100*FNout/FNti ||100;                          //percentage
+  let N_balance = (FNout==FNti) ? 100 : 100*FNout/FNti;          //percentage
   //denitrification end-------------------------------------------------------------
+
+  //check numeric errors
+  let errors=nit.errors;
+  if(effluent_alk<50) errors.push("effluent_alk < 50 mgCaCO3/L");
+  if(isNaN(TOD_balance) || (TOD_balance < 99.9 || TOD_balance > 100.1) ) errors.push(`TOD_balance is ${TOD_balance}% (DN)`);
+  if(isNaN(N_balance)   || (N_balance   < 99.9 || N_balance   > 100.1) ) errors.push(`N_balance is ${N_balance}% (DN)`);
+
 
   //create output streams (effluent and wastage)
   let Suse    = inf_frac.COD.usCOD;           //mg/L | USO influent == effluent

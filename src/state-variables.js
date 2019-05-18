@@ -41,7 +41,7 @@ class State_Variables {
     if(X_iSS  <  0) throw `Error: inert suspended solids (X_iSS=${X_iSS}) not allowed`;
     if(S_FSA  <  0) throw `Error: free saline ammonia (S_FSA=${S_FSA}) not allowed`;
     if(S_OP   <  0) throw `Error: orthophosphate (S_OP=${S_OP}) not allowed`;
-    if(S_NOx  <  0) throw `Error: nitrate and nitrite (S_NOx=${S_NOx}) not allowed`;
+    if(S_NOx  <  0) throw `Error: nitrate/nitrite (S_NOx=${S_NOx}) not allowed`;
     if(X_OHO  <  0) throw `Error: ordinary heterotrophic organisms (X_OHO=${X_OHO}) not allowed`;
 
     //inputs and default values
@@ -245,7 +245,7 @@ try{module.exports=State_Variables}catch(e){}
   //test 1: print totals and fluxes
   (function(){
     return
-    let s = new State_Variables(25);
+    let s = new State_Variables(1,1,0,0,0,0,0,0,0,0);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
     console.log("=== Totals (mg/L) ===");              console.log(s.totals);

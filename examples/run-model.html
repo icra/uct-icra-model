@@ -56,6 +56,51 @@
       font-size:smaller;
     }
   </style>
+  <!--css for folded sections-->
+  <style>
+    .folded > [id] { display:none; }
+    arrow {
+      border: solid black;
+      border-width: 0 2px 2px 0;
+      display: inline-block;
+      padding: 3px;
+      transform:rotate(45deg);
+      transition: all 0.1s;
+    }
+    .folded arrow { transform:rotate(-45deg) }
+    div:not(.folded) code[onclick]{
+      background:#f9f9f9;
+    }
+  </style>
+  <style>
+    main div.card {
+      border-bottom:1px solid #ccc;
+    }
+    main code[onclick]{
+      display:block;
+      padding-top:5px;
+      padding-bottom:5px;
+      padding-left:5px;
+    }
+    main code[onclick]:hover{
+      color:black;
+      background:#eee;
+    }
+    main #inputs, #outputs {
+      margin-top:20px;
+      width:49%;
+    }
+    main #inputs > div:first-child, #outputs > div:first-child {
+      height:22px;
+    }
+    main #inputs {
+      margin-right:5px;
+      /*width:60%;*/
+    }
+    main #outputs {
+      /*width:39%;*/
+    }
+  </style>
 
   <!--frontend functions and css for folding/unfolding sections-->
   <script>
@@ -81,23 +126,8 @@
       });
     }
   </script>
-  <style>
-    .folded > [id] { display:none; }
-    arrow {
-      border: solid black;
-      border-width: 0 2px 2px 0;
-      display: inline-block;
-      padding: 3px;
-      transform:rotate(45deg);
-      transition: all 0.1s;
-    }
-    .folded arrow { transform:rotate(-45deg) }
-    div:not(.folded) code[onclick]{
-      background:#f9f9f9;
-    }
-  </style>
 
-  <!--frontend decimal number formatter-->
+  <!--frontend decimal number formatter and units formatter-->
   <script>
     /*convert a number to a string: i.e. 3999.4 turns into "3,999.4"*/
     //global variable because creating a NumberFormat object is slow
@@ -132,36 +162,6 @@
         .replace(/_/g,' ');
     }
   </script>
-
-  <style>
-    main div.card {
-      border-bottom:1px solid #ccc;
-    }
-    main code[onclick]{
-      display:block;
-      padding-top:5px;
-      padding-bottom:5px;
-      padding-left:5px;
-    }
-    main code[onclick]:hover{
-      color:black;
-      background:#eee;
-    }
-    main #inputs, #outputs {
-      margin-top:20px;
-      width:49%;
-    }
-    main #inputs > div:first-child, #outputs > div:first-child {
-      height:22px;
-    }
-    main #inputs {
-      margin-right:5px;
-      /*width:60%;*/
-    }
-    main #outputs {
-      /*width:39%;*/
-    }
-  </style>
 </head><body>
 
 <!--title-->
@@ -360,22 +360,6 @@
       </small>
     </div>
 
-    <!--summaries-->
-    <div class='card'>
-      <code onclick="toggle_class_folded('#outputs #summaries')">
-        <arrow></arrow> Summary
-      </code>
-      <div id=summaries></div>
-    </div>
-
-    <!--fractionation-->
-    <div class='card folded'>
-      <code onclick="toggle_class_folded('#outputs #fractionation')">
-        <arrow></arrow> Fractionation
-      </code>
-      <div id=fractionation></div>
-    </div>
-
     <!--errors-->
     <div class='card folded'>
       <code onclick="toggle_class_folded('#outputs #errors')">
@@ -384,12 +368,28 @@
       <div id=errors style="display:"><small>loading...</small></div>
     </div>
 
+    <!--summaries-->
+    <div class='card'>
+      <code onclick="toggle_class_folded('#outputs #summaries')">
+        <arrow></arrow> Summary
+      </code>
+      <div id=summaries></div>
+    </div>
+
     <!--process variables-->
     <div class='card folded'>
       <code onclick="toggle_class_folded('#outputs #processes')">
         <arrow></arrow> Process variables
       </code>
       <div id=processes class=flex></div>
+    </div>
+
+    <!--fractionation-->
+    <div class='card folded'>
+      <code onclick="toggle_class_folded('#outputs #fractionation')">
+        <arrow></arrow> Fractionation
+      </code>
+      <div id=fractionation></div>
     </div>
 
     <!--export-->
@@ -407,7 +407,7 @@
   About
   <ul>
     <li><a target=_blank href="//github.com/icra/uct-icra-model">README</a>
-    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">ASSUMPTIONS</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">MODEL ASSUMPTIONS</a>
     <li><a target=_blank href="//github.com/icra/uct-icra-model/tree/master/src">SOURCE CODE</a>
     <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/TODO.md">TODO</a>
   </ul>
@@ -462,6 +462,7 @@
         parseFloat(document.querySelector('#influent #S_NOx').value),
       );
     }catch(e){
+      console.error(e);
       alert(e);
       return;
     }
@@ -517,6 +518,7 @@
     try{
       run = plant.run();
     }catch(e){
+      console.error(e);
       alert(e);
       return;
     }
@@ -669,7 +671,7 @@
           Object.entries(summaries).forEach(([name,sv])=>{
             if(key=="Q"){
               let Q = sv.Q;
-              newRow.insertCell(-1).outerHTML=`<td class=number colspan=2 flow value=${Q}>${format(Q)}</td>`;
+              newRow.insertCell(-1).outerHTML=`<td class=number colspan=2 flow title=${Q}>${format(Q)}</td>`;
             }else{
               let conc = sv[key][0];
               let flux = sv[key][1];
@@ -725,7 +727,7 @@
       (function draw_errors(errors){
         document.querySelector('#error_counter').innerHTML=errors.length ? `(<b>${errors.length}</b>)`:'(0)';
         let div=document.querySelector('#outputs #errors');
-        div.innerHTML=errors.length?"":"<li class=error>no errors";
+        div.innerHTML=errors.length?"":"<li class=error style=background:#af0>no errors";
         errors.forEach(error=>{
           div.appendChild((function(){
             let li=document.createElement('li');

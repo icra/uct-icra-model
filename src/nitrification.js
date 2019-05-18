@@ -17,25 +17,25 @@ try{
 State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq, SF,fxt,DO,pH){
   /*inputs and default values*/
   //as inputs
-  T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
-  Vp  = isNaN(Vp ) ? 8473.3 : Vp ; //m3   | Volume
-  Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
+  T   = isNaN(T)   ? 16     : T  ; //ºC   | Temperature
+  Vp  = isNaN(Vp)  ? 8473.3 : Vp ; //m3   | Volume
+  Rs  = isNaN(Rs)  ? 15     : Rs ; //days | Solids retention time
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
   if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //capacity estimation inputs
-  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS | sludge settleability
-  A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2      | area of the settler
-  fq   = isNaN(fq  )? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
+  DSVI = isNaN(DSVI) ? 120    : DSVI; //mL/gTSS | sludge settleability
+  A_ST = isNaN(A_ST) ? 1248.6 : A_ST; //m2      | area of the settler
+  fq   = isNaN(fq)   ? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
 
   //nitrification inputs
-  SF  = isNaN(SF ) ? 1.25 : SF ; /* safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
-                                    choose a high value for high influent ammonia concentration variation */
+  SF  = isNaN(SF) ? 1.25 : SF ; /* safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
+                                   choose a high value for high influent ammonia concentration variation */
   fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
-  DO  = isNaN(DO ) ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
-  pH  = isNaN(pH ) ? 7.2  : pH ; //pH units
+  DO  = isNaN(DO)  ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
+  pH  = isNaN(pH)  ? 7.2  : pH ; //pH units
 
   //input checks
   if(SF  < 0) throw `Error: Safety factor (SF=${SF}) not allowed`;
@@ -45,7 +45,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //influent fractionation
   let frac = this.totals;
 
-  //execute activated sludge without nitrification
+  //execute activated sludge without nitrification first
   let as = this.activated_sludge(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq); //object
 
   //flowrate
@@ -62,9 +62,9 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Ns   = as.process_variables.Ns.value;   //mg/L | N required from sludge production
 
   //3 - nitrification kinetics
-  const µAm = constants.µAm;                //0.450 1/d | auth. max specific growth rate at 20ºC
-  const theta_µAm = constants.theta_µAm;    //1.123 1/d | temperature correction factor
-  let µAmT  = µAm*Math.pow(theta_µAm,T-20); //1/d       | growth rate corrected by temperature
+  const µAm = constants.µAm;               //0.450 1/d | auth. max specific growth rate at 20ºC
+  const theta_µAm = constants.theta_µAm;   //1.123 1/d | temperature correction factor
+  let µAmT = µAm*Math.pow(theta_µAm,T-20); //1/d       | growth rate corrected by temperature
 
   //correct µA by DO (book page 468)
   const K_O = constants.K_O;    //0.4 mgDO/L | nitrifier Oxygen sensitivity constant
@@ -82,9 +82,9 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   const theta_Kn = constants.theta_Kn;  //1.123 mgN/L     | Kn temperature correction factor
   let KnT = Kn*Math.pow(theta_Kn,T-20); //mgN/L           | Kn corrected by temperature
 
-  const bA = constants.bA;               //1/d at 20ºC (endogenous respiration rate)
-  const theta_bA = constants.theta_bA;   //bA temperature correction factor
-  let bAT  = bA*Math.pow(theta_bA,T-20); //1/d | growth rate corrected by temperature
+  const bA = constants.bA;              //1/d at 20ºC (endogenous respiration rate)
+  const theta_bA = constants.theta_bA;  //bA temperature correction factor
+  let bAT = bA*Math.pow(theta_bA,T-20); //1/d | growth rate corrected by temperature
 
   //page 17
   //maximum design unaerated sludge mass fraction
@@ -95,16 +95,16 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
   //compile Rsm and fxm errors from previous module
   let errors = as.errors;
-  if(Rs  < Rsm) errors.push("Rs  < Rsm");
-  if(fxt > fxm) errors.push("fxt > fxm");
+  if(Rs  < Rsm) errors.push("Rs < Rsm: sludge retention time is below the minimum required for nitrification");
+  if(fxt > fxm) errors.push("fxt > fxm: unaerated sludge is above the maximum allowed to achieve nitrification");
 
   //unaerated sludge (current and max)
   let MX_T_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge
   let MX_T_fxm = fxm*MX_T; //kg TSS | max uneaerated sludge
 
   //effluent ammonia nitrification
-  let Nae_fxt = KnT*(bAT + 1/Rs)/(µAm_pH*(1-fxt)-bAT-1/Rs); //mg/L as N | effluent ammonia concentration if fxt <  fxm
-  let Nae_fxm = KnT/(SF-1);                                 //mg/L as N | effluent ammonia concentration if fxt == fxm
+  let Nae_fxt = KnT*(bAT+1/Rs)/(µAm_pH*(1-fxt)-bAT-1/Rs); //mg/L as N | effluent ammonia concentration if fxt <  fxm
+  let Nae_fxm = KnT/(SF-1);                               //mg/L as N | effluent ammonia concentration if fxt == fxm
 
   //2 checks for effluent ammonia concentration
   let Nae_max = Math.max(0, Nti - Ns - Nouse - Nobse); //will be 0 if Ns > Nti
@@ -116,13 +116,13 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   let Nte_fxm = Nae_fxm + Nouse + Nobse; //mg/L as N | effluent TKN concentration if fxt = fxm
 
   //nitrification capacity Nc
-  let Nc_fxt = Nti - Ns - Nte_fxt; //mg/L as N | Nitrification capacity if fxt < fxm
-  let Nc_fxm = Nti - Ns - Nte_fxm; //mg/L as N | Nitrification capacity if fxt = fxm
+  let Nc_fxt = Math.max(0, Nti - Ns - Nte_fxt); //mg/L as N | Nitrification capacity if fxt < fxm
+  let Nc_fxm = Math.max(0, Nti - Ns - Nte_fxm); //mg/L as N | Nitrification capacity if fxt = fxm
+  console.log({Nti, Ns, Nte_fxt});
 
   //oxygen demand
   const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
   //console.log({i_COD_NO3});//debugging
-
   let FOn_fxt = i_COD_NO3*Q*Nc_fxt; //kgO/d | O demand if fxt < fxm
   let FOn_fxm = i_COD_NO3*Q*Nc_fxm; //kgO/d | O demand if fxt = fxm
   let FOc     = as.process_variables.FOc.value; //kg=/d
