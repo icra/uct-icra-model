@@ -93,19 +93,25 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let f_XBH      = (YHvss*Rs)/(1+bHT*Rs);       //gVSS·d/gCOD    | OHO biomass production rate
 
   //kinetics for "not all influent FBSO is degraded"
-  /*TODO review this part with George*/
   const k_v20       = constants.k_v20;                    //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
   const theta_k_v20 = constants.theta_k_v20;              //1.035 ø         | k_v20 temperature correction factor
   let k_vT          = k_v20*Math.pow(theta_k_v20,T-20);   //L/mgVSS·d       | k_v corrected by temperature
   let S_FBSO_i      = this.components.S_FBSO;             //mgCOD/L         | influent S_FBSO
+  /*TODO show George the numeric check below*/
   let S_b           = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L         | FBSO effluent concentration: cannot be higher than influent S_FBSO
   let FdSbi         = Math.max(0, FSbi - Q*S_b);          //kgCOD/d         | influent biodegradable COD mass flux that will generate biomass
 
   //total VSS production
   /*
-    TODO if all FSbi is S_VFA (BPO=0 and FBSO=0) what would happen to MX_BH?
-    would be possible to calculate OHO mass ratios instead of being inputs?
-    (discuss with george)
+    TODO (discuss with george)
+    what if VFA >>> FBSO ≈ BPO ?
+    example of wrong numeric inputs allowed: if VFA=100, FBSO=0, BPO=0,
+    then => FdSbi=100, so MX_BH = wrong, because:
+
+      MX_BH = FdSbi*(YHvss*Rs)/(1+bHT*Rs) 
+
+    - could we implement something to find the limitating factor (VFA or FBSO or BPO), for example looking at N or P content?
+    - would be possible to calculate OHO mass ratios instead of being inputs?
   */
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
   const fH  = constants.fH           //0.20 ø | endogenous OHO fraction
@@ -192,7 +198,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //in AS only: influent nitrate = effluent nitrate
   let Nne = this.components.S_NOx; //mgN/L
 
-  //calculate necessary C for biomass TODO: get george approval
+  //calculate necessary C for biomass
+  //TODO: get george approval for these new equation (Cs)
   let Cs  = (f_C_OHO*(MX_BH+MX_EH)+f_C_UPO*MX_I)/(Rs*Q); //mgC/L | C in influent required for sludge production
   let Cti = frac.TOC.total;                              //mgC/L | total TOC influent
 

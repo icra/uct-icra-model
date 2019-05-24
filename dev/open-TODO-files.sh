@@ -1,4 +1,5 @@
 #!/bin/bash
 
-#open all files containing the words "TODO" or "TBD"
-vim -o $(grep --exclude 'open-TODO-files.sh' --exclude-dir 'dev' -e "TODO" -e "TBD" . -r| cut -d\: -f1| uniq)
+#open all files containing the word "TODO"
+
+vim -o $(grep --exclude-dir 'dev' -e "TODO" . -r| cut -d\: -f1| uniq)

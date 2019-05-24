@@ -1,21 +1,20 @@
 ## Pending Tasks
-  - discuss with george: added a check to ensure S-b < F-BSO.
-  - discuss "what if all influent BSO is VFA" scenario (what happens to MX-BH?)
-  - idea (discuss with george): compute OHO mass ratios instead of being inputs from influent composition.
-  - discuss with george if we can express the model as gujer matrix.
-  - discuss with george: low values of influent COD fractions (~0.01) create
-    problems: COD balance is not 100%, due to FOn, and Nne also is not correct,
-    in denitrification (nitrate "appears").
-  - discuss with george chemical P removal (see papers at dev-docs folder).
-  - discuss with george: play with the run-model interface and observe Rs, Rsm, a, a-opt relationship.
+  - discuss with george:
+    - open all TODO files ("activated-sludge.js" and "denitrification.js").
+    - check to ensure S-b < F-BSO.
+    - "what if all influent BSO is VFA" scenario (what happens to MX-BH?).
+    - idea: compute OHO mass ratios instead of being inputs from influent composition.
+    - can we express the model as gujer matrix?
+    - chemical P removal (see papers at dev-docs folder).
+    - play with the run-model interface and observe Rs, Rsm, a, a-opt relationship.
   - function that pretty prints a plant.run() result for reporting.
-  - implement "assertion" module (numeric checks for physical meaning) -> expand "error" capturing functionality
+  - implement "warnings" module (numeric checks for physical meaning) -> expand "error" capturing functionality.
 
 ## Future / new modules TBD
+  - pH effect on chemical P removal (as found on Szabo et al)
   - energy consumption module (reuse ecoinvent equations)
   - oxygen limitation module (reuse ecoinvent equations)
   - bio P removal EBPR module
-  - pH effect on chemical P removal (as found on Szabo et al)
   - anaerobic digestion module (will consider inorganic carbon exiting, created
     from TOC)
   - stoichiometry for CO2 produced
