@@ -108,7 +108,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
     example of wrong numeric inputs allowed: if VFA=100, FBSO=0, BPO=0,
     then => FdSbi=100, so MX_BH = wrong, because:
 
-      MX_BH = FdSbi*(YHvss*Rs)/(1+bHT*Rs) 
+      MX_BH = FdSbi*(YHvss*Rs)/(1+bHT*Rs)
 
     - could we implement something to find the limitating factor (VFA or FBSO or BPO), for example looking at N or P content?
     - would be possible to calculate OHO mass ratios instead of being inputs?
@@ -125,7 +125,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Pouse = frac.TP.usOP;                                //mgP/L | P organic unbiodegradable soluble effluent
   let Pobse = S_b*f_P_FBSO/fCV_FBSO;                       //mgP/L | P organic biodegradable soluble effluent
   let Psa   = Math.max(0, Pti - Ps - Pouse - Pobse);       //mgP/L | inorganic soluble P available for chemical P removal
-  console.log({Pti,Ps,Pouse,Pobse,Psa});
+  //console.log({Pti,Ps,Pouse,Pobse,Psa});//debug
 
   /*chemical P removal*/
   let cpr         = chemical_P_removal(Q, Psa, mass_FeCl3); //object
@@ -192,7 +192,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //console.log({Nae,Nti,Ns,Nouse,Nobse}); //debugging
 
   //ammonia balance
-  let Nae_balance = (Nae == (Nai + Nobsi + Nobpi - Ns + Noupi - Nobse)) ? 100 : 
+  let Nae_balance = (Nae == (Nai + Nobsi + Nobpi - Ns + Noupi - Nobse)) ? 100 :
       100*Nae/(Nai + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
 
   //in AS only: influent nitrate = effluent nitrate
