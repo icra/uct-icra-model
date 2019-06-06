@@ -97,22 +97,11 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   const theta_k_v20 = constants.theta_k_v20;              //1.035 ø         | k_v20 temperature correction factor
   let k_vT          = k_v20*Math.pow(theta_k_v20,T-20);   //L/mgVSS·d       | k_v corrected by temperature
   let S_FBSO_i      = this.components.S_FBSO;             //mgCOD/L         | influent S_FBSO
-  /*TODO show George the numeric check below*/
   let S_b           = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L         | FBSO effluent concentration: cannot be higher than influent S_FBSO
   let FdSbi         = Math.max(0, FSbi - Q*S_b);          //kgCOD/d         | influent biodegradable COD mass flux that will generate biomass
 
   //total VSS production
-  /*
-    TODO (discuss with george)
-    what if VFA >>> FBSO ≈ BPO ?
-    example of wrong numeric inputs allowed: if VFA=100, FBSO=0, BPO=0,
-    then => FdSbi=100, so MX_BH = wrong, because:
-
-      MX_BH = FdSbi*(YHvss*Rs)/(1+bHT*Rs)
-
-    - could we implement something to find the limitating factor (VFA or FBSO or BPO), for example looking at N or P content?
-    - would be possible to calculate OHO mass ratios instead of being inputs?
-  */
+  /* TODO - calculate theoretical OHO mass ratios */
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
   const fH  = constants.fH           //0.20 ø | endogenous OHO fraction
   let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS  | endogenous residue OHOs
@@ -199,7 +188,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Nne = this.components.S_NOx; //mgN/L
 
   //calculate necessary C for biomass
-  //TODO: get george approval for these new equation (Cs)
   let Cs  = (f_C_OHO*(MX_BH+MX_EH)+f_C_UPO*MX_I)/(Rs*Q); //mgC/L | C in influent required for sludge production
   let Cti = frac.TOC.total;                              //mgC/L | total TOC influent
 
@@ -242,10 +230,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   })();
 
   //nitrogenous oxygen demand
-  /*
-    TODO problem:
-    when influent COD values are very small FOn should be ~0 (?) check with george
-  */
   const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
   let FOn = i_COD_NO3*Q*Nae;  //kgO/d
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand

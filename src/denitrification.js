@@ -120,9 +120,8 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   if(a < a_opt) Nne = Nc/(a+RAS+1);                                  //mgN/L
   else          Nne = Nc - (Dp1-Nni) + (a*DO + RAS*DO_RAS)/i_NO3_N2; //mgN/L
 
-  /*TODO check with george*/
   //effluent nitrate cannot be higher than the created from nitrification
-  Nne = Math.min(Nne_max, Nne); //proposed solution TODO
+  Nne = Math.min(Nne_max, Nne);
   console.log({Nne_max, Nne});
 
   //effluent total nitrogen (TKN+NOx)
@@ -178,7 +177,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
   //check numeric errors
   let errors=nit.errors;
-  if(effluent_alk<50) errors.push("effluent_alk < 50 mgCaCO3/L");
+  if(effluent_alk < 50) errors.push("effluent_alk < 50 mgCaCO3/L");
   if(isNaN(TOD_balance) || (TOD_balance < 99.9 || TOD_balance > 100.1) ) errors.push(`TOD_balance is ${TOD_balance}% (DN)`);
   if(isNaN(N_balance)   || (N_balance   < 99.9 || N_balance   > 100.1) ) errors.push(`N_balance is ${N_balance}% (DN)`);
 
@@ -210,8 +209,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3, between equation 11 and 12
   let Rs_bal = (function(){
     //inputs
-    let a_prac = IR; //this might need to be its own input instead TODO ask George how this may be asked exactly to the user
-    //necessary variables for computing Rs_bal
+    let a_prac = IR;
     let Oa   = DO;                                  //mgO/L
     let Os   = DO_RAS;                              //mgO/L
     let s    = RAS;                                 //ø
@@ -219,16 +217,16 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     let fSup = nit.as_process_variables.fSup.value; //ø | gUPO/gCOD
     let bAT  = nit.process_variables.bAT.value;     //1/d
     //intermediate calculations necessary for computing Rs_bal
-    let A      = Sbi;                         //mgCOD/L | VFA + FBSO + BPO
-    let B      = fSb_s*(1-YH)/i_NO3_N2;       //mg/L
-    let C      = Nti - Nte;                   //mgN/L
-    let D      = (a_prac*Oa + s*Os)/i_NO3_N2; //unit missing
-    let E      = (a_prac+s)/(a_prac+s+1);     //unit missing
+    let A    = Sbi;                         //mgCOD/L | VFA + FBSO + BPO
+    let B    = fSb_s*(1-YH)/i_NO3_N2;       //mg/L
+    let C    = Nti - Nte;                   //mgN/L
+    let D    = (a_prac*Oa + s*Os)/i_NO3_N2; //unit missing
+    let E    = (a_prac+s)/(a_prac+s+1);     //unit missing
     //Rs_bal is a big equation splitted in "Rs_top" and "Rs_bot" (numerator and denominator)
     let Rs_top = C*E+D-A*B+A*SF*K2T*YHvss/µA-E*(f_N_OHO*A*YHvss+f_N_UPO*Sti*fSup/fCV_UPO);                                  //numerator
     let Rs_bot = A*(B*bHT+K2T*YHvss)-A*SF*bAT*K2T*YHvss/µA-bHT*(C*E+D)+E*bHT*(f_N_OHO*A*YHvss*fH+f_N_UPO*Sti*fSup/fCV_UPO); //denominator
     let Rs_bal = Rs_top/Rs_bot;
-    return Math.max(0, Rs_bal); //Rs_bal can't be negative TODO ask george
+    return Math.max(0, Rs_bal); //Rs_bal can't be negative
   })();
 
   //denitrification results

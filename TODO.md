@@ -1,25 +1,27 @@
 ## Pending Tasks
   - discuss with george:
-    - open all TODO files ("activated-sludge.js" and "denitrification.js").
-    - check to ensure S-b < F-BSO.
     - "what if all influent BSO is VFA" scenario (what happens to MX-BH?).
-    - idea: compute OHO mass ratios instead of being inputs from influent composition.
-    - can we express the model as gujer matrix?
+    - idea: compute OHO mass ratios instead of being inputs from influent
+      composition.
+    - play with the run-model interface and observe Rs, Rsm, a, a-opt
+      relationship.
     - chemical P removal (see papers at dev-docs folder).
-    - play with the run-model interface and observe Rs, Rsm, a, a-opt relationship.
-  - function that pretty prints a plant.run() result for reporting.
-  - implement "warnings" module (numeric checks for physical meaning) -> expand "error" capturing functionality.
+  - implement "warnings" module (numeric checks for physical meaning) -> expand
+    "error" capturing functionality.
+  - [for reporting] function for pretty printing a plant.run() result.
+
+## discussed in skype
+  - do not show results if we have warnings
+  - put Rs-bal in capacity estimation module
 
 ## Future / new modules TBD
-  - pH effect on chemical P removal (as found on Szabo et al)
-  - energy consumption module (reuse ecoinvent equations)
+  - energy consumption module (started, not integrated)
+  - chemical P removal (as found on Szabo et al)
   - oxygen limitation module (reuse ecoinvent equations)
   - bio P removal EBPR module
   - anaerobic digestion module (will consider inorganic carbon exiting, created
     from TOC)
   - stoichiometry for CO2 produced
-  - [GUI] add a source code viewer to see equations
-  - [GUI] API
 
 ## Tasks done/solved/clear/discussed
   - [done] validate test values of X.tave and Q.ADWF in the user interface.
@@ -51,3 +53,4 @@
   - [done] change YH = 0.45 gVSS/gCOD to YH = 0.666 gCOD/gCOD
   - [done] refactor warnings/errors output from plant object
   - [done] output in a new object the capacity estimation results ("theoretical" values).
+  - [done] check to ensure S-b < F-BSO.
