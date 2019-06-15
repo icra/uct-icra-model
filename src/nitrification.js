@@ -118,7 +118,7 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
   //nitrification capacity Nc
   let Nc_fxt = Math.max(0, Nti - Ns - Nte_fxt); //mg/L as N | Nitrification capacity if fxt < fxm
   let Nc_fxm = Math.max(0, Nti - Ns - Nte_fxm); //mg/L as N | Nitrification capacity if fxt = fxm
-  console.log({Nti, Ns, Nte_fxt});
+  //console.log({Nti, Ns, Nte_fxt});
 
   //oxygen demand
   const i_COD_NO3 = 64/14; //~4.57 gCOD/gN

@@ -91,7 +91,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //stoichiometric constants
   const i_NO3_N2  = 40/14; //~2.86 gCOD/gN | stoichiometric factor for NO3 reduction to N2
   const i_COD_NO3 = 64/14; //~4.57 gCOD/gN | conversion factor for NO3 in COD
-  console.log({i_NO3_N2, i_COD_NO3});//debugging
+  //console.log({i_NO3_N2, i_COD_NO3});//debugging
 
   //denitrification potential
   const YH    = constants.YH;                         //0.666 gCOD/gCOD
@@ -122,7 +122,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
   //effluent nitrate cannot be higher than the created from nitrification
   Nne = Math.min(Nne_max, Nne);
-  console.log({Nne_max, Nne});
+  //console.log({Nne_max, Nne});
 
   //effluent total nitrogen (TKN+NOx)
   let FN2g = Math.max(0, Q*(Nni + Nc - Nne)); //kgN/d | N2 gas produced
