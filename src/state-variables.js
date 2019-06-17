@@ -74,10 +74,12 @@ class State_Variables {
     };
   };
 
-  //set a single state variable. example -> sv.set("S_VFA",10);
+  //update a state variable value. example -> sv.set("S_VFA",10);
   set(key, newValue){
     if(this.components[key]===undefined) throw `key "${key}" not found`;
     if(typeof newValue != 'number')      throw `newValue ("${newValue}") is not a number`;
+    if(newValue < 0)                     throw `newValue ("${newValue}") is negative`;
+    //update state variable value
     this.components[key]=newValue;
   };
 
