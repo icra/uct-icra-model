@@ -16,7 +16,7 @@ try{
   require('./nitrification.js');                     //prototype nitrification    (in State Variables)
   require('./denitrification.js');                   //prototype denitrification  (in State Variables)
   require('./chemical-P-removal.js');                //function chemical P rem   (in activated sludge)
-}catch(e){console.log(e);}
+}catch(e){}
 
 class Plant{
   constructor(influent, configuration, parameters){
