@@ -238,6 +238,58 @@ class State_Variables {
     });
     return new_sv;
   }
+
+  static get info(){
+    return {
+      Q : {unit:"ML/d", descr:"flowrate"},
+      components:{
+        S_VFA :{unit:"mg/L", descr:"Biodegradable Soluble Organics (BSO) (volatile fatty acids)"},
+        S_FBSO:{unit:"mg/L", descr:"Biodegradable Soluble Organics (BSO) (fermentable organics)"},
+        X_BPO :{unit:"mg/L", descr:"Biodegradable Particulate Organics (BPO)"},
+        X_UPO :{unit:"mg/L", descr:"Unbiodegradable Particulate Organics (UPO)"},
+        S_USO :{unit:"mg/L", descr:"Unbiodegradable Soluble Organics (USO)"},
+        X_iSS :{unit:"mg/L", descr:"Inert Suspended Solids (sand)"},
+        S_FSA :{unit:"mg/L", descr:"Inorganic Free Saline Ammonia (NH4)"},
+        S_OP  :{unit:"mg/L", descr:"Inorganic OrthoPhosphate (PO4)"},
+        S_NOx :{unit:"mg/L", descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
+        X_OHO :{unit:"mg/L", descr:"Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)"},
+      },
+      mass_ratios:{
+        f_CV_VFA :{unit:"gCOD/gVSS",descr:"S_VFA/VSS  mass ratio"},
+        f_C_VFA  :{unit:"gC/gVSS",  descr:"S_VFA/C    mass ratio"},
+        f_N_VFA  :{unit:"gN/gVSS",  descr:"S_VFA/N    mass ratio"},
+        f_P_VFA  :{unit:"gP/gVSS",  descr:"S_VFA/P    mass ratio"},
+        f_CV_FBSO:{unit:"gCOD/gVSS",descr:"S_FBSO/VSS mass ratio"},
+        f_C_FBSO :{unit:"gC/gVSS",  descr:"S_FBSO/C   mass ratio"},
+        f_N_FBSO :{unit:"gN/gVSS",  descr:"S_FBSO/N   mass ratio"},
+        f_P_FBSO :{unit:"gP/gVSS",  descr:"S_FBSO/P   mass ratio"},
+        f_CV_BPO :{unit:"gCOD/gVSS",descr:"X_BPO/VSS  mass ratio"},
+        f_C_BPO  :{unit:"gC/gVSS",  descr:"X_BPO/C    mass ratio"},
+        f_N_BPO  :{unit:"gN/gVSS",  descr:"X_BPO/N    mass ratio"},
+        f_P_BPO  :{unit:"gP/gVSS",  descr:"X_BPO/P    mass ratio"},
+        f_CV_UPO :{unit:"gCOD/gVSS",descr:"X_UPO/VSS  mass ratio"},
+        f_C_UPO  :{unit:"gC/gVSS",  descr:"X_UPO/C    mass ratio"},
+        f_N_UPO  :{unit:"gN/gVSS",  descr:"X_UPO/N    mass ratio"},
+        f_P_UPO  :{unit:"gP/gVSS",  descr:"X_UPO/P    mass ratio"},
+        f_CV_USO :{unit:"gCOD/gVSS",descr:"S_USO/VSS  mass ratio"},
+        f_C_USO  :{unit:"gC/gVSS",  descr:"S_USO/C    mass ratio"},
+        f_N_USO  :{unit:"gN/gVSS",  descr:"S_USO/N    mass ratio"},
+        f_P_USO  :{unit:"gP/gVSS",  descr:"S_USO/P    mass ratio"},
+        f_CV_OHO :{unit:"gCOD/gVSS",descr:"X_OHO/VSS  mass ratio"},
+        f_C_OHO  :{unit:"gC/gVSS",  descr:"X_OHO/C    mass ratio"},
+        f_N_OHO  :{unit:"gN/gVSS",  descr:"X_OHO/N    mass ratio"},
+        f_P_OHO  :{unit:"gP/gVSS",  descr:"X_OHO/P    mass ratio"},
+        f_CV_ANO :{unit:"gCOD/gVSS",descr:"X_ANO/VSS  mass ratio"},
+        f_C_ANO  :{unit:"gC/gVSS",  descr:"X_ANO/C    mass ratio"},
+        f_N_ANO  :{unit:"gN/gVSS",  descr:"X_ANO/N    mass ratio"},
+        f_P_ANO  :{unit:"gP/gVSS",  descr:"X_ANO/P    mass ratio"},
+        f_CV_PAO :{unit:"gCOD/gVSS",descr:"X_PAO/VSS  mass ratio"},
+        f_C_PAO  :{unit:"gC/gVSS",  descr:"X_PAO/C    mass ratio"},
+        f_N_PAO  :{unit:"gN/gVSS",  descr:"X_PAO/N    mass ratio"},
+        f_P_PAO  :{unit:"gP/gVSS",  descr:"X_PAO/P    mass ratio"},
+      },
+    }
+  }
 }
 
 //export class
