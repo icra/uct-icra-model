@@ -101,7 +101,6 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let FdSbi         = Math.max(0, FSbi - Q*S_b);          //kgCOD/d         | influent biodegradable COD mass flux that will generate biomass
 
   //total VSS production
-  /* TODO - calculate theoretical OHO mass ratios */
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
   const fH  = constants.fH           //0.20 ø | endogenous OHO fraction
   let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS  | endogenous residue OHOs

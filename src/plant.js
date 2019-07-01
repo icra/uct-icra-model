@@ -29,6 +29,7 @@ class Plant{
     this.influent      = influent;      //state variables object
     this.configuration = configuration; //object {pst,nit,dn,cpr}
     this.parameters    = parameters;    //object {fw,removal_BPO,removal_UPO,removal_iSS,T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH,IR,DO_RAS,influent_alk}
+    this.constants     = constants;
   };
 
   //run the plant model
@@ -87,26 +88,26 @@ class Plant{
         cap:"Capacity Estimation",
       },
       parameters:{
-        fw          :{unit:"ø",         tec:"pst", descr:"fraction of Q that goes to wastage"},
-        removal_BPO :{unit:"%",         tec:"pst", descr:"removal of the component X_BPO"},
-        removal_UPO :{unit:"%",         tec:"pst", descr:"removal of the component X_UPO"},
-        removal_iSS :{unit:"%",         tec:"pst", descr:"removal of the component X_iSS"},
-        T           :{unit:"ºC",        tec:"as",  descr:"temperature"},
-        Vp          :{unit:"m3",        tec:"as",  descr:"reactor volume"},
-        Rs          :{unit:"d",         tec:"as",  descr:"solids retention time or sludge age"},
+        fw          :{unit:"ø",         tec:"pst", descr:"Fraction of Q that goes to primary wastage"},
+        removal_BPO :{unit:"%",         tec:"pst", descr:"Primary settler removal of the component X_BPO"},
+        removal_UPO :{unit:"%",         tec:"pst", descr:"Primary settler removal of the component X_UPO"},
+        removal_iSS :{unit:"%",         tec:"pst", descr:"Primary settler removal of the component X_iSS"},
+        T           :{unit:"ºC",        tec:"as",  descr:"Temperature"},
+        Vp          :{unit:"m3",        tec:"as",  descr:"Reactor volume"},
+        Rs          :{unit:"d",         tec:"as",  descr:"Solids retention time or sludge age"},
         RAS         :{unit:"ø",         tec:"as",  descr:"SST underflow recycle ratio"},
-        waste_from  :{unit:"option",    tec:"as",  descr:"waste_from | options {'reactor','sst'}"},
-        DSVI        :{unit:"mL/gTSS",   tec:"cap", descr:"sludge settleability"},
-        A_ST        :{unit:"m2",        tec:"cap", descr:"area of the settler"},
-        fq          :{unit:"ø",         tec:"cap", descr:"peak flow (Qmax/Qavg)"},
-        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", descr:"mass of FeCl3 added for chemical P removal"},
-        SF          :{unit:"ø",         tec:"nit", descr:"safety factor. design choice. Moves the sludge age"},
-        fxt         :{unit:"ø",         tec:"nit", descr:"current unaerated sludge mass fraction"},
+        waste_from  :{unit:"option",    tec:"as",  descr:"Waste_from | options {'reactor','sst'}"},
+        DSVI        :{unit:"mL/gTSS",   tec:"cap", descr:"Sludge settleability"},
+        A_ST        :{unit:"m2",        tec:"cap", descr:"Area of the settler"},
+        fq          :{unit:"ø",         tec:"cap", descr:"Peak flow (Qmax/Qavg)"},
+        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", descr:"Mass of FeCl3 added for chemical P removal"},
+        SF          :{unit:"ø",         tec:"nit", descr:"Safety factor. design choice. Moves the sludge age"},
+        fxt         :{unit:"ø",         tec:"nit", descr:"Current unaerated sludge mass fraction"},
         DO          :{unit:"mgO/L",     tec:"nit", descr:"DO in the aerobic reactor"},
         pH          :{unit:"ø",         tec:"nit", descr:"pH"},
-        IR          :{unit:"ø",         tec:"dn",  descr:"internal recirculation ratio"},
+        IR          :{unit:"ø",         tec:"dn",  descr:"Internal recirculation ratio"},
         DO_RAS      :{unit:"mgO/L",     tec:"dn",  descr:"DO in the underflow recycle"},
-        influent_alk:{unit:"mgCaCO3/L", tec:"dn",  descr:"influent alkalinity (mg/L CaCO3)"},
+        influent_alk:{unit:"mgCaCO3/L", tec:"dn",  descr:"Influent alkalinity (mg/L CaCO3)"},
       },
     }
   };
