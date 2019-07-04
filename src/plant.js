@@ -30,6 +30,13 @@ class Plant{
     this.configuration = configuration; //object {pst,nit,dn,cpr}
     this.parameters    = parameters;    //object {fw,removal_BPO,removal_UPO,removal_iSS,T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH,IR,DO_RAS,influent_alk}
     this.constants     = constants;
+
+    //check state variables and parameters specified
+    if(influent.constructor !== State_Variables) throw "influent is not a State_Variables object";
+    let info=Plant.info;
+    Object.keys(info.parameters).forEach(key=>{
+      if(parameters[key]===undefined) throw `parameters key "${key}" not specified`;
+    });
   };
 
   //run the plant model
@@ -138,6 +145,9 @@ try{module.exports=Plant}catch(e){}
     Vp          : 8473.30,   //m3    | AS  | reactor volume
     Rs          : 15.0000,   //d     | AS  | solids retention time or sludge age
     RAS         : 1.00000,   //ø     | AS  | SST underflow recycle ratio
+    DSVI        : 120,       //mL/gTSS | CE  | sludge settleability
+    A_ST        : 30000,     //m2      | CE  | area of the settler
+    fq          : 2.4,       //ø       | CE  | peak flow (Qmax/Qavg)
     waste_from  : "reactor", //option| AS  | waste_from | options {'reactor','sst'}
     mass_FeCl3  : 3000.00,   //kg/d  | CPR | mass of FeCl3 added for chemical P removal
     SF          : 1.25000,   //ø     | NIT | safety factor. design choice. Moves the sludge age

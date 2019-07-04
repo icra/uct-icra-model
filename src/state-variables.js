@@ -31,7 +31,7 @@
 
 class State_Variables {
   constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx, X_OHO){
-    //input checks
+    //numeric input checks
     if(Q      <= 0) throw `Error: Flowrate (Q=${Q}) not allowed`;
     if(S_VFA  <  0) throw `Error: volatile fatty acids (S_VFA=${S_VFA}) not allowed`;
     if(S_FBSO <  0) throw `Error: fermentable biodegradable soluble organics (S_FBSO=${S_FBSO}) not allowed`;
@@ -47,23 +47,23 @@ class State_Variables {
     //inputs and default values
     this.Q = isNaN(Q) ? 25 : Q; //ML/d | flowrate
     this.components={
-      S_VFA : isNaN(S_VFA ) ? 50   : S_VFA , //mg/L | Biodegradable   Soluble     Organics (BSO) (volatile fatty acids)
-      S_FBSO: isNaN(S_FBSO) ? 115  : S_FBSO, //mg/L | Biodegradable   Soluble     Organics (BSO) (fermentable organics)
-      X_BPO : isNaN(X_BPO ) ? 440  : X_BPO , //mg/L | Biodegradable   Particulate Organics (BPO)
-      X_UPO : isNaN(X_UPO ) ? 100  : X_UPO , //mg/L | Unbiodegradable Particulate Organics (UPO)
-      S_USO : isNaN(S_USO ) ? 45   : S_USO , //mg/L | Unbiodegradable Soluble     Organics (USO)
-      X_iSS : isNaN(X_iSS ) ? 60   : X_iSS , //mg/L | Inert Suspended Solids (sand)
-      S_FSA : isNaN(S_FSA ) ? 39.1 : S_FSA , //mg/L | Inorganic Free Saline Ammonia (NH4)
-      S_OP  : isNaN(S_OP  ) ? 7.28 : S_OP  , //mg/L | Inorganic OrthoPhosphate (PO4)
-      S_NOx : isNaN(S_NOx ) ? 0    : S_NOx , //mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
-      X_OHO : isNaN(X_OHO ) ? 0    : X_OHO , //mg/L | Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
+      S_VFA : isNaN(S_VFA )? 50  : S_VFA ,//mg/L | Biodegradable   Soluble     Organics (BSO) (volatile fatty acids)
+      S_FBSO: isNaN(S_FBSO)? 115 : S_FBSO,//mg/L | Biodegradable   Soluble     Organics (BSO) (fermentable organics)
+      X_BPO : isNaN(X_BPO )? 440 : X_BPO ,//mg/L | Biodegradable   Particulate Organics (BPO)
+      X_UPO : isNaN(X_UPO )? 100 : X_UPO ,//mg/L | Unbiodegradable Particulate Organics (UPO)
+      S_USO : isNaN(S_USO )? 45  : S_USO ,//mg/L | Unbiodegradable Soluble     Organics (USO)
+      X_iSS : isNaN(X_iSS )? 60  : X_iSS ,//mg/L | Inert Suspended Solids (sand)
+      S_FSA : isNaN(S_FSA )? 39.1: S_FSA ,//mg/L | Inorganic Free Saline Ammonia (NH4)
+      S_OP  : isNaN(S_OP  )? 7.28: S_OP  ,//mg/L | Inorganic OrthoPhosphate (PO4)
+      S_NOx : isNaN(S_NOx )? 0   : S_NOx ,//mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
+      X_OHO : isNaN(X_OHO )? 0   : X_OHO ,//mg/L | Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
     };
     this.mass_ratios={
       /*----+------------------+----------------+-----------------+-----------------+
       |     | COD              | C              | N               | P               |
       +-----+------------------+----------------+-----------------+-----------------*/
-      /*VFA*/ f_CV_VFA : 1.0667, f_C_VFA : 0.400, f_N_VFA : 0.0000, f_P_VFA : 0.0000, // part of BSO
-      /*FBS*/ f_CV_FBSO: 1.4200, f_C_FBSO: 0.471, f_N_FBSO: 0.0464, f_P_FBSO: 0.0118, // part of BSO
+      /*VFA*/ f_CV_VFA : 1.0667, f_C_VFA : 0.400, f_N_VFA : 0.0000, f_P_VFA : 0.0000, // BSO
+      /*FBS*/ f_CV_FBSO: 1.4200, f_C_FBSO: 0.471, f_N_FBSO: 0.0464, f_P_FBSO: 0.0118, // BSO
       /*BPO*/ f_CV_BPO : 1.5230, f_C_BPO : 0.498, f_N_BPO : 0.0323, f_P_BPO : 0.0072, // BPO
       /*UPO*/ f_CV_UPO : 1.4810, f_C_UPO : 0.518, f_N_UPO : 0.1000, f_P_UPO : 0.0250, // UPO
       /*USO*/ f_CV_USO : 1.4930, f_C_USO : 0.498, f_N_USO : 0.0366, f_P_USO : 0.0000, // USO
@@ -212,7 +212,7 @@ class State_Variables {
       COD: [totals.COD.total,      fluxes.totals.COD.total],  //chemical oxygen demand
       TKN: [totals.TKN.total,      fluxes.totals.TKN.total],  //total kjeldahl nitrogen
       NH4: [totals.TKN.FSA,        fluxes.totals.TKN.FSA],    //inorganic nitrogen (NH4, ammonia)
-      NOx: [this.components.S_NOx, fluxes.components.S_NOx],  //nitrate (NO3) and nitrite (NO2)
+      NOx: [this.components.S_NOx, fluxes.components.S_NOx],  //nitrate (NO3) and nitrite (NO2) is not TKN
       TP:  [totals.TP.total,       fluxes.totals.TP.total],   //total phosphorus
       PO4: [totals.TP.PO4,         fluxes.totals.TP.PO4],     //inorganic phosphorus
       VSS: [totals.TSS.VSS,        fluxes.totals.TSS.VSS],    //volatile suspended solids
@@ -222,7 +222,7 @@ class State_Variables {
     }
   }
 
-  //combine 2 state variable objects
+  //add up 2 state variable objects
   combine(sv){
     //new state variables empty object
     let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);

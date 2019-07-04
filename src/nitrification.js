@@ -95,8 +95,8 @@ State_Variables.prototype.nitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeC
 
   //compile Rsm and fxm errors from previous module
   let errors = as.errors;
-  if(Rs  < Rsm) errors.push("Rs < Rsm: sludge retention time is below the minimum required for nitrification");
-  if(fxt > fxm) errors.push("fxt > fxm: unaerated sludge is above the maximum allowed to achieve nitrification");
+  if(Rs  < Rsm) errors.push(`Rs < Rsm: sludge retention time is below the minimum required for nitrification (Rsm=${Rsm})`);
+  if(fxt > fxm) errors.push(`fxt > fxm: unaerated sludge is above the maximum allowed to achieve nitrification (fxm=${fxm})`);
 
   //unaerated sludge (current and max)
   let MX_T_fxt = fxt*MX_T; //kg TSS | actual uneaerated sludge
