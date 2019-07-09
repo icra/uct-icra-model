@@ -66,9 +66,9 @@ function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
   let Q_ADWF = VR*X_tave/(L*Sti); //ML/d     | capacity of the treatment plant
 
   let results={
-    iterations:{value:iterations, unit:'iterations', descr:'amount of newton-raphson iterations performed to compute X_tave'}, //iterations done to compute X_tave
     X_Tave:{value:X_tave, unit:"kgTSS/m3", descr:"Average TSS conccentration in reactor"},
     Q_ADWF:{value:Q_ADWF, unit:"ML/d",     descr:"Average dry weather flow"},
+    iterations:{value:iterations, unit:'iterations', descr:'amount of newton-raphson iterations performed to compute X_tave'},
   }
   //console.log(results);
   return results;
