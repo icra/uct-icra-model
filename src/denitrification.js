@@ -206,7 +206,8 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //check if fxt is lower than fx1min and raise an error
   if(fxt<fx1min) errors.push("fxt < fx1min");
 
-  //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3, between equation 11 and 12
+  //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3, 
+  //between equation 11 and 12
   let Rs_bal = (function(){
     //inputs
     let a_prac = IR;

@@ -10,6 +10,10 @@ const constants={
   k_v20      : 0.070, //L/mgVSS·d | constant for not degraded bCOD (FBSO)
   theta_k_v20: 1.035, //ø         | k_v20 temperature correction factor
   fH         : 0.200, //ø         | heterotrophic endogenous residue fraction
+
+  //TODO bio P integration
+  f_PAO      : 0.250, //ø         | PAO endogenous residue fraction
+
   f_iOHO     : 0.150, //giSS/gVSS | iSS content of OHOs
 
   //nitrification

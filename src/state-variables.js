@@ -30,9 +30,9 @@
 */
 
 class State_Variables {
-  constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx, X_OHO){
+  constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx, X_OHO, X_PAO){
     //numeric input checks
-    if(Q      <= 0) throw `Error: Flowrate (Q=${Q}) not allowed`;
+    if(Q      <  0) throw `Error: Flowrate (Q=${Q}) not allowed`;
     if(S_VFA  <  0) throw `Error: volatile fatty acids (S_VFA=${S_VFA}) not allowed`;
     if(S_FBSO <  0) throw `Error: fermentable biodegradable soluble organics (S_FBSO=${S_FBSO}) not allowed`;
     if(X_BPO  <  0) throw `Error: biodegradable particulated organics (X_BPO=${X_BPO}) not allowed`;
@@ -43,6 +43,7 @@ class State_Variables {
     if(S_OP   <  0) throw `Error: orthophosphate (S_OP=${S_OP}) not allowed`;
     if(S_NOx  <  0) throw `Error: nitrate/nitrite (S_NOx=${S_NOx}) not allowed`;
     if(X_OHO  <  0) throw `Error: ordinary heterotrophic organisms (X_OHO=${X_OHO}) not allowed`;
+    if(X_PAO  <  0) throw `Error: polyphosphate accumulating organisms (X_PAO=${X_PAO}) not allowed`;
 
     //inputs and default values
     this.Q = isNaN(Q) ? 25 : Q; //ML/d | flowrate
@@ -57,6 +58,7 @@ class State_Variables {
       S_OP  : isNaN(S_OP  )? 7.28: S_OP  ,//mg/L | Inorganic OrthoPhosphate (PO4)
       S_NOx : isNaN(S_NOx )? 0   : S_NOx ,//mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
       X_OHO : isNaN(X_OHO )? 0   : X_OHO ,//mg/L | Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
+      X_PAO : isNaN(X_PAO )? 0   : X_PAO ,//mg/L | Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)
     };
     this.mass_ratios={
       /*----+------------------+----------------+-----------------+-----------------+
@@ -69,7 +71,7 @@ class State_Variables {
       /*USO*/ f_CV_USO : 1.4930, f_C_USO : 0.498, f_N_USO : 0.0366, f_P_USO : 0.0000, // USO
       /*OHO*/ f_CV_OHO : 1.4810, f_C_OHO : 0.518, f_N_OHO : 0.1000, f_P_OHO : 0.0250, // Ordinary Heterotrophic Organisms
       ///*ANO*/ f_CV_ANO : 1.4810, f_C_ANO : 0.518, f_N_ANO : 0.1000, f_P_ANO : 0.0250, // Ammonia Oxidizing Organisms
-      ///*PAO*/ f_CV_PAO : 1.4810, f_C_PAO : 0.518, f_N_PAO : 0.1000, f_P_PAO : 0.0250, // Phosphate Accumulating Organisms
+      /*PAO*/ f_CV_PAO : 1.4810, f_C_PAO : 0.518, f_N_PAO : 0.1000, f_P_PAO : 0.3800, // Phosphate Accumulating Organisms
       /*----------------------------------------------------------------------------*/
     };
   };
@@ -97,12 +99,12 @@ class State_Variables {
       let  uCOD = usCOD + upCOD;        //unbio           COD
       let  sCOD = bsCOD + usCOD;        //soluble         COD
       let  pCOD = bpCOD + upCOD;        //partic          COD
-      let Total_COD = bsCOD + usCOD + bpCOD + upCOD + co.X_OHO;
+      let Total_COD = bsCOD + usCOD + bpCOD + upCOD + co.X_OHO + co.X_PAO;
       let COD={
         total: Total_COD,
         bCOD,  uCOD,  sCOD,  pCOD,
         bsCOD, usCOD, bpCOD, upCOD,
-        active: co.X_OHO,
+        active: co.X_OHO + co.X_PAO,
       };
 
     //TOC all fractions (Total Organic Carbon)
@@ -114,7 +116,9 @@ class State_Variables {
       let  uOC = usOC + upOC;                                                                  //unbio           OC
       let  sOC = bsOC + usOC;                                                                  //soluble         OC
       let  pOC = bpOC + upOC;                                                                  //partic          OC
-      let actOC = co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO;                                         //OC in active biomass (OHO)
+      let actOC = co.X_OHO * mr.f_C_OHO / mr.f_CV_OHO + //OC in active biomass (OHO)
+                  co.X_PAO * mr.f_C_PAO / mr.f_CV_PAO;  //OC in active biomass (PAO)
+
       let Total_TOC = bsOC + usOC + bpOC + upOC + actOC;
       let TOC={
         total:Total_TOC,
@@ -132,7 +136,8 @@ class State_Variables {
       let  uON = usON + upON;                                                                  //unbio           ON
       let  sON = bsON + usON;                                                                  //soluble         ON
       let  pON = bpON + upON;                                                                  //partic          ON
-      let actON = co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO;                                         //ON in active biomass (OHO)
+      let actON = co.X_OHO * mr.f_N_OHO / mr.f_CV_OHO+ //ON in active biomass (OHO)
+                  co.X_PAO * mr.f_N_PAO / mr.f_CV_PAO; //ON in active biomass (PAO)
       let Total_TKN = co.S_FSA + bsON + usON + bpON + upON + actON;
       let TKN={
         total:Total_TKN,
@@ -152,7 +157,9 @@ class State_Variables {
       let  uOP = usOP + upOP;                                                                  //unbio           OP
       let  sOP = bsOP + usOP;                                                                  //soluble         OP
       let  pOP = bpOP + upOP;                                                                  //partic          OP
-      let actOP = co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO;                                         //OP in active biomass (OHO)
+      let actOP = co.X_OHO * mr.f_P_OHO / mr.f_CV_OHO + //OP in active biomass (OHO)
+                  co.X_PAO * mr.f_P_PAO / mr.f_CV_PAO;  //OP in active biomass (PAO)
+
       let Total_TP = co.S_OP + bsOP + usOP + bpOP + upOP + actOP;
       let TP={
         total:Total_TP,
@@ -166,7 +173,10 @@ class State_Variables {
     //TSS all fractions (Volatile Suspended Solids (VSS) + inert Suspended Solids (iSS))
       let bVSS      = co.X_BPO / mr.f_CV_BPO; //bio   VSS
       let uVSS      = co.X_UPO / mr.f_CV_UPO; //unbio VSS
-      let actVSS    = co.X_OHO / mr.f_CV_OHO; //OHO   VSS active biomass
+
+      let actVSS    = co.X_OHO / mr.f_CV_OHO + //OHO VSS active biomass
+                      co.X_PAO / mr.f_CV_PAO;  //PAO VSS active biomass
+
       let Total_VSS = bVSS + uVSS + actVSS;   //total VSS
       let Total_TSS = Total_VSS + co.X_iSS;   //total TSS
       let TSS={
@@ -253,6 +263,7 @@ class State_Variables {
         S_OP  :{unit:"mg/L as P",   descr:"Inorganic OrthoPhosphate (PO4)"},
         S_NOx :{unit:"mg/L as N",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
         X_OHO :{unit:"mg/L as COD", descr:"Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)"},
+        X_PAO :{unit:"mg/L as COD", descr:"Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)"},
       },
       mass_ratios:{
         f_CV_VFA :{unit:"gCOD/gVSS",descr:"S_VFA/VSS  mass ratio"},
@@ -283,10 +294,10 @@ class State_Variables {
         //f_C_ANO  :{unit:"gC/gVSS",  descr:"X_ANO/C    mass ratio"},
         //f_N_ANO  :{unit:"gN/gVSS",  descr:"X_ANO/N    mass ratio"},
         //f_P_ANO  :{unit:"gP/gVSS",  descr:"X_ANO/P    mass ratio"},
-        //f_CV_PAO :{unit:"gCOD/gVSS",descr:"X_PAO/VSS  mass ratio"},
-        //f_C_PAO  :{unit:"gC/gVSS",  descr:"X_PAO/C    mass ratio"},
-        //f_N_PAO  :{unit:"gN/gVSS",  descr:"X_PAO/N    mass ratio"},
-        //f_P_PAO  :{unit:"gP/gVSS",  descr:"X_PAO/P    mass ratio"},
+        f_CV_PAO :{unit:"gCOD/gVSS",descr:"X_PAO/VSS  mass ratio"},
+        f_C_PAO  :{unit:"gC/gVSS",  descr:"X_PAO/C    mass ratio"},
+        f_N_PAO  :{unit:"gN/gVSS",  descr:"X_PAO/N    mass ratio"},
+        f_P_PAO  :{unit:"gP/gVSS",  descr:"X_PAO/P    mass ratio"},
       },
     }
   }
@@ -298,7 +309,6 @@ try{module.exports=State_Variables}catch(e){}
 /*tests*/{
   //test 1: print totals and fluxes
   (function(){
-    return
     let s = new State_Variables(1,1,0,0,0,0,0,0,0,0);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
