@@ -1,5 +1,6 @@
 /*
  * All kinetic constants
+ * TODO add descriptions and units from bio P removal new constants
 **/
 
 const constants={
@@ -10,11 +11,13 @@ const constants={
   k_v20      : 0.070, //L/mgVSS·d | constant for not degraded bCOD (FBSO)
   theta_k_v20: 1.035, //ø         | k_v20 temperature correction factor
   fH         : 0.200, //ø         | heterotrophic endogenous residue fraction
-
-  //TODO bio P integration
-  f_PAO      : 0.250, //ø         | PAO endogenous residue fraction
-
   f_iOHO     : 0.150, //giSS/gVSS | iSS content of OHOs
+
+  //EBPR bio P removal
+  b_PAO      : 0.040, //TODO endogenous residue respiration rate at 20ºC
+  theta_b_PAO: 1.029, //TODO b_PAO temperature correction factor
+  f_PAO      : 0.250, //TODO ø         | PAO endogenous residue fraction
+  f_iPAO     : 1.300, //TODO giSS/gVSS | iSS content of PAOs
 
   //nitrification
   µAm      : 0.450, //1/d       | autotrophic max specific growth rate at 20ºC

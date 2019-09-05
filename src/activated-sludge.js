@@ -112,7 +112,10 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Pti   = frac.TP.total;                               //mgP/L | total P influent
   let Pouse = frac.TP.usOP;                                //mgP/L | P organic unbiodegradable soluble effluent
   let Pobse = S_b*f_P_FBSO/fCV_FBSO;                       //mgP/L | P organic biodegradable soluble effluent
-  let Psa   = Math.max(0, Pti - Ps - Pouse - Pobse);       //mgP/L | inorganic soluble P available for chemical P removal
+
+  //TODO: añadir P_bio_rem desde bioPremoval
+  let P_bio_rem = 0; //
+  let Psa = Math.max(0, Pti - Ps - Pouse - Pobse - P_bio_rem);       //mgP/L | inorganic soluble P available for chemical P removal
   //console.log({Pti,Ps,Pouse,Pobse,Psa});//debug
 
   /*chemical P removal*/

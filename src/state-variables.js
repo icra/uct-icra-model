@@ -309,6 +309,7 @@ try{module.exports=State_Variables}catch(e){}
 /*tests*/{
   //test 1: print totals and fluxes
   (function(){
+    return
     let s = new State_Variables(1,1,0,0,0,0,0,0,0,0);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
