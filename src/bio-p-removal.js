@@ -156,7 +156,7 @@ function bio_p_removal(){
   //potential biological P removal
   let P_bio_rem = P_bio_PAO + P_bio_OHO + P_bio_E + P_bio_I; //mgP/L
 
-  //-----------------------bio P removal ens here
+  //-----------------------bio P removal ends here
 
   //nota: cambiar Ps y Psa en activated sludge TODO
   //caso similar a FOt; volver a calcular
