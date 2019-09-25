@@ -83,7 +83,7 @@ function bio_p_removal(){
   const Y_PAO = YH/f_CV_PAO;            //0.45 = 0.666/1.481
   const i_8_6 = (5/8)*2*(32/14)/(1-YH); //8.6 stoichiometric constant
   const i_3_0 = 1/(1-YH);               //3.0 stoichiometric constant
-  console.log({i_8_6,i_3_0});
+  //console.log({i_8_6,i_3_0});
 
   //fermentables available for conversion into VFA by OHOs
   let S_FBSO_conv = S_FBSO - i_8_6*(RAS*S_NOx_RAS + S_NOx) - i_3_0*(RAS*DO_RAS + DO); //mgCOD/L
