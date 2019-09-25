@@ -1,6 +1,8 @@
 .LP
 .ce
-Document under development
+Last edit: september 2019
+.ce
+note: bio P removal equations still not added!
 
 .TL
 UCT-ICRA wastewater MLE model
@@ -36,13 +38,14 @@ Q
   S sub FSA,
   S sub OP,
   S sub NOx,
-  X sub OHO
+  X sub OHO,
+  X sub PAO
 .EN
 
 .NH 2
 Total chemical oxygen demand ($S sub t$)
 .EQ (mgCOD/L)
-S sub t = S sub VFA + S sub FBSO + X sub BPO + X sub UPO + S sub USO + X sub OHO
+S sub t = S sub VFA + S sub FBSO + X sub BPO + X sub UPO + S sub USO + X sub OHO + X sub PAO
 .EN
 
 and:
@@ -54,7 +57,7 @@ $ S sub bs = S sub VFA + S sub FBSO $;
 $ S sub bp = X sub BPO $;
 $ S sub {u p } = X sub UPO $;
 $ S sub us = S sub USO $;
-$ S sub active = X sub OHO $;
+$ S sub active = X sub OHO + X sub PAO $;
 $ S sub t = S sub bs + S sub bp + S sub {u p} + S sub us + S sub active $;
 .TE
 
@@ -90,8 +93,8 @@ $ X sub BPO  $; 1.5230; 0.0323; 0.0072; 0.498
 $ X sub UPO  $; 1.4810; 0.1000; 0.0250; 0.518
 $ S sub USO  $; 1.4930; 0.0366; 0.0000; 0.498
 $ X sub OHO  $; 1.4810; 0.1000; 0.0250; 0.518
-$ ANO        $; 1.4810; 0.1000; 0.0250; 0.518
-$ PAO        $; 1.4810; 0.1000; 0.0250; 0.518
+$ X sub PAO  $; 1.4810; 0.1000; 0.0250; 0.518
+$ X sub ANO  $; 1.4810; 0.1000; 0.0250; 0.518
 .TE
 
 .NH 2
@@ -108,7 +111,7 @@ $N sub obs = S sub VFA f sub N sub VFA over f sub cv sub VFA + S sub FBSO f sub 
 $N sub obp = X sub BPO f sub N sub BPO over f sub cv sub BPO$;
 $N sub ous = S sub USO f sub N sub USO over f sub cv sub USO$;
 $N sub oup = X sub UPO f sub N sub UPO over f sub cv sub UPO$;
-$N sub active = X sub OHO f sub N sub OHO over f sub cv sub OHO $;
+$N sub active = X sub OHO f sub N sub OHO over f sub cv sub OHO + X sub PAO f sub N sub PAO over f sub cv sub PAO $;
 .TE
 
 .NH 2
@@ -125,7 +128,7 @@ $P sub obs = S sub VFA f sub P sub VFA over f sub cv sub VFA + S sub FBSO f sub 
 $P sub obp = X sub BPO f sub P sub BPO over f sub cv sub BPO$;
 $P sub ous = S sub USO f sub P sub USO over f sub cv sub USO$;
 $P sub oup = X sub UPO f sub P sub UPO over f sub cv sub UPO$;
-$P sub active = X sub OHO f sub P sub OHO over f sub cv sub OHO$;
+$P sub active = X sub OHO f sub P sub OHO over f sub cv sub OHO + X sub PAO f sub P sub PAO over f sub cv sub PAO $;
 .TE
 
 .NH 2
@@ -141,7 +144,7 @@ $C sub obs = S sub VFA f sub C sub VFA over f sub cv sub VFA + S sub FBSO f sub 
 $C sub obp = X sub BPO f sub C sub BPO over f sub cv sub BPO$;
 $C sub ous = S sub USO f sub C sub USO over f sub cv sub USO$;
 $C sub oup = X sub UPO f sub C sub UPO over f sub cv sub UPO$;
-$C sub active = X sub OHO f sub C sub OHO over f sub cv sub OHO$;
+$C sub active = X sub OHO f sub C sub OHO over f sub cv sub OHO + X sub PAO f sub C sub PAO over f sub cv sub PAO $;
 .TE
 
 .NH 2
@@ -154,7 +157,8 @@ where:
 X sub V =
   X sub BPO over f sub cv sub BPO +
   X sub UPO over f sub cv sub UPO +
-  X sub OHO over f sub cv sub OHO
+  X sub OHO over f sub cv sub OHO +
+  X sub PAO over f sub cv sub PAO
 .EN
 
 .bp
