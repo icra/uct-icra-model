@@ -12,5 +12,5 @@ let K2T_PAO   = K2_20_PAO*Math.pow(1.080, T-20); //gN/gVSS·d
 let bHT       = 0.24*Math.pow(1.029,T-20);       //1/d
 
 //new Dp1
-let Dp1 = S_FBSO_AN*(1+r)*(1-YH)/2.86 + 
+let Dp1 = S_FBSO_AN*(1+r)*(1-YH)/2.86 +
   fx1*K2T_PAO*(F_sb_OHO/Q)*(YH/f_CV_OHO)/(1+bHT*Rs);

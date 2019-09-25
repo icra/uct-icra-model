@@ -33,7 +33,7 @@ function bio_p_removal(){
   let f_N_UPO  = 0.100;
   let f_N_USO  = 0.0366;
   let f_P_OHO  = 0.025;
-  let f_P_PAO  = 0.380; 
+  let f_P_PAO  = 0.380;
   let f_P_UPO  = 0.025;
   let f_P_USO  = 0;
   let f_CV_USO = 1.4930;
@@ -63,16 +63,12 @@ function bio_p_removal(){
   let Pti         = 17;     //mgP/L   | state-variables.js
   let FSti        = 11250;  //kgCOD/d | state-variables.js
   let FiSS        = 735;    //kgiSS/d | state-variables.js
-
   let S_b         = 585;    //mgCOD/L | computed at as (is S_b or Sbi?) TBD
   let YHvss       = 0.45;   //        | computed at as
   let bHT         = 0.202;  //1/d     | computed at as
   let k_vT        = 0.0505; //        | computed at as
-
   let F_extra_iSS = 0;      //kgiSS/d | computed at cpr
-
   let fxm         = 0.5;    //computed at nit
-
   let f_P_X_E     = 0.03;  //gP/gVSS   | fraction of P in endogenous mass (OHO+PAO)
   let f_P_X_I     = 0.03;  //gP/gVSS   | fraction of P in inert mas (OHO+PAO)
   let f_VT_PAO    = 0.46;  //gPAOVSS/gTSS | se puede calcular (?) TBD
@@ -88,8 +84,8 @@ function bio_p_removal(){
   //fermentables available for conversion into VFA by OHOs
   let S_FBSO_conv = S_FBSO - i_8_6*(RAS*S_NOx_RAS + S_NOx) - i_3_0*(RAS*DO_RAS + DO); //mgCOD/L
 
-  //loop
-  let S_FBSO_AN  = 0; //initial seed value                        //mgCOD/L | fermentable lost in the effluent of the last anaerobic reactor 
+  //prepare loop for MX_BH calculation
+  let S_FBSO_AN  = 0; //initial seed value                        //mgCOD/L | fermentable lost in the effluent of the last anaerobic reactor
   let F_ss_PAO   = Q*(S_FBSO_conv - (1+RAS)*S_FBSO_AN) + Q*S_VFA; //kgCOD/d | VFA stored by PAOs
   let F_sb_OHO   = Q*S_b - F_ss_PAO;                              //kgCOD/d | remaining bCOD for OHOs
   let MX_BH      = YHvss/(1+bHT*Rs)*F_sb_OHO*Rs;                  //kgVSS   | active OHO biomass
@@ -125,11 +121,11 @@ function bio_p_removal(){
   let f_VT     = MX_V/MX_T;                                               //gVSS/gTSS | valor orientativo 0.80 TBD
   let f_P_TSS = (1/MX_T)*(
     (
-      f_P_OHO*MX_BH + 
-      f_P_X_E*(MX_EH+MX_E_PAO) + 
+      f_P_OHO*MX_BH +
+      f_P_X_E*(MX_EH+MX_E_PAO) +
       f_P_X_I*MX_I
-    )/f_VT + 
-    f_P_PAO*MX_PAO/f_VT_PAO + 
+    )/f_VT +
+    f_P_PAO*MX_PAO/f_VT_PAO +
     f_P_iSS*MX_IO
   ); //particulate P (gP/gTSS)
 
@@ -160,7 +156,7 @@ function bio_p_removal(){
   //potential biological P removal
   let P_bio_rem = P_bio_PAO + P_bio_OHO + P_bio_E + P_bio_I; //mgP/L
 
-  //-----------------------bio P removal acaba aqui
+  //-----------------------bio P removal ends here
 
   //nota: cambiar Ps y Psa en activated sludge TODO
   //caso similar a FOt; volver a calcular
