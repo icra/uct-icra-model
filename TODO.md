@@ -1,4 +1,5 @@
 ## Pending Tasks
+  - replace FOt calculations in denitrification (add a note in nitrification "without denitrification")
   - discuss with george:
     - "what if all influent BSO is VFA" scenario (what happens to MX-BH?).
     - idea: compute OHO mass ratios instead of being inputs from influent

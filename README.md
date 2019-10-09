@@ -1,5 +1,3 @@
-Status: Under refactorization (May 2019)
-
 # UCT-ICRA model
 
 ## Wastewater treatment plant model implementation in Javascript
@@ -241,22 +239,54 @@ is given by either of the QADWF equations above.
 
 ## REFERENCES
 <ul>
-  <li>1Clayton JA, Ekama GA, Wentzel MC and Marais GvR (1991) Denitrification kinetics in biological nitrogen and phosphorus removal systems treating municipal wastewaters. Wat. Sci. Tech., 23(4/6-2) 1025-1035.
-  <li>Ekama GA and Marais GvR (1986) Sludge settleability and secondary settling tank design procedures. J. Water Pollut. Control., 85(1) 101-113.
-  <li>Ekama GA, Barnard JL, Guenthert FW, Krebs P, McCorquodale JA, Parker DS and Wahlberg EJ (1997) Secondary settling tanks: Theory, design, modelling and operation. IAWQ STR No 6, pp216, International Association on Water Quality, London. ISBN 900222 03 5, ISSN 1025-0913.
-  <li>Ekama GA and Wentzel MC (1999) Denitrification kinetics in N and P removal activated sludge systems treating municipal wastewaters. Wat. Sci. Tech., 39(6) 69-77.
-  <li>Ekama GA and Marais P (2004) Assessing the applicability of the 1D flux theory to full scale secondary settling tank design with a 2D hydrodynamic model. Wat. Res., 38(3) 495-506.
-  <li>Ekama GA and Wentzel MC (2004) A predictive model for the reactor inorganic suspended solids concentration in activated sludge systems. Wat. Res., 38(19) 4093-4106.
-  <li>Ekama GA (2009) Using bio-process stoichiometry to build a steady state plant wide wastewater treatment plant model. Wat. Res., 43(8) 2101-2120.
-  <li>Ekama GA (2010) The role and control of sludge age in biological nutrient removal activated sludge systems. Wat. Sci. Tech., 61(7) 1645-1652.
-  <li>Ekama GA (2011) Biological nutrient removal. In: Wilderer P (ed.) Treatise on Water Science, Vol 4, pp409-528. Oxford: Academic Press.
-  <li>Henze M, van Loosdrecht MCM, Ekama GA and Brdjanovic D (2008) Biological wastewater treatment: Principles, modelling and design. IWA Publishing, London. 528 pages. ISBN - 10:1843391880; 13:9781843391883.
-  <li>Ikumi DS, Harding TH and Ekama GA (2014) Biodegradability of wastewater and activated sludge organics in anaerobic digestion. Wat. Res., 56(1) 267-279.
-  <li>Ramphao MC, Wentzel MC, Merritt R, Ekama GA, Young T and Buckley CA (2005) The impact of membrane solid-liquid separation on the design of biological nutrient removal activated sludge systems. Biotech & Bioeng., 89(6) 630-646.
-  <li>2Robertson J and Ekama GA (2016) A comparison of conventional activated sludge and integrated fixed film media in MLE, UCT and JHB configurations. Procs. 14th biennial WISA conference and exhibition, Durban, 15-19 May, 2016.
-  <li>Van Haandel AC, Dold PL and Marais GvR (1982) Optimization of nitrogen removal in the single sludge activated sludge process. Wat. Sci. Tech. 14, 443-446.
-  <li>Wentzel MC, Dold PL, Ekama GA and Marais GvR (1985) Kinetics of biological phosphorus release. Wat. Sci. Tech., 17, 57-71.
-  <li>Wentzel MC, Ekama GA, Dold PL and Marais GvR (1990) Biological excess phosphorus removal - steady state process design. Water SA, 16(1) 29-48.
-  <li>Wentzel MC, Ekama GA and Sotemann SW (2006) Mass balances based plant wide wastewater treatment plant models - Part 1: Biodegradability of wastewater organics under anaerobic conditions. Water SA, 32(3) 269-275.
-  <li>WRC (1984) Theory, design and operation of nutrient removal activated sludge processes (Chs 4-6). Ed. Wiechers HNS, Water Research Commission, TT16/84 , ISBN 0 908356 13 7. (www.wrc.org.za).
+  <li>1Clayton JA, Ekama GA, Wentzel MC and Marais GvR (1991) Denitrification
+  kinetics in biological nitrogen and phosphorus removal systems treating
+  municipal wastewaters. Wat. Sci. Tech., 23(4/6-2) 1025-1035.
+  <li>Ekama GA and Marais GvR (1986) Sludge settleability and secondary
+  settling tank design procedures. J. Water Pollut. Control., 85(1) 101-113.
+  <li>Ekama GA, Barnard JL, Guenthert FW, Krebs P, McCorquodale JA, Parker DS
+  and Wahlberg EJ (1997) Secondary settling tanks: Theory, design, modelling
+  and operation. IAWQ STR No 6, pp216, International Association on Water
+  Quality, London. ISBN 900222 03 5, ISSN 1025-0913.
+  <li>Ekama GA and Wentzel MC (1999) Denitrification kinetics in N and P
+  removal activated sludge systems treating municipal wastewaters. Wat. Sci.
+  Tech., 39(6) 69-77.
+  <li>Ekama GA and Marais P (2004) Assessing the applicability of the 1D flux
+  theory to full scale secondary settling tank design with a 2D hydrodynamic
+  model. Wat. Res., 38(3) 495-506.
+  <li>Ekama GA and Wentzel MC (2004) A predictive model for the reactor
+  inorganic suspended solids concentration in activated sludge systems. Wat.
+  Res., 38(19) 4093-4106.
+  <li>Ekama GA (2009) Using bio-process stoichiometry to build a steady state
+  plant wide wastewater treatment plant model. Wat. Res., 43(8) 2101-2120.
+  <li>Ekama GA (2010) The role and control of sludge age in biological nutrient
+  removal activated sludge systems. Wat. Sci. Tech., 61(7) 1645-1652.
+  <li>Ekama GA (2011) Biological nutrient removal. In: Wilderer P (ed.)
+  Treatise on Water Science, Vol 4, pp409-528. Oxford: Academic Press.
+  <li>Henze M, van Loosdrecht MCM, Ekama GA and Brdjanovic D (2008) Biological
+  wastewater treatment: Principles, modelling and design. IWA Publishing,
+  London. 528 pages. ISBN - 10:1843391880; 13:9781843391883.
+  <li>Ikumi DS, Harding TH and Ekama GA (2014) Biodegradability of wastewater
+  and activated sludge organics in anaerobic digestion. Wat. Res., 56(1)
+  267-279.
+  <li>Ramphao MC, Wentzel MC, Merritt R, Ekama GA, Young T and Buckley CA
+  (2005) The impact of membrane solid-liquid separation on the design of
+  biological nutrient removal activated sludge systems. Biotech & Bioeng.,
+  89(6) 630-646.
+  <li>2Robertson J and Ekama GA (2016) A comparison of conventional activated
+  sludge and integrated fixed film media in MLE, UCT and JHB configurations.
+  Procs. 14th biennial WISA conference and exhibition, Durban, 15-19 May, 2016.
+  <li>Van Haandel AC, Dold PL and Marais GvR (1982) Optimization of nitrogen
+  removal in the single sludge activated sludge process. Wat. Sci. Tech. 14,
+  443-446.
+  <li>Wentzel MC, Dold PL, Ekama GA and Marais GvR (1985) Kinetics of
+  biological phosphorus release. Wat. Sci. Tech., 17, 57-71.
+  <li>Wentzel MC, Ekama GA, Dold PL and Marais GvR (1990) Biological excess
+  phosphorus removal - steady state process design. Water SA, 16(1) 29-48.
+  <li>Wentzel MC, Ekama GA and Sotemann SW (2006) Mass balances based plant
+  wide wastewater treatment plant models - Part 1: Biodegradability of
+  wastewater organics under anaerobic conditions. Water SA, 32(3) 269-275.
+  <li>WRC (1984) Theory, design and operation of nutrient removal activated
+  sludge processes (Chs 4-6). Ed. Wiechers HNS, Water Research Commission,
+  TT16/84 , ISBN 0 908356 13 7. (www.wrc.org.za).
 </ul>

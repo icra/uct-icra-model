@@ -8,7 +8,6 @@ try{
 }catch(e){}
 
 function bio_p_removal(){
-
   //doubts
   let S_NOx_RAS = 0.5;   //mgCOD/L | new input or it can be calculated ?
   let f_CV      = 1.481; //mass ratio of OHOs and PAO combined | TBD this can be calculated as M
@@ -19,10 +18,10 @@ function bio_p_removal(){
 
   /*INPUTS*/
   //inputs -- state variables
-  let S_FBSO      = 124;   //mgCOD/L | input state variable
-  let S_VFA       = 22;    //mgCOD/L | input state variable
-  let S_USO       = 53;    //mgCOD/L | input state variable
-  let S_NOx       = 0;     //mgCOD/L | input state variable
+  let S_FBSO = 124;   //mgCOD/L | input state variable
+  let S_VFA  = 22;    //mgCOD/L | input state variable
+  let S_USO  = 53;    //mgCOD/L | input state variable
+  let S_NOx  = 0;     //mgCOD/L | input state variable
 
   //inputs -- mass ratios
   let f_CV_UPO = 1.481;

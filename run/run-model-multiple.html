@@ -489,7 +489,7 @@
                 <u>Process variables</u>
               </a>
 
-              <!--as,nit,dn,cpr,cap-->
+              <!--as,nit,dn,cpr,cap,bip-->
               <div v-if="plant.visibles.outputs.process_variables.visible">
                 <ul v-for="obj,key in plant.outputs.run.process_variables">
                   <li v-if="obj && plant.configuration[key]!=false">
@@ -551,6 +551,7 @@
           dn:false,
           cpr:false,
           cap:false,
+          bip:false,
         },
         primary:{
           visible:false,
@@ -583,7 +584,7 @@
       };
     }
   }
-  plants.forEach(plant=>{plant.visibles = new Visibles();});
+  plants.forEach(plant=>{plant.visibles=new Visibles();});
 </script>
 
 <!--frontend: vue-->
@@ -603,7 +604,7 @@
         let plant = new Plant(
           //syntax-----------( Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx, X_OHO)  //influent syntax
           new State_Variables(25,    50,    115,   440,   100,    45,    60,  39.1, 7.28,     0,     0), //influent
-          {pst:true, nit:true, dn:true, cpr:true },                                                     //configuration
+          {pst:true, nit:true, dn:true, cpr:true, bip:false },                                                     //configuration
           {                                                                                             //parameters
             //legend {PST:'primary settler', AS:'activated sludge', CE:'capacity estimation', NIT:'nitrification', DN:'denitrification', CPR:'chemical P removal'}
             fw          : 0.00500,   //ø       | PST | fraction of Q that goes to wastage
@@ -652,4 +653,7 @@
 
   //initialize plants
   vm_plants.add_plant();
+
+  //TODO TBD
+  //create a vue component for state variables (?)
 </script>

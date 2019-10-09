@@ -9,6 +9,7 @@
     "chemical-P-removal"
     "nitrification",
     "denitrification"
+    "bio-P-removal"
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
     Qi → [PST] → [AS] → [nitrification] → Qe
@@ -232,7 +233,7 @@ class State_Variables {
     }
   }
 
-  //add up 2 state variable objects
+  //sum 2 state variable objects
   combine(sv){
     //new state variables empty object
     let new_sv = new State_Variables(0,0,0,0,0,0,0,0,0,0,0);

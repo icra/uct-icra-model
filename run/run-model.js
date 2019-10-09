@@ -38,10 +38,11 @@ influent.mass_ratios={
 
 //plant configuration: enable modules (on=true/off=false)
 let configuration={
-  pst:true, //primary settler
-  nit:true, //nitrification
-  dn:true,  //denitrification
-  cpr:true  //chemical P removal
+  pst:true,  //primary settler
+  nit:true,  //nitrification
+  dn:true,   //denitrification
+  cpr:true,  //chemical P removal
+  bip:false, //bio P removal
 };
 
 //parameters: plant settings
