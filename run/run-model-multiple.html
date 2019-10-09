@@ -70,6 +70,7 @@
       margin-bottom:5px;
       border-bottom:1px solid #ccc;
       border-top:1px solid #ccc;
+      padding-left:1px;
     }
     .grid-li{ /*three columns: key, value, unit*/
       display:grid;
@@ -90,7 +91,12 @@
     }
   </style>
 </head><body>
-<!--titol--><h2 onclick=window.location.reload()>UCT-ICRA wastewater treatment plant model</h2><hr>
+<!--titol-->
+<h2 onclick=window.location.reload()>
+  UCT-ICRA wwtp model
+  <small style=font-size:12px>MLE (PST, AS, NIT, DN, EBPR, SST processes)</small>
+</h2>
+<hr>
 
 <!--plants-->
 <div id=plants>
@@ -657,3 +663,19 @@
   //TODO TBD
   //create a vue component for state variables (?)
 </script>
+
+<!--footer-->
+<footer style="border-top:1px solid #ccc;margin-top:20px;padding:8px">
+  <b>About</b>
+  <ul id=about>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model">README</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">MODEL ASSUMPTIONS</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/tree/master/src">SOURCE CODE</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/TODO.md">TODO</a>
+  </ul>
+  <style>
+    ul#about li{
+      font-size:smaller;
+    }
+  </style>
+</footer>
