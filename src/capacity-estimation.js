@@ -7,6 +7,8 @@
   - X_tave: average total solids concentration
   if the plant is tretating more than Q_ADWF, is overloaded. if is less, the
   plant is underloaded
+
+  TODO: add calculation of % of capacity overloaded and allow 5% before stopping the model
 */
 
 function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){

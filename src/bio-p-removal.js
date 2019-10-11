@@ -1,78 +1,87 @@
 /*
-  Bio P removal implementation
+ * Bio P removal implementation 
+ *
+ * standalone version, still not integrated to uct-icra model
+ *
 */
 
+/*integration notes*/
+
+//load modules
 try{
   State_Variables    = require("./state-variables.js");
   chemical_P_removal = require("./chemical-P-removal.js");
 }catch(e){}
 
 function bio_p_removal(){
-  //doubts
-  let S_NOx_RAS = 0.5;   //mgCOD/L | new input or it can be calculated ?
-  let f_CV      = 1.481; //mass ratio of OHOs and PAO combined | TBD this can be calculated as M
-
-  //new inputs for Bio P removal
-  let number_of_an_zones = 2;   //new | number of anoxic zones | TODO
-  let f_AN               = 0.1; //new input | value <= fxm | TODO | anaerobic mass fraction, different from fxt (?)
-
   /*INPUTS*/
-  //inputs -- state variables
-  let S_FBSO = 124;   //mgCOD/L | input state variable
-  let S_VFA  = 22;    //mgCOD/L | input state variable
-  let S_USO  = 53;    //mgCOD/L | input state variable
-  let S_NOx  = 0;     //mgCOD/L | input state variable
+    //doubts
+    let S_NOx_RAS = 0.500; //mgCOD/L | new input or it can be calculated ?
+    let f_CV      = 1.481; //mass ratio of OHOs and PAO combined | TBD can this be calculated?
 
-  //inputs -- mass ratios
-  let f_CV_UPO = 1.481;
-  let f_CV_OHO = 1.481;
-  let f_CV_PAO = 1.481;
-  let f_N_OHO  = 0.100;
-  let f_N_PAO  = 0.100;
-  let f_N_UPO  = 0.100;
-  let f_N_USO  = 0.0366;
-  let f_P_OHO  = 0.025;
-  let f_P_PAO  = 0.380;
-  let f_P_UPO  = 0.025;
-  let f_P_USO  = 0;
-  let f_CV_USO = 1.4930;
+    //new inputs for Bio P removal
+    let number_of_an_zones = 2;   //new | number of anoxic zones | TODO
+    let f_AN               = 0.1; //new input | value <= fxm | TODO | anaerobic mass fraction, different from fxt (?)
 
-  //inputs -- constants
-  let YH          = 0.666;  //see constants.js
-  let fH          = 0.2;    //see constants.js
-  let f_iOHO      = 0.15;   //TODO inert fraction of OHO
-  let b_PAO       = 0.04;   //new TODO
-  let theta_b_PAO = 1.029   //new TODO
-  let f_PAO       = 0.25;   //TODO fraction of endogenous residue of the PAOs
-  let f_iPAO      = 1.3;    //TODO inert fraction of PAO
-  let f_i         = 0.15;   //TODO inert fraction of OHO and PAO (=OHO)
+    //inputs -- state variables
+    let S_FBSO = 124; //mgCOD/L | input state variable
+    let S_VFA  =  22; //mgCOD/L | input state variable
+    let S_USO  =  53; //mgCOD/L | input state variable
+    let S_NOx  =   0; //mgCOD/L | input state variable
 
-  //inputs -- plant parameters
-  let DO          = 0;      //mgO/L | input
-  let DO_RAS      = 0;      //mgO/L | input
-  let Q           = 15;     //ML/d  | input
-  let RAS         = 0.75;   //ø     | input
-  let Rs          = 20;     //d     | input
-  let T           = 14      //ºC    | input
-  let Vp          = 21370;  //m3    | input
-  let mass_FeCl3  = 10;     //kg/d  | input
+    //inputs -- mass ratios
+    let f_CV_UPO = 1.4810;
+    let f_CV_OHO = 1.4810;
+    let f_CV_PAO = 1.4810;
+    let f_N_OHO  = 0.1000;
+    let f_N_PAO  = 0.1000;
+    let f_N_UPO  = 0.1000;
+    let f_N_USO  = 0.0366;
+    let f_P_OHO  = 0.0250;
+    let f_P_PAO  = 0.3800;
+    let f_P_UPO  = 0.0250;
+    let f_P_USO  = 0.0000;
+    let f_CV_USO = 1.4930;
 
-  //variables already calculated in other modules
-  let Nti         = 60;     //mgN/L   | state-variables.js
-  let Pti         = 17;     //mgP/L   | state-variables.js
-  let FSti        = 11250;  //kgCOD/d | state-variables.js
-  let FiSS        = 735;    //kgiSS/d | state-variables.js
-  let S_b         = 585;    //mgCOD/L | computed at as (is S_b or Sbi?) TBD
-  let YHvss       = 0.45;   //        | computed at as
-  let bHT         = 0.202;  //1/d     | computed at as
-  let k_vT        = 0.0505; //        | computed at as
-  let F_extra_iSS = 0;      //kgiSS/d | computed at cpr
-  let fxm         = 0.5;    //computed at nit
-  let f_P_X_E     = 0.03;  //gP/gVSS   | fraction of P in endogenous mass (OHO+PAO)
-  let f_P_X_I     = 0.03;  //gP/gVSS   | fraction of P in inert mas (OHO+PAO)
-  let f_VT_PAO    = 0.46;  //gPAOVSS/gTSS | se puede calcular (?) TBD
-  let f_P_iSS     = 0.02;  //gP/giSS   | fraction of P in iSS
+    //inputs -- constants
+    let YH          = 0.666; //see constants.js
+    let fH          = 0.200; //see constants.js
+    let f_iOHO      = 0.150; //TODO inert fraction of OHO
+    let b_PAO       = 0.040; //new TODO
+    let theta_b_PAO = 1.029; //new TODO
+    let f_PAO       = 0.250; //TODO fraction of endogenous residue of the PAOs
+    let f_iPAO      = 1.300; //TODO inert fraction of PAO | not constant, has to be calculated (0.15 - 1.3) (1.3 is PAOs full of polyPP)
+    let f_i         = 0.150; //TODO inert fraction of OHO and PAO (=OHO)
 
+    //inputs -- plant parameters
+    let DO          = 0;      //mgO/L | input
+    let DO_RAS      = 0;      //mgO/L | input
+    let Q           = 15;     //ML/d  | input
+    let RAS         = 0.75;   //ø     | input
+    let Rs          = 20;     //d     | input
+    let T           = 14      //ºC    | input
+    let Vp          = 21370;  //m3    | input
+    let mass_FeCl3  = 10;     //kg/d  | input
+
+    //variables already calculated in other modules
+    let Nti         = 60;     //mgN/L   | state-variables.js
+    let Pti         = 17;     //mgP/L   | state-variables.js
+    let FSti        = 11250;  //kgCOD/d | state-variables.js
+    let FiSS        = 735;    //kgiSS/d | state-variables.js
+    let S_b         = 585;    //mgCOD/L | computed at as (is S_b or Sbi?) TBD
+    let YHvss       = 0.45;   //        | computed at as
+    let bHT         = 0.24*Math.pow(1.029,T-20);       //1/d
+    let k_vT        = 0.0505; //        | computed at as
+    let F_extra_iSS = 0;      //kgiSS/d | computed at cpr
+    let fxm         = 0.5;    //computed at nit
+    let f_P_X_E     = 0.025; //gP/gVSS   | fraction of P in endogenous mass (OHO+PAO)
+
+    let f_P_X_I     = 0.03;  //gP/gVSS   | UPO fraction of P in inert mas
+
+    let f_VT_PAO    = 0.46;  //gPAOVSS/gTSS | can be calculated
+
+    let f_P_iSS     = 0.02;  //gP/giSS   | fraction of P in iSS
+  /*INPUTS END*/
 
   /*EQUATIONS*/
   const Y_PAO = YH/f_CV_PAO;            //0.45 = 0.666/1.481
@@ -105,28 +114,19 @@ function bio_p_removal(){
   }
 
   let MX_EH    = fH*bHT*Rs*MX_BH;                                         //kgVSS     | endogenous residue OHOs
-
   let b_PAO_T  = b_PAO*Math.pow(theta_b_PAO, T-20);                       //1/d       | endogenous respiration rate corrected by temperature
   let f_XPAO   = Y_PAO/(1 + b_PAO_T*Rs);                                  //gVSS/gCOD | PAO biomass production rate
   let MX_PAO   = f_XPAO*F_ss_PAO*Rs;                                      //kgVSS     | active PAO biomass
   let MX_E_PAO = f_PAO*b_PAO_T*MX_PAO*Rs;                                 //kgVSS     | endogenous residue PAOs
-
   let MX_I     = f_i*Rs*FSti/f_CV;                                        //kgVSS     | VSS inert mass (PAOs+OHOs)
   let MX_V     = MX_BH + MX_EH + MX_I + MX_PAO + MX_E_PAO;                //kgVSS     | total VSS mass
+
   let MX_IO    = FiSS*Rs + f_iOHO*MX_BH + f_iPAO*MX_PAO + F_extra_iSS*Rs; //kgiSS     | total inert solids (iSS + iOHO + iPAO + P_precipitation)
   let MX_T     = MX_V + MX_IO;                                            //kgTSS     | total TSS mass
   let X_V      = MX_V/Vp;                                                 //kgVSS/m3  | total VSS conc
   let X_T      = MX_T/Vp;                                                 //kgTSS/m3  | total TSS conc
+
   let f_VT     = MX_V/MX_T;                                               //gVSS/gTSS | valor orientativo 0.80 TBD
-  let f_P_TSS = (1/MX_T)*(
-    (
-      f_P_OHO*MX_BH +
-      f_P_X_E*(MX_EH+MX_E_PAO) +
-      f_P_X_I*MX_I
-    )/f_VT +
-    f_P_PAO*MX_PAO/f_VT_PAO +
-    f_P_iSS*MX_IO
-  ); //particulate P (gP/gTSS)
 
   //VSS to COD biomass conversion
   let X_OHO = f_CV_OHO*(MX_BH  + MX_EH   )/Vp*1000; //mgCOD/L | OHO conc in COD units
@@ -143,31 +143,48 @@ function bio_p_removal(){
   }
 
   //carbonaceous oxygen demand in bio P removal
-  let FOc = (1 - YH)*Q*S_b + f_CV*(1 - fH)*(b_PAO_T*MX_PAO + bHT*MX_BH); //kgO/d
+  let FOc_OHO = (1 - YH)*F_sb_OHO + f_CV*(1 - fH   )*(    bHT*MX_BH  ); //kgO/d
+  let FOc_PAO = (1 - YH)*F_ss_PAO + f_CV*(1 - f_PAO)*(b_PAO_T*MX_PAO ); //kgO/d
+  let FOc     = FOc_OHO + FOc_PAO; //kgO/d
+
+  //COD balance
+  let exiting_COD = FOc + f_CV*MX_V/Rs + Q*(S_USO ); //TODO remember to include the S_b FBSO not consumed when integration
+  let COD_balance = 100*exiting_COD/FSti;
+
+  console.log({COD_balance});
 
   /*P REMOVAL*/
   //P removed by PAOs
-  let P_bio_PAO = f_P_PAO*MX_PAO/Rs/Q;                //mgP/L
-  let P_bio_OHO = f_P_OHO*MX_BH/Rs/Q;                 //mgP/L
-  let P_bio_E   = f_P_X_E*(MX_E_PAO + MX_EH)/Rs/Q;    //mgP/L
-  let P_bio_I   = f_P_X_I*MX_I/Rs/Q;                  //mgP/L
+  let P_bio_PAO = f_P_PAO*MX_PAO/Rs/Q;             //mgP/L
+  let P_bio_OHO = f_P_OHO*MX_BH/Rs/Q;              //mgP/L
+  let P_bio_E   = f_P_X_E*(MX_E_PAO + MX_EH)/Rs/Q; //mgP/L
+  let P_bio_I   = f_P_X_I*MX_I/Rs/Q;               //mgP/L
 
   //potential biological P removal
   let P_bio_rem = P_bio_PAO + P_bio_OHO + P_bio_E + P_bio_I; //mgP/L
 
   //-----------------------bio P removal ends here
 
-  //nota: cambiar Ps y Psa en activated sludge TODO
-  //caso similar a FOt; volver a calcular
+  //note: change Ps and Psa in activated sludge TODO
+  //similar case for FOt, recalculate
   //mgP/L | P influent required for sludge production
-  let Ps    = ((f_P_OHO*(MX_BH+MX_EH)+f_P_PAO*(MX_PAO+MX_E_PAO)) +f_P_UPO*MX_I)/(Rs*Q); //mgP/L
-  let Pouse = S_USO*f_P_USO/f_CV_USO; //mgP/L
-  let Pobse = 0; //mgP/L
 
-  if(Ps > Pti) new Error("Ps > Pti: not enough influent TP to produce biomass");
+  let Ps = ( (f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) + f_P_PAO*(MX_PAO) ) + f_P_UPO*MX_I)/(Rs*Q); //mgP/L
+  console.log({Ps,P_bio_rem}); //mgP/L | they should be equal
+
+  let f_P_PAO_calculated = (Q*Pti*Rs - f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) - f_P_UPO*MX_I)/MX_PAO;
+
+  console.log({f_P_PAO});
+  console.log({f_P_PAO_calculated}); //note: it should be lower than f_P_PAO (0.38)
+
+  let Pouse = S_USO*f_P_USO/f_CV_USO; //mgP/L
+  let Pobse = 0; //mgP/L  (calculate from S_b*f_P_FBSO/f_CV_FBSO)
+
+  if(Ps > Pti) console.warn("Ps > Pti: not enough influent TP to fill up the PAOs with polyphosphate");
 
   //mgP/L | inorganic soluble P available for chemical P removal
   let Psa = Math.max(0, Pti - Ps - Pouse - Pobse - P_bio_rem);
+  console.log({Psa});
 
   //execute chemical P removal module
   let cpr        = chemical_P_removal(Q, Psa, mass_FeCl3); //object
@@ -175,6 +192,34 @@ function bio_p_removal(){
 
   //total P concentration removed = bio + chemical
   let P_total_rem = P_bio_rem + P_chem_rem; //mgP/L
+
+
+  /*calculate mass of iSS*/
+  let f_iPAO_calculted = f_iOHO + 3.268*f_P_PAO_calculated; //giSS/gPAOVSS (3.268 is experimental value giSS/gPP)
+  MX_IO = FiSS*Rs + f_iOHO*MX_BH + f_iPAO_calculted*MX_PAO + F_extra_iSS*Rs; //kgiSS | total inert solids (iSS + iOHO + P_precipitation)
+
+  /*
+    at this point we need a select system type and reactor volume
+      - AO (MLE)
+      - A2O (3 stage bardenpho)
+      - UCT system
+
+    - AO:  we need underflow "s" recycle ratio (the 'a' recycle is calculated)
+    - A2O: we need underflow "s" recycle ratio (the 'a' recycle is calculated)
+    - UCT: we calculate the 'a' recycle. The 'r' recycle (from anoxic to
+      anaerobic) and the 's' recycle are given as inputs.
+  */
+
+  //
+  let f_P_TSS = (1/MX_T)*(
+    (
+      f_P_OHO*MX_BH +
+      f_P_X_E*(MX_EH+MX_E_PAO) +
+      f_P_X_I*MX_I
+    )/f_VT +
+    f_P_PAO*MX_PAO/f_VT_PAO +
+    f_P_iSS*MX_IO
+  ); //particulate P (gP/gTSS)
 
   //P in TSS_effluent
   let X_P_e = f_P_TSS*X_T*1000; //g/m3 == mg/L
@@ -196,57 +241,79 @@ function bio_p_removal(){
   let Nouse = S_USO*f_N_USO/f_CV_USO; //mgN/L
   let Nae   = Nti - Ns - Nouse; //?
 
-  //TODO parte "difícil" calcular nitratos para denitrification
-  let Nne = 0; //?
+  //calculate nitrate for denitrification TODO
+  let Nne = 0; //mgN/L
 
-  /*recalcular Dp1 para denitrification + bio P removal*/
-  let Dp1 = 0; //mgN/L
+  /*
+    modification for denitrification Dp1
+    when there is bio P removal
+  */
+  let Dp1 = (function(){ //mgN/L
+    let r=0;//recirculation from anoxic to anaerobic reactor
+    //is the same as S_NOx_RAS???? TBD
 
-  //output streams------------------(Q,  VFA FBSO BPO      UPO      USO    iSS      FSA  OP   NOx  OHO      PAO    )
+    let fx1       = fxm - f_AN;                      //ø
+    let K2_20_PAO = 0.255;                           //gN/gVSS·d
+    let K2T_PAO   = K2_20_PAO*Math.pow(1.080, T-20); //gN/gVSS·d
+
+    //new equation for Dp1
+    let Dp1 = S_FBSO_AN*(1+r)*(1-YH)/2.86 +
+              fx1*K2T_PAO*(F_sb_OHO/Q)*(YH/f_CV_OHO)/(1+bHT*Rs);
+
+    return Dp1; 
+  })();
+
+  //output streams-TBD-TODO---------(Q,  VFA FBSO BPO      UPO      USO    iSS      FSA  OP   NOx  OHO      PAO    )
   let effluent = new State_Variables(Qe, 0,  0,   0,       0,       S_USO, 0,       Nae, Pse, Nne, 0,       0      );
   let wastage  = new State_Variables(Qw, 0,  0,   BPO_was, UPO_was, S_USO, iSS_was, Nae, Pse, Nne, OHO_was, PAO_was);
 
-  //console.log({effluent,wastage});
-
   //bioP process variables
-  let process_variables = {
-    //----k
-    S_FBSO_conv : {value:S_FBSO_conv, unit:"mgCOD/L",    descr:""},
-    S_FBSO_AN   : {value:S_FBSO_AN,   unit:"mgCOD/L",    descr:""},
-    MX_BH       : {value:MX_BH,       unit:"kgVSS",      descr:""},
-    MX_BH_next  : {value:MX_BH_next,  unit:"kgVSS",      descr:""},
-    iterations  : {value:iterations,  unit:"iterations", descr:""},
-    F_ss_PAO    : {value:F_ss_PAO,    unit:"kgCOD/d",    descr:""},
-    F_sb_OHO    : {value:F_sb_OHO,    unit:"kgCOD/d",    descr:""},
-    b_PAO_T     : {value:b_PAO_T,     unit:"1/d",        descr:""},
-    f_XPAO      : {value:f_XPAO,      unit:"gVSS/gCOD",  descr:""},
-    MX_PAO      : {value:MX_PAO,      unit:"kgVSS",      descr:""},
-    MX_E_PAO    : {value:MX_E_PAO,    unit:"kgVSS",      descr:""},
-    MX_EH       : {value:MX_EH,       unit:"kgVSS",      descr:""},
-    MX_I        : {value:MX_I,        unit:"kgVSS",      descr:""},
-    MX_V        : {value:MX_V,        unit:"kgVSS",      descr:""},
-    MX_IO       : {value:MX_IO,       unit:"kgiSS",      descr:""},
-    MX_T        : {value:MX_T,        unit:"kgTSS",      descr:""},
-    X_V         : {value:X_V,         unit:"kgVSS/m3",   descr:""},
-    X_T         : {value:X_T,         unit:"kgTSS/m3",   descr:""},
-    f_VT        : {value:f_VT,        unit:"gVSS/gTSS",  descr:""},
-    f_P_TSS     : {value:f_P_TSS,     unit:"gP/gTSS",    descr:""},
-    FOc         : {value:FOc,         unit:"kgO/d",      descr:""},
-    P_bio_PAO   : {value:P_bio_PAO,   unit:"mgP/L",      descr:""},
-    P_bio_OHO   : {value:P_bio_OHO,   unit:"mgP/L",      descr:""},
-    P_bio_E     : {value:P_bio_E  ,   unit:"mgP/L",      descr:""},
-    P_bio_I     : {value:P_bio_I  ,   unit:"mgP/L",      descr:""},
-    P_bio_rem   : {value:P_bio_rem,   unit:"mgP/L",      descr:""},
-    Psa         : {value:Psa,         unit:"mgP/L",      descr:""},
-    Pse         : {value:Pse,         unit:"mgP/L",      descr:""},
-    Nae         : {value:Nae,         unit:"mgN/L",      descr:""},
-    f         : {value:f,         unit:"ø",              descr:""},
-    X_OHO     : {value:X_OHO,     unit:"mgCOD/L",        descr:""},
-    X_PAO     : {value:X_PAO,     unit:"mgCOD/L",        descr:""},
+  let process_variables={
+    S_FBSO_conv : {value:S_FBSO_conv, unit:"mgCOD/L",   },
+    S_FBSO_AN   : {value:S_FBSO_AN,   unit:"mgCOD/L",   },
+    F_ss_PAO    : {value:F_ss_PAO,    unit:"kgCOD/d",   },
+    F_sb_OHO    : {value:F_sb_OHO,    unit:"kgCOD/d",   },
+    MX_BH       : {value:MX_BH,       unit:"kgVSS",     },
+    MX_BH_next  : {value:MX_BH_next,  unit:"kgVSS",     },
+    iterations  : {value:iterations,  unit:"iterations",},
+    MX_EH       : {value:MX_EH,       unit:"kgVSS",     },
+    b_PAO_T     : {value:b_PAO_T,     unit:"1/d",       },
+    f_XPAO      : {value:f_XPAO,      unit:"gVSS/gCOD", },
+    MX_PAO      : {value:MX_PAO,      unit:"kgVSS",     },
+    MX_E_PAO    : {value:MX_E_PAO,    unit:"kgVSS",     },
+    MX_I        : {value:MX_I,        unit:"kgVSS",     },
+    MX_V        : {value:MX_V,        unit:"kgVSS",     },
+    MX_IO       : {value:MX_IO,       unit:"kgiSS",     },
+    MX_T        : {value:MX_T,        unit:"kgTSS",     },
+    X_V         : {value:X_V,         unit:"kgVSS/m3",  },
+    X_T         : {value:X_T,         unit:"kgTSS/m3",  },
+    f_VT        : {value:f_VT,        unit:"gVSS/gTSS", },
+    f_P_TSS     : {value:f_P_TSS,     unit:"gP/gTSS",   },
+    X_OHO       : {value:X_OHO,       unit:"mgCOD/L",   },
+    X_PAO       : {value:X_PAO,       unit:"mgCOD/L",   },
+    Ns          : {value:Ns,          unit:"mgN/L",     },
+    FOc         : {value:FOc,         unit:"kgO/d",     },
+    P_bio_PAO   : {value:P_bio_PAO,   unit:"mgP/L",     },
+    P_bio_OHO   : {value:P_bio_OHO,   unit:"mgP/L",     },
+    P_bio_E     : {value:P_bio_E  ,   unit:"mgP/L",     },
+    P_bio_I     : {value:P_bio_I  ,   unit:"mgP/L",     },
+    P_bio_rem   : {value:P_bio_rem,   unit:"mgP/L",     },
+    Ps          : {value:Ps,          unit:"mgP/L",     },
+    Psa         : {value:Psa,         unit:"mgP/L",     },
+    Pse         : {value:Pse,         unit:"mgP/L",     },
+    P_total_rem : {value:P_total_rem, unit:"mgP/L",     },
+    f           : {value:f,           unit:"ø",         },
+    Nae         : {value:Nae,         unit:"mgN/L",     },
+    Nne         : {value:Nne,         unit:"mgN/L",     },
+    Dp1         : {value:Dp1,         unit:"mgN/L",     },
   };
-  return process_variables;
+
+  return {process_variables, effluent, wastage};
 };
 
+/*test*/
 (function(){
-  console.log(bio_p_removal());
+  console.log("bio P removal -- standalone pre integration");
+  let bip = bio_p_removal();
+  console.log(bip.process_variables);
 })();

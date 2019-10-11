@@ -103,10 +103,16 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
 
   //optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
+
+  //debugging
+  //console.log({Nc,Nni});
+  //console.log({Dp1});
+
   let a_opt = (function(){
     let A = DO/i_NO3_N2;
-    let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/i_NO3_N2;
+    let B = Nc-(Dp1-Nni)+((1+RAS)*DO + RAS*DO_RAS)/i_NO3_N2; //TBD equation to be checked when we have influent NOx>0
     let C = (1+RAS)*((Dp1-Nni)-RAS*DO_RAS/i_NO3_N2)-RAS*Nc;
+    //console.log({A,B,C}); //debugging
     return Math.max(0, (-B+Math.sqrt(B*B+4*A*C))/(2*A));
   })();
 
@@ -134,6 +140,11 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let FOn = nit.process_variables.FOn.value;     //kgO/d
   let FOt = FOc + FOn - FOd;                     //kgO/d
   let OUR = FOt*1000/(Vp*(1-fxt)*24);            //mgO/L·h
+
+  //debugging
+  console.log({Vp,fxt,FOc,FOn,FOd});
+  console.log({i_NO3_N2,Nc,Nne});
+  console.log({Q});
 
   //effluent alkalinity
   let Nobi  = inf_frac.TKN.bON;                  //mg/L | biodegradable TKN influent "(Nobsi+Nobpi)"

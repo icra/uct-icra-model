@@ -1,4 +1,9 @@
 ## Pending Tasks
+  - bio P: george sends hand calculations and laura + lluís check it.
+  - add note
+    "this model was tested and checked against the ekama plant wide spreadsheet
+    using the ww characteristics in [WRC 1984, EKAMA 2011, HENZE ET AL 2008,
+    EKAMA 2017] and gave answers less than 0.1% difference for the raw and settled ww characteristics"
   - replace FOt calculations in denitrification (add a note in nitrification "without denitrification")
   - save plant layout to json file in "run-model-multiple.html".
   - discuss with george:
