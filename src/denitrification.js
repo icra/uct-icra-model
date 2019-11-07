@@ -142,9 +142,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let OUR = FOt*1000/(Vp*(1-fxt)*24);            //mgO/L·h
 
   //debugging
-  console.log({Vp,fxt,FOc,FOn,FOd});
-  console.log({i_NO3_N2,Nc,Nne});
-  console.log({Q});
+  //console.log({Vp,fxt,FOc,FOn,FOd});
+  //console.log({i_NO3_N2,Nc,Nne});
+  //console.log({Q});
 
   //effluent alkalinity
   let Nobi  = inf_frac.TKN.bON;                  //mg/L | biodegradable TKN influent "(Nobsi+Nobpi)"

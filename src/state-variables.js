@@ -71,8 +71,8 @@ class State_Variables {
       /*UPO*/ f_CV_UPO : 1.4810, f_C_UPO : 0.518, f_N_UPO : 0.1000, f_P_UPO : 0.0250, // UPO
       /*USO*/ f_CV_USO : 1.4930, f_C_USO : 0.498, f_N_USO : 0.0366, f_P_USO : 0.0000, // USO
       /*OHO*/ f_CV_OHO : 1.4810, f_C_OHO : 0.518, f_N_OHO : 0.1000, f_P_OHO : 0.0250, // Ordinary Heterotrophic Organisms
-      ///*ANO*/ f_CV_ANO : 1.4810, f_C_ANO : 0.518, f_N_ANO : 0.1000, f_P_ANO : 0.0250, // Ammonia Oxidizing Organisms
       /*PAO*/ f_CV_PAO : 1.4810, f_C_PAO : 0.518, f_N_PAO : 0.1000, f_P_PAO : 0.3800, // Phosphate Accumulating Organisms
+      ///*ANO*/ f_CV_ANO : 1.4810, f_C_ANO : 0.518, f_N_ANO : 0.1000, f_P_ANO : 0.0250, // Ammonia Oxidizing Organisms
       /*----------------------------------------------------------------------------*/
     };
   };

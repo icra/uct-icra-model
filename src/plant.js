@@ -169,13 +169,15 @@ try{module.exports=Plant}catch(e){}
 (function(){
   /* CREATE PLANT and RUN MODEL */
 
-  //TODO CHECK WITH GEORGE 2019 OCT 11TH FRIDAY 15:00
-
   /*influent state variables*/
-  //syntax------------------------(Q        VFA FBSO   BPO    UPO    USO   iSS    FSA    OP     NOx OHO PAO)
-  let influent=new State_Variables(59.0445, 50, 185.7, 707.3, 149.5, 57.5, 99.83, 59.57, 14.15, 0,  0,  0  );
+  let influent=new State_Variables(
+    //Q      VFA    FBSO   BPO    UPO    USO   
+    59.0445, 50,    185.7, 707.3, 149.5, 57.5, 
+    //iSS    FSA    OP     NOx    OHO    PAO
+    99.83,   59.57, 14.15, 0,     0,     0
+  );
 
-  //mass_ratios
+  //influent mass_ratios
   influent.mass_ratios.f_CV_VFA  = 1.0667; //gCOD/gVSS
   influent.mass_ratios.f_C_VFA   = 0.4000; //gC/gVSS
   influent.mass_ratios.f_N_VFA   = 0.0000; //gN/gVSS
@@ -253,7 +255,6 @@ try{module.exports=Plant}catch(e){}
     A_ST        :  4995.00000, //m2      | CE  | area of the settler
     fq          :     2.50000, //ø       | CE  | peak flow (Qmax/Qavg)
     waste_from  :   "reactor", //string  | AS  | options {'reactor','sst'}
-    mass_FeCl3  :     0.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
     SF          :     1.25000, //ø       | NIT | safety factor
     fxt         :     0.27600, //ø       | NIT | unaerated sludge mass fraction
     DO          :     2.00000, //mgO/L   | NIT | DO aerobic reactor
@@ -261,6 +262,7 @@ try{module.exports=Plant}catch(e){}
     IR          :     6.00000, //ø       | DN  | internal recirculation ratio
     DO_RAS      :     1.00000, //mgO/L   | DN  | DO in the underflow recycle
     influent_alk:   300.00000, //mg/L    | DN  | influent alkalinity (CaCO3)
+    mass_FeCl3  :     0.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
   };
 
   //create plant
@@ -276,5 +278,4 @@ try{module.exports=Plant}catch(e){}
     console.log(run.errors);
     console.log(run.process_variables.cap);
   }
-
 })();

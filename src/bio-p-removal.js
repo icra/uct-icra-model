@@ -313,6 +313,7 @@ function bio_p_removal(){
 
 /*test*/
 (function(){
+  return
   console.log("bio P removal -- standalone pre integration");
   let bip = bio_p_removal();
   console.log(bip.process_variables);
