@@ -167,6 +167,7 @@ try{module.exports=Plant}catch(e){}
 
 /*unit test*/
 (function(){
+  return
   /* CREATE PLANT and RUN MODEL */
 
   /*influent state variables*/
