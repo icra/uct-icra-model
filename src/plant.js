@@ -27,39 +27,74 @@ try{
   require('./nitrification.js');                     //State_Variables.prototype.nitrification
   require('./denitrification.js');                   //State_Variables.prototype.denitrification
   require('./chemical-P-removal.js');                //function chemical P rem (in activated sludge)
+  require('./bio-P-removal.js');                //function chemical P rem (in activated sludge)
 }catch(e){}
 
 class Plant{
   constructor(influent, configuration, parameters){
     /*
      * - influent:      state variables object
-     * - configuration: plant configuration | dictionary of booleans {pst,nit,dn,bip,cpr}
-     * - parameters:    plant parameters    | dictionary of numbers/strings (~20 objects)
+     * - configuration: plant configuration | dictionary of booleans {pst,nit,dn,cpr,bip}
+     * - parameters:    plant parameters    | dictionary of numbers/strings (~20 aprox)
+     * - constants:     kinetic constants   | dictionary of numbers (~20 aprox)
     */
-    this.influent      = influent;      //state variables object
-    this.configuration = configuration; //object {pst,nit,dn,cpr} collection of booleans
-    this.parameters    = parameters;    //object {fw,removal_BPO,removal_UPO,removal_iSS,T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH,IR,DO_RAS,influent_alk}
-    this.constants     = constants;     //kinetic constants (dictionary)
-
-    /*check inputs*/
-    let info=Plant.info;
+    this.influent      = influent     ||new State_Variables(); //state variables object
+    this.configuration = configuration||{}; //plant configuration (techs)
+    this.parameters    = parameters   ||{}; //plant parameters
+    this.constants     = constants    ||{}; //kinetic constants
 
     //check influent state variables
-    if(influent.constructor !== State_Variables) throw "influent is not a State_Variables object";
+    if(this.influent.constructor!==State_Variables){
+      throw "influent is not a State_Variables object";
+    }
 
-    //check configuration (activable technologies)
+    //check input objects
+    if(!this.constants)     throw 'Plant kinetic constants not defined';
+
+    //check configuration: activable technologies (booleans)
     ['pst','nit','dn','cpr','bip'].forEach(key=>{
-      if(configuration[key]===undefined) throw `configuration "${key}" not specified`;
+      if(this.configuration[key]===undefined){
+        this.configuration[key]=false;
+      }
     });
 
-    //check parameters
+    //check influent, configuration and parameters according to static info object
+    let info=Plant.info;
+
+    //check plant parameters
     Object.keys(info.parameters).forEach(key=>{
-      if(parameters[key]===undefined) throw `parameters "${key}" not specified`;
+      let type=info.parameters[key].type; //type of variable ('number','string')
+
+      //not defined parameters: 
+      //if number => 0
+      //else => throw error
+      if(this.parameters[key]===undefined){
+        if(type=='number'){
+          this.parameters[key]=0;
+        }else if(key=='waste_from'){
+          this.parameters.waste_from='reactor';
+        }else{
+          throw `Error: parameter "${key}" not defined`;
+        }
+      }
+
+      //defined parameters: check type and numeric value
+      else{
+        //check correct type of parameter
+        if(typeof(this.parameters[key])!=type){
+          throw `parameter "${key}" must be a ${type}`;
+        }
+        if(type=='number'){
+          if(this.parameters[key]<0)
+            throw `Error: parameter value (${this.parameters[key]}) not allowed`;
+        }
+      }
+
     });
 
     //check kinetic constants
     Object.keys(constants.info).forEach(key=>{
-      if(constants[key]===undefined) throw `kinetic constant "${key}" not specified`;
+      if(constants[key]===undefined) throw `kinetic constant "${key}" not defined`;
     });
   };
 
@@ -137,26 +172,26 @@ class Plant{
         bip:"Bio P removal",
       },
       parameters:{
-        fw          :{unit:"ø",         tec:"pst", descr:"Fraction of Q that goes to primary wastage"},
-        removal_BPO :{unit:"%",         tec:"pst", descr:"Primary settler removal of the component X_BPO"},
-        removal_UPO :{unit:"%",         tec:"pst", descr:"Primary settler removal of the component X_UPO"},
-        removal_iSS :{unit:"%",         tec:"pst", descr:"Primary settler removal of the component X_iSS"},
-        T           :{unit:"ºC",        tec:"as",  descr:"Temperature"},
-        Vp          :{unit:"m3",        tec:"as",  descr:"Reactor volume"},
-        Rs          :{unit:"d",         tec:"as",  descr:"Solids retention time or sludge age"},
-        RAS         :{unit:"ø",         tec:"as",  descr:"SST underflow recycle ratio"},
-        waste_from  :{unit:"option",    tec:"as",  descr:"Waste_from | options {'reactor','sst'}"},
-        DSVI        :{unit:"mL/gTSS",   tec:"cap", descr:"Sludge settleability"},
-        A_ST        :{unit:"m2",        tec:"cap", descr:"Area of the settler"},
-        fq          :{unit:"ø",         tec:"cap", descr:"Peak flow (Qmax/Qavg)"},
-        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", descr:"Mass of FeCl3 added for chemical P removal"},
-        SF          :{unit:"ø",         tec:"nit", descr:"Safety factor. design choice. Moves the sludge age"},
-        fxt         :{unit:"ø",         tec:"nit", descr:"Current unaerated sludge mass fraction"},
-        DO          :{unit:"mgO/L",     tec:"nit", descr:"DO in the aerobic reactor"},
-        pH          :{unit:"ø",         tec:"nit", descr:"pH"},
-        IR          :{unit:"ø",         tec:"dn",  descr:"Internal recirculation ratio"},
-        DO_RAS      :{unit:"mgO/L",     tec:"dn",  descr:"DO in the underflow recycle"},
-        influent_alk:{unit:"mgCaCO3/L", tec:"dn",  descr:"Influent alkalinity (mg/L CaCO3)"},
+        fw          :{unit:"ø",         tec:"pst", type:"number", descr:"Fraction of Q that goes to primary wastage"},
+        removal_BPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_BPO"},
+        removal_UPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_UPO"},
+        removal_iSS :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_iSS"},
+        T           :{unit:"ºC",        tec:"as",  type:"number", descr:"Temperature"},
+        Vp          :{unit:"m3",        tec:"as",  type:"number", descr:"Reactor volume"},
+        Rs          :{unit:"d",         tec:"as",  type:"number", descr:"Solids retention time or sludge age"},
+        RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"SST underflow recycle ratio"},
+        waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Waste_from | options {'reactor','sst'}"},
+        DSVI        :{unit:"mL/gTSS",   tec:"cap", type:"number", descr:"Sludge settleability"},
+        A_ST        :{unit:"m2",        tec:"cap", type:"number", descr:"Area of the settler"},
+        fq          :{unit:"ø",         tec:"cap", type:"number", descr:"Peak flow (Qmax/Qavg)"},
+        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 added for chemical P removal"},
+        SF          :{unit:"ø",         tec:"nit", type:"number", descr:"Safety factor. design choice. Moves the sludge age"},
+        fxt         :{unit:"ø",         tec:"nit", type:"number", descr:"Current unaerated sludge mass fraction"},
+        DO          :{unit:"mgO/L",     tec:"nit", type:"number", descr:"DO in the aerobic reactor"},
+        pH          :{unit:"ø",         tec:"nit", type:"number", descr:"pH"},
+        IR          :{unit:"ø",         tec:"dn",  type:"number", descr:"Internal recirculation ratio"},
+        DO_RAS      :{unit:"mgO/L",     tec:"dn",  type:"number", descr:"DO in the underflow recycle"},
+        influent_alk:{unit:"mgCaCO3/L", tec:"dn",  type:"number", descr:"Influent alkalinity (mg/L CaCO3)"},
       },
     };
   };
