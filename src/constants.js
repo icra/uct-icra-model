@@ -13,11 +13,10 @@ const constants={
   fH         : 0.200, //ø         | heterotrophic endogenous residue fraction
   f_iOHO     : 0.150, //giSS/gVSS | iSS content of OHOs
 
-  //EBPR bio P removal
-  b_PAO      : 0.040, //TODO endogenous residue respiration rate at 20ºC
-  theta_b_PAO: 1.029, //TODO b_PAO temperature correction factor
-  f_PAO      : 0.250, //TODO ø         | PAO endogenous residue fraction
-  f_iPAO     : 1.300, //TODO giSS/gVSS | iSS content of PAOs
+  //bio P removal (EBPR)
+  b_PAO      : 0.040, //1/d | endogenous residue respiration rate at 20ºC
+  theta_b_PAO: 1.029, //ø   | b_PAO temperature correction factor
+  f_PAO      : 0.250, //ø   | PAO endogenous residue fraction
 
   //nitrification
   µAm      : 0.450, //1/d       | autotrophic max specific growth rate at 20ºC

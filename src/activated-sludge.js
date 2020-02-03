@@ -96,6 +96,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   const k_v20       = constants.k_v20;                    //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
   const theta_k_v20 = constants.theta_k_v20;              //1.035 ø         | k_v20 temperature correction factor
   let k_vT          = k_v20*Math.pow(theta_k_v20,T-20);   //L/mgVSS·d       | k_v corrected by temperature
+  console.log({k_vT});
   let S_FBSO_i      = this.components.S_FBSO;             //mgCOD/L         | influent S_FBSO
   let S_b           = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L         | FBSO effluent concentration: cannot be higher than influent S_FBSO
   let FdSbi         = Math.max(0, FSbi - Q*S_b);          //kgCOD/d         | influent biodegradable COD mass flux that will generate biomass
@@ -281,9 +282,9 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
   //process_variables
   let process_variables={
+    YHvss   :{value:YHvss,     unit:"gVSS/gCOD",   descr:"Heterotrophic yield coefficient"},
     fSus    :{value:fSus,      unit:"gUSO/gCOD",   descr:"USO/COD ratio (influent)"},
     fSup    :{value:fSup,      unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"},
-    YHvss   :{value:YHvss,     unit:"gVSS/gCOD",   descr:"Heterotrophic yield coefficient"},
     k_vT    :{value:k_vT,      unit:"L/mgVSS·d",   descr:"k_v20 corrected by temperature"},
     Ns      :{value:Ns,        unit:"mgN/L",       descr:"N required for sludge production"},
     Ps      :{value:Ps,        unit:"mgN/L",       descr:"P required for sludge production"},
