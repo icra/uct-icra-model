@@ -1,6 +1,7 @@
 /*
  * Bio P removal implementation
  * this is a standalone module: to be integrated to uct-icra model
+ * (work in progress)
 */
 
 //load modules
@@ -12,7 +13,7 @@ try{
 function bio_p_removal(){
   /*INPUTS*/
     //doubts
-    let S_NOx_RAS = 0.500; //mgCOD/L | new input or it can be calculated ?
+    let S_NOx_RAS = 0.500; //mgNOx/L | new input or it can be calculated ?
     let f_CV      = 1.481; //mass ratio of OHOs and PAO combined | TBD can this be calculated?
 
     //new inputs for Bio P removal
