@@ -27,7 +27,7 @@ try{
   require('./nitrification.js');                     //State_Variables.prototype.nitrification
   require('./denitrification.js');                   //State_Variables.prototype.denitrification
   require('./chemical-P-removal.js');                //function chemical P rem (in activated sludge)
-  require('./bio-P-removal.js');                //function chemical P rem (in activated sludge)
+  require('./bio-P-removal.js');                     //bio P removal
 }catch(e){}
 
 class Plant{
@@ -65,7 +65,7 @@ class Plant{
     Object.keys(info.parameters).forEach(key=>{
       let type=info.parameters[key].type; //type of variable ('number','string')
 
-      //not defined parameters: 
+      //not defined parameters:
       //if number => 0
       //else => throw error
       if(this.parameters[key]===undefined){
@@ -207,8 +207,8 @@ try{module.exports=Plant}catch(e){}
 
   /*influent state variables*/
   let influent=new State_Variables(
-    //Q      VFA    FBSO   BPO    UPO    USO   
-    59.0445, 50,    185.7, 707.3, 149.5, 57.5, 
+    //Q      VFA    FBSO   BPO    UPO    USO
+    59.0445, 50,    185.7, 707.3, 149.5, 57.5,
     //iSS    FSA    OP     NOx    OHO    PAO
     99.83,   59.57, 14.15, 0,     0,     0
   );
