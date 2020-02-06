@@ -187,8 +187,8 @@ function bio_p_removal(){
   let P_total_rem = P_bio_rem + P_chem_rem; //mgP/L
 
   /*calculate mass of iSS*/
-  let f_iPAO_calculted = f_iOHO + 3.268*f_P_PAO_calculated; //giSS/gPAOVSS (3.268 is experimental value giSS/gPP)
-  MX_IO = FiSS*Rs + f_iOHO*MX_BH + f_iPAO_calculted*MX_PAO + F_extra_iSS*Rs; //kgiSS | total inert solids (iSS + iOHO + P_precipitation)
+  let f_iPAO_calculated = f_iOHO + 3.268*f_P_PAO_calculated; //giSS/gPAOVSS (3.268 is experimental value giSS/gPP)
+  MX_IO = FiSS*Rs + f_iOHO*MX_BH + f_iPAO_calculated*MX_PAO + F_extra_iSS*Rs; //kgiSS | total inert solids (iSS + iOHO + P_precipitation)
 
   /*
     at this point we need a select system type and reactor volume
