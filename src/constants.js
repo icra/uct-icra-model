@@ -1,9 +1,14 @@
 /*
  * All kinetic constants
  * TODO add descriptions and units from bio P removal new constants
-**/
+*/
 
 const constants={
+  //bio P removal (EBPR) TODO
+  b_PAO      : 0.040, //1/d | endogenous residue respiration rate at 20ºC
+  theta_b_PAO: 1.029, //ø   | b_PAO temperature correction factor
+  f_PAO      : 0.250, //ø   | PAO endogenous residue fraction
+
   //activated sludge
   YH         : 0.666, //gCOD/gCOD | heterotrophic yield (not affected by temperature)
   bH         : 0.240, //1/d       | heterotrophic endogenous respiration rate at 20ºC
@@ -12,11 +17,6 @@ const constants={
   theta_k_v20: 1.035, //ø         | k_v20 temperature correction factor
   fH         : 0.200, //ø         | heterotrophic endogenous residue fraction
   f_iOHO     : 0.150, //giSS/gVSS | iSS content of OHOs
-
-  //bio P removal (EBPR)
-  b_PAO      : 0.040, //1/d | endogenous residue respiration rate at 20ºC
-  theta_b_PAO: 1.029, //ø   | b_PAO temperature correction factor
-  f_PAO      : 0.250, //ø   | PAO endogenous residue fraction
 
   //nitrification
   µAm      : 0.450, //1/d       | autotrophic max specific growth rate at 20ºC

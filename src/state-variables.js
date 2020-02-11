@@ -31,7 +31,7 @@
 */
 
 class State_Variables {
-  constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, 
+  constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO,
     X_iSS, S_FSA, S_OP, S_NOx, X_OHO, X_PAO){
     //numeric input checks
     if(Q      < 0) throw `Error: Flowrate (Q=${Q}) not allowed`;
@@ -110,7 +110,7 @@ class State_Variables {
       };
 
     //TOC all fractions (Total Organic Carbon)
-      let bsOC  = co.S_VFA *mr.f_C_VFA /mr.f_CV_VFA + 
+      let bsOC  = co.S_VFA *mr.f_C_VFA /mr.f_CV_VFA +
                   co.S_FBSO*mr.f_C_FBSO/mr.f_CV_FBSO; //bio + soluble OC
       let usOC  = co.S_USO*mr.f_C_USO/mr.f_CV_USO;                                          //unbio + soluble OC
       let bpOC  = co.X_BPO*mr.f_C_BPO/mr.f_CV_BPO;                                          //bio   + partic  OC
@@ -130,7 +130,7 @@ class State_Variables {
       };
 
     //TKN all fractions (Organic Nitrogen (ON) + Inorganic Free Saline Ammonia (FSA))
-      let bsON  = co.S_VFA *mr.f_N_VFA /mr.f_CV_VFA + 
+      let bsON  = co.S_VFA *mr.f_N_VFA /mr.f_CV_VFA +
                   co.S_FBSO*mr.f_N_FBSO/mr.f_CV_FBSO; //bio + soluble ON
       let usON  = co.S_USO*mr.f_N_USO/mr.f_CV_USO;                                          //unbio + soluble ON
       let bpON  = co.X_BPO*mr.f_N_BPO/mr.f_CV_BPO;                                          //bio   + partic  ON
@@ -152,7 +152,7 @@ class State_Variables {
       }
 
     //TP all fractions (Organic P (OP) + Inorganic Phosphate (PO4))
-      let bsOP  = co.S_VFA *mr.f_P_VFA /mr.f_CV_VFA + 
+      let bsOP  = co.S_VFA *mr.f_P_VFA /mr.f_CV_VFA +
                   co.S_FBSO*mr.f_P_FBSO/mr.f_CV_FBSO; //bio + soluble OP
       let usOP  = co.S_USO*mr.f_P_USO/mr.f_CV_USO;                                          //unbio + soluble OP
       let bpOP  = co.X_BPO*mr.f_P_BPO/mr.f_CV_BPO;                                          //bio   + partic  OP
@@ -185,7 +185,7 @@ class State_Variables {
         active: actVSS,
         iSS:    co.X_iSS,
         VSS:    Total_VSS,
-        bVSS,   
+        bVSS,
         uVSS,
       };
 

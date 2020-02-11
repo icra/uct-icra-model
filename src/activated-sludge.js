@@ -76,6 +76,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let Supi = frac.COD.upCOD; //mg/L | UPO influent
   let fSus = Suse/Sti ||0;   //gUSO/gCOD influent
   let fSup = Supi/Sti ||0;   //gUPO/gCOD influent
+  //console.log({Supi,Sti,fSup});
 
   //2.1 - influent mass fluxes (kg/d)
   let inf_fluxes = this.fluxes;           //object: all mass fluxes. structure: {components, totals}
@@ -96,10 +97,11 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   const k_v20       = constants.k_v20;                    //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
   const theta_k_v20 = constants.theta_k_v20;              //1.035 ø         | k_v20 temperature correction factor
   let k_vT          = k_v20*Math.pow(theta_k_v20,T-20);   //L/mgVSS·d       | k_v corrected by temperature
-  console.log({k_vT});
-  let S_FBSO_i      = this.components.S_FBSO;             //mgCOD/L         | influent S_FBSO
-  let S_b           = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L         | FBSO effluent concentration: cannot be higher than influent S_FBSO
-  let FdSbi         = Math.max(0, FSbi - Q*S_b);          //kgCOD/d         | influent biodegradable COD mass flux that will generate biomass
+  //console.log({k_vT});
+
+  let S_FBSO_i = this.components.S_FBSO;             //mgCOD/L | influent S_FBSO
+  let S_b      = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L | FBSO effluent concentration: cannot be higher than influent S_FBSO
+  let FdSbi    = Math.max(0, FSbi - Q*S_b);          //kgCOD/d | influent biodegradable COD mass flux that will generate biomass
 
   //total VSS production
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
@@ -203,7 +205,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   //  MX_V  = MX_BH + MX_EH + MX_I;                 //kg_VSS | total VSS                            (OHO+UPO)
   //  MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS; //kg_iSS | total inert solids                   (iSS)
   //  MX_T  = MX_V + MX_IO;                         //kg_TSS | total TSS                            (OHO+UPO+iSS)
-  let BPO_was = 0;                          //mg/L | BPO wastage | all BPO is turned into biomass
+  let BPO_was = 0;                          //mg/L | BPO wastage | all BPO is turned into biomass (model assumption)
   let UPO_was = f*fCV_UPO*(X_I)*1000;       //mg/L | UPO wastage
   let iSS_was = f*X_IO*1000;                //mg/L | iSS wastage (precipitation by FeCl3 already included)
   let OHO_was = f*fCV_OHO*(X_BH+X_EH)*1000; //mg/L | OHO wastage
@@ -332,12 +334,13 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
 /*test*/
 (function(){
-  return
-  //---------------------------(     Q  VFA FBSO  BPO  UPO USO iSS   FSA    OP  NOx OHO)
-  //let inf = new State_Variables(24.875,  50, 115, 255,  10, 45, 15, 39.1, 7.28,   0,  0);
-  let inf = new State_Variables(1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  //---------------------------(T       Vp  Rs  RAS  waste_from mass_FeCl3)
-  let as = inf.activated_sludge(16, 8473.3, 15, 1.0,  'reactor',      3000);
+  //return
+  //--------new State_Variables(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  FSA,   OP, NOx, OHO, PAO)
+  let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0,   0,   0);
+
+  //-----------activated_sludge( T,     Vp, Rs, RAS, waste_from, mass_FeCl3, DSVI,  A_ST,  fq)
+  let as = inf.activated_sludge(16, 8473.3, 15, 1.0,  'reactor',       3000,  120, 12486, 2.4);
+
   //show results
   console.log("=== AS process variables");   console.log(as.process_variables);
   console.log("=== AS chemical P removal "); console.log(as.cpr);
@@ -347,5 +350,5 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   console.log("=== Wastage totals");         console.log(as.wastage.totals);
   console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Effluent totals");        console.log(as.effluent.totals);
-  console.log("=== errors ");                console.log(as.errors);
+  console.log(`=== errors (${as.errors.length})`); console.log(as.errors);
 })();

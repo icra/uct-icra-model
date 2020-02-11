@@ -53,7 +53,6 @@
     .number{text-align:right;}
     .unit{font-size:smaller;color:#555;}
   </style>
-
   <!--css plants-->
   <style>
     #plants a{
@@ -90,19 +89,25 @@
       float:right;
     }
   </style>
+  <!--css footer-->
+  <style>
+    footer ul#about li{
+      font-size:smaller;
+    }
+  </style>
 </head><body>
-<!--titol-->
+
+<!--title-->
 <h2 onclick=window.location.reload()>
   UCT-ICRA wwtp model
   <small style=font-size:12px>MLE (PST, AS, NIT, DN, EBPR, SST processes)</small>
-</h2>
-<hr>
+</h2><hr>
 
-<!--plants-->
+<!--html-->
 <div id=plants>
   <div>
     <!--btn afegir/eliminar depuradora-->
-    <button v-on:click="add_plant()" style="background:#af0;padding:1em">New plant</button>
+    <button v-on:click="add_plant()" style="padding:1em">New plant</button>
   </div><hr>
   <!--no plants warning--><div v-if="plants.length==0" class=blank>[~No plants]</div>
 
@@ -111,7 +116,7 @@
     <li>
       <input v-model="plant.name" placeholder="Plant name">
       <!--btn execute model-->
-      <button v-on:click="run_model(plant)">Run model</button>
+      <button v-on:click="run_model(plant)" style="background:#af0">Run model</button>
       <button v-on:click="remove_plant(plant)">Remove plant</button>
     </li>
 
@@ -136,7 +141,7 @@
               <a v-on:click="plant.visibles.inputs.influent.components^=true">
                 <span v-if="plant.visibles.inputs.influent.components">&darr;</span>
                 <span v-else>&rarr;</span>
-                <u>Influent &mdash; State Variables (components)</u>
+                <u>State Variables (components)</u>
               </a>
               <ul v-if="plant.visibles.inputs.influent.components">
                 <!--influent Q-->
@@ -161,7 +166,7 @@
               <a v-on:click="plant.visibles.inputs.influent.mass_ratios^=true">
                 <span v-if="plant.visibles.inputs.influent.mass_ratios">&darr;</span>
                 <span v-else>&rarr;</span>
-                <u>Influent &mdash; Mass ratios (VSS)</u>
+                <u>Mass ratios (VSS)</u>
               </a>
               <ul v-if="plant.visibles.inputs.influent.mass_ratios">
                 <li v-for="par,key in plant.influent.mass_ratios" class=grid-li
@@ -180,7 +185,7 @@
               <a v-on:click="plant.visibles.inputs.influent.summary^=true">
                 <span v-if="plant.visibles.inputs.influent.summary">&darr;</span>
                 <span v-else>&rarr;</span>
-                <u>Influent &mdash; State Variables (fractionation summary)</u>
+                <u>Fractionation (summary)</u>
               </a>
               <ul v-if="plant.visibles.inputs.influent.summary"><li>
                 <table border=1>
@@ -202,7 +207,7 @@
               <a v-on:click="plant.visibles.inputs.influent.totals^=true">
                 <span v-if="plant.visibles.inputs.influent.totals">&darr;</span>
                 <span v-else>&rarr;</span>
-                <u>Influent &mdash; State Variables (fractionation complete)</u>
+                <u>Fractionation (complete)</u>
               </a>
               <ul v-if="plant.visibles.inputs.influent.totals"><li>
                 <table border=1>
@@ -367,7 +372,7 @@
                       <li>
                         <a v-on:click="plant.visibles.outputs.primary[key].summary^=true">
                           <span v-if="plant.visibles.outputs.primary[key].summary">&darr;</span><span v-else>&rarr;</span>
-                          <u>Primary {{key}} (fractionation summary)</u>
+                          <u>Fractionation (summary)</u>
                         </a>
                         <ul v-if="plant.visibles.outputs.primary[key].summary"><li>
                           <table border=1>
@@ -388,7 +393,7 @@
                       <li>
                         <a v-on:click="plant.visibles.outputs.primary[key].totals^=true">
                           <span v-if="plant.visibles.outputs.primary[key].totals">&darr;</span><span v-else>&rarr;</span>
-                          <u>Primary {{key}} (fractionation complete)</u>
+                          <u>Fractionation (complete)</u>
                         </a>
                         <ul v-if="plant.visibles.outputs.primary[key].totals"><li>
                           <table border=1>
@@ -439,7 +444,7 @@
                       <li>
                         <a v-on:click="plant.visibles.outputs.secondary[key].summary^=true">
                           <span v-if="plant.visibles.outputs.secondary[key].summary">&darr;</span><span v-else>&rarr;</span>
-                          <u>Secondary {{key}} (fractionation summary)</u>
+                          <u>Fractionation (summary)</u>
                         </a>
                         <ul v-if="plant.visibles.outputs.secondary[key].summary"><li>
                           <table border=1>
@@ -460,7 +465,7 @@
                       <li>
                         <a v-on:click="plant.visibles.outputs.secondary[key].totals^=true">
                           <span v-if="plant.visibles.outputs.secondary[key].totals">&darr;</span><span v-else>&rarr;</span>
-                          <u>Secondary {{key}} (fractionation complete)</u>
+                          <u>Fractionation (complete)</u>
                         </a>
                         <ul v-if="plant.visibles.outputs.secondary[key].totals"><li>
                           <table border=1>
@@ -523,6 +528,17 @@
     <li v-else class=blank>[Press 'Run model' button to generate outputs]</li>
   </ul>
 </div>
+
+<!--footer-->
+<footer style="border-top:1px solid #ccc;margin-top:20px;padding:8px">
+  <b>About</b>
+  <ul id=about>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model">README</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">MODEL ASSUMPTIONS</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/tree/master/src">SOURCE CODE</a>
+    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/TODO.md">TODO</a>
+  </ul>
+</footer>
 
 <!--backend: plants-->
 <script>
@@ -635,7 +651,7 @@
             mass_FeCl3  : 3000.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
           },
         );
-        plant.name     = `Plant ${plants.length+1} name`;
+        plant.name     = `Plant ${plants.length+1}`;
         plant.visibles = new Visibles(); //arbre items visibles
         plants.push(plant);
         this.$forceUpdate();
@@ -663,19 +679,3 @@
   //TODO TBD
   //create a vue component for state variables (?)
 </script>
-
-<!--footer-->
-<footer style="border-top:1px solid #ccc;margin-top:20px;padding:8px">
-  <b>About</b>
-  <ul id=about>
-    <li><a target=_blank href="//github.com/icra/uct-icra-model">README</a>
-    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">MODEL ASSUMPTIONS</a>
-    <li><a target=_blank href="//github.com/icra/uct-icra-model/tree/master/src">SOURCE CODE</a>
-    <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/TODO.md">TODO</a>
-  </ul>
-  <style>
-    ul#about li{
-      font-size:smaller;
-    }
-  </style>
-</footer>
