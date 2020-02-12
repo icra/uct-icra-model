@@ -333,8 +333,8 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 };
 
 /*test*/
-(function(){
-  //return
+{
+  return
   //--------new State_Variables(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  FSA,   OP, NOx, OHO, PAO)
   let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0,   0,   0);
 
@@ -351,4 +351,4 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Effluent totals");        console.log(as.effluent.totals);
   console.log(`=== errors (${as.errors.length})`); console.log(as.errors);
-})();
+};

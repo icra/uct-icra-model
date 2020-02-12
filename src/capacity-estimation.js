@@ -81,6 +81,6 @@ try{module.exports=capacity_estimation;}catch(e){}
 
 /*standalone test*/
 (function(){
-  return;
+  return
   console.log(capacity_estimation(/*default values*/));
 })();

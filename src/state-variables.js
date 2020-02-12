@@ -320,17 +320,17 @@ try{module.exports=State_Variables}catch(e){}
 /*tests*/
 {
   //test 1: print totals and fluxes
-  (function(){
+  {
     return
     let s = new State_Variables(1,1,0,0,0,0,0,0,0,0);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
     console.log("=== Totals (mg/L) ===");              console.log(s.totals);
     console.log("=== Fluxes (kg/d) ===");              console.log(s.fluxes);
-  })();
+  };
 
   //test 2: combine 2 state variables and check result
-  (function(){
+  {
     return
     let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2);
     let s2 = new State_Variables(10,1,1,1,1,1,1,1,1,1);
@@ -339,10 +339,10 @@ try{module.exports=State_Variables}catch(e){}
     console.log(s2.summary);
     console.log(s3.summary);
     console.log(s3.components);
-  })();
+  };
 
   //test 3: example from george ekama (raw ww + set ww)
-  (function(){
+  {
     return
     /*
     [inputs]                    [outputs]
@@ -372,5 +372,5 @@ try{module.exports=State_Variables}catch(e){}
     s.set('X_UPO',20);
     s.set('X_iSS',34);
     console.log(s.summary);
-  })();
-}
+  };
+};

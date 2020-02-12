@@ -1,0 +1,9 @@
+1. turn "state variables" prototypes into "plant" prototypes.
+
+  for example, instead of calling:
+    influent.activated_sludge( parameters )
+
+  should be called:
+    plant.activated_sludge( parameters )
+
+2. add calculation of % of capacity overloaded and allow 5% before stopping the model

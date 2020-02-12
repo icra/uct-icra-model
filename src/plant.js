@@ -114,10 +114,15 @@ class Plant{
     //chemical P removal
     if(conf.cpr==false){ p.mass_FeCl3=0; }
 
+    //TODO
     //apply bio P removal here?
+    //bioP + nitrification + NO denitrification condition
+    //check condition depending on plant configuration
     if(conf.bip){
-      //TODO
       console.log("bio p removal still not implemented");
+      if(conf.nit && conf.dn==false && conf.single_tank==true){
+        if(f_AN>fxm) throw new Error("f_AN > fxm");
+      }
     }
 
     //apply MLE: AS + ( NIT + (DN) )
