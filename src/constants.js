@@ -5,7 +5,7 @@
 
 const constants={
   //bio P removal (EBPR) TODO
-  b_PAO      : 0.040, //1/d | endogenous residue respiration rate at 20ºC
+  b_PAO      : 0.040, //1/d | PAOs endogenous residue respiration rate at 20ºC
   theta_b_PAO: 1.029, //ø   | b_PAO temperature correction factor
   f_PAO      : 0.250, //ø   | PAO endogenous residue fraction
 

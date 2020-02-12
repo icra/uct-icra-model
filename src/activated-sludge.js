@@ -105,7 +105,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
   //total VSS production
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
-  const fH  = constants.fH           //0.20 ø | endogenous OHO fraction
+  const fH  = constants.fH;          //0.20 ø | endogenous OHO fraction
   let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS  | endogenous residue OHOs
   let MX_I  = FXti * Rs;             //kgVSS  | influent uVSS
   let MX_V  = MX_BH + MX_EH + MX_I;  //kgVSS  | total VSS
