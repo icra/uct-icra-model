@@ -1,13 +1,24 @@
 /*
- * All kinetic constants
- * TODO add descriptions and units from bio P removal new constants
+ * All kinetic and stoichiometric constants for
+ * - Activated Sludge
+ * - Nitrification
+ * - Denitrification
+ * - Bio P Removal (EBPR)
 */
 
 const constants={
-  //bio P removal (EBPR) TODO
-  b_PAO      : 0.040, //1/d | PAOs endogenous residue respiration rate at 20ºC
-  theta_b_PAO: 1.029, //ø   | b_PAO temperature correction factor
-  f_PAO      : 0.250, //ø   | PAO endogenous residue fraction
+  //bio P removal (EBPR)
+  b_PAO      : 0.040,  //1/d       | PAO endogenous residue respiration rate at 20ºC
+  theta_b_PAO: 1.029,  //ø         | b_PAO temperature correction factor
+  f_PAO      : 0.250,  //ø         | PAO endogenous residue fraction
+  f_P_X_E    : 0.025,  //gP/gVSS   | fraction of P in endogenous mass (OHO+PAO)
+  f_P_X_I    : 0.030,  //gP/gVSS   | P in inert VSS mass (UPO)
+  f_VT_PAO   : 0.460,  //gVSS/gTSS | fraction of PAO in TSS
+  f_P_iSS    : 0.020,  //gP/giSS   | fraction of P in iSS
+  f_P_PAO    : 0.3800, //gP/gVSS   | fraction of P in active PAO mass
+  f_iPAO     : 1.300,  //giSS/gVSS
+  //f_iPAO has to be calculated (0.15 - 1.3) (1.3 is PAOs full of polyPP)
+  //f_iPAO_calculated should be lower than 1.3
 
   //activated sludge
   YH         : 0.666, //gCOD/gCOD | heterotrophic yield (not affected by temperature)
@@ -34,15 +45,15 @@ const constants={
 
   //denitrification
   K1_20   : 0.720, //gN/gVSS·d | at 20ºC page 482 and 113
-  K2_20   : 0.101, //gN/gVSS·d | at 20ºC page 482 and 113
   theta_K1: 1.200, //ø         | temperature correction factor for K1_20
+  K2_20   : 0.101, //gN/gVSS·d | at 20ºC page 482 and 113
   theta_K2: 1.080, //ø         | temperature correction factor for K2_20
 
   //not used (denitrification)
-  K3_20   : 0.072, //gN/gVSS·d | at 20ºC page 482 and 113
-  K4_20   : 0.048, //gN/gVSS·d | at 20ºC page 482 and 113
-  theta_K3: 1.029, //ø         | temperature correction factor for K3_20
-  theta_K4: 1.029, //ø         | temperature correction factor for K4_20
+  //K3_20   : 0.072, //gN/gVSS·d | at 20ºC page 482 and 113
+  //theta_K3: 1.029, //ø         | temperature correction factor for K3_20
+  //K4_20   : 0.048, //gN/gVSS·d | at 20ºC page 482 and 113
+  //theta_K4: 1.029, //ø         | temperature correction factor for K4_20
 
   info:{
     YH         :{unit:"gCOD/gCOD", tec:"as",  descr:"heterotrophic yield (not affected by temperature)"},
@@ -69,9 +80,18 @@ const constants={
     K2_20      :{unit:"gN/gVSS·d", tec:"dn",  descr:"DN K2 at 20ºC page 482 and 113"},
     theta_K2   :{unit:"ø",         tec:"dn",  descr:"temperature correction factor for K2_20"},
     //K3_20    :{unit:"gN/gVSS·d", tec:"dn",  descr:"DN K3 at 20ºC page 482 and 113"},
-    //K4_20    :{unit:"gN/gVSS·d", tec:"dn",  descr:"DN K4 at 20ºC page 482 and 113"},
     //theta_K3 :{unit:"ø",         tec:"dn",  descr:"temperature correction factor for K3_20"},
+    //K4_20    :{unit:"gN/gVSS·d", tec:"dn",  descr:"DN K4 at 20ºC page 482 and 113"},
     //theta_K4 :{unit:"ø",         tec:"dn",  descr:"temperature correction factor for K4_20"},
+    b_PAO      :{unit:"1/d",       tec:"bpr", descr:"PAO endogenous residue respiration rate at 20ºC"},
+    theta_b_PAO:{unit:"ø",         tec:"bpr", descr:"b_PAO temperature correction factor"},
+    f_PAO      :{unit:"ø",         tec:"bpr", descr:"PAO endogenous residue fraction"},
+    f_P_X_E    :{unit:"gP/gVSS",   tec:"bpr", descr:"fraction of P in endogenous mass (OHO+PAO)"},
+    f_P_X_I    :{unit:"gP/gVSS",   tec:"bpr", descr:"P in inert VSS mass (UPO)"},
+    f_VT_PAO   :{unit:"gVSS/gTSS", tec:"bpr", descr:"fraction of PAO in TSS"},
+    f_P_iSS    :{unit:"gP/giSS",   tec:"bpr", descr:"fraction of P in iSS"},
+    f_P_PAO    :{unit:"gP/gVSS",   tec:"bpr", descr:"fraction of P in the active PAO mass"},
+    f_iPAO     :{unit:"giSS/gVSS", tec:"bpr", descr:"iSS content of PAOs"},
   },
 };
 

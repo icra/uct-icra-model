@@ -5,14 +5,14 @@
 
 function chemical_P_removal(Q, PO4i, mass_FeCl3){
   //inputs and default values
-  Q          = isNaN(Q)          ? 1  : Q;          //ML/d
-  PO4i       = isNaN(PO4i)       ? 7  : PO4i;       //mg/L as P (calculated as "Pse" in 'activated-sludge.js')
-  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added
+  Q          = isNaN(Q)          ? 1  : Q;          //ML/d      | influent flowrate
+  PO4i       = isNaN(PO4i)       ? 7  : PO4i;       //mgP/L     | named "Psa" in 'activated-sludge.js'
+  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kgFeCl3/d | mass of FeCl3 added daily
 
   //input checks
-  if(Q          <= 0) throw `Error: flowrate (Q=${Q}) not allowed`;
-  if(PO4i       <  0) throw `Error: input PO4 (PO4i=${PO4i}) can't be negative `;
-  if(mass_FeCl3 <  0) throw `Error: mass of FeCl3 (mass_FeCl3=${mass_FeCl3}) can't be negative`;
+  if(Q          <= 0) throw new Error(`Value of Flowrate (Q=${Q}) not allowed`);
+  if(PO4i       <  0) throw new Error(`Value of Input PO4 (PO4i=${PO4i}) not allowed`);
+  if(mass_FeCl3 <  0) throw new Error(`Value of Mass of FeCl3 (mass_FeCl3=${mass_FeCl3}) not allowed`);
 
   //molecular weights
   const M_Fe        = 55.845;   //g/mol (Fe molecular weight)
@@ -21,14 +21,14 @@ function chemical_P_removal(Q, PO4i, mass_FeCl3){
   const M_FeH2PO4OH = 250.9646; //g/mol ((Fe)(1.6)(H2PO4)(OH)(3.8) molecular weight)
   const M_FeOH3     = 106.866;  //g/mol (FeOH3 molecular weight)
 
-  //get moles of P available in PO4 (influent)
+  //compute moles of influent P
   let moles_P = Q*PO4i*1000/M_P; //moles/d of P
 
   //convert kg/d of FeCl3 to moles of Fe
-  let mass_Fe  = M_Fe/M_FeCl3*mass_FeCl3; //kg/d of Fe
-  let moles_Fe = mass_Fe*1000/M_Fe;       //moles/d Fe
+  let mass_Fe  = M_Fe/M_FeCl3*mass_FeCl3; //kg/d of Fe dosed
+  let moles_Fe = mass_Fe*1000/M_Fe;       //moles/d Fe dosed
 
-  //get Fe/P mole ratio
+  //compute Fe/P mole ratio
   let Fe_P_mole_ratio = moles_Fe/moles_P || 0; //mol_Fe/mol_P
 
   //get the PO4 effluent concentration from the Fe/P mole ratio

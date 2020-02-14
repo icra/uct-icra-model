@@ -73,32 +73,32 @@ class State_Variables {
       /*USO*/ f_CV_USO : 1.4930, f_C_USO : 0.498, f_N_USO : 0.0366, f_P_USO : 0.0000, // USO
       /*OHO*/ f_CV_OHO : 1.4810, f_C_OHO : 0.518, f_N_OHO : 0.1000, f_P_OHO : 0.0250, // Ordinary Heterotrophic Organisms
       /*PAO*/ f_CV_PAO : 1.4810, f_C_PAO : 0.518, f_N_PAO : 0.1000, f_P_PAO : 0.3800, // Phosphate Accumulating Organisms
-      ///*ANO*/ f_CV_ANO : 1.4810, f_C_ANO : 0.518, f_N_ANO : 0.1000, f_P_ANO : 0.0250, // Ammonia Oxidizing Organisms
+      ///*NIT*/ f_CV_NIT : 1.4810, f_C_NIT : 0.518, f_N_NIT : 0.1000, f_P_NIT : 0.0250, // Ammonia Oxidizing Organisms
       /*----------------------------------------------------------------------------*/
     };
   };
 
   //update a state variable value. example -> sv.set("S_VFA",10);
   set(key, newValue){
-    if(this.components[key]===undefined) throw `key "${key}" not found`;
-    if(typeof newValue != 'number')      throw `key "${key}" newValue ("${newValue}") is not a number`;
-    if(newValue < 0)                     throw `key "${key}" newValue ("${newValue}") is negative`;
+    if(this.components[key]===undefined) throw `component "${key}" not found`;
+    if(typeof newValue != 'number')      throw `component "${key}" newValue ("${newValue}") is not a number`;
+    if(newValue < 0)                     throw `component "${key}" newValue ("${newValue}") is negative`;
     //update state variable value
     this.components[key]=newValue;
   };
 
   //calculate complete fractionation for [COD, TKN, TP, TOC,TSS]
   get totals(){
-    let mr=this.mass_ratios;//alias for "mass ratios"
-    let co=this.components; //alias for "components"
+    let mr=this.mass_ratios;//alias "mass ratios"
+    let co=this.components; //alias "components"
 
     //COD fractions (Chemical Oxygen Demand)
-      let bsCOD = co.S_VFA + co.S_FBSO; //bio   + soluble COD
-      let usCOD = co.S_USO;             //unbio + soluble COD
-      let bpCOD = co.X_BPO;             //bio   + partic  COD
-      let upCOD = co.X_UPO;             //unbio + partic  COD
-      let  bCOD = bsCOD + bpCOD;        //bio             COD
-      let  uCOD = usCOD + upCOD;        //unbio           COD
+      let bsCOD = co.S_VFA + co.S_FBSO; //biodg + soluble COD
+      let usCOD = co.S_USO;             //unbgd + soluble COD
+      let bpCOD = co.X_BPO;             //biodg + partic  COD
+      let upCOD = co.X_UPO;             //unbgd + partic  COD
+      let  bCOD = bsCOD + bpCOD;        //biodg           COD
+      let  uCOD = usCOD + upCOD;        //unbgd           COD
       let  sCOD = bsCOD + usCOD;        //soluble         COD
       let  pCOD = bpCOD + upCOD;        //partic          COD
       let Total_COD = bsCOD + usCOD + bpCOD + upCOD + co.X_OHO + co.X_PAO;
@@ -112,15 +112,15 @@ class State_Variables {
     //TOC all fractions (Total Organic Carbon)
       let bsOC  = co.S_VFA *mr.f_C_VFA /mr.f_CV_VFA +
                   co.S_FBSO*mr.f_C_FBSO/mr.f_CV_FBSO; //bio + soluble OC
-      let usOC  = co.S_USO*mr.f_C_USO/mr.f_CV_USO;                                          //unbio + soluble OC
-      let bpOC  = co.X_BPO*mr.f_C_BPO/mr.f_CV_BPO;                                          //bio   + partic  OC
-      let upOC  = co.X_UPO*mr.f_C_UPO/mr.f_CV_UPO;                                          //unbio + partic  OC
-      let  bOC  = bsOC + bpOC;                                                                  //bio             OC
-      let  uOC  = usOC + upOC;                                                                  //unbio           OC
-      let  sOC  = bsOC + usOC;                                                                  //soluble         OC
-      let  pOC  = bpOC + upOC;                                                                  //partic          OC
-      let actOC = co.X_OHO*mr.f_C_OHO/mr.f_CV_OHO + //OC in active biomass (OHO)
-                  co.X_PAO*mr.f_C_PAO/mr.f_CV_PAO;  //OC in active biomass (PAO)
+      let usOC  = co.S_USO*mr.f_C_USO/mr.f_CV_USO;    //unbio + soluble OC
+      let bpOC  = co.X_BPO*mr.f_C_BPO/mr.f_CV_BPO;    //bio   + partic  OC
+      let upOC  = co.X_UPO*mr.f_C_UPO/mr.f_CV_UPO;    //unbio + partic  OC
+      let  bOC  = bsOC + bpOC;                        //bio             OC
+      let  uOC  = usOC + upOC;                        //unbio           OC
+      let  sOC  = bsOC + usOC;                        //soluble         OC
+      let  pOC  = bpOC + upOC;                        //partic          OC
+      let actOC = co.X_OHO*mr.f_C_OHO/mr.f_CV_OHO +   //OC in active biomass (OHO)
+                  co.X_PAO*mr.f_C_PAO/mr.f_CV_PAO;    //OC in active biomass (PAO)
       let Total_TOC = bsOC + usOC + bpOC + upOC + actOC;
       let TOC={
         total:Total_TOC,
@@ -131,16 +131,16 @@ class State_Variables {
 
     //TKN all fractions (Organic Nitrogen (ON) + Inorganic Free Saline Ammonia (FSA))
       let bsON  = co.S_VFA *mr.f_N_VFA /mr.f_CV_VFA +
-                  co.S_FBSO*mr.f_N_FBSO/mr.f_CV_FBSO; //bio + soluble ON
-      let usON  = co.S_USO*mr.f_N_USO/mr.f_CV_USO;                                          //unbio + soluble ON
-      let bpON  = co.X_BPO*mr.f_N_BPO/mr.f_CV_BPO;                                          //bio   + partic  ON
-      let upON  = co.X_UPO*mr.f_N_UPO/mr.f_CV_UPO;                                          //unbio + partic  ON
-      let  bON  = bsON + bpON;                                                                  //bio             ON
-      let  uON  = usON + upON;                                                                  //unbio           ON
-      let  sON  = bsON + usON;                                                                  //soluble         ON
-      let  pON  = bpON + upON;                                                                  //partic          ON
-      let actON = co.X_OHO*mr.f_N_OHO/mr.f_CV_OHO+ //ON in active biomass (OHO)
-                  co.X_PAO*mr.f_N_PAO/mr.f_CV_PAO; //ON in active biomass (PAO)
+                  co.S_FBSO*mr.f_N_FBSO/mr.f_CV_FBSO; //bio   + soluble ON
+      let usON  = co.S_USO*mr.f_N_USO/mr.f_CV_USO;    //unbio + soluble ON
+      let bpON  = co.X_BPO*mr.f_N_BPO/mr.f_CV_BPO;    //bio   + partic  ON
+      let upON  = co.X_UPO*mr.f_N_UPO/mr.f_CV_UPO;    //unbio + partic  ON
+      let  bON  = bsON + bpON;                        //biodegradable   ON
+      let  uON  = usON + upON;                        //unbiodegradable ON
+      let  sON  = bsON + usON;                        //soluble         ON
+      let  pON  = bpON + upON;                        //partic          ON
+      let actON = co.X_OHO*mr.f_N_OHO/mr.f_CV_OHO+    //ON in active biomass (OHO)
+                  co.X_PAO*mr.f_N_PAO/mr.f_CV_PAO;    //ON in active biomass (PAO)
       let Total_TKN = co.S_FSA + bsON + usON + bpON + upON + actON;
       let TKN={
         total:Total_TKN,
@@ -154,15 +154,15 @@ class State_Variables {
     //TP all fractions (Organic P (OP) + Inorganic Phosphate (PO4))
       let bsOP  = co.S_VFA *mr.f_P_VFA /mr.f_CV_VFA +
                   co.S_FBSO*mr.f_P_FBSO/mr.f_CV_FBSO; //bio + soluble OP
-      let usOP  = co.S_USO*mr.f_P_USO/mr.f_CV_USO;                                          //unbio + soluble OP
-      let bpOP  = co.X_BPO*mr.f_P_BPO/mr.f_CV_BPO;                                          //bio   + partic  OP
-      let upOP  = co.X_UPO*mr.f_P_UPO/mr.f_CV_UPO;                                          //unbio + partic  OP
-      let  bOP  = bsOP + bpOP;                                                                  //bio             OP
-      let  uOP  = usOP + upOP;                                                                  //unbio           OP
-      let  sOP  = bsOP + usOP;                                                                  //soluble         OP
-      let  pOP  = bpOP + upOP;                                                                  //partic          OP
-      let actOP = co.X_OHO*mr.f_P_OHO/mr.f_CV_OHO + //OP in active biomass (OHO)
-                  co.X_PAO*mr.f_P_PAO/mr.f_CV_PAO;  //OP in active biomass (PAO)
+      let usOP  = co.S_USO*mr.f_P_USO/mr.f_CV_USO;    //unbio + soluble OP
+      let bpOP  = co.X_BPO*mr.f_P_BPO/mr.f_CV_BPO;    //bio   + partic  OP
+      let upOP  = co.X_UPO*mr.f_P_UPO/mr.f_CV_UPO;    //unbio + partic  OP
+      let  bOP  = bsOP + bpOP;                        //biodegradable   OP
+      let  uOP  = usOP + upOP;                        //unbiodegradable OP
+      let  sOP  = bsOP + usOP;                        //soluble         OP
+      let  pOP  = bpOP + upOP;                        //partic          OP
+      let actOP = co.X_OHO*mr.f_P_OHO/mr.f_CV_OHO +   //OP in active biomass (OHO)
+                  co.X_PAO*mr.f_P_PAO/mr.f_CV_PAO;    //OP in active biomass (PAO)
       let Total_TP = co.S_OP + bsOP + usOP + bpOP + upOP + actOP;
       let TP={
         total:Total_TP,
@@ -174,8 +174,8 @@ class State_Variables {
       };
 
     //TSS all fractions (Volatile Suspended Solids (VSS) + inert Suspended Solids (iSS))
-      let bVSS   = co.X_BPO/mr.f_CV_BPO;    //bio   VSS
-      let uVSS   = co.X_UPO/mr.f_CV_UPO;    //unbio VSS
+      let bVSS   = co.X_BPO/mr.f_CV_BPO;    //biodegradable   VSS
+      let uVSS   = co.X_UPO/mr.f_CV_UPO;    //unbiodegradalbe VSS
       let actVSS = co.X_OHO/mr.f_CV_OHO +   //OHO VSS active biomass
                    co.X_PAO/mr.f_CV_PAO;    //PAO VSS active biomass
       let Total_VSS = bVSS + uVSS + actVSS; //total VSS
@@ -193,7 +193,7 @@ class State_Variables {
     return {COD,TKN,TP,TOC,TSS};
   };
 
-  //convert components and totals (mg/L) to mass fluxes (kg/d)
+  //convert "components" (mg/L) and "totals" (mg/L) to mass fluxes (kg/d)
   get fluxes(){
     let components={};
     let totals={};
@@ -218,14 +218,14 @@ class State_Variables {
 
   //create summary table (concentrations and fluxes) for important components
   get summary(){
-    let totals = this.totals;
-    let fluxes = this.fluxes;
-    let components = this.components;
+    let totals     = this.totals;     //object | concentrations (mg/L)
+    let fluxes     = this.fluxes;     //object | mass fluxes (kg/d)
+    let components = this.components; //object | concentrations
     return {
       Q:   this.Q,
       COD: [totals.COD.total, fluxes.totals.COD.total],  //chemical oxygen demand
       TKN: [totals.TKN.total, fluxes.totals.TKN.total],  //total kjeldahl nitrogen
-      NH4: [totals.TKN.FSA,   fluxes.totals.TKN.FSA],    //inorganic nitrogen (NH4, ammonia)
+      NH4: [totals.TKN.FSA,   fluxes.totals.TKN.FSA],    //inorganic nitrogen (NH4 or ammonia or FSA)
       NOx: [components.S_NOx, fluxes.components.S_NOx],  //nitrate (NO3) and nitrite (NO2) is not TKN
       TP:  [totals.TP.total,  fluxes.totals.TP.total],   //total phosphorus
       PO4: [totals.TP.PO4,    fluxes.totals.TP.PO4],     //inorganic phosphorus
@@ -239,14 +239,15 @@ class State_Variables {
   //combine 2 state variable objects (2 flows)
   combine(sv){
     //check sv
-    if(sv.constructor!==State_Variables)
+    if(sv.constructor!==State_Variables){
       throw "input is not a State Variables object";
+    }
 
     //new state variables empty object
-    let new_sv = new State_Variables();
+    const new_sv = new State_Variables();
 
     //new flowrate
-    let Q = this.Q + sv.Q;
+    const Q = this.Q + sv.Q;
     new_sv.Q = Q;
 
     //new concentrations: mass flux divided by the new Q
@@ -259,10 +260,10 @@ class State_Variables {
     return new_sv;
   }
 
-  //units and descriptions. Syntax--> let info=State_Variables.info;
+  //units and descriptions. Syntax--> let info = State_Variables.info; console.log(info.components.S_VFA.unit);
   static get info(){
     return {
-      Q : {unit:"ML/d", descr:"flowrate"},
+      Q:{unit:"ML/d", descr:"flowrate"},
       components:{
         S_VFA :{unit:"mg/L as COD", descr:"Biodegradable Soluble Organics (BSO) (volatile fatty acids)"},
         S_FBSO:{unit:"mg/L as COD", descr:"Biodegradable Soluble Organics (BSO) (fermentable organics)"},
@@ -277,38 +278,38 @@ class State_Variables {
         X_PAO :{unit:"mg/L as COD", descr:"Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)"},
       },
       mass_ratios:{
-        f_CV_VFA :{unit:"gCOD/gVSS",descr:"S_VFA/VSS  mass ratio"},
-        f_C_VFA  :{unit:"gC/gVSS",  descr:"S_VFA/C    mass ratio"},
-        f_N_VFA  :{unit:"gN/gVSS",  descr:"S_VFA/N    mass ratio"},
-        f_P_VFA  :{unit:"gP/gVSS",  descr:"S_VFA/P    mass ratio"},
-        f_CV_FBSO:{unit:"gCOD/gVSS",descr:"S_FBSO/VSS mass ratio"},
-        f_C_FBSO :{unit:"gC/gVSS",  descr:"S_FBSO/C   mass ratio"},
-        f_N_FBSO :{unit:"gN/gVSS",  descr:"S_FBSO/N   mass ratio"},
-        f_P_FBSO :{unit:"gP/gVSS",  descr:"S_FBSO/P   mass ratio"},
-        f_CV_BPO :{unit:"gCOD/gVSS",descr:"X_BPO/VSS  mass ratio"},
-        f_C_BPO  :{unit:"gC/gVSS",  descr:"X_BPO/C    mass ratio"},
-        f_N_BPO  :{unit:"gN/gVSS",  descr:"X_BPO/N    mass ratio"},
-        f_P_BPO  :{unit:"gP/gVSS",  descr:"X_BPO/P    mass ratio"},
-        f_CV_UPO :{unit:"gCOD/gVSS",descr:"X_UPO/VSS  mass ratio"},
-        f_C_UPO  :{unit:"gC/gVSS",  descr:"X_UPO/C    mass ratio"},
-        f_N_UPO  :{unit:"gN/gVSS",  descr:"X_UPO/N    mass ratio"},
-        f_P_UPO  :{unit:"gP/gVSS",  descr:"X_UPO/P    mass ratio"},
-        f_CV_USO :{unit:"gCOD/gVSS",descr:"S_USO/VSS  mass ratio"},
-        f_C_USO  :{unit:"gC/gVSS",  descr:"S_USO/C    mass ratio"},
-        f_N_USO  :{unit:"gN/gVSS",  descr:"S_USO/N    mass ratio"},
-        f_P_USO  :{unit:"gP/gVSS",  descr:"S_USO/P    mass ratio"},
-        f_CV_OHO :{unit:"gCOD/gVSS",descr:"X_OHO/VSS  mass ratio"},
-        f_C_OHO  :{unit:"gC/gVSS",  descr:"X_OHO/C    mass ratio"},
-        f_N_OHO  :{unit:"gN/gVSS",  descr:"X_OHO/N    mass ratio"},
-        f_P_OHO  :{unit:"gP/gVSS",  descr:"X_OHO/P    mass ratio"},
-        f_CV_PAO :{unit:"gCOD/gVSS",descr:"X_PAO/VSS  mass ratio"},
-        f_C_PAO  :{unit:"gC/gVSS",  descr:"X_PAO/C    mass ratio"},
-        f_N_PAO  :{unit:"gN/gVSS",  descr:"X_PAO/N    mass ratio"},
-        f_P_PAO  :{unit:"gP/gVSS",  descr:"X_PAO/P    mass ratio"},
-        //f_CV_ANO :{unit:"gCOD/gVSS",descr:"X_ANO/VSS  mass ratio"},
-        //f_C_ANO  :{unit:"gC/gVSS",  descr:"X_ANO/C    mass ratio"},
-        //f_N_ANO  :{unit:"gN/gVSS",  descr:"X_ANO/N    mass ratio"},
-        //f_P_ANO  :{unit:"gP/gVSS",  descr:"X_ANO/P    mass ratio"},
+        f_CV_VFA :{unit:"gCOD/gVSS",descr:"COD from S_VFA/VSS mass ratio"},
+        f_C_VFA  :{unit:"gC/gVSS",  descr:"C from S_VFA/VSS mass ratio"},
+        f_N_VFA  :{unit:"gN/gVSS",  descr:"N from S_VFA/VSS mass ratio"},
+        f_P_VFA  :{unit:"gP/gVSS",  descr:"P from S_VFA/VSS mass ratio"},
+        f_CV_FBSO:{unit:"gCOD/gVSS",descr:"COD from S_FBSO/VSS mass ratio"},
+        f_C_FBSO :{unit:"gC/gVSS",  descr:"C from S_FBSO/VSS mass ratio"},
+        f_N_FBSO :{unit:"gN/gVSS",  descr:"N from S_FBSO/VSS mass ratio"},
+        f_P_FBSO :{unit:"gP/gVSS",  descr:"P from S_FBSO/VSS mass ratio"},
+        f_CV_BPO :{unit:"gCOD/gVSS",descr:"COD from X_BPO/VSS mass ratio"},
+        f_C_BPO  :{unit:"gC/gVSS",  descr:"C from X_BPO/VSS mass ratio"},
+        f_N_BPO  :{unit:"gN/gVSS",  descr:"N from X_BPO/VSS mass ratio"},
+        f_P_BPO  :{unit:"gP/gVSS",  descr:"P from X_BPO/VSS mass ratio"},
+        f_CV_UPO :{unit:"gCOD/gVSS",descr:"COD from X_UPO/VSS mass ratio"},
+        f_C_UPO  :{unit:"gC/gVSS",  descr:"C from X_UPO/VSS mass ratio"},
+        f_N_UPO  :{unit:"gN/gVSS",  descr:"N from X_UPO/VSS mass ratio"},
+        f_P_UPO  :{unit:"gP/gVSS",  descr:"P from X_UPO/VSS mass ratio"},
+        f_CV_USO :{unit:"gCOD/gVSS",descr:"COD from S_USO/VSS mass ratio"},
+        f_C_USO  :{unit:"gC/gVSS",  descr:"C from S_USO/VSS mass ratio"},
+        f_N_USO  :{unit:"gN/gVSS",  descr:"N from S_USO/VSS mass ratio"},
+        f_P_USO  :{unit:"gP/gVSS",  descr:"P from S_USO/VSS mass ratio"},
+        f_CV_OHO :{unit:"gCOD/gVSS",descr:"COD from X_OHO/VSS mass ratio"},
+        f_C_OHO  :{unit:"gC/gVSS",  descr:"C from X_OHO/VSS mass ratio"},
+        f_N_OHO  :{unit:"gN/gVSS",  descr:"N from X_OHO/VSS mass ratio"},
+        f_P_OHO  :{unit:"gP/gVSS",  descr:"P from X_OHO/VSS mass ratio"},
+        f_CV_PAO :{unit:"gCOD/gVSS",descr:"COD from X_PAO/VSS mass ratio"},
+        f_C_PAO  :{unit:"gC/gVSS",  descr:"C from X_PAO/VSS mass ratio"},
+        f_N_PAO  :{unit:"gN/gVSS",  descr:"N from X_PAO/VSS mass ratio"},
+        f_P_PAO  :{unit:"gP/gVSS",  descr:"P from X_PAO/VSS mass ratio"},
+        //f_CV_NIT :{unit:"gCOD/gVSS",descr:"COD from X_NIT/VSS mass ratio"},
+        //f_C_NIT  :{unit:"gC/gVSS",  descr:"C from X_NIT/VSS mass ratio"},
+        //f_N_NIT  :{unit:"gN/gVSS",  descr:"N from X_NIT/VSS mass ratio"},
+        //f_P_NIT  :{unit:"gP/gVSS",  descr:"P from X_NIT/VSS mass ratio"},
       },
     }
   }
@@ -320,17 +321,17 @@ try{module.exports=State_Variables}catch(e){}
 /*tests*/
 {
   //test 1: print totals and fluxes
-  {
+  (function(){
     return
     let s = new State_Variables(1,1,0,0,0,0,0,0,0,0);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
     console.log("=== Totals (mg/L) ===");              console.log(s.totals);
     console.log("=== Fluxes (kg/d) ===");              console.log(s.fluxes);
-  };
+  })();
 
   //test 2: combine 2 state variables and check result
-  {
+  (function(){
     return
     let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2);
     let s2 = new State_Variables(10,1,1,1,1,1,1,1,1,1);
@@ -339,10 +340,11 @@ try{module.exports=State_Variables}catch(e){}
     console.log(s2.summary);
     console.log(s3.summary);
     console.log(s3.components);
-  };
+  })();
+
 
   //test 3: example from george ekama (raw ww + set ww)
-  {
+  (function(){
     return
     /*
     [inputs]                    [outputs]
@@ -372,5 +374,5 @@ try{module.exports=State_Variables}catch(e){}
     s.set('X_UPO',20);
     s.set('X_iSS',34);
     console.log(s.summary);
-  };
+  })();
 };

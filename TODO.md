@@ -22,15 +22,15 @@
   - put Rs-bal in capacity estimation module
 
 ## Future / new modules TBD
-  - energy consumption module (started, not integrated)
-  - chemical P removal (as found on Szabo et al)
+  - chemical P removal (as found on Szabo et al paper)
   - oxygen limitation module (reuse ecoinvent equations)
-  - bio P removal EBPR module
+  - bio P removal EBPR module (in development)
   - anaerobic digestion module (will consider inorganic carbon exiting, created
     from TOC)
   - stoichiometry for CO2 produced
 
 ## Tasks done/solved/clear/discussed
+  - [done] energy consumption module in ecoadvisor
   - [done] validate test values of X.tave and Q.ADWF in the user interface.
   - [done] validate test values of Rs/Rsm/Rs.bal/IR/a.opt/a.prac.
   - [done] K.O in ASM1 = 0.4

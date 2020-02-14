@@ -14,21 +14,21 @@ try{
   require("./nitrification.js");
 }catch(e){}
 
-State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq, SF,fxt,DO,pH, IR,DO_RAS,influent_alk){
+State_Variables.prototype.denitrification=function(
+    T,Vp,Rs,RAS,waste_from,mass_FeCl3,
+    SF,fxt,DO,pH,
+    IR,DO_RAS,influent_alk
+  ){
   /*inputs and default values*/
-  //as inputs
+  //activated sludge inputs
   T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
   Vp  = isNaN(Vp ) ? 8473.3 : Vp ; //m3   | Volume
   Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
-  if(['reactor','sst'].indexOf(waste_from)==-1) throw `The input "waste_from" must be equal to "reactor" or "sst" (not "${waste_from}")`;
-  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
-  //capacity estimation inputs
-  DSVI = isNaN(DSVI) ? 120    : DSVI; //mL/gTSS | sludge settleability
-  A_ST = isNaN(A_ST) ? 1248.6 : A_ST; //m2      | area of the settler
-  fq   = isNaN(fq)   ? 2.4    : fq  ; //ø       | peak flow (Qmax/Qavg)
+  //chemical P removal inputs
+  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
   //nitrification inputs
   SF  = isNaN(SF)  ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
@@ -36,16 +36,16 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   DO  = isNaN(DO)  ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
   pH  = isNaN(pH)  ? 7.2  : pH ; //pH units
 
-  //denitrification inputs
+  //denitrification inputs (this module)
   IR           = isNaN(IR)           ? 5.4 : IR;           //ø             | internal recirculation ratio
   DO_RAS       = isNaN(DO_RAS)       ? 1.0 : DO_RAS;       //mgO/L         | DO in the underflow recycle
   influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
 
   //input checks
-  if(IR     <= 0) throw `Error: Internal recirculation ratio (IR=${IR}) not allowed`;
-  if(DO_RAS <  0) throw `Error: Dissolved oxygen in the recycle stream (DO_RAS=${DO_RAS}) not allowed`;
+  if(IR     <= 0) throw new Error(`Value of Internal recirculation ratio (IR=${IR}) not allowed`);
+  if(DO_RAS <  0) throw new Error(`Value of Dissolved oxygen in the recycle stream (DO_RAS=${DO_RAS}) not allowed`);
 
-  //get mass rations
+  //get mass ratios
   const fH = constants.fH;                   //ø | 0.20 (endogenous residue fraction)
   const fCV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
   const fCV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
@@ -54,8 +54,8 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   const f_N_UPO = this.mass_ratios.f_N_UPO;  //gN/gVSS
   const f_N_BPO = this.mass_ratios.f_N_BPO;  //gN/gVSS
 
-  //execute as+nitrification before denitrification first
-  let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,DSVI,A_ST,fq,SF,fxt,DO,pH); //object
+  //execute as+nitrification first
+  let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH); //object
 
   //get fractionations
   let inf_frac = this.totals;         //object | influent fractionation
@@ -156,6 +156,12 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   const i_3_57 = 50/14;
   let effluent_alk = influent_alk + i_3_57*Nobi - i_3_57*(Ns-Noupi) - i_7_14*Nc + i_3_57*(Nc-Nne); //mg/L as CaCO3
 
+  //check effluent alkalinity value, must be above 50 mgCaCO3/L
+  if(effluent_alk < 50){
+    console.warn(`Warning: effluent_alk (${effluent_alk}) < 50 mgCaCO3/L`);
+    //TBD should this be an error instead of warning?
+  }
+
   //TOD balance (TOD = COD + i_COD_NO3*TKN)
   let Qe   = nit.effluent.Q;                                         //ML/d | effluent flowrate
   let TODi = Q *(inf_frac.COD.total + i_COD_NO3*inf_frac.TKN.total); //kgO/d
@@ -186,12 +192,9 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   let N_balance = (FNout==FNti) ? 100 : 100*FNout/FNti;          //percentage
   //denitrification end-------------------------------------------------------------
 
-  //check numeric errors
-  let errors=nit.errors;
-  if(effluent_alk < 50) errors.push("effluent_alk < 50 mgCaCO3/L");
-  if(isNaN(TOD_balance) || (TOD_balance < 99.9 || TOD_balance > 100.1) ) errors.push(`TOD_balance is ${TOD_balance}% (DN)`);
-  if(isNaN(N_balance)   || (N_balance   < 99.9 || N_balance   > 100.1) ) errors.push(`N_balance is ${N_balance}% (DN)`);
-
+  //check TOD and N balance
+  if(isNaN(TOD_balance) || (TOD_balance < 99.9 || TOD_balance > 100.1) ) throw new Error(`TOD_balance is ${TOD_balance}%`);
+  if(isNaN(N_balance)   || (N_balance   < 99.9 || N_balance   > 100.1) ) throw new Error(`N_balance is ${N_balance}%`);
 
   //create output streams (effluent and wastage)
   let Suse    = inf_frac.COD.usCOD;           //mg/L | USO influent == effluent
@@ -214,10 +217,10 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //utilitze all the readily biodegradable organics (BSO)
   let fx1min = fSb_s*(1-YH)*(1+bHT*Rs)/(i_NO3_N2*K1T*YHvss*Rs);
 
-  //check if fxt is lower than fx1min and raise an error
-  if(fxt<fx1min) errors.push("fxt < fx1min");
+  //check if fxt is lower than fx1min
+  if(fxt<fx1min) throw new Error(`fxt (${fxt}) < fx1min (${fx1min})`);
 
-  //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3, 
+  //calculate Rs balanced from "BalancedMLEEquations.pdf", page 3,
   //between equation 11 and 12
   let Rs_bal = (function(){
     //inputs
@@ -272,14 +275,12 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
   //hide description (for debugging)
   //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
-    process_variables,
-    nit_process_variables: nit.process_variables,
-    as_process_variables:  nit.as_process_variables,
-    cpr:                   nit.cpr,
-    cap:                   nit.cap,
-    errors,
-    effluent,
-    wastage,
+    process_variables,                               //denitrification process variables
+    nit_process_variables: nit.process_variables,    //nitrification process variables
+    as_process_variables:  nit.as_process_variables, //activated sludge process variables
+    cpr:                   nit.cpr,                  //chemical P removal process variables
+    effluent,                                        //State_Variables object
+    wastage,                                         //State_Variables object
   };
 };
 
@@ -299,7 +300,7 @@ State_Variables.prototype.denitrification=function(T,Vp,Rs,RAS,waste_from,mass_F
     console.log("=== AS+NIT+DN wastage summary");  console.log(dn.wastage.summary);
     console.log("=== AS process");                 console.log(dn.as_process_variables);
     console.log("=== NIT process");                console.log(dn.nit_process_variables);
-    console.log("=== DN process");                 console.log(dn.process_variables);
     console.log("=== DN chemical P removal");      console.log(dn.cpr);
   */
+  console.log("=== DN process");                 console.log(dn.process_variables);
 })();
