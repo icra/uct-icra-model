@@ -20,41 +20,45 @@ State_Variables.prototype.bio_p_removal = function(
   // INPUTS
   //===========================================================================
     //default values
-    T                  = isNaN(T         ) ? 14    : T         ; //ºC    | parameter
-    Vp                 = isNaN(Vp        ) ? 21370 : Vp        ; //m3    | parameter
-    Rs                 = isNaN(Rs        ) ? 20    : Rs        ; //d     | parameter
-    RAS                = isNaN(RAS       ) ? 0.75  : RAS       ; //ø     | parameter
-    waste_from         = waste_from || 'reactor'; //"reactor" or "sst"
-    DO                 = isNaN(DO        ) ? 0     : DO        ; //mgO/L | parameter
-    DO_RAS             = isNaN(DO_RAS    ) ? 0     : DO_RAS    ; //mgO/L | parameter
-    system_type        = system_type || "AO (MLE)"; //string (option)
-    S_NOx_RAS          = isNaN(S_NOx_RAS         )? 0.500 : S_NOx_RAS;          //mgNOx/L | NOx concentration at RAS
+    T           = isNaN(T)         ?    14 : T        ; //ºC | temperature
+    Vp          = isNaN(Vp)        ? 21370 : Vp       ; //m3 | volume
+    Rs          = isNaN(Rs)        ?    20 : Rs       ; //d  | SRT, sludge age
+    RAS         = isNaN(RAS)       ?  0.75 : RAS      ; //ø  | Recycle ratio
+    waste_from  = waste_from       || 'reactor'       ; //string (option)
+    DO          = isNaN(DO)        ?     0 : DO       ; //mgO/L | Dissolved oxygen
+    DO_RAS      = isNaN(DO_RAS)    ?     0 : DO_RAS   ; //mgO/L | Dissolved oxygen at recycle
+    system_type = system_type      || 'AO (MLE)'      ; //string (option)
+    S_NOx_RAS   = isNaN(S_NOx_RAS) ? 0.500 : S_NOx_RAS; //mgNOx/L | NOx concentration at RAS
+    f_AN        = isNaN(f_AN)      ?   0.1 : f_AN     ; //ø       | anaerobic mass fraction, different from fxt, value must be <= fxm
     number_of_an_zones = isNaN(number_of_an_zones)? 2     : number_of_an_zones; //anaerobic zones
-    f_AN               = isNaN(f_AN              )? 0.1   : f_AN;               //ø | anaerobic mass fraction, different from fxt, value must be <= fxm
 
     //chemical P removal inputs
     mass_FeCl3 = isNaN(mass_FeCl3) ? 10 : mass_FeCl3; //kgFeCl3/d | dosed
 
     //input checks
-    if(Vp  <= 0) throw new Error(`Reactor volume (Vp=${Vp}) not allowed`);
-    if(Rs  <= 0) throw new Error(`Solids retention time (Rs=${Rs}) not allowed`);
-    if(RAS <= 0) throw new Error(`SST recycle ratio (RAS=${RAS}) not allowed`);
-    if(['reactor','sst'].indexOf(waste_from)==-1) throw new Error(`The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`);
+    if(Vp       <= 0) throw new Error(`Reactor volume (Vp=${Vp}) not allowed`);
+    if(Rs       <= 0) throw new Error(`Solids retention time (Rs=${Rs}) not allowed`);
+    if(RAS      <= 0) throw new Error(`SST recycle ratio (RAS=${RAS}) not allowed`);
+    if(S_NOx_RAS < 0) throw new Error(`Value of Recirculation NOx concentration (${S_NOx_RAS}) not allowed`);
+    if(f_AN      < 0) throw new Error(`Value of Anaerobic Sludge Fraction (f_AN=${f_AN}) not allowed`);
+    if(number_of_an_zones <=0) throw new Error(`Value of Number of Anaerobic Zones (${number_of_an_zones}) not allowed`);
+
+    //input checks (strings)
+    if(['reactor','sst'].indexOf(waste_from)==-1){
+      throw new Error(`The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`);
+    }
     if(['AO (MLE)','A2O (3 stage bardenpho)','UCT system'].indexOf(system_type)==-1){
       throw new Error(`Value of System type is not one of these three:
         ${['AO (MLE)','A2O (3 stage bardenpho)','UCT system']}`
       );
     }
-    if(S_NOx_RAS          < 0) throw new Error(`Value of Recirculation NOx concentration (${S_NOx_RAS}) not allowed`);
-    if(number_of_an_zones <=0) throw new Error(`Value of Number of Anaerobic Zones (${number_of_an_zones}) not allowed`);
-    if(f_AN               < 0) throw new Error(`Value of Anaerobic Sludge Fraction (f_AN=${f_AN}) not allowed`);
 
   //influent state variables
-  let Q      = this.Q;                 //ML/d    | state variable
-  let S_FBSO = this.components.S_FBSO; //mgCOD/L | state variable
-  let S_VFA  = this.components.S_VFA;  //mgCOD/L | state variable
-  let S_USO  = this.components.S_USO;  //mgCOD/L | state variable
-  let S_NOx  = this.components.S_NOx;  //mgNOx/L | state variable
+  let Q      = this.Q;                 //ML/d    | flowrate
+  let S_FBSO = this.components.S_FBSO; //mgCOD/L | S_FBSO
+  let S_VFA  = this.components.S_VFA;  //mgCOD/L | S_VFA
+  let S_USO  = this.components.S_USO;  //mgCOD/L | S_USO
+  let S_NOx  = this.components.S_NOx;  //mgNOx/L | S_NOx
 
   //fractionation related variables
   let frac = this.totals;                          //object  | {COD,TKN,TP,TOC,TSS}
@@ -64,15 +68,15 @@ State_Variables.prototype.bio_p_removal = function(
   let Cti  = frac.TOC.total;                       //mgC/L   | total TOC influent
   let FiSS = Q*this.components.X_iSS;              //kgiSS/d | total iSS mass flux
   let Sbi  = frac.COD.bCOD;                        //mgCOD/L | bCOD = S_VFA+S_FBSO+X_BPO
-  let Suse = frac.COD.usCOD;                       //mgCOD/L | usCOD
+  let Suse = this.components.S_USO;                //mgCOD/L | usCOD
   let fSup = this.components.X_UPO/frac.COD.total; //ø       | X_UPO/Sti
   let fSus = this.components.S_USO/frac.COD.total; //ø       | S_USO/Sti
 
   //all mass fluxes
   let inf_fluxes = this.fluxes; //object: all mass fluxes. structure: {components, totals}
 
-  //nitrate
-  let Nne = this.components.S_NOx; //mgN/L
+  //effluent nitrate is not calculated in this module
+  let Nne = S_NOx; //mgN/L
 
   //VSS mass ratios (UPO)
   const f_CV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS | mass ratio
@@ -107,7 +111,7 @@ State_Variables.prototype.bio_p_removal = function(
 
   //kinetic constants (OHO) calculated
   const YHvss  = YH/f_CV_OHO;            //0.45 gVSS/gCOD
-  const bHT    = bH*Math.pow(ϴ_bH,T-20); //1/d            | bH corrected by temperature
+  const bHT    = bH*Math.pow(ϴ_bH,T-20); //1/d | bH corrected by temperature
 
   //kinetic constants (PAO)
   const b_PAO    = constants.b_PAO;       //1/d       | PAOs endogenous residue respiration rate at 20ºC
@@ -131,7 +135,7 @@ State_Variables.prototype.bio_p_removal = function(
 
   //COD conversion stoichiometric constants
   const i_8_6 = (5/8)*2*(32/14)/(1-YH); //gCOD/gNOx | ~8.6 (conv NOx to COD)
-  const i_3_0 = 1/(1-YH);               //gCOD/gDO  | ~3.0 (conv DO to COD)
+  const i_3_0 = 1/(1-YH);               //gCOD/gDO  | ~3.0 (conv DO  to COD)
 
   //===========================================================================
   // EQUATIONS
@@ -207,8 +211,8 @@ State_Variables.prototype.bio_p_removal = function(
   //console.log({f_CV_OHO, f_CV_PAO, f_CV_combined});
 
   //compute the rest of suspended solids
-  let MX_I  = fSup*Rs*FSti/f_CV_combined;                              //kgVSS     | VSS inert biomass (UPO from PAOs+OHOs)
-  let MX_V  = MX_BH + MX_EH + MX_I + MX_PAO + MX_E_PAO;                //kgVSS     | total VSS mass
+  let MX_I = fSup*Rs*FSti/f_CV_combined;               //kgVSS | VSS inert biomass (UPO from PAOs+OHOs)
+  let MX_V = MX_BH + MX_EH + MX_I + MX_PAO + MX_E_PAO; //kgVSS | total VSS mass
 
   /*chemical P removal here*/
   //compute the influent P concentration required for sludge production
@@ -241,7 +245,7 @@ State_Variables.prototype.bio_p_removal = function(
   //total P concentration removed = bio + chemical
   let P_total_rem = P_bio_rem + P_chem_rem; //mgP/L
 
-  console.log({Pti, Ps, P_bio_rem, Pouse, Pobse, Psa, Pse});
+  //console.log({Pti, Ps, P_bio_rem, Pouse, Pobse, Psa, Pse});
 
   //compute iSS and TSS
   let MX_IO = FiSS*Rs + f_iOHO*MX_BH + f_iPAO*MX_PAO + F_extra_iSS*Rs; //kgiSS     | total inert solids (iSS + iOHO + iPAO + P_precipitation)
@@ -259,10 +263,6 @@ State_Variables.prototype.bio_p_removal = function(
   let f_avPAO = MX_PAO/MX_V ||0; //gVSS/gVSS | fraction of active biomass in VSS
   let f_atOHO = MX_BH /MX_T ||0; //gVSS/gTSS | fraction of active biomass in TSS
   let f_atPAO = MX_PAO/MX_T ||0; //gVSS/gTSS | fraction of active biomass in TSS
-
-  //conversion from VSS to COD (reactor concentrations)
-  let X_OHO = f_CV_OHO*(MX_BH  + MX_EH   )/Vp*1000; //mgCOD/L | OHO conc in COD units
-  let X_PAO = f_CV_PAO*(MX_PAO + MX_E_PAO)/Vp*1000; //mgCOD/L | PAO conc in COD units
 
   //secondary settler (SST) and recycle flow (RAS) equations
   let SST=(function(RAS){
@@ -314,16 +314,17 @@ State_Variables.prototype.bio_p_removal = function(
   //  MX_V  = MX_BH + MX_EH + MX_I;                 //kg_VSS | total VSS                            (OHO+UPO)
   //  MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS; //kg_iSS | total inert solids                   (iSS)
   //  MX_T  = MX_V + MX_IO;                         //kg_TSS | total TSS                            (OHO+UPO+iSS)
-  let BPO_was = 0;                          //mg/L | BPO wastage | all BPO is turned into biomass (model assumption)
-  let UPO_was = f*f_CV_UPO*(X_I)*1e3;       //mg/L | UPO wastage
-  let iSS_was = f*X_IO*1000;                //mg/L | iSS wastage (precipitation by FeCl3 already included)
+  let BPO_was = 0;                  //mg/L | BPO wastage | all BPO is turned into biomass (model assumption)
+  let UPO_was = f*f_CV_UPO*X_I*1e3; //mg/L | UPO wastage
+  let iSS_was = f*X_IO*1e3;         //mg/L | iSS wastage (precipitation by FeCl3 already included)
 
-  let OHO_was = f*f_CV_OHO*(MX_BH +MX_EH   )/Vp*1e3; //mgCOD/L | OHO wastage
-  let PAO_was = f*f_CV_PAO*(MX_PAO+MX_E_PAO)/Vp*1e3; //mgCOD/L | OHO wastage
+  //biomass wasted
+  let OHO_was = f*f_CV_OHO*(MX_BH  + MX_EH   )/Vp*1e3; //mgCOD/L | OHO wastage
+  let PAO_was = f*f_CV_PAO*(MX_PAO + MX_E_PAO)/Vp*1e3; //mgCOD/L | PAO wastage
 
-  //output streams------------------( Q, VFA, FBSO,     BPO,     UPO,  USO,     iSS, FSA,  OP, NOx,     OHO,     PAO)
-  let effluent = new State_Variables(Qe,   0,    0,       0,       0, Suse,       0, Nae, Pse, Nne,       0,       0);
-  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was, PAO_was);
+  //output streams------------------( Q, VFA, FBSO, BPO,     UPO,  USO,     iSS, FSA,  OP, NOx,     OHO,     PAO)
+  let effluent = new State_Variables(Qe,   0,    0,   0,       0, Suse,       0, Nae, Pse, Nne,       0,       0);
+  let wastage  = new State_Variables(Qw,   0,    0,   0, UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was, PAO_was);
 
   //copy influent mass ratios for the new outputs
   effluent.mass_ratios = this.mass_ratios;
@@ -361,22 +362,23 @@ State_Variables.prototype.bio_p_removal = function(
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
   let OUR = FOt/(Vp*24)*1000; //mg/L·h | oxygen uptake rate
 
-
   //2.11 - P balance
   let FPti      = inf_fluxes.totals.TP.total; //kgP/d | total TP influent
   let FPte      = eff_fluxes.totals.TP.total; //kgP/d | total TP effluent
   let FPw       = was_fluxes.totals.TP.total; //kgP/d | total TP wastage
-  let FPout     = FPte + FPw;                 //kgP/d | total TP out
+  let FPout     = FPte + FPw + Q*P_chem_rem;  //kgP/d | total TP out
   let P_balance = (FPout==FPti) ? 100 : 100*FPout/FPti; //percentage
 
-  console.log({FPti, FPte, FPw, FPout})
+  console.log({P_balance, FPti, FPte, FPw, FPout})
+  return
 
   //check if Ps i equal to P_bio_rem
-  console.log({Ps, P_bio_rem}); //mgP/L | they should be equal
+  //console.log({Ps, P_bio_rem}); //mgP/L | they should be equal
 
   //compute f_P_PAO_calculated
   //note: f_P_PAO_calculated should be lower than f_P_PAO (0.38)
   let f_P_PAO_calculated = (Q*Pti*Rs - f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) - f_P_UPO*MX_I)/MX_PAO; //gP/gVSS
+
   //console.log({f_P_PAO, f_P_PAO_calculated});
   if(f_P_PAO_calculated > f_P_PAO){
     console.warn(`Warning: f_P_PAO_calculated (${f_P_PAO_calculated}) > f_P_PAO (${f_P_PAO}) [gP/gVSS]`);
@@ -409,7 +411,7 @@ State_Variables.prototype.bio_p_removal = function(
     - UCT: we calculate the 'a' recycle. The 'r' recycle (from anoxic to
       anaerobic) and the 's' recycle are given as inputs.
   */
-  console.log({system_type});
+  //console.log({system_type});
 
   //fraction of P in TSS
   let f_P_TSS = (1/MX_T)*(
@@ -517,10 +519,10 @@ State_Variables.prototype.bio_p_removal = function(
 {
   //return
   //syntax:                    ( Q, VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx, OHO, PAO)
-  let inf = new State_Variables(15,  22,  124, 439, 112,  53,  49,  39, 12,   0,   0,   0);
+  let inf = new State_Variables(15,  22,  124, 439, 112,  53,  49,  39, 15,   0,   0,   0);
   //console.log(inf.totals);
   //console.log(inf.fluxes);
 
   let bip = inf.bio_p_removal();
-  console.log(bip.process_variables);
+  //console.log(bip.process_variables);
 }

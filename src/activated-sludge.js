@@ -108,7 +108,7 @@ State_Variables.prototype.activated_sludge=function(
   let f_XBH = (YHvss*Rs)/(1+bHT*Rs); //gVSS·d/gCOD
 
   //effluent FBSO
-  let S_FBSO_i = this.components.S_FBSO;             //mgCOD/L | influent S_FBSO
+  let S_FBSO_i = this.components.S_FBSO;          //mgCOD/L | influent S_FBSO
   let S_b   = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L | FBSO effluent concentration: cannot be higher than influent S_FBSO
   let FdSbi = Math.max(0, FSbi - Q*S_b);          //kgCOD/d | influent biodegradable COD mass flux that will generate biomass
 

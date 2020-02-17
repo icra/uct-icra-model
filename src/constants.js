@@ -11,10 +11,12 @@ const constants={
   b_PAO      : 0.040,  //1/d       | PAO endogenous residue respiration rate at 20ºC
   theta_b_PAO: 1.029,  //ø         | b_PAO temperature correction factor
   f_PAO      : 0.250,  //ø         | PAO endogenous residue fraction
+
   f_P_X_E    : 0.025,  //gP/gVSS   | fraction of P in endogenous mass (OHO+PAO)
-  f_P_X_I    : 0.030,  //gP/gVSS   | P in inert VSS mass (UPO)
-  f_VT_PAO   : 0.460,  //gVSS/gTSS | fraction of PAO in TSS
+  f_P_X_I    : 0.025,  //gP/gVSS   | P in inert VSS mass (UPO)
   f_P_iSS    : 0.020,  //gP/giSS   | fraction of P in iSS
+
+  f_VT_PAO   : 0.460,  //gVSS/gTSS | fraction of PAO in TSS
   f_iPAO     : 1.300,  //giSS/gVSS
   //f_iPAO has to be calculated (0.15 - 1.3) (1.3 is PAOs full of polyPP)
   //f_iPAO_calculated should be lower than 1.3
