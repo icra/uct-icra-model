@@ -56,7 +56,8 @@ State_Variables.prototype.nitrification=function(
   let Nouse = frac.TKN.usON;               //mg/L | total N_USO_influent = N_USO_effluent
   let Nobse = as.effluent.totals.TKN.bsON; //mg/L | total bsON (from FBSO not degraded)
 
-  //get necessary variables from activated_sludge
+  //get necessary variables from activated_sludge or bpr
+  //TODO
   let MX_T = as.process_variables.MX_T.value; //kg   | total sludge produced
   let Ns   = as.process_variables.Ns.value;   //mg/L | N required from sludge production
 
@@ -198,7 +199,6 @@ State_Variables.prototype.nitrification=function(
   return {
     process_variables,                          //nitrification process variables
     as_process_variables: as.process_variables, //activated sludge process variables
-    cpr: as.cpr,                                //chemical P removal process variables
     effluent,                                   //State_Variables object
     wastage,                                    //State_Variables object
   };

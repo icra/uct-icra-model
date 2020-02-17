@@ -7,15 +7,21 @@
                Qw
 */
 
-//import files
+//load modules
 try{
-  State_Variables     = require("./state-variables.js");
-  constants           = require("./constants.js");
-  chemical_P_removal  = require("./chemical-P-removal.js");
+  State_Variables    = require("./state-variables.js");
+  constants          = require("./constants.js");
+  chemical_P_removal = require("./chemical-P-removal.js");
 }catch(e){}
 
-State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_FeCl3){
-  //inputs and default values
+State_Variables.prototype.activated_sludge=function(
+  T, Vp, Rs, RAS, waste_from,
+  mass_FeCl3
+  ){
+  //===========================================================================
+  // INPUTS
+  //===========================================================================
+  //default values
   T   = isNaN(T)   ? 16     : T;   //ºC   | Temperature
   Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume of reactor
   Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
@@ -31,7 +37,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   */
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
 
-  //inputs for chemical P removal
+  //chemical P removal inputs
   mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for P precipitation
 
   //input checks
@@ -82,13 +88,15 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let FXti = inf_fluxes.totals.TSS.uVSS;  //kgVSS/d | influent unbiodegradable VSS
   let FiSS = inf_fluxes.totals.TSS.iSS;   //kgiSS/d | influent iSS
 
+  //===========================================================================
+  // EQUATIONS
+  //===========================================================================
   //2.2 - kinetics - page 10
-  const YH    = constants.YH;            //0.66 gCOD/gCOD | heterotrophic yield coefficient (does not change with temperature)
-  const YHvss = YH/f_CV_OHO;             //0.45 gVSS/gCOD | heterotrophic yield coefficient (does not change with temperature)
-  const bH    = constants.bH;            //0.24 1/d       | endogenous respiration rate at 20ºC
-  const ϴ_bH  = constants.theta_bH;      //1.029 ø        | bH temperature correction factor
-  let bHT     = bH*Math.pow(ϴ_bH, T-20); //1/d            | endogenous respiration rate corrected by temperature
-  let f_XBH   = (YHvss*Rs)/(1+bHT*Rs);   //gVSS·d/gCOD    | OHO biomass production rate
+  const YH    = constants.YH;           //0.66 gCOD/gCOD | heterotrophic yield coefficient (does not change with temperature)
+  const YHvss = YH/f_CV_OHO;            //0.45 gVSS/gCOD | heterotrophic yield coefficient (does not change with temperature)
+  const bH    = constants.bH;           //0.24 1/d       | endogenous respiration rate at 20ºC
+  const ϴ_bH  = constants.theta_bH;     //1.029 ø        | bH temperature correction factor
+  let bHT     = bH*Math.pow(ϴ_bH,T-20); //1/d            | endogenous respiration rate corrected by temperature
 
   //kinetics for "not all influent FBSO is degraded"
   const k_v20   = constants.k_v20;              //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
@@ -96,9 +104,13 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
   let k_vT      = k_v20*Math.pow(ϴ_k_v20,T-20); //L/mgVSS·d       | k_v corrected by temperature
   //console.log({k_vT});
 
+  //compute OHO biomass production rate
+  let f_XBH = (YHvss*Rs)/(1+bHT*Rs); //gVSS·d/gCOD
+
+  //effluent FBSO
   let S_FBSO_i = this.components.S_FBSO;             //mgCOD/L | influent S_FBSO
-  let S_b      = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L | FBSO effluent concentration: cannot be higher than influent S_FBSO
-  let FdSbi    = Math.max(0, FSbi - Q*S_b);          //kgCOD/d | influent biodegradable COD mass flux that will generate biomass
+  let S_b   = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L | FBSO effluent concentration: cannot be higher than influent S_FBSO
+  let FdSbi = Math.max(0, FSbi - Q*S_b);          //kgCOD/d | influent biodegradable COD mass flux that will generate biomass
 
   //total VSS production
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
@@ -315,7 +327,7 @@ State_Variables.prototype.activated_sludge=function(T,Vp,Rs,RAS,waste_from,mass_
 
 /*test*/
 {
-  return
+  //return
   //--------new State_Variables(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  FSA,   OP, NOx, OHO, PAO)
   let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0,   0,   0);
 

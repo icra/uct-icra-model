@@ -20,86 +20,86 @@ State_Variables.prototype.denitrification=function(
     IR,DO_RAS,influent_alk
   ){
   /*inputs and default values*/
-  //activated sludge inputs
-  T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
-  Vp  = isNaN(Vp ) ? 8473.3 : Vp ; //m3   | Volume
-  Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
-  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
-  waste_from = waste_from || 'reactor'; //"reactor" or "sst"
+    //activated sludge inputs
+    T   = isNaN(T  ) ? 16     : T  ; //ºC   | Temperature
+    Vp  = isNaN(Vp ) ? 8473.3 : Vp ; //m3   | Volume
+    Rs  = isNaN(Rs ) ? 15     : Rs ; //days | Solids retention time
+    RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
+    waste_from = waste_from || 'reactor'; //"reactor" or "sst"
 
-  //chemical P removal inputs
-  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
+    //chemical P removal inputs
+    mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
 
-  //nitrification inputs
-  SF  = isNaN(SF)  ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
-  fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
-  DO  = isNaN(DO)  ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
-  pH  = isNaN(pH)  ? 7.2  : pH ; //pH units
+    //nitrification inputs
+    SF  = isNaN(SF)  ? 1.25 : SF ; //safety factor | Design choice. Moves the sludge age.
+    fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
+    DO  = isNaN(DO)  ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
+    pH  = isNaN(pH)  ? 7.2  : pH ; //pH units
 
-  //denitrification inputs (this module)
-  IR           = isNaN(IR)           ? 5.4 : IR;           //ø             | internal recirculation ratio
-  DO_RAS       = isNaN(DO_RAS)       ? 1.0 : DO_RAS;       //mgO/L         | DO in the underflow recycle
-  influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
+    //denitrification inputs (this module)
+    IR           = isNaN(IR)           ? 5.4 : IR;           //ø             | internal recirculation ratio
+    DO_RAS       = isNaN(DO_RAS)       ? 1.0 : DO_RAS;       //mgO/L         | DO in the underflow recycle
+    influent_alk = isNaN(influent_alk) ? 250 : influent_alk; //mg/L as CaCO3 | influent alkalinity
 
   //input checks
-  if(IR     <= 0) throw new Error(`Value of Internal recirculation ratio (IR=${IR}) not allowed`);
-  if(DO_RAS <  0) throw new Error(`Value of Dissolved oxygen in the recycle stream (DO_RAS=${DO_RAS}) not allowed`);
+    if(IR     <= 0) throw new Error(`Value of Internal recirculation ratio (IR=${IR}) not allowed`);
+    if(DO_RAS <  0) throw new Error(`Value of Dissolved oxygen in the recycle stream (DO_RAS=${DO_RAS}) not allowed`);
 
   //get mass ratios
-  const fH = constants.fH;                   //ø | 0.20 (endogenous residue fraction)
-  const fCV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
-  const fCV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
-  const fCV_BPO = this.mass_ratios.f_CV_BPO; //gCOD/gVSS
-  const f_N_OHO = this.mass_ratios.f_N_OHO;  //gN/gVSS
-  const f_N_UPO = this.mass_ratios.f_N_UPO;  //gN/gVSS
-  const f_N_BPO = this.mass_ratios.f_N_BPO;  //gN/gVSS
+    const fH = constants.fH;                   //ø | 0.20 (endogenous residue fraction)
+    const fCV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
+    const fCV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
+    const fCV_BPO = this.mass_ratios.f_CV_BPO; //gCOD/gVSS
+    const f_N_OHO = this.mass_ratios.f_N_OHO;  //gN/gVSS
+    const f_N_UPO = this.mass_ratios.f_N_UPO;  //gN/gVSS
+    const f_N_BPO = this.mass_ratios.f_N_BPO;  //gN/gVSS
 
   //execute as+nitrification first
   let nit=this.nitrification(T,Vp,Rs,RAS,waste_from,mass_FeCl3,SF,fxt,DO,pH); //object
 
   //get fractionations
-  let inf_frac = this.totals;         //object | influent fractionation
-  let eff_frac = nit.effluent.totals; //object | nit effluent fractionation
-  let was_frac = nit.wastage.totals;  //object | nit wastage fractionation
+    let inf_frac = this.totals;         //object | influent fractionation
+    let eff_frac = nit.effluent.totals; //object | nit effluent fractionation
+    let was_frac = nit.wastage.totals;  //object | nit wastage fractionation
 
   //get necessary variables
-  let Q    = this.Q;                         //ML/d  | influent flowrate
-  let S_b  = nit.effluent.components.S_FBSO; //mg/L  | bCOD not degraded "Sbse"
-  let Sbi  = inf_frac.COD.bCOD;              //mg/L  | bio COD (BSO+BPO)
-  let Sbsi = inf_frac.COD.bsCOD;             //mg/L  | BSO COD (VFA+FBSO)
-  let Sti  = inf_frac.COD.total;             //mg/L  | total COD influent
-  let Nae  = nit.effluent.components.S_FSA;  //mgN/L | effluent ammonia
-  let Nc   = nit.process_variables.Nc.value; //mgN/L | nitrate generated in nitrification (does not include influent nitrate)
-  let Nni  = this.components.S_NOx;          //mgN/L | influent nitrate (not including nitrification capacity)
-  let Nti  = inf_frac.TKN.total;             //mgN/L | total TKN influent
-  let Nte  = eff_frac.TKN.total;             //mgN/L | total TKN effluent
+    let Q    = this.Q;                         //ML/d  | influent flowrate
+    let S_b  = nit.effluent.components.S_FBSO; //mg/L  | bCOD not degraded "Sbse"
+    let Sbi  = inf_frac.COD.bCOD;              //mg/L  | bCOD  (VFA+FBSO+BPO)
+    let Sbsi = inf_frac.COD.bsCOD;             //mg/L  | bsCOD (VFA+FBSO)
+    let Sti  = inf_frac.COD.total;             //mg/L  | total COD influent
+    let Nae  = nit.effluent.components.S_FSA;  //mgN/L | effluent ammonia
+    let Nc   = nit.process_variables.Nc.value; //mgN/L | nitrate generated in nitrification (does not include influent nitrate)
+    let Nni  = this.components.S_NOx;          //mgN/L | influent nitrate (not including nitrification capacity)
+    let Nti  = inf_frac.TKN.total;             //mgN/L | total TKN influent
+    let Nte  = eff_frac.TKN.total;             //mgN/L | total TKN effluent
 
-  //denitrification (page 19)
-  //3.2 - denitrification kinetics
-  const K1_20 = constants.K1_20;                         //0.720 gN/gVSS·d | at 20ºC page 482 and 113
-  const K2_20 = constants.K2_20;                         //0.101 gN/gVSS·d | at 20ºC page 482 and 113
-  //const K3_20 = constants.K3_20;                         //0.072 gN/gVSS·d | at 20ºC page 482 and 113
-  //const K4_20 = constants.K4_20;                         //0.048 gN/gVSS·d | at 20ºC page 482 and 113
-  const K1T   = K1_20*Math.pow(constants.theta_K1,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.200)
-  const K2T   = K2_20*Math.pow(constants.theta_K2,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.080)
-  //const K3T   = K3_20*Math.pow(constants.theta_K3,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.029)
-  //const K4T   = K4_20*Math.pow(constants.theta_K4,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.029)
+  //denitrification kinetics (page 19)
+    //3.2 - denitrification kinetic constants
+    const K1_20 = constants.K1_20;                         //0.720 gN/gVSS·d | at 20ºC page 482 and 113
+    const K2_20 = constants.K2_20;                         //0.101 gN/gVSS·d | at 20ºC page 482 and 113
+    //const K3_20 = constants.K3_20;                         //0.072 gN/gVSS·d | at 20ºC page 482 and 113
+    //const K4_20 = constants.K4_20;                         //0.048 gN/gVSS·d | at 20ºC page 482 and 113
+    const K1T   = K1_20*Math.pow(constants.theta_K1,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.200)
+    const K2T   = K2_20*Math.pow(constants.theta_K2,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.080)
+    //const K3T   = K3_20*Math.pow(constants.theta_K3,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.029)
+    //const K4T   = K4_20*Math.pow(constants.theta_K4,T-20); //gN/gVSS·d       | corrected by temperature (theta = 1.029)
 
   //3.2
   let fSb_s = Sbsi/Sbi||0; //ratio BSO/(BSO+BPO)
 
   //stoichiometric constants
-  const i_NO3_N2  = 40/14; //~2.86 gCOD/gN | stoichiometric factor for NO3 reduction to N2
-  const i_COD_NO3 = 64/14; //~4.57 gCOD/gN | conversion factor for NO3 in COD
-  //console.log({i_NO3_N2, i_COD_NO3});//debugging
+    const i_NO3_N2  = 40/14; //~2.86 gCOD/gN | stoichiometric factor for NO3 reduction to N2
+    const i_COD_NO3 = 64/14; //~4.57 gCOD/gN | conversion factor for NO3 in COD
+    //console.log({i_NO3_N2, i_COD_NO3});//debugging
 
   //denitrification potential
-  const YH    = constants.YH;                         //0.666 gCOD/gCOD
-  const YHvss = YH/fCV_OHO;                           //0.45  gVSS/gCOD
-  let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YHvss*Rs/(1+bHT*Rs)
-  let Dp1RBSO = Sbsi*(1-YH)/i_NO3_N2;                 //mgN/L | influent
-  let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgN/L | influent
-  let Dp1     = Dp1RBSO+Dp1BPO;                       //mgN/L | influent
+    const YH    = constants.YH;                         //0.666 gCOD/gCOD
+    const YHvss = YH/fCV_OHO;                           //0.45  gVSS/gCOD
+    let f_XBH   = nit.as_process_variables.f_XBH.value; //gVSS·d/gCOD | YHvss*Rs/(1+bHT*Rs)
+    let Dp1RBSO = Sbsi*(1-YH)/i_NO3_N2;                 //mgN/L | influent
+    let Dp1BPO  = K2T*fxt*(Sbi-S_b)*f_XBH;              //mgN/L | influent
+    let Dp1     = Dp1RBSO+Dp1BPO;                       //mgN/L | influent
 
   //optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
@@ -278,7 +278,6 @@ State_Variables.prototype.denitrification=function(
     process_variables,                               //denitrification process variables
     nit_process_variables: nit.process_variables,    //nitrification process variables
     as_process_variables:  nit.as_process_variables, //activated sludge process variables
-    cpr:                   nit.cpr,                  //chemical P removal process variables
     effluent,                                        //State_Variables object
     wastage,                                         //State_Variables object
   };
@@ -300,7 +299,6 @@ State_Variables.prototype.denitrification=function(
     console.log("=== AS+NIT+DN wastage summary");  console.log(dn.wastage.summary);
     console.log("=== AS process");                 console.log(dn.as_process_variables);
     console.log("=== NIT process");                console.log(dn.nit_process_variables);
-    console.log("=== DN chemical P removal");      console.log(dn.cpr);
   */
   console.log("=== DN process");                 console.log(dn.process_variables);
 })();

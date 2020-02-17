@@ -2,27 +2,27 @@
   *  WASTEWATER TREATMENT PLANT CLASS
   *  ================================
   *
-  *  this class takes 3 objects as inputs. It has a run() method that outputs
-  *  effluents, wastages and process variables
+  *  the class constructor takes 3 objects as inputs. It has a run() method
+  *  that outputs effluents, wastages and process variables.
   *
   *  inputs          outputs
   *  ------          -------
   *  {influent}      {primary effluent}
-  *  {configuration} {secondary effluent}
-  *  {parameters}    {primary wastage}
+  *  {configuration} {primary wastage}
+  *  {parameters}    {secondary effluent}
   *                  {secondary wastage}
   *                  {process variables}
   *
   * syntax:
-  *   let p = new Plant(influent, configuration, parameters)
+  *   let p = new Plant(influent, configuration, parameters);
   *   let r = p.run();
 */
 
 /*import modules*/
 try{
   State_Variables     = require('./state-variables.js'); //class State_Variables
-  constants           = require("./constants.js");
-  capacity_estimation = require('./capacity-estimation.js');
+  constants           = require("./constants.js"); //object
+  capacity_estimation = require('./capacity-estimation.js'); //function
   require('./primary-settler.js');    //State_Variables.prototype.primary_settler
   require('./activated-sludge.js');   //State_Variables.prototype.activated_sludge
   require('./nitrification.js');      //State_Variables.prototype.nitrification
@@ -37,7 +37,7 @@ class Plant{
      * - influent:      state variables object
      * - configuration: plant configuration | dictionary of booleans {pst,nit,dn,cpr,bpr}
      * - parameters:    plant parameters    | dictionary of numbers/strings (~20 aprox)
-     * - constants:     kinetic constants   | dictionary of numbers (~20 aprox)
+     * - constants:     kinetic constants   | dictionary of numbers
     */
     this.influent      = influent     ||new State_Variables(); //state variables object
     this.configuration = configuration||{}; //plant configuration (techs)
@@ -103,6 +103,7 @@ class Plant{
 
     //chemical P removal input
     let mass_FeCl3 = conf.cpr ? p.mass_FeCl3 : 0; //kgFeCl3/d dosed
+    console.log(mass_FeCl3);
 
     //execute primary settler
     let pst = null;
@@ -118,23 +119,15 @@ class Plant{
     let bpr = null;
     let cpr = null;
     let cap = null;
-    if(conf.dn){
-      //denitrification
-      dn  = pst.effluent.denitrification (p.T,p.Vp,p.Rs,p.RAS,p.waste_from,mass_FeCl3,p.SF,p.fxt,p.DO,p.pH,p.IR,p.DO_RAS,p.influent_alk);
-      nit = dn.nit_process_variables;
-      as  = dn.as_process_variables;
-    }else if(conf.nit){
-      //nitrification (no DN)
-      nit = pst.effluent.nitrification   (p.T,p.Vp,p.Rs,p.RAS,p.waste_from,mass_FeCl3,p.SF,p.fxt,p.DO,p.pH);
-      as  = nit.as_process_variables;
-    }else{
-      //activated sludge (no NIT, no DN, fully aerobic)
-      as  = pst.effluent.activated_sludge(p.T,p.Vp,p.Rs,p.RAS,p.waste_from,mass_FeCl3);
-    }
 
-    //bio P removal
+    //bio P removal BEFORE nit and dn
     if(conf.bpr){
-
+      bpr = pst.effluent.bio_p_removal(
+        p.system_type, p.S_NOx_RAS, p.number_of_an_zones, p.f_AN,
+        p.T, p.Vp, p.Rs, p.RAS,
+        p.DO, p.DO_RAS,
+        mass_FeCl3
+      );
       //bioP + nitrification + NO denitrification condition
       //check condition depending on plant configuration
       if(conf.nit && conf.dn==false && p.number_of_an_zones==1){
@@ -142,20 +135,38 @@ class Plant{
           throw new Error(`f_AN (${p.f_AN})> fxm (${nit.fxm.value})`);
         }
       }
-
     }
 
-    //chemical P removal results
+    if(conf.dn){
+      //denitrification
+      dn  = pst.effluent.denitrification(p.T,p.Vp,p.Rs,p.RAS,p.waste_from,mass_FeCl3,p.SF,p.fxt,p.DO,p.pH,p.IR,p.DO_RAS,p.influent_alk);
+      nit = dn.nit_process_variables;
+      as  = dn.as_process_variables;
+    }else if(conf.nit){
+      //nitrification (no DN)
+      dn  = null;
+      nit = pst.effluent.nitrification(p.T,p.Vp,p.Rs,p.RAS,p.waste_from,mass_FeCl3,p.SF,p.fxt,p.DO,p.pH);
+      as  = nit.as_process_variables;
+    }else{
+      //activated sludge (no NIT, no DN, fully aerobic)
+      dn  = null;
+      nit = null;
+      as  = pst.effluent.activated_sludge(p.T,p.Vp,p.Rs,p.RAS,p.waste_from,mass_FeCl3);
+    }
+
+    //chemical P removal AFTER BPR (TODO)
     cpr = conf.bpr ? bpr.cpr : as.cpr;
 
-    //execute capacity estimation module
+    //execute capacity estimation module AFTER BPR (TODO)
     {
       let DSVI = p.DSVI;
-      let MX_T = as.MX_T.value; //TODO or bpr.MX_T.value
-      let Sti = pst.totals.COD.total;
+      let MX_T = as.MX_T.value; //TODO {as,bpr}.MX_T.value
+      let Sti = pst.effluent.totals.COD.total;
+      let Q = pst.effluent.Q;
       let FSti = Q*Sti;
       let A_ST = p.A_ST;
       let Vp = p.Vp;
+      let X_T = MX_T/Vp; //kgTSS/m3
       let fq = p.fq;
       cap = capacity_estimation(DSVI, MX_T/FSti, Sti, A_ST, Vp, fq); //object
       //console.log(cap);//debug
@@ -166,8 +177,7 @@ class Plant{
     }
 
     //pack all process variables
-    let process_variables = {as,nit,dn,bpr,cpr,cap};
-
+    let process_variables={as,nit,dn,bpr,cpr,cap};
 
     //all plant results {process_variables, streams}
     console.timeEnd('>> run uct-icra model');
@@ -175,8 +185,26 @@ class Plant{
     //debug_mode: hides descriptions making easier reading results
     if(debug_mode){
       Object.values(process_variables).forEach(pv=>{
+        if(pv==null) return;
         Object.values(pv).forEach(obj=>delete obj.descr);
       });
+    }
+
+    let secondary_effluent = null; //TODO
+    let secondary_wastage  = null; //TODO
+
+    if(conf.dn){
+      secondary_effluent = dn.effluent;
+      secondary_wastage  = dn.wastage;
+    }else if(conf.nit){
+      secondary_effluent = nit.effluent;
+      secondary_wastage  = nit.wastage;
+    }else if(conf.bpr){
+      secondary_effluent = bpr.effluent;
+      secondary_wastage  = bpr.wastage;
+    }else{
+      secondary_effluent = as.effluent;
+      secondary_wastage  = as.wastage;
     }
 
     return{
@@ -186,8 +214,8 @@ class Plant{
         wastage : pst.wastage,  //primary wastage  (state variables object)
       },
       secondary:{
-        effluent: as.effluent, //secondary effluent (state variables object)
-        wastage : as.wastage,  //secondary wastage  (state variables object)
+        effluent: secondary_effluent, //secondary effluent (state variables object)
+        wastage : secondary_wastage,  //secondary wastage  (state variables object)
       },
     };
   };
@@ -209,22 +237,27 @@ class Plant{
         removal_BPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_BPO"},
         removal_UPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_UPO"},
         removal_iSS :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_iSS"},
+
         T           :{unit:"ºC",        tec:"as",  type:"number", descr:"Temperature"},
         Vp          :{unit:"m3",        tec:"as",  type:"number", descr:"Reactor volume"},
         Rs          :{unit:"d",         tec:"as",  type:"number", descr:"Solids retention time or sludge age"},
         RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"SST underflow recycle ratio"},
         waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Waste_from | options {'reactor','sst'}"},
-        DSVI        :{unit:"mL/gTSS",   tec:"cap", type:"number", descr:"Sludge settleability"},
-        A_ST        :{unit:"m2",        tec:"cap", type:"number", descr:"Area of the settler"},
-        fq          :{unit:"ø",         tec:"cap", type:"number", descr:"Peak flow (Qmax/Qavg)"},
-        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 added for chemical P removal"},
+
         SF          :{unit:"ø",         tec:"nit", type:"number", descr:"Safety factor. design choice. Moves the sludge age"},
         fxt         :{unit:"ø",         tec:"nit", type:"number", descr:"Current unaerated sludge mass fraction"},
         DO          :{unit:"mgO/L",     tec:"nit", type:"number", descr:"DO in the aerobic reactor"},
         pH          :{unit:"ø",         tec:"nit", type:"number", descr:"pH"},
+
         IR          :{unit:"ø",         tec:"dn",  type:"number", descr:"Internal recirculation ratio"},
         DO_RAS      :{unit:"mgO/L",     tec:"dn",  type:"number", descr:"DO in the underflow recycle"},
         influent_alk:{unit:"mgCaCO3/L", tec:"dn",  type:"number", descr:"Influent alkalinity (mg/L CaCO3)"},
+
+        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 added for chemical P removal"},
+
+        DSVI        :{unit:"mL/gTSS",   tec:"cap", type:"number", descr:"Sludge settleability"},
+        A_ST        :{unit:"m2",        tec:"cap", type:"number", descr:"Area of the settler"},
+        fq          :{unit:"ø",         tec:"cap", type:"number", descr:"Peak flow (Qmax/Qavg)"},
       },
     };
   };
@@ -310,11 +343,11 @@ try{module.exports=Plant}catch(e){}
 
   //plant configuration
   let configuration={
-    pst : false , //primary settler
-    nit : true  , //nitrification
-    dn  : true  , //denitrification
-    cpr : false , //chemical P removal
-    bpr : false , //bio P removal
+    pst : true, //primary settler
+    nit : true, //nitrification
+    dn  : true, //denitrification
+    cpr : true, //chemical P removal
+    bpr : true, //bio P removal
   };
 
   //plant parameters
@@ -328,7 +361,7 @@ try{module.exports=Plant}catch(e){}
     Rs          :     7.80500, //d       | AS  | solids retention time
     RAS         :     1.00000, //ø       | AS  | SST underflow recycle ratio
     waste_from  :   "reactor", //string  | AS  | options {'reactor','sst'}
-    mass_FeCl3  :     0.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
+    mass_FeCl3  :    10.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
     SF          :     1.25000, //ø       | NIT | safety factor
     fxt         :     0.27600, //ø       | NIT | unaerated sludge mass fraction
     DO          :     2.00000, //mgO/L   | NIT | DO aerobic reactor
@@ -350,4 +383,5 @@ try{module.exports=Plant}catch(e){}
 
   //run model
   let run = plant.run(debug_mode=true);
+  console.log(run)
 })();

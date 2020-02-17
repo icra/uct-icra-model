@@ -15,7 +15,6 @@ const constants={
   f_P_X_I    : 0.030,  //gP/gVSS   | P in inert VSS mass (UPO)
   f_VT_PAO   : 0.460,  //gVSS/gTSS | fraction of PAO in TSS
   f_P_iSS    : 0.020,  //gP/giSS   | fraction of P in iSS
-  f_P_PAO    : 0.3800, //gP/gVSS   | fraction of P in active PAO mass
   f_iPAO     : 1.300,  //giSS/gVSS
   //f_iPAO has to be calculated (0.15 - 1.3) (1.3 is PAOs full of polyPP)
   //f_iPAO_calculated should be lower than 1.3
@@ -90,7 +89,6 @@ const constants={
     f_P_X_I    :{unit:"gP/gVSS",   tec:"bpr", descr:"P in inert VSS mass (UPO)"},
     f_VT_PAO   :{unit:"gVSS/gTSS", tec:"bpr", descr:"fraction of PAO in TSS"},
     f_P_iSS    :{unit:"gP/giSS",   tec:"bpr", descr:"fraction of P in iSS"},
-    f_P_PAO    :{unit:"gP/gVSS",   tec:"bpr", descr:"fraction of P in the active PAO mass"},
     f_iPAO     :{unit:"giSS/gVSS", tec:"bpr", descr:"iSS content of PAOs"},
   },
 };
