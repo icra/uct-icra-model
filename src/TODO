@@ -16,15 +16,18 @@
   fH --> f_OHO
 
 3. bio P:
-  * discuss with george the FBSO not consumed (kvT)
-    it has to be included in the formula for S_FBSO available for conversion into VFAs?
+  * The FBSO not consumed (kvT)
+    has to be included in the formula for S_FBSO available for conversion into VFAs?
 
-  * DO is the one that we already ask?
+  * DO is the one that we already ask? (says influent DO, confirm)
 
-  * inorganic soluble P available for chemical P removal
-    let Psa = Math.max(0, Pti - Ps - Pouse - Pobse - P_bio_rem); //mgP/L
-    Ps and P_bio_rem is the same, is it possible that this is accounted 2 times?
+  * f_VT_PAO (gPAOVSS/gTSS) = 0.46 is constant?
+    * sería correcto decir que...
+      f_VT_PAO = (MX_PAO + MX_E_PAO)/MX_T ?
 
   * single tank is the same as number_of_an_zones==1?
 
   * se puede tener bio P sin nitrificación?
+
+  * ¿está bien la ecuación?
+  * f_P_PAO_calculated = (Q*Pti*Rs - f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) - f_P_UPO*MX_I)/MX_PAO; //gP/gVSS

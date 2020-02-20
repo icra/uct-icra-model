@@ -94,6 +94,7 @@ State_Variables.prototype.activated_sludge=function(
   //2.2 - kinetics - page 10
   const YH    = constants.YH;           //0.66 gCOD/gCOD | heterotrophic yield coefficient (does not change with temperature)
   const YHvss = YH/f_CV_OHO;            //0.45 gVSS/gCOD | heterotrophic yield coefficient (does not change with temperature)
+  const fH    = constants.fH;           //0.20 ø         | endogenous OHO fraction
   const bH    = constants.bH;           //0.24 1/d       | endogenous respiration rate at 20ºC
   const ϴ_bH  = constants.theta_bH;     //1.029 ø        | bH temperature correction factor
   let bHT     = bH*Math.pow(ϴ_bH,T-20); //1/d            | endogenous respiration rate corrected by temperature
@@ -114,7 +115,6 @@ State_Variables.prototype.activated_sludge=function(
 
   //total VSS production
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
-  const fH  = constants.fH;          //0.20 ø | endogenous OHO fraction
   let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS  | endogenous residue OHOs
   let MX_I  = FXti * Rs;             //kgVSS  | influent uVSS
   let MX_V  = MX_BH + MX_EH + MX_I;  //kgVSS  | total VSS
@@ -284,7 +284,7 @@ State_Variables.prototype.activated_sludge=function(
     fSup    :{value:fSup,      unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"},
     k_vT    :{value:k_vT,      unit:"L/mgVSS·d",   descr:"k_v20 corrected by temperature"},
     Ns      :{value:Ns,        unit:"mgN/L",       descr:"N required for sludge production"},
-    Ps      :{value:Ps,        unit:"mgN/L",       descr:"P required for sludge production"},
+    Ps      :{value:Ps,        unit:"mgP/L",       descr:"P required for sludge production"},
     Cs      :{value:Cs,        unit:"mgC/L",       descr:"C required for sludge production"},
     HRT     :{value:HRT,       unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
     bHT     :{value:bHT,       unit:"1/d",         descr:"OHO Endogenous respiration rate corrected by temperature"},
