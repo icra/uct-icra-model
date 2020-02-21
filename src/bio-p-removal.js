@@ -19,7 +19,7 @@ State_Variables.prototype.bio_p_removal=function(
   //===========================================================================
   // INPUTS
   //===========================================================================
-    //default values
+    //default input values
     T           = isNaN(T)         ?    14 : T        ; //ºC | temperature
     Vp          = isNaN(Vp)        ? 21370 : Vp       ; //m3 | volume
     Rs          = isNaN(Rs)        ?    20 : Rs       ; //d  | SRT, sludge age
@@ -36,7 +36,7 @@ State_Variables.prototype.bio_p_removal=function(
     //chemical P removal inputs
     mass_FeCl3 = isNaN(mass_FeCl3) ? 0 : mass_FeCl3; //kgFeCl3/d | dosed
 
-    //input checks
+    //input checks (numbers)
     if(Vp       <= 0) throw new Error(`Reactor volume (Vp=${Vp}) not allowed`);
     if(Rs       <= 0) throw new Error(`Solids retention time (Rs=${Rs}) not allowed`);
     if(RAS      <= 0) throw new Error(`SST recycle ratio (RAS=${RAS}) not allowed`);
@@ -58,28 +58,29 @@ State_Variables.prototype.bio_p_removal=function(
     }
 
   //get mass ratios
-    const f_CV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
-    const f_CV_USO = this.mass_ratios.f_CV_USO; //gCOD/gVSS
-    const f_CV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
-    const f_CV_PAO = this.mass_ratios.f_CV_PAO; //gCOD/gVSS
-    const f_N_UPO  = this.mass_ratios.f_N_UPO;  //gN/gVSS
-    const f_N_USO  = this.mass_ratios.f_N_USO;  //gN/gVSS
-    const f_N_OHO  = this.mass_ratios.f_N_OHO;  //gN/gVSS
-    const f_N_PAO  = this.mass_ratios.f_N_PAO;  //gN/gVSS
-    const f_C_UPO  = this.mass_ratios.f_C_UPO;  //gC/gVSS
-    const f_C_USO  = this.mass_ratios.f_C_USO;  //gC/gVSS
-    const f_C_OHO  = this.mass_ratios.f_C_OHO;  //gC/gVSS
-    const f_C_PAO  = this.mass_ratios.f_C_PAO;  //gC/gVSS
-    const f_P_UPO  = this.mass_ratios.f_P_UPO;  //gP/gVSS
-    const f_P_USO  = this.mass_ratios.f_P_USO;  //gP/gVSS
-    const f_P_OHO  = this.mass_ratios.f_P_OHO;  //gP/gVSS
-    const f_P_PAO  = this.mass_ratios.f_P_PAO;  //gP/gVSS
+  const f_CV_UPO = this.mass_ratios.f_CV_UPO; //gCOD/gVSS
+  const f_CV_USO = this.mass_ratios.f_CV_USO; //gCOD/gVSS
+  const f_CV_OHO = this.mass_ratios.f_CV_OHO; //gCOD/gVSS
+  const f_CV_PAO = this.mass_ratios.f_CV_PAO; //gCOD/gVSS
+  const f_N_UPO  = this.mass_ratios.f_N_UPO;  //gN/gVSS
+  const f_N_USO  = this.mass_ratios.f_N_USO;  //gN/gVSS
+  const f_N_OHO  = this.mass_ratios.f_N_OHO;  //gN/gVSS
+  const f_N_PAO  = this.mass_ratios.f_N_PAO;  //gN/gVSS
+  const f_C_UPO  = this.mass_ratios.f_C_UPO;  //gC/gVSS
+  const f_C_USO  = this.mass_ratios.f_C_USO;  //gC/gVSS
+  const f_C_OHO  = this.mass_ratios.f_C_OHO;  //gC/gVSS
+  const f_C_PAO  = this.mass_ratios.f_C_PAO;  //gC/gVSS
+  const f_P_UPO  = this.mass_ratios.f_P_UPO;  //gP/gVSS
+  const f_P_USO  = this.mass_ratios.f_P_USO;  //gP/gVSS
+  const f_P_OHO  = this.mass_ratios.f_P_OHO;  //gP/gVSS
+  const f_P_PAO  = this.mass_ratios.f_P_PAO;  //gP/gVSS
 
   //influent state variables
   let Q      = this.Q;                 //ML/d    | flowrate
-  let S_FBSO = this.components.S_FBSO; //mgCOD/L | fermentable biodeg soluble organics (BSO)
   let S_VFA  = this.components.S_VFA;  //mgCOD/L | volatile fatty acids (BSO)
+  let S_FBSO = this.components.S_FBSO; //mgCOD/L | fermentable biodeg soluble organics (BSO)
   let S_USO  = this.components.S_USO;  //mgCOD/L | unbiodeg soluble organics
+  let X_UPO  = this.components.X_UPO;  //mgCOD/L | influent unbiodegradable particulate organics (UPO)
   let S_NOx  = this.components.S_NOx;  //mgNOx/L | influent nitrate and nitrite
 
   //fractionation objects
@@ -87,24 +88,23 @@ State_Variables.prototype.bio_p_removal=function(
   let inf_flux = this.fluxes; //all mass fluxes. structure: {components, totals}
 
   //COD fractions
-  let FSti = inf_flux.totals.COD.total;                //kgCOD/d | total COD influent mass flux
-  let Sbi  = inf_frac.COD.bCOD;                        //mgCOD/L | bCOD = S_VFA+S_FBSO+X_BPO influent mass flux
-  let fSup = this.components.X_UPO/inf_frac.COD.total; //ø       | X_UPO/Sti ratio
-  let fSus = this.components.S_USO/inf_frac.COD.total; //ø       | S_USO/Sti ratio
+  let FSti = inf_flux.totals.COD.total; //kgCOD/d | total COD influent mass flux
+  let FSbi = inf_flux.totals.COD.bCOD;  //kgCOD/d | bCOD = S_VFA+S_FBSO+X_BPO influent mass flux
+  let fSup = X_UPO/inf_frac.COD.total;  //ø       | X_UPO/Sti ratio
+  let fSus = S_USO/inf_frac.COD.total;  //ø       | S_USO/Sti ratio
 
-  //iSS influent mass flux
-  let FiSS = Q*this.components.X_iSS; //kgiSS/d
+  //iSS influent and inert VSS mass fluxes
+  let FiSS = Q*this.components.X_iSS;  //kgiSS/d
+  let FXti = inf_flux.totals.TSS.uVSS; //kgVSS/d
 
   //kinetic constants (OHO)
-  const YH     = constants.YH;     //0.66 gCOD/gCOD | heterotrophic yield coefficient (does not change with temperature)
-  const YHvss  = YH/f_CV_OHO;      //0.45 gVSS/gCOD
-  const f_iOHO = constants.f_iOHO; //0.15 giSS/gVSS | fraction of inert solids in biomass
-
-  //endogenous OHO respiration constants
-  const fH   = constants.fH;           //0.20 ø   | endogenous OHO fraction
-  const bH   = constants.bH;           //0.24 1/d | endogenous respiration rate at 20ºC
-  const ϴ_bH = constants.theta_bH;     //1.029 ø  | bH temperature correction factor
-  const bHT  = bH*Math.pow(ϴ_bH,T-20); //1/d      | bH corrected by temperature
+  const YH     = constants.YH;           //0.66 gCOD/gCOD | heterotrophic yield coefficient (does not change with temperature)
+  const YHvss  = YH/f_CV_OHO;            //0.45 gVSS/gCOD | YH expressed as VSS/COD yield
+  const f_iOHO = constants.f_iOHO;       //0.15 giSS/gVSS | fraction of inert solids in biomass
+  const fH     = constants.fH;           //0.20 ø         | endogenous OHO fraction
+  const bH     = constants.bH;           //0.24 1/d       | endogenous respiration rate at 20ºC
+  const ϴ_bH   = constants.theta_bH;     //1.029 ø        | bH temperature correction factor
+  const bHT    = bH*Math.pow(ϴ_bH,T-20); //1/d            | bH corrected by temperature
 
   //kinetic constants (PAO)
   const Y_PAO   = YH/f_CV_PAO;                  //gVSS/gCOD | ~0.45 = 0.666/1.481
@@ -115,8 +115,8 @@ State_Variables.prototype.bio_p_removal=function(
   const b_PAO_T = b_PAO*Math.pow(ϴ_b_PAO,T-20); //1/d       | b_PAO corrected by temperature
 
   //mass fractions (P, VSS, TSS)
-  let f_VT_PAO = constants.f_VT_PAO; //0.46  gVSS/gTSS | fraction of PAO in TSS
-  const f_P_iSS  = constants.f_P_iSS;  //0.02  gP/giSS   | fraction of P in iSS
+  let f_VT_PAO = constants.f_VT_PAO;  //0.46  gVSS/gTSS | fraction of PAO in TSS
+  const f_P_iSS  = constants.f_P_iSS; //0.02  gP/giSS | fraction of P in iSS
 
   //FBSO related constants
   const k_v20   = constants.k_v20;              //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
@@ -130,7 +130,8 @@ State_Variables.prototype.bio_p_removal=function(
   //===========================================================================
   // EQUATIONS
   //===========================================================================
-  //compute fermentables available for conversion into VFA by OHOs
+
+  //compute S_FBSO available for conversion into VFA (done by OHOs)
   //TBD subtract FBSO not consumed also, ask george
   let S_FBSO_conv = Math.max(0,
     S_FBSO - i_8_6*(RAS*S_NOx_RAS + S_NOx) - i_3_0*(RAS*DO_RAS + DO)
@@ -153,10 +154,10 @@ State_Variables.prototype.bio_p_removal=function(
   while(true){
     S_FBSO_AN  = S_FBSO_conv/(1+RAS)/Math.pow(1+(k_vT*(f_AN*MX_BH/(number_of_an_zones*Q*(1+RAS)))), number_of_an_zones); //mgCOD/L
     F_ss_PAO   = Math.max(0, Q*(S_FBSO_conv - (1+RAS)*S_FBSO_AN + S_VFA) ); //kgCOD/d | VFA stored by PAOs
-    F_sb_OHO   = Math.max(0, Q*Sbi - F_ss_PAO);                             //kgCOD/d | remaining bCOD for OHOs
+    F_sb_OHO   = Math.max(0, FSbi - F_ss_PAO);                             //kgCOD/d | remaining bCOD for OHOs
     MX_BH_next = F_sb_OHO*f_XBH;                                            //kgVSS   | active OHO biomass
 
-    //show values for current iteration
+    //(debugging) show values for current iteration
     //console.log({S_FBSO_AN, F_ss_PAO, F_sb_OHO, MX_BH_next, MX_BH, iterations});
 
     //break loop if MX_BH value converged
@@ -176,9 +177,9 @@ State_Variables.prototype.bio_p_removal=function(
   }
 
   //compute OHO VSS endogenous residue
-  let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS | endogenous residue OHOs
+  let MX_EH = fH * bHT * Rs * MX_BH; //kgVSS
 
-  //compute PAO VSS
+  //compute PAO VSS (active and endogenous biomass)
   let f_XPAO   = (Y_PAO*Rs)/(1+b_PAO_T*Rs); //gVSS·d/gCOD | PAO biomass production rate
   let MX_PAO   = f_XPAO*F_ss_PAO;           //kgVSS       | active PAO biomass
   let MX_E_PAO = f_PAO*b_PAO_T*MX_PAO*Rs;   //kgVSS       | endogenous residue PAOs
@@ -202,7 +203,7 @@ State_Variables.prototype.bio_p_removal=function(
   //console.log({f_CV_OHO, f_CV_PAO, f_CV_combined});
 
   //compute the rest of suspended solids
-  let MX_I = fSup*Rs*FSti/f_CV_combined;               //kgVSS | VSS inert biomass (UPO from PAOs+OHOs)
+  let MX_I = FXti * Rs;                                //kgVSS | VSS inert biomass (UPO)
   let MX_V = MX_BH + MX_EH + MX_I + MX_PAO + MX_E_PAO; //kgVSS | total VSS mass
 
   /*chemical P removal here*/
@@ -245,15 +246,14 @@ State_Variables.prototype.bio_p_removal=function(
   let MX_IO = FiSS*Rs + f_iOHO*MX_BH + f_iPAO*MX_PAO + F_extra_iSS*Rs; //kgiSS | total inert solids (iSS + iOHO + iPAO + P_precipitation)
   let MX_T  = MX_V + MX_IO;                                            //kgTSS | total TSS mass
 
-  //solids concentrations
-  let X_I  = MX_I/Vp  ||0; //kgVSS/m3 | influent uVSS
+  //TSS concentrations
+  let X_I  = MX_I/Vp  ||0; //kgVSS/m3 | influent uVSS conc
   let X_V  = MX_V/Vp  ||0; //kgVSS/m3 | total VSS conc
-  let X_IO = MX_IO/Vp ||0; //kgiSS/m3 | inert solids (iSS + iOHO + P precipitation)
+  let X_IO = MX_IO/Vp ||0; //kgiSS/m3 | inert solids (iSS+iOHO+iPAO+P_precipitation) conc
   let X_T  = MX_T/Vp  ||0; //kgTSS/m3 | total TSS conc
 
-  //VSS ratios
+  //VSS ratios (a:active, v:vss, t:tss)
   let f_VT    = MX_V  /MX_T ||0; //gVSS/gTSS | valor orientativo 0.80
-
   let f_avOHO = MX_BH /MX_V ||0; //gVSS/gVSS | fraction of active biomass in VSS
   let f_avPAO = MX_PAO/MX_V ||0; //gVSS/gVSS | fraction of active biomass in VSS
   let f_AV    = f_avOHO + f_avPAO;
@@ -270,7 +270,7 @@ State_Variables.prototype.bio_p_removal=function(
     return {f,X_RAS,Qr,Qw};
   })(RAS);
 
-  //2.4 - page 12 | get the correct wastage flowrate according to "waste_from" input
+  //compute wastage flowrate according to "waste_from" input
   let Qw=(function(){ //ML/d | wastage flowrate
     if     (waste_from=='reactor') return (Vp/Rs)/1000;
     else if(waste_from=='sst')     return SST.Qw;
@@ -285,11 +285,11 @@ State_Variables.prototype.bio_p_removal=function(
 
   //Nitrogen
   let Nai   = this.components.S_FSA; //mgN/L | total ammonia influent
-  let Nobsi = inf_frac.TKN.bsON;         //mgN/L | bsON influent (VFA + FBSO)
-  let Nobpi = inf_frac.TKN.bpON;         //mgN/L | bpON influent
-  let Noupi = inf_frac.TKN.upON;         //mgN/L | upON influent
+  let Nobsi = inf_frac.TKN.bsON;     //mgN/L | bsON influent (VFA + FBSO)
+  let Nobpi = inf_frac.TKN.bpON;     //mgN/L | bpON influent
+  let Noupi = inf_frac.TKN.upON;     //mgN/L | upON influent
   let Nobse = 0;                     //mgN/L | bsON effluent (not all FBSO is degraded) TODO
-  let Nouse = inf_frac.TKN.usON;         //mgN/L | usON influent = effluent
+  let Nouse = inf_frac.TKN.usON;     //mgN/L | usON influent = effluent
 
   //compute N in influent required for biomass production
   let Nti = inf_frac.TKN.total; //mgN/L | total TKN influent concentration
@@ -332,12 +332,12 @@ State_Variables.prototype.bio_p_removal=function(
   let eff_flux = effluent.fluxes; //object
   let was_flux = wastage.fluxes;  //object
 
-  //compute C in influent required for biomass production
+  //compute influent C required for biomass production
   let Cti = inf_frac.TOC.total; //mgC/L | total TOC influent concentration
   let Cs  = (f_C_OHO*(MX_BH+MX_EH) + f_C_PAO*(MX_PAO+MX_E_PAO) + f_C_UPO*MX_I)/(Rs*Q); //mgC/L | C influent required for sludge production
   if(Cs > Cti) throw new Error(`Cs (${Cs}) > Cti (${Cti}): not enough influent TOC to produce biomass`);
 
-  //compute carbonaceous oxygen demand in bio P removal
+  //compute carbonaceous oxygen demand
   let FOc_OHO = (1 - YH)*F_sb_OHO + f_CV_OHO*(1 - fH   )*(    bHT*MX_BH  ); //kgO/d
   let FOc_PAO = (1 - YH)*F_ss_PAO + f_CV_PAO*(1 - f_PAO)*(b_PAO_T*MX_PAO ); //kgO/d
   let FOc     = FOc_OHO + FOc_PAO;                                          //kgO/d
@@ -356,54 +356,50 @@ State_Variables.prototype.bio_p_removal=function(
   let N_balance = (FNout==FNti) ? 100 : 100*FNout/FNti; //percentage
 
   //nitrogenous oxygen demand
-  const i_COD_NO3 = 64/14; //~4.57 gCOD/gN
+  const i_COD_NO3 = 64/14;    //~4.57 gCOD/gN
   let FOn = i_COD_NO3*Q*Nae;  //kgO/d
   let FOt = FOc + FOn;        //kgO/d  | total oxygen demand
   let OUR = FOt/(Vp*24)*1000; //mg/L·h | oxygen uptake rate
 
-  //2.11 - P balance
-  let FPti      = inf_flux.totals.TP.total;                  //kgP/d | total TP influent
-  let FPte      = eff_flux.totals.TP.total;                  //kgP/d | total TP effluent
-  let FPw       = was_flux.totals.TP.total;                  //kgP/d | total TP wastage
-  let FPremoved = cpr.PO4_removed.value;                       //kgP/d | PO4 removed by FeCl3
-
-  let FP_iSS_was = 0;
-
-  let FPout     = FPte + FPw + FP_iSS_was;         //kgP/d | total TP out
+  //P balance (difficult!) TODO
+  let FPti       = inf_flux.totals.TP.total;        //kgP/d | total TP influent
+  let FP_iSS_inf = f_P_iSS*inf_flux.totals.TSS.iSS; //kgP/d | P in influent iSS
+  FPti += FP_iSS_inf;
+  let FPte       = eff_flux.totals.TP.total;         //kgP/d | total TP effluent
+  let FPw        = was_flux.totals.TP.total;         //kgP/d | total TP wastage
+  let FP_iSS_was = f_P_iSS*was_flux.totals.TSS.iSS;
+  let FPremoved  = cpr.PO4_removed.value;            //kgP/d | PO4 removed by FeCl3
+  let FPout     = FPte + FPw + FP_iSS_was + FPremoved;         //kgP/d | total TP out
   let P_balance = (FPout==FPti) ? 100 : 100*FPout/FPti;        //percentage
-
   console.log({P_balance, FPti, FPte, FPw, FPremoved, FPout})
 
-  //check if Ps i equal to P_bio_rem
-  //console.log({Ps, P_bio_rem}); //mgP/L | they should be equal
+  //CALCULATED FRACTIONS
 
-  //compute f_P_PAO_calculated
+  /*1. compute f_P_PAO (0.38 gP/gVSS)*/
   //note: f_P_PAO_calculated should be lower than f_P_PAO (0.38)
   let f_P_PAO_calculated = (Q*Pti*Rs - f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) - f_P_UPO*MX_I)/MX_PAO; //gP/gVSS
-  //is this equation ok?
-
-
   //console.log({f_P_PAO, f_P_PAO_calculated});
+  //is this equation ok?
   if(f_P_PAO_calculated > f_P_PAO){
     console.warn(`Warning: f_P_PAO_calculated (${f_P_PAO_calculated}) > f_P_PAO (${f_P_PAO}) [gP/gVSS]`);
     //TBD: should this be an error instead of warning?
   }
 
-  /*calculate mass of iSS*/
+  /*2. compute f_iPAO (1.3 giSS/gVSS) */
   //fraction of fixed inorganic suspended solids of PAO
   let f_iPAO_calculated = f_iOHO + 3.268*f_P_PAO_calculated; //giSS/gVSS
   //(3.268 is experimental value)
-
   //max value is f_iPAO = 1.3 giSS/gVSS
   if(f_iPAO_calculated > f_iPAO){
     console.warn(`Warning: f_iPAO_calculated (${f_iPAO_calculated}) > f_iPAO (${f_iPAO}) [giSS/gVSS]`);
   }
 
+  /*3. compute MX_IO (kgiSS)*/
   //total inert solids = iSS     + iOHO         + iPAO                     + precipitation
   let MX_IO_calculated = FiSS*Rs + f_iOHO*MX_BH + f_iPAO_calculated*MX_PAO + F_extra_iSS*Rs; //kgiSS
   //  MX_IO            = FiSS*Rs + f_iOHO*MX_BH + f_iPAO*MX_PAO            + F_extra_iSS*Rs; //kgiSS
 
-
+  /*4. compute f_VT_PAO (PAOVSS/TSS ratio)*/
   let f_VT_PAO_calculated = (MX_PAO + MX_E_PAO)/MX_T;
 
   console.log([
@@ -424,10 +420,11 @@ State_Variables.prototype.bio_p_removal=function(
     - UCT: we calculate the 'a' recycle. The 'r' recycle (from anoxic to
       anaerobic) and the 's' recycle are given as inputs.
   */
+  //TODO
   //console.log({system_type});
 
-
   //fraction of P in TSS
+  //TODO
   let f_P_TSS = (1/MX_T)*(
     (
       f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) +
@@ -438,14 +435,15 @@ State_Variables.prototype.bio_p_removal=function(
   ); //particulate P (gP/gTSS)
 
   //P in TSS_effluent
-  let X_P_e = f_P_TSS*X_T*1000; //gP/m3
-  let FX_P_e = Qw*X_P_e; //kgP/d wasted
-
+  //TODO
+  let X_P_e = f_P_TSS*X_T*1e3; //gP/m3 | P content of TSS
+  let FX_P_e = Qw*X_P_e;       //kgP/d in effluent TSS
   console.log({f_P_TSS, X_P_e});
 
   /*
     modification for Dp1 (denitrification potential)
     when there is bio P removal
+    TODO
   */
   let Dp1 = (function(){ //mgN/L
     let r         = 0;                               //recirculation from anoxic to anaerobic reactor
@@ -462,65 +460,76 @@ State_Variables.prototype.bio_p_removal=function(
   })();
 
   //nominal hydraulic retention time
-  let HRT = Vp/(Q*1000)*24; //h
+  let HRT=Vp/(Q*1000)*24; //h
 
-  //bio P results
-  let process_variables = {
+  //bio P process variables
+  let process_variables={
     fSus        :{value:fSus,        unit:"gUSO/gCOD",   descr:"USO/COD ratio (influent)"},
     fSup        :{value:fSup,        unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"},
     YHvss       :{value:YHvss,       unit:"gVSS/gCOD",   descr:"OHO yield coefficient"},
-    bHT         :{value:bHT,         unit:"1/d",         descr:"OHO Endogenous respiration rate corrected by temperature"},
     Y_PAO       :{value:Y_PAO,       unit:"gVSS/gCOD",   descr:"PAO yield coefficient"},
-    b_PAO_T     :{value:b_PAO_T,     unit:"1/d",        },
+    bHT         :{value:bHT,         unit:"1/d",         descr:"OHO endogenous respiration rate corrected by temperature"},
+    b_PAO_T     :{value:b_PAO_T,     unit:"1/d",         descr:"PAO endogenous respiration rate corrected by temperature"},
     k_vT        :{value:k_vT,        unit:"L/mgVSS·d",   descr:"k_v20 corrected by temperature"},
 
-    S_FBSO_conv :{value:S_FBSO_conv, unit:"mgCOD/L",    },
-    S_FBSO_AN   :{value:S_FBSO_AN,   unit:"mgCOD/L",    },
-    F_ss_PAO    :{value:F_ss_PAO,    unit:"kgCOD/d",    },
-    F_sb_OHO    :{value:F_sb_OHO,    unit:"kgCOD/d",    },
-    iterations  :{value:iterations,  unit:"iterations", },
-    f_XBH       :{value:f_XBH,       unit:"gVSS·d/gCOD", descr:"OHO Biomass production rate"},
-    f_XPAO      :{value:f_XPAO,      unit:"gVSS·d/gCOD",},
-    MX_BH       :{value:MX_BH,       unit:"kgVSS",       descr:"OHO Biomass produced VSS"},
-    MX_EH       :{value:MX_EH,       unit:"kgVSS",       descr:"OHO Endogenous residue VSS"},
-    MX_PAO      :{value:MX_PAO,      unit:"kgVSS",      },
-    MX_E_PAO    :{value:MX_E_PAO,    unit:"kgVSS",      },
+    //Biomass production
+    S_FBSO_conv :{value:S_FBSO_conv, unit:"mgCOD/L",     descr:""},
+    S_FBSO_AN   :{value:S_FBSO_AN,   unit:"mgCOD/L",     descr:""},
+    F_ss_PAO    :{value:F_ss_PAO,    unit:"kgCOD/d",     descr:""},
+    F_sb_OHO    :{value:F_sb_OHO,    unit:"kgCOD/d",     descr:""},
+    iterations  :{value:iterations,  unit:"iterations",  descr:"iterations to compute MX_BH"},
+    f_XBH       :{value:f_XBH,       unit:"gVSS·d/gCOD", descr:"OHO biomass production rate"},
+    f_XPAO      :{value:f_XPAO,      unit:"gVSS·d/gCOD", descr:"PAO biomass production rate"},
+    MX_BH       :{value:MX_BH,       unit:"kgVSS",       descr:"OHO active biomass VSS"},
+    MX_PAO      :{value:MX_PAO,      unit:"kgVSS",       descr:"PAO active biomass VSS"},
+    MX_EH       :{value:MX_EH,       unit:"kgVSS",       descr:"OHO endogenous residue VSS"},
+    MX_E_PAO    :{value:MX_E_PAO,    unit:"kgVSS",       descr:"PAO endogenous residue VSS"},
     MX_I        :{value:MX_I,        unit:"kgVSS",       descr:"Unbiodegradable organics VSS"},
-    MX_V        :{value:MX_V,        unit:"kgVSS",       descr:"Volatile Suspended Solids"},
+    MX_V        :{value:MX_V,        unit:"kgVSS",       descr:"Total volatile suspended solids"},
     MX_IO       :{value:MX_IO,       unit:"kgiSS",       descr:"Inert Solids (influent+biomass)"},
-    MX_T        :{value:MX_T,        unit:"kgTSS",       descr:"Total Suspended Solids"},
-    X_V         :{value:X_V,         unit:"kgVSS/m3",    descr:"VSS concentration in SST"},
-    X_T         :{value:X_T,         unit:"kgTSS/m3",    descr:"TSS concentration in SST"},
+    MX_T        :{value:MX_T,        unit:"kgTSS",       descr:"Total suspended solids"},
+    X_V         :{value:X_V,         unit:"kgVSS/m3",    descr:"VSS concentration"},
+    X_T         :{value:X_T,         unit:"kgTSS/m3",    descr:"TSS concentration"},
     f_VT        :{value:f_VT,        unit:"gVSS/gTSS",   descr:"VSS/TSS ratio"},
-    f_AV        :{value:f_AV,        unit:"gAVSS/gVSS",  descr:"Active VSS fraction of the total VSS"},
-    f_AT        :{value:f_AT,        unit:"gAVSS/gTSS",  descr:"Active VSS fraction of the total TSS"},
+    f_AV        :{value:f_AV,        unit:"gAVSS/gVSS",  descr:"Active_VSS/VSS ratio"},
+    f_AT        :{value:f_AT,        unit:"gAVSS/gTSS",  descr:"Active_VSS/TSS ratio "},
+
+    //Misc
     Ns          :{value:Ns,          unit:"mgN/L",       descr:"N required for sludge production"},
     Cs          :{value:Cs,          unit:"mgC/L",       descr:"C required for sludge production"},
     HRT         :{value:HRT,         unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
 
+    //Phosphorus
+    Pti         :{value:Pti,         unit:"mgP/L",       descr:"Influent TP"},
     Ps          :{value:Ps,          unit:"mgP/L",       descr:"P required for sludge production"},
-    PO4_release :{value:PO4_release, unit:"mgP/L",      },
-    P_bio_PAO   :{value:P_bio_PAO,   unit:"mgP/L",      },
-    P_bio_OHO   :{value:P_bio_OHO,   unit:"mgP/L",      },
-    P_bio_E     :{value:P_bio_E,     unit:"mgP/L",      },
-    P_bio_I     :{value:P_bio_I,     unit:"mgP/L",      },
-    P_bio_rem   :{value:P_bio_rem,   unit:"mgP/L",      },
+    PO4_release :{value:PO4_release, unit:"mgP/L",       descr:""},
+    P_bio_PAO   :{value:P_bio_PAO,   unit:"mgP/L",       descr:"P removed by active PAO VSS"},
+    P_bio_OHO   :{value:P_bio_OHO,   unit:"mgP/L",       descr:"P removed by active OHO VSS"},
+    P_bio_E     :{value:P_bio_E,     unit:"mgP/L",       descr:"P removed by endogenous VSS (OHO+PAO)"},
+    P_bio_I     :{value:P_bio_I,     unit:"mgP/L",       descr:"P removed by inert biomass VSS"},
+    P_bio_rem   :{value:P_bio_rem,   unit:"mgP/L",       descr:"Total Bio P removal"},
     Psa         :{value:Psa,         unit:"mgP/L",       descr:"P available for chemical P removal"},
     Pse         :{value:Pse,         unit:"mgP/L",       descr:"PO4 effluent after chemical P removal"},
-    P_chem_rem  :{value:P_chem_rem,  unit:"mgP/L",      },
-    P_total_rem :{value:P_total_rem, unit:"mgP/L",      },
-    f_P_TSS     :{value:f_P_TSS,     unit:"gP/gTSS",    },
+    P_chem_rem  :{value:P_chem_rem,  unit:"mgP/L",       descr:"Chemical P removal"},
+    P_total_rem :{value:P_total_rem, unit:"mgP/L",       descr:"Total P removal (bio+chem)"},
+    f_P_TSS     :{value:f_P_TSS,     unit:"gP/gTSS",     descr:"P/TSS ratio"},
 
-    FOc     :{value:FOc,       unit:"kgO/d",       descr:"Carbonaceous Oxygen Demand"},
-    FOn     :{value:FOn,       unit:"kgO/d",       descr:"Nitrogenous Oxygen Demand"},
-    FOt     :{value:FOt,       unit:"kgO/d",       descr:"Total Oxygen Demand"},
-    OUR     :{value:OUR,       unit:"mgO/L·h",     descr:"Oxygen Uptake Rate"},
-    Qr      :{value:SST.Qr,    unit:"ML/d",        descr:"SST recycle flowrate"},
-    f_RAS   :{value:SST.f,     unit:"ø",           descr:"SST concentrating factor"},
-    X_RAS   :{value:SST.X_RAS, unit:"kg/m3",       descr:"SST recycle flow TSS concentration"},
-    f       :{value:f,         unit:"ø",           descr:"Wastage concentrating factor"},
-    Dp1     :{value:Dp1,       unit:"mgN/L",      },
+    //O2 demand
+    FOc         :{value:FOc,         unit:"kgO/d",       descr:"Carbonaceous Oxygen Demand"},
+    FOn         :{value:FOn,         unit:"kgO/d",       descr:"Nitrogenous Oxygen Demand"},
+    FOt         :{value:FOt,         unit:"kgO/d",       descr:"Total Oxygen Demand"},
+    OUR         :{value:OUR,         unit:"mgO/L·h",     descr:"Oxygen Uptake Rate"},
 
+    //SST related
+    Qr          :{value:SST.Qr,      unit:"ML/d",        descr:"SST recycle flowrate"},
+    f_RAS       :{value:SST.f,       unit:"ø",           descr:"SST concentrating factor"},
+    X_RAS       :{value:SST.X_RAS,   unit:"kg/m3",       descr:"SST recycle flow TSS concentration"},
+    f           :{value:f,           unit:"ø",           descr:"Wastage concentrating factor"},
+
+    //Dp1
+    Dp1         :{value:Dp1,         unit:"mgN/L",       descr:"Denitrification Potential"},
+
+    //Mass balances
     COD_balance :{value:COD_balance, unit:"%", descr:"COD balance"},
     N_balance   :{value:N_balance,   unit:"%", descr:"N balance"},
     Nae_balance :{value:Nae_balance, unit:"%", descr:"Ammonia balance"},
@@ -532,17 +541,21 @@ State_Variables.prototype.bio_p_removal=function(
   Object.values(process_variables).forEach(value=>{
     delete value.descr;
   });
+  console.log("=================");
+  console.log("PROCESS VARIABLES");
+  console.log("=================");
+  console.log(process_variables);
 
   return{
     process_variables,
-    cpr,               //chemical P removal process variables
-    effluent,          //State_Variables object
-    wastage,           //State_Variables object
+    cpr,      //chemical P removal process variables
+    effluent, //State_Variables object
+    wastage,  //State_Variables object
   }
-}
+};
 
 /*test*/
-{
+(function(){
   //return
   //syntax:                    ( Q, VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx, OHO, PAO)
   let inf = new State_Variables(15,  22,  124, 439, 112,  53,  49,  39, 12,   0,   0,   0);
@@ -551,8 +564,4 @@ State_Variables.prototype.bio_p_removal=function(
   //console.log(inf.fluxes);
 
   let bip = inf.bio_p_removal();
-  console.log("=================");
-  console.log("PROCESS VARIABLES");
-  console.log("=================");
-  console.log(bip.process_variables);
-}
+})();
