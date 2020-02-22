@@ -1,14 +1,8 @@
 * turn "state variables" prototypes into "plant" prototypes.
   - for example, instead of calling:
-    '''
       influent.activated_sludge( parameters )
-    '''
   - should be used as:
-    '''
       plant.activated_sludge( parameters )
-    '''
-
-* move capacity estimation module outside activated sludge
 
 * Adapt nomenclature for OHOs, for example:
   YH --> Y_OHO
@@ -16,18 +10,18 @@
   fH --> f_OHO
 
 3. bio P:
-  * The FBSO not consumed (kvT)
+  - se puede tener bio P sin nitrificación?
+  - single tank is the same as number_of_an_zones==1?
+  - The FBSO not consumed (kvT)
     has to be included in the formula for S_FBSO available for conversion into VFAs?
+  - The DO is the one that we already ask? (says influent DO, confirm)
 
-  * DO is the one that we already ask? (says influent DO, confirm)
+  - f_iPAO_calculated revisar
+  - MX_IO_calculated revisar
+  - f_VT_PAO (gPAOVSS/gTSS) = 0.46
+    - se usa para calcular f_P_TSS
+    - en "f_VT_PAO_calculated" obtenemos valor bastante distinto a 0.46 (~0.14)
+  - f_P_TSS revisar
+  
+  - Dp1 revisar
 
-  * f_VT_PAO (gPAOVSS/gTSS) = 0.46 is constant?
-    * sería correcto decir que...
-      f_VT_PAO = (MX_PAO + MX_E_PAO)/MX_T ?
-
-  * single tank is the same as number_of_an_zones==1?
-
-  * se puede tener bio P sin nitrificación?
-
-  * ¿está bien la ecuación?
-  * f_P_PAO_calculated = (Q*Pti*Rs - f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) - f_P_UPO*MX_I)/MX_PAO; //gP/gVSS

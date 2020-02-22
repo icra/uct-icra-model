@@ -213,7 +213,7 @@ State_Variables.prototype.activated_sludge=function(
   //  MX_IO = FiSS*Rs + f_iOHO*MX_BH + F_extra_iSS; //kg_iSS | total inert solids                   (iSS)
   //  MX_T  = MX_V + MX_IO;                         //kg_TSS | total TSS                            (OHO+UPO+iSS)
   let BPO_was = 0;                          //mg/L | BPO wastage | all BPO is turned into biomass (model assumption)
-  let UPO_was = f*f_CV_UPO*(X_I)*1e3;       //mg/L | UPO wastage
+  let UPO_was = f*f_CV_UPO*X_I*1e3;         //mg/L | UPO wastage
   let iSS_was = f*X_IO*1000;                //mg/L | iSS wastage (precipitation by FeCl3 already included)
   let OHO_was = f*f_CV_OHO*(X_BH+X_EH)*1e3; //mg/L | OHO wastage
 

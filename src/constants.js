@@ -14,8 +14,11 @@ const constants={
   f_P_iSS    : 0.020,  //gP/giSS   | fraction of P in iSS
   f_VT_PAO   : 0.460,  //gVSS/gTSS | fraction of PAO in TSS
   f_iPAO     : 1.300,  //giSS/gVSS | fraction of iSS in PAO
-  //f_iPAO has to be calculated (0.15 - 1.3) (1.3 is PAOs full of polyPP)
-  //f_iPAO_calculated should be lower than 1.3
+  f_PO4_rel  : 0.500,  //gP/gCOD   | ratio of P release/VFA uptake (1molP/1molCOD)
+
+  //denitrification PAO modification
+  K2_20_PAO    : 0.255, //gN/gVSS·d | at 20ºC page 482 and 113
+  theta_K2_PAO : 1.080, //ø         | temperature correction factor for K2_20
 
   //activated sludge
   YH         : 0.666, //gCOD/gCOD | heterotrophic yield (not affected by temperature)
