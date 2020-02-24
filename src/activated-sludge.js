@@ -15,8 +15,8 @@ try{
 }catch(e){}
 
 State_Variables.prototype.activated_sludge=function(
-  T, Vp, Rs, RAS, waste_from,
-  mass_FeCl3
+    T, Vp, Rs, DO, RAS, waste_from,
+    mass_FeCl3
   ){
   //===========================================================================
   // INPUTS
@@ -25,6 +25,7 @@ State_Variables.prototype.activated_sludge=function(
   T   = isNaN(T)   ? 16     : T;   //ºC   | Temperature
   Vp  = isNaN(Vp)  ? 8473.3 : Vp;  //m3   | Volume of reactor
   Rs  = isNaN(Rs)  ? 15     : Rs;  //days | Solids Retention Time or Sludge Age
+  DO  = isNaN(DO)  ? 2.0    : DO ; //mg/L | DO in the aerobic reactor
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   /*
     option 'waste_from':
@@ -44,6 +45,7 @@ State_Variables.prototype.activated_sludge=function(
   if(Vp  <= 0) throw new Error(`Reactor volume (Vp=${Vp}) not allowed`);
   if(Rs  <= 0) throw new Error(`Solids retention time (Rs=${Rs}) not allowed`);
   if(RAS <= 0) throw new Error(`SST recycle ratio (RAS=${RAS}) not allowed`);
+  if(DO  <  0) throw new Error(`Dissolved oxygen (DO=${DO}) not allowed`);
   if(['reactor','sst'].indexOf(waste_from)==-1) throw new Error(`The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`);
 
   //get necessary mass ratios
@@ -109,9 +111,9 @@ State_Variables.prototype.activated_sludge=function(
   let f_XBH = (YHvss*Rs)/(1+bHT*Rs); //gVSS·d/gCOD
 
   //effluent FBSO
-  let S_FBSO_i = this.components.S_FBSO;          //mgCOD/L | influent S_FBSO
-  let S_b   = Math.min(S_FBSO_i, 1/(f_XBH*k_vT)); //mgCOD/L | FBSO effluent concentration: cannot be higher than influent S_FBSO
-  let FdSbi = Math.max(0, FSbi - Q*S_b);          //kgCOD/d | influent biodegradable COD mass flux that will generate biomass
+  let S_FBSO = this.components.S_FBSO;           //mgCOD/L | influent S_FBSO
+  let Sbse   = Math.min(S_FBSO, 1/(f_XBH*k_vT)); //mgCOD/L | FBSO effluent concentration: cannot be higher than influent S_FBSO
+  let FdSbi  = Math.max(0, FSbi - Q*Sbse);       //kgCOD/d | influent biodegradable COD mass flux that will generate biomass
 
   //total VSS production
   let MX_BH = FdSbi * f_XBH;         //kgVSS  | OHO live biomass VSS
@@ -123,7 +125,7 @@ State_Variables.prototype.activated_sludge=function(
   let Ps    = (f_P_OHO*(MX_BH+MX_EH)+f_P_UPO*MX_I)/(Rs*Q); //mgP/L | P influent required for sludge production
   let Pti   = frac.TP.total;                               //mgP/L | total P influent
   let Pouse = frac.TP.usOP;                                //mgP/L | P organic unbiodegradable soluble effluent
-  let Pobse = S_b*f_P_FBSO/f_CV_FBSO;                      //mgP/L | P organic biodegradable soluble effluent
+  let Pobse = Sbse*f_P_FBSO/f_CV_FBSO;                     //mgP/L | P organic biodegradable soluble effluent
 
   let Psa = Math.max(0, Pti - Ps - Pouse - Pobse); //mgP/L | inorganic soluble P available for chemical P removal
   //console.log({Pti,Ps,Pouse,Pobse,Psa});//debug
@@ -186,7 +188,7 @@ State_Variables.prototype.activated_sludge=function(
   let Nouse = frac.TKN.usON;                               //mgN/L | usON influent = effluent
   let Nobpi = frac.TKN.bpON;                               //mgN/L | bpON influent
   let Noupi = frac.TKN.upON;                               //mgN/L | upON influent
-  let Nobse = S_b*f_N_FBSO/f_CV_FBSO;                      //mgN/L | bsON effluent (not all FBSO is degraded)
+  let Nobse = Sbse*f_N_FBSO/f_CV_FBSO;                     //mgN/L | bsON effluent (not all FBSO is degraded)
 
   //effluent ammonia = total TKN - Ns - usON - bsON
   let Nae = Math.max(0, Nti - Ns - Nouse - Nobse); //mgN/L
@@ -217,9 +219,9 @@ State_Variables.prototype.activated_sludge=function(
   let iSS_was = f*X_IO*1000;                //mg/L | iSS wastage (precipitation by FeCl3 already included)
   let OHO_was = f*f_CV_OHO*(X_BH+X_EH)*1e3; //mg/L | OHO wastage
 
-  //output streams------------------(Q,  VFA FBSO BPO      UPO      USO   iSS      FSA  OP   NOx  OHO    )
-  let effluent = new State_Variables(Qe, 0,  S_b, 0,       0,       Suse, 0,       Nae, Pse, Nne, 0      );
-  let wastage  = new State_Variables(Qw, 0,  S_b, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne, OHO_was);
+  //output streams------------------(Q,  VFA FBSO  BPO      UPO      USO   iSS      FSA  OP   NOx  O2  OHO      PAO)
+  let effluent = new State_Variables(Qe, 0,  Sbse, 0,       0,       Suse, 0,       Nae, Pse, Nne, DO, 0,       0);
+  let wastage  = new State_Variables(Qw, 0,  Sbse, BPO_was, UPO_was, Suse, iSS_was, Nae, Pse, Nne, DO, OHO_was, 0);
 
   //copy influent mass ratios for the new outputs
   effluent.mass_ratios = this.mass_ratios;

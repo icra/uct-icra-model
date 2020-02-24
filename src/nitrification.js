@@ -15,14 +15,16 @@ try{
 }catch(e){}
 
 State_Variables.prototype.nitrification=function(
-    T,Vp,Rs,RAS,waste_from,mass_FeCl3,
-    SF,fxt,DO,pH
+    T, Vp, Rs, DO, RAS, waste_from,
+    mass_FeCl3,
+    SF, fxt, pH
   ){
   /*inputs and default values*/
   //as inputs
   T   = isNaN(T)   ? 16     : T  ; //ºC   | Temperature
   Vp  = isNaN(Vp)  ? 8473.3 : Vp ; //m3   | Volume
   Rs  = isNaN(Rs)  ? 15     : Rs ; //days | Solids retention time
+  DO  = isNaN(DO)  ? 2.0    : DO ; //mg/L | DO in the aerobic reactor
   RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
   waste_from = waste_from || 'reactor'; //"reactor" or "sst"
 
@@ -33,19 +35,17 @@ State_Variables.prototype.nitrification=function(
   SF  = isNaN(SF) ? 1.25 : SF ; /* safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
                                    choose a high value for high influent ammonia concentration variation */
   fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
-  DO  = isNaN(DO)  ? 2.0  : DO ; //mg/L          | DO in the aerobic reactor
   pH  = isNaN(pH)  ? 7.2  : pH ; //pH units
 
   //input checks
-  if(SF  < 0) throw `Error: Safety factor (SF=${SF}) not allowed`;
-  if(fxt < 0) throw `Error: Unaerated sludge mass fraction (fxt=${fxt}) not allowed`;
-  if(DO  < 0) throw `Error: Dissolved oxygen in the aerobic reactor (DO=${DO}) not allowed`;
+  if(SF  < 0) throw new Error(`Safety factor (SF=${SF}) not allowed`);
+  if(fxt < 0) throw new Error(`Unaerated sludge mass fraction (fxt=${fxt}) not allowed`);
 
   //influent fractionation
-  let frac = this.totals;
+  let frac = this.totals; //object
 
   //execute activated sludge without nitrification first
-  let as = this.activated_sludge(T,Vp,Rs,RAS,waste_from,mass_FeCl3); //object
+  let as = this.activated_sludge(T,Vp,Rs,DO,RAS,waste_from,mass_FeCl3); //object
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -56,8 +56,7 @@ State_Variables.prototype.nitrification=function(
   let Nouse = frac.TKN.usON;               //mg/L | total N_USO_influent = N_USO_effluent
   let Nobse = as.effluent.totals.TKN.bsON; //mg/L | total bsON (from FBSO not degraded)
 
-  //get necessary variables from activated_sludge or bpr
-  //TODO
+  //get necessary variables from activated_sludge or bpr TODO
   let MX_T = as.process_variables.MX_T.value; //kg   | total sludge produced
   let Ns   = as.process_variables.Ns.value;   //mg/L | N required from sludge production
 
@@ -78,7 +77,7 @@ State_Variables.prototype.nitrification=function(
   let µAm_pH = µAmO*Math.pow(ϴ_pH, pH-7.2)*Ki*(Kmax-pH)/(Kmax+Kii-pH); //page 471 and 113
 
   //kinetic constants for AN organisms
-  const YA = constants.YA;          //0.100 gVSS/gFSA | yield coefficient at 20ºC
+  const YA = constants.YA;          //0.100 gVSS/gNH4 | yield coefficient at 20ºC
   const Kn = constants.Kn;          //1.000 mgN/L     | ammonia half saturation coefficient at 20ºC
   const ϴ_Kn = constants.theta_Kn;  //1.123 mgN/L     | Kn temperature correction factor
   let KnT = Kn*Math.pow(ϴ_Kn,T-20); //mgN/L           | Kn corrected by temperature
@@ -131,7 +130,7 @@ State_Variables.prototype.nitrification=function(
   let OUR_fxm = FOt_fxm*1000/(Vp*(1-fxm)*24); //mgO/L·h
 
   //page 475 4.14.22.3 book: calculate mass of nitrifiers
-  let f_XBA = YA*Rs/(1+bAT*Rs);    //gVSS·d/gFSA
+  let f_XBA = YA*Rs/(1+bAT*Rs);    //gVSS·d/gNH4
   let MX_BA = Q*Nc_fxt*f_XBA;      //kg VSS
   let MX_BA_perc = 100*MX_BA/MX_T; //% percentage of nitrifiers VSS/TSS
   let X_BA  = MX_BA/Vp;            //kgVSS/m3
@@ -140,23 +139,24 @@ State_Variables.prototype.nitrification=function(
   //prepare nitrification outputs
   let Qe   = as.effluent.Q;                //ML/d
   let Qw   = as.wastage.Q;                 //ML/d
-  let Suse = as.effluent.components.S_USO; //mg/L
-  let Pse  = as.effluent.components.S_OP;  //mg/L
+  let Suse = as.effluent.components.S_USO; //mgCOD/L
+  let Pse  = as.effluent.components.S_PO4; //mgP/L
 
   //concentration of particulated fractions in wastage
   let iSS_was = as.wastage.components.X_iSS; //mg/L | iSS concentration
   let UPO_was = as.wastage.components.X_UPO; //mg/L | UPO concentration
-  let OHO_was = as.wastage.components.X_OHO; //mg/L | BPO concentration
+  let OHO_was = as.wastage.components.X_OHO; //mg/L | OHO concentration
+  let PAO_was = as.wastage.components.X_PAO; //mg/L | PAO concentration
 
   //FBSO from previous step
-  let S_b = as.effluent.components.S_FBSO; //mg/L of bCOD not degraded
+  let Sbse = as.effluent.components.S_FBSO; //mg/L of bCOD not degraded
 
   //effluent nitrate: nitrate generated + influent
   let Nne = Nc_fxt + as.effluent.components.S_NOx;
 
-  //output state variables----------(Q   VFA FBSO BPO UPO      USO   iSS      FSA      PO4  NOx  OHO    )
-  let effluent = new State_Variables(Qe, 0,  S_b, 0,  0,       Suse, 0,       Nae_fxt, Pse, Nne, 0      );
-  let wastage  = new State_Variables(Qw, 0,  S_b, 0,  UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nne, OHO_was);
+  //output state variables----------(Q   VFA FBSO  BPO UPO      USO   iSS      NH4      PO4  NOx  O2  OHO      PAO    )
+  let effluent = new State_Variables(Qe, 0,  Sbse, 0,  0,       Suse, 0,       Nae_fxt, Pse, Nne, DO, 0,       0      );
+  let wastage  = new State_Variables(Qw, 0,  Sbse, 0,  UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nne, DO, OHO_was, PAO_was);
 
   //copy influent mass ratios
   effluent.mass_ratios = this.mass_ratios;
@@ -207,7 +207,7 @@ State_Variables.prototype.nitrification=function(
 /*test*/
 (function(){
   return
-  //new influent---------------(Q       VFA FBSO BPO  UPO USO iSS FSA   OP    NOx OHO)
+  //new influent---------------(Q       VFA FBSO BPO  UPO USO iSS NH4   OP    NOx OHO)
   let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0,  0  );
   //call as+nit--------------(T   Vp      Rs  RAS  waste      mass_FeCl3 SF    fxt   DO   pH)
   let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2);

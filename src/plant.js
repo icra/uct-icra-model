@@ -130,7 +130,7 @@ class Plant{
       );
       //bioP + nitrification + NO denitrification condition
       //check condition depending on plant configuration
-      if(conf.nit && conf.dn==false && p.number_of_an_zones==1){
+      if(conf.nit==true && conf.dn==false && p.number_of_an_zones==0){
         if(f_AN>fxm){
           throw new Error(`f_AN (${p.f_AN})> fxm (${nit.fxm.value})`);
         }

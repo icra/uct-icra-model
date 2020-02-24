@@ -31,8 +31,11 @@
 */
 
 class State_Variables {
-  constructor(Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO,
-    X_iSS, S_FSA, S_OP, S_NOx, X_OHO, X_PAO){
+  constructor(Q,
+    S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, //COD fractions
+    X_iSS, S_NH4, S_PO4, S_NOx, S_O2,   //other components
+    X_OHO, X_PAO                        //live biomass
+  ){
     //numeric input checks
     if(Q      < 0) throw `Error: Flowrate (Q=${Q}) not allowed`;
     if(S_VFA  < 0) throw `Error: volatile fatty acids (S_VFA=${S_VFA}) not allowed`;
@@ -41,9 +44,10 @@ class State_Variables {
     if(X_UPO  < 0) throw `Error: unbiodegradable particulated organics (X_UPO=${X_UPO}) not allowed`;
     if(S_USO  < 0) throw `Error: unbiodegradable soluble organics (S_USO=${S_USO}) not allowed`;
     if(X_iSS  < 0) throw `Error: inert suspended solids (X_iSS=${X_iSS}) not allowed`;
-    if(S_FSA  < 0) throw `Error: free saline ammonia (S_FSA=${S_FSA}) not allowed`;
-    if(S_OP   < 0) throw `Error: orthophosphate (S_OP=${S_OP}) not allowed`;
+    if(S_NH4  < 0) throw `Error: free saline ammonia (S_NH4=${S_NH4}) not allowed`;
+    if(S_PO4  < 0) throw `Error: orthophosphate (S_PO4=${S_PO4}) not allowed`;
     if(S_NOx  < 0) throw `Error: nitrate/nitrite (S_NOx=${S_NOx}) not allowed`;
+    if(S_O2   < 0) throw `Error: dissolved oxygen (S_O2=${S_O2}) not allowed`;
     if(X_OHO  < 0) throw `Error: ordinary heterotrophic organisms (X_OHO=${X_OHO}) not allowed`;
     if(X_PAO  < 0) throw `Error: polyphosphate accumulating organisms (X_PAO=${X_PAO}) not allowed`;
 
@@ -56,9 +60,10 @@ class State_Variables {
       X_UPO : isNaN(X_UPO )? 0 : X_UPO ,//mg/L | Unbiodegradable Particulate Organics (UPO)
       S_USO : isNaN(S_USO )? 0 : S_USO ,//mg/L | Unbiodegradable Soluble     Organics (USO)
       X_iSS : isNaN(X_iSS )? 0 : X_iSS ,//mg/L | Inert Suspended Solids (sand)
-      S_FSA : isNaN(S_FSA )? 0 : S_FSA ,//mg/L | Inorganic Free Saline Ammonia (NH4)
-      S_OP  : isNaN(S_OP  )? 0 : S_OP  ,//mg/L | Inorganic OrthoPhosphate (PO4)
+      S_NH4 : isNaN(S_NH4 )? 0 : S_NH4 ,//mg/L | Inorganic Free Saline Ammonia (NH4)
+      S_PO4 : isNaN(S_PO4 )? 0 : S_PO4 ,//mg/L | Inorganic OrthoPhosphate (PO4)
       S_NOx : isNaN(S_NOx )? 0 : S_NOx ,//mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
+      S_O2  : isNaN(S_O2  )? 0 : S_O2  ,//mg/L | Dissolved O2
       X_OHO : isNaN(X_OHO )? 0 : X_OHO ,//mg/L | Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
       X_PAO : isNaN(X_PAO )? 0 : X_PAO ,//mg/L | Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)
     };
@@ -69,8 +74,8 @@ class State_Variables {
       /*VFA*/ f_CV_VFA : 1.0667, f_C_VFA : 0.400, f_N_VFA : 0.0000, f_P_VFA : 0.0000, // BSO
       /*FBS*/ f_CV_FBSO: 1.4200, f_C_FBSO: 0.471, f_N_FBSO: 0.0464, f_P_FBSO: 0.0118, // BSO
       /*BPO*/ f_CV_BPO : 1.5230, f_C_BPO : 0.498, f_N_BPO : 0.0323, f_P_BPO : 0.0072, // BPO
-      /*UPO*/ f_CV_UPO : 1.4810, f_C_UPO : 0.518, f_N_UPO : 0.1000, f_P_UPO : 0.0250, // UPO
       /*USO*/ f_CV_USO : 1.4930, f_C_USO : 0.498, f_N_USO : 0.0366, f_P_USO : 0.0000, // USO
+      /*UPO*/ f_CV_UPO : 1.4810, f_C_UPO : 0.518, f_N_UPO : 0.1000, f_P_UPO : 0.0250, // UPO
       /*OHO*/ f_CV_OHO : 1.4810, f_C_OHO : 0.518, f_N_OHO : 0.1000, f_P_OHO : 0.0250, // Ordinary Heterotrophic Organisms
       /*PAO*/ f_CV_PAO : 1.4810, f_C_PAO : 0.518, f_N_PAO : 0.1000, f_P_PAO : 0.3800, // Phosphate Accumulating Organisms
       ///*NIT*/ f_CV_NIT : 1.4810, f_C_NIT : 0.518, f_N_NIT : 0.1000, f_P_NIT : 0.0250, // Ammonia Oxidizing Organisms
@@ -129,7 +134,7 @@ class State_Variables {
         active: actOC,
       };
 
-    //TKN all fractions (Organic Nitrogen (ON) + Inorganic Free Saline Ammonia (FSA))
+    //TKN all fractions (Organic Nitrogen (ON) + Inorganic Free Saline Ammonia (NH4))
       let bsON  = co.S_VFA *mr.f_N_VFA /mr.f_CV_VFA +
                   co.S_FBSO*mr.f_N_FBSO/mr.f_CV_FBSO; //bio   + soluble ON
       let usON  = co.S_USO*mr.f_N_USO/mr.f_CV_USO;    //unbio + soluble ON
@@ -141,10 +146,10 @@ class State_Variables {
       let  pON  = bpON + upON;                        //partic          ON
       let actON = co.X_OHO*mr.f_N_OHO/mr.f_CV_OHO+    //ON in active biomass (OHO)
                   co.X_PAO*mr.f_N_PAO/mr.f_CV_PAO;    //ON in active biomass (PAO)
-      let Total_TKN = co.S_FSA + bsON + usON + bpON + upON + actON;
+      let Total_TKN = co.S_NH4 + bsON + usON + bpON + upON + actON;
       let TKN={
         total:Total_TKN,
-        FSA:co.S_FSA,
+        NH4:co.S_NH4,
         ON:sON+pON,
         bON,  uON,  sON,  pON,
         bsON, usON, bpON, upON,
@@ -163,10 +168,10 @@ class State_Variables {
       let  pOP  = bpOP + upOP;                        //partic          OP
       let actOP = co.X_OHO*mr.f_P_OHO/mr.f_CV_OHO +   //OP in active biomass (OHO)
                   co.X_PAO*mr.f_P_PAO/mr.f_CV_PAO;    //OP in active biomass (PAO)
-      let Total_TP = co.S_OP + bsOP + usOP + bpOP + upOP + actOP;
+      let Total_TP = co.S_PO4 + bsOP + usOP + bpOP + upOP + actOP;
       let TP={
         total:Total_TP,
-        PO4:co.S_OP,
+        PO4:co.S_PO4,
         OP:sOP+pOP,
         bOP,  uOP,  sOP,  pOP,
         bsOP, usOP, bpOP, upOP,
@@ -195,8 +200,8 @@ class State_Variables {
 
   //convert "components" (mg/L) and "totals" (mg/L) to mass fluxes (kg/d)
   get fluxes(){
-    let components={};
-    let totals={};
+    let components = {};
+    let totals     = {};
 
     //components
     Object.entries(this.components).forEach(([key,value])=>{
@@ -225,8 +230,9 @@ class State_Variables {
       Q:   this.Q,
       COD: [totals.COD.total, fluxes.totals.COD.total],  //chemical oxygen demand
       TKN: [totals.TKN.total, fluxes.totals.TKN.total],  //total kjeldahl nitrogen
-      NH4: [totals.TKN.FSA,   fluxes.totals.TKN.FSA],    //inorganic nitrogen (NH4 or ammonia or FSA)
+      NH4: [totals.TKN.NH4,   fluxes.totals.TKN.NH4],    //inorganic nitrogen (NH4 or free saline ammonia or FSA)
       NOx: [components.S_NOx, fluxes.components.S_NOx],  //nitrate (NO3) and nitrite (NO2) is not TKN
+      O2:  [components.S_O2,  fluxes.components.S_O2],   //dissolved oxygen
       TP:  [totals.TP.total,  fluxes.totals.TP.total],   //total phosphorus
       PO4: [totals.TP.PO4,    fluxes.totals.TP.PO4],     //inorganic phosphorus
       VSS: [totals.TSS.VSS,   fluxes.totals.TSS.VSS],    //volatile suspended solids
@@ -265,17 +271,18 @@ class State_Variables {
     return {
       Q:{unit:"ML/d", descr:"flowrate"},
       components:{
-        S_VFA :{unit:"mg/L as COD", descr:"Biodegradable Soluble Organics (BSO) (volatile fatty acids)"},
-        S_FBSO:{unit:"mg/L as COD", descr:"Biodegradable Soluble Organics (BSO) (fermentable organics)"},
-        X_BPO :{unit:"mg/L as COD", descr:"Biodegradable Particulate Organics (BPO)"},
-        X_UPO :{unit:"mg/L as COD", descr:"Unbiodegradable Particulate Organics (UPO)"},
-        S_USO :{unit:"mg/L as COD", descr:"Unbiodegradable Soluble Organics (USO)"},
-        X_iSS :{unit:"mg/L as SS",  descr:"Inert Suspended Solids (sand)"},
-        S_FSA :{unit:"mg/L as N",   descr:"Inorganic Free Saline Ammonia (NH4)"},
-        S_OP  :{unit:"mg/L as P",   descr:"Inorganic OrthoPhosphate (PO4)"},
-        S_NOx :{unit:"mg/L as N",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
-        X_OHO :{unit:"mg/L as COD", descr:"Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)"},
-        X_PAO :{unit:"mg/L as COD", descr:"Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)"},
+        S_VFA :{unit:"mgCOD/L", descr:"Biodegradable Soluble Organics (BSO) (volatile fatty acids)"},
+        S_FBSO:{unit:"mgCOD/L", descr:"Biodegradable Soluble Organics (BSO) (fermentable organics)"},
+        X_BPO :{unit:"mgCOD/L", descr:"Biodegradable Particulate Organics (BPO)"},
+        X_UPO :{unit:"mgCOD/L", descr:"Unbiodegradable Particulate Organics (UPO)"},
+        S_USO :{unit:"mgCOD/L", descr:"Unbiodegradable Soluble Organics (USO)"},
+        X_iSS :{unit:"mgiSS/L", descr:"Inert Suspended Solids (sand)"},
+        S_NH4 :{unit:"mgN/L",   descr:"Inorganic Free Saline Ammonia (FSA)"},
+        S_PO4 :{unit:"mgP/L",   descr:"Inorganic OrthoPhosphate (PO4)"},
+        S_NOx :{unit:"mgN/L",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
+        S_O2  :{unit:"mgO/L",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
+        X_OHO :{unit:"mgCOD/L", descr:"Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)"},
+        X_PAO :{unit:"mgCOD/L", descr:"Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)"},
       },
       mass_ratios:{
         f_CV_VFA :{unit:"gCOD/gVSS",descr:"COD from S_VFA/VSS mass ratio"},
@@ -323,7 +330,7 @@ try{module.exports=State_Variables}catch(e){}
   //test 1: print totals and fluxes
   (function(){
     return
-    let s = new State_Variables(1,1,0,0,0,0,0,0,0,0);
+    let s = new State_Variables(1,1,0,0,0,0,0,0,0,0,0);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
     console.log("=== Totals (mg/L) ===");              console.log(s.totals);
@@ -333,8 +340,8 @@ try{module.exports=State_Variables}catch(e){}
   //test 2: combine 2 state variables and check result
   (function(){
     return
-    let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2);
-    let s2 = new State_Variables(10,1,1,1,1,1,1,1,1,1);
+    let s1 = new State_Variables(10,2,2,2,2,2,2,2,2,2,2);
+    let s2 = new State_Variables(10,1,1,1,1,1,1,1,1,1,1);
     let s3 = s1.combine(s2);
     console.log(s1.summary);
     console.log(s2.summary);
@@ -345,14 +352,14 @@ try{module.exports=State_Variables}catch(e){}
 
   //test 3: example from george ekama (raw ww + set ww)
   (function(){
-    return
+    //return
     /*
     [inputs]                    [outputs]
     S_VFA_inf:         50,      Total_COD_raw:  1151,
     S_FBSO_inf:        186,     Total_C_raw:    383.4286,
     S_USO_inf:         58,      Total_TKN_raw:  90.0039,
-    S_FSA_inf:         59.6,    Total_TP_raw:   20.0795,
-    S_OP_inf:          14.15,   Total_VSS_raw:  565.4983,
+    S_NH4_inf:         59.6,    Total_TP_raw:   20.0795,
+    S_PO4_inf:         14.15,   Total_VSS_raw:  565.4983,
     X_BPO_non_set_inf: 301,     Total_TSS_raw:  665.4983,
     X_BPO_set_inf:     406,     Total_COD_set:  615,
     X_UPO_non_set_inf: 20,      Total_C_set:    205.2029,
@@ -361,8 +368,8 @@ try{module.exports=State_Variables}catch(e){}
     X_iSS_set_inf:     34,      Total_VSS_set:  211.1406,
     ............................Total_TSS_set:  245.1406 */
     //create 2 manual scenarios: (1) raw ww, (2) settled ww
-    //syntax:                (Q  VFA FBS BPO UPO USO iSS FSA  OP    NOx OHO PAO)
-    let s=new State_Variables(25,50, 186,0,  0,  58, 0,  59.6,14.15,0,  0,  0);
+    //syntax:                (Q  VFA FBS BPO UPO USO iSS NH4  OP    NOx O2 OHO PAO)
+    let s=new State_Variables(25,50, 186,0,  0,  58, 0,  59.6,14.15,0,  0, 0,  0);
     console.log('---raw ww---');
     s.set("X_BPO",707);
     s.set("X_UPO",150);

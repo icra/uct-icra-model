@@ -12,7 +12,6 @@ const constants={
   theta_b_PAO: 1.029,  //ø         | b_PAO temperature correction factor
   f_PAO      : 0.250,  //ø         | PAO endogenous residue fraction
   f_P_iSS    : 0.020,  //gP/giSS   | fraction of P in iSS
-  f_VT_PAO   : 0.460,  //gVSS/gTSS | fraction of PAO in TSS
   f_iPAO     : 1.300,  //giSS/gVSS | fraction of iSS in PAO
   f_PO4_rel  : 0.500,  //gP/gCOD   | ratio of P release/VFA uptake (1molP/1molCOD)
 
@@ -86,7 +85,6 @@ const constants={
     b_PAO      :{unit:"1/d",       tec:"bpr", descr:"PAO endogenous residue respiration rate at 20ºC"},
     theta_b_PAO:{unit:"ø",         tec:"bpr", descr:"b_PAO temperature correction factor"},
     f_PAO      :{unit:"ø",         tec:"bpr", descr:"PAO endogenous residue fraction"},
-    f_VT_PAO   :{unit:"gVSS/gTSS", tec:"bpr", descr:"fraction of PAO in TSS"},
     f_P_iSS    :{unit:"gP/giSS",   tec:"bpr", descr:"fraction of P in iSS"},
     f_iPAO     :{unit:"giSS/gVSS", tec:"bpr", descr:"iSS content of PAOs"},
   },
