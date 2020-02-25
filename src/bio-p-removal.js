@@ -12,8 +12,7 @@ try{
 
 State_Variables.prototype.bio_p_removal=function(
   T, Vp, Rs, DO, RAS, IR, waste_from,
-  system_type, S_NOx_RAS, number_of_an_zones, f_AN,
-  DO, DO_RAS,
+  system_type, S_NOx_RAS, number_of_an_zones, f_AN, DO_RAS,
   mass_FeCl3,
 ){
   //===========================================================================
@@ -91,8 +90,8 @@ State_Variables.prototype.bio_p_removal=function(
     //COD fractions
     let FSti = inf_flux.totals.COD.total; //kgCOD/d | total COD influent mass flux
     let FSbi = inf_flux.totals.COD.bCOD;  //kgCOD/d | bCOD = S_VFA+S_FBSO+X_BPO influent mass flux
-    let fSup = X_UPO/inf_frac.COD.total;  //ø       | X_UPO/Sti ratio
-    let fSus = S_USO/inf_frac.COD.total;  //ø       | S_USO/Sti ratio
+    let fSup = X_UPO/inf_frac.COD.total ||0;  //ø       | X_UPO/Sti ratio
+    let fSus = S_USO/inf_frac.COD.total ||0;  //ø       | S_USO/Sti ratio
 
     //iSS influent and inert VSS mass fluxes
     let FiSS = inf_flux.components.X_iSS; //kgiSS/d
@@ -330,9 +329,9 @@ State_Variables.prototype.bio_p_removal=function(
   let OHO_was = f_RAS*f_CV_OHO*(MX_BH  + MX_EH   )/Vp*1e3; //mgCOD/L | OHO wastage
   let PAO_was = f_RAS*f_CV_PAO*(MX_PAO + MX_E_PAO)/Vp*1e3; //mgCOD/L | PAO wastage
 
-  //output streams------------------( Q, VFA, FBSO,     BPO,     UPO,   USO,     iSS, FSA,  OP,   NOx,     OHO,     PAO)
-  let effluent = new State_Variables(Qe,   0,    0,       0,       0, S_USO,       0, Nae, Pse, S_NOx,       0,       0);
-  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, S_USO, iSS_was, Nae, Pse, S_NOx, OHO_was, PAO_was);
+  //output streams------------------( Q, VFA, FBSO,     BPO,     UPO,   USO,     iSS, FSA,  OP,   NOx, O2, OHO,     PAO)
+  let effluent = new State_Variables(Qe,   0,    0,       0,       0, S_USO,       0, Nae, Pse, S_NOx, 0,  0,       0);
+  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, S_USO, iSS_was, Nae, Pse, S_NOx, 0,  OHO_was, PAO_was);
 
   //copy influent mass ratios for the new outputs
   effluent.mass_ratios = this.mass_ratios; //object
@@ -397,10 +396,11 @@ State_Variables.prototype.bio_p_removal=function(
   //fraction of fixed inorganic suspended solids of PAO
   //f_iPAO has to be calculated (0.15 - 1.3) (1.3 is PAOs full of polyPP)
   //f_iPAO_calculated should be lower than 1.3
-  let f_iPAO_calculated = f_iOHO + 3.268*f_P_PAO_calculated; //giSS/gVSS
+  let f_iPAO_calculated = Math.min(f_iPAO, f_iOHO + 3.268*f_P_PAO_calculated); //giSS/gVSS
   //(3.268 is experimental value)
   if(f_iPAO_calculated > f_iPAO){
     console.warn(`Warning: f_iPAO_calculated (${f_iPAO_calculated}) > f_iPAO (${f_iPAO}) [giSS/gVSS]`);
+    //TODO confirm with george in the future
   }
 
   /*3. compute MX_IO (kgiSS)*/
@@ -409,7 +409,7 @@ State_Variables.prototype.bio_p_removal=function(
   //  MX_IO            = FiSS*Rs + f_iOHO*MX_BH + f_iPAO*MX_PAO            + F_extra_iSS*Rs; //kgiSS
 
   /*4. compute f_VT_PAO (PAOVSS/TSS ratio)*/
-  let f_VT_PAO = (MX_PAO + MX_E_PAO)/MX_T;
+  let f_VT_PAO = (MX_PAO + MX_E_PAO)/MX_T; //gPAOVSS/gTSS
   let f_P_TSS = (1/MX_T)*(
     (
       f_P_OHO*(MX_BH+MX_EH+MX_E_PAO) +
@@ -458,7 +458,7 @@ State_Variables.prototype.bio_p_removal=function(
     let fxm       = 0.5;                               //ø | get value from "nitrification.js"
     let fx1       = fxm - f_AN;                        //ø
     let K2_20_PAO = constants.K2_20_PAO;               //0.255 gN/gVSS·d
-    let ϴ_K2_PAO  = constants.theta_K2_PAO;            //1.080 
+    let ϴ_K2_PAO  = constants.theta_K2_PAO;            //1.080
     let K2T_PAO   = K2_20_PAO*Math.pow(ϴ_K2_PAO,T-20); //gN/gVSS·d
 
     //compute Dp1 modified for bio P removal
@@ -566,8 +566,9 @@ State_Variables.prototype.bio_p_removal=function(
 /*test*/
 (function(){
   //return
-  //syntax:                    ( Q, VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx, OHO, PAO)
-  let inf = new State_Variables(15,  22,  124, 439, 112,  53,  49,  39, 12,   0,   0,   0);
+  //syntax:                    ( Q, VFA, FBSO, BPO, UPO, USO, iSS, FSA, OP, NOx, O2 OHO, PAO)
+  //let inf = new State_Variables(15,  22,  124, 439, 112,  53,  49,  39, 12,   0, 0, 0,   0);
+  let inf = new State_Variables(15,  0,  0, 0, 0,  0,  0,  0, 0,   0, 0, 0,   0);
   //console.log(inf.totals);
   //console.log(inf.summary);
   //console.log(inf.fluxes);

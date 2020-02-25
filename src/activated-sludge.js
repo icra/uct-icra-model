@@ -329,7 +329,7 @@ State_Variables.prototype.activated_sludge=function(
 
 /*test*/
 {
-  //return
+  return
   //--------new State_Variables(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  FSA,   OP, NOx, OHO, PAO)
   let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0,   0,   0);
 

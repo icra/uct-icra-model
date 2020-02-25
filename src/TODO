@@ -16,16 +16,20 @@ doing now:
   fH --> f_OHO
 
 3. bio P:
+
   - [VERIFICAR] se puede tener bio P sin nitrificación?
+
   - [PENDIENTE] calcular 'r' recycle ratio: no lo calculamos la planta ya lo sabe, añadir como input
-  - [PENDIENTE] Dp1 revisar
+    - r sirve para recalcular Dp1
+
   - [PENDIENTE] f_iPAO_calculated revisar (luego calcular MX_IO_calculated)
+
   - [PENDIENTE] f_VT_PAO (gPAOVSS/gTSS) = 0.46
     - se usa para calcular f_P_TSS
     - en "f_VT_PAO_calculated" obtenemos valor bastante distinto a 0.46 (~0.14)
     - f_P_TSS revisar
     - comprobar si X_P_TSS funciona para calcular el balance
-  
+
   - [OK] single tank is the same as number_of_an_zones==1?
     - significa solo un aerobico
 

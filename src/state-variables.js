@@ -352,7 +352,7 @@ try{module.exports=State_Variables}catch(e){}
 
   //test 3: example from george ekama (raw ww + set ww)
   (function(){
-    //return
+    return
     /*
     [inputs]                    [outputs]
     S_VFA_inf:         50,      Total_COD_raw:  1151,
