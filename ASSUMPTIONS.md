@@ -1,5 +1,5 @@
 ## Model assumptions / limitations
-  - The model process is a MLE (Modified Ludzack Ettinger process).
+  - The model is for a MLE process (Modified Ludzack Ettinger).
   - The influent active biomass (X-OHO and X-PAO as mgCOD/L) has to be 0.
   - Mass of nitrifiers (MX-BA as suspended solids) is not considered into total
     solids mass (MX-T) as it is 1%-2% of the total mass.
@@ -14,4 +14,5 @@
   - All CO<sub>2</sub> produced is stripped out.
   - Inorganic carbon is not included in the carbon balance over the AS reactor,
     because it is very small.
-  - The volume of FeCl3 solution added for chemical P precipitation is 0.
+  - The volume of FeCl3 solution added for chemical P precipitation is
+    considered 0.

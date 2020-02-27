@@ -1,416 +1,534 @@
-<!--uct-icra-model integration in a html interface-->
-<!doctype html><html><head><meta charset=utf8>
-  <title>uct-icra model</title>
+<!doctype html><html><head>
+  <meta charset=utf8>
+  <title>UCT-ICRA model</title>
+  <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon">
+  <link rel="icon"          href="img/favicon.png" type="image/x-icon">
 
-  <!--frontend css-->
+  <!--carrega moduls backend-->
+  <script src='../src/state-variables.js'></script>
+  <script src="../src/constants.js"></script>
+  <script src="../src/primary-settler.js"></script>
+  <script src="../src/activated-sludge.js"></script>
+  <script src="../src/bio-p-removal.js"></script>
+  <script src="../src/chemical-P-removal.js"></script>
+  <script src="../src/nitrification.js"></script>
+  <script src="../src/denitrification.js"></script>
+  <script src="../src/capacity-estimation.js"></script>
+  <script src='../src/plant.js'></script>
+
+  <!--Vue JS toggle production/development-->
+  <!--
+    - production version
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    - development version
+  -->
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+  <!--css general-->
   <style>
+    /*
     @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
-    body{
-      font-family: 'Roboto', verdana;
-      color: #5C5C5C;
+    */
+    body {
       overflow-y:scroll;
+      font-family: 'Roboto', verdana;
     }
     table{
       border-collapse:collapse;
-      margin-bottom:10px;
     }
-    td,th{
-      border:1px solid #ccc;
+    ul{
+      padding-left:10px;
+      list-style-type:none;
+      margin-top:0;
+      margin-bottom:0;
     }
-
-    /*numbers and units*/
-    .number{ text-align:right; }
-    .unit{ font-size:smaller;}
+    hr{border:none;border-bottom:1px solid #ccc;}
+    input[type=text]{max-width:70px;}
     input[type=number]{
       text-align:right;
+      max-width:7em;
+      border:none;
+      line-height:1.4em;
     }
+    [onclick]{cursor:pointer;}
 
-    .flex{
-      display:flex;
-      flex-wrap:wrap;
-    }
-    [onclick]{cursor:pointer}
-    .error{
-      font-size:smaller;
-      margin-left:1em;
-    }
-
-    #influent div[title]{ margin-right:1px; }
-    #inputs #edar input[type=number],
-    #inputs #edar select,
-    #inputs #mass_ratios input,
-    #inputs #constants input{
-      display:block;
-      max-width:70px;
-    }
-    #inputs #influent input{
-      display:block;
-      max-width:45px;
-    }
-
-    #inputs #constants table,
-    #outputs #processes table{
-      margin-right:3px;
-    }
-    #outputs #fractionation td.number{
-      font-size:smaller;
-    }
+    .blank{font-size:smaller;color:#555;}
+    .number{text-align:right;}
+    .unit{font-size:smaller;color:#555;}
   </style>
 
-  <!--frontend css folded sections-->
+  <!--css plants-->
   <style>
-    .folded > [id] { display:none; }
-    arrow {
-      border: solid black;
-      border-width: 0 2px 2px 0;
-      display: inline-block;
-      padding: 3px;
-      transform:rotate(45deg);
-      transition: all 0.1s;
+    #plants a{
+      font-family:monospace;
+      font-size:larger;
+      cursor:pointer;
     }
-    .folded arrow { transform:rotate(-45deg) }
-    div:not(.folded) code[onclick]{
-      background:#f9f9f9;
+    #plants a:hover{
+      text-decoration:underline;
     }
-  </style>
-
-  <style>
-    main div.card {
-      border-bottom:1px solid #ccc;
-    }
-    main code[onclick]{
-      display:block;
-      padding-top:5px;
-      padding-bottom:5px;
-      padding-left:5px;
-    }
-    main code[onclick]:hover{
-      color:black;
+    .plant{
       background:#eee;
+      padding-bottom:10px;
+      margin-bottom:5px;
+      border-bottom:1px solid #ccc;
+      border-top:1px solid #ccc;
+      padding-left:1px;
     }
-    main #inputs, #outputs {
-      margin-top:20px;
-      width:49%;
+    .grid-li{ /*three columns: key, value, unit*/
+      display:grid;
+      grid-template-columns:10em 7em 15em;
+      grid-gap:1%;
     }
-    main #inputs > div:first-child, #outputs > div:first-child {
-      height:22px;
+    .grid-li.four{ /*four columns: key, value, unit, technology*/
+      grid-template-columns:10em 7em 15em 10em;
     }
-    main #inputs {
-      margin-right:5px;
+    .grid-li.five{ /*five columns: key, value, unit, value unit (complete fractionation)*/
+      grid-template-columns:5em 7em 7em 7em 7em;
     }
-    main #outputs {
+    .grid-li:hover{
+      background:rgba(255,255,255,0.5);
+    }
+    .grid-li input[type=number]{
+      float:right;
+    }
+
+    #plants li.inputs_outputs {
+      display:grid;
+      grid-template-columns:50% 50%;
     }
   </style>
 
-  <!--frontend functions and css for folding/unfolding sections-->
-  <script>
-    function toggle_class_folded(selector){
-      let el = document.querySelector(selector);
-      if(!el) return;
-
-      //if el is folded, fold all other cards in the same section
-      let pn = el.parentNode;
-      if(pn.parentNode.id && pn.classList.contains('folded')){
-        hide_child_divs('#'+pn.parentNode.id);
-      }
-
-      //actual folding/unfolding of el
-      el.parentNode.classList.toggle('folded');
+  <!--css footer-->
+  <style>
+    footer ul#about li{
+      font-size:smaller;
     }
-
-    function hide_child_divs(selector){
-      selector=selector||false;
-      if(!selector)return;
-      document.querySelectorAll(`${selector} > div.card`).forEach(div=>{
-        div.classList.add('folded');
-      });
-    }
-  </script>
-
-  <!--frontend decimal number formatter and units formatter-->
-  <script>
-    /*convert a number to a string: i.e. 3999.4 turns into "3,999.4"*/
-    //global variable because creating a NumberFormat object is slow
-    let nf=[
-      new Intl.NumberFormat('en-EN', {maximumFractionDigits:0}),
-      new Intl.NumberFormat('en-EN', {maximumFractionDigits:1}),
-      new Intl.NumberFormat('en-EN', {maximumFractionDigits:2}),
-      new Intl.NumberFormat('en-EN', {maximumFractionDigits:3}),
-      new Intl.NumberFormat('en-EN', {maximumFractionDigits:4}),
-      new Intl.NumberFormat('en-EN', {maximumFractionDigits:5}),
-    ];
-    function format(number,digits){
-      digits=digits||0;
-      let abs_number = Math.abs(number);
-      if(abs_number< 100   ) digits=1;
-      if(abs_number<  10   ) digits=2;
-      if(abs_number<   1   ) digits=3;
-      if(abs_number<   0.1 ) digits=4;
-      if(abs_number<   0.01) digits=5;
-      return nf[digits].format(number);
-    }
-
-    String.prototype.prettifyUnit=function(){
-      return this
-        .replace('CO3','CO<sub>3</sub>')
-        .replace('FeCl3','FeCl<sub>3</sub>')
-        .replace('NH4','NH<sub>4</sub>')
-        .replace('NOx','NO<sub>x</sub>')
-        .replace('PO4','PO<sub>4</sub>')
-        .replace('m2','m<sup>2</sup>')
-        .replace('m3','m<sup>3</sup>')
-        .replace(/_/g,' ');
-    }
-  </script>
+  </style>
 </head><body>
 
-<h3 style=color:red>note: this interface is deprecated. please use this <a href=run-model-multiple.html>new one</a></h3>
-<hr>
-
 <!--title-->
-<div style="border-bottom:1px solid #aaa;margin-bottom:4px;justify-content:center" class=flex>
-  <h3>
-    <span id=title onclick> UCT-ICRA model </span>
-    <!--run button-->
-    <button id=run style="font-size:22px;margin:5px 0px">RUN</button>
-    <style>
-      button#run {
-        background:#af0;
-        border-radius:3px;
-        border:1px solid #ccc;
-        box-shadow:2px 2px 2px 0px #ccc;
-        outline:none;
-      }
-      button#run:active{
-        box-shadow:inset 2px 2px 7px 0px #ccc;
-      }
-    </style>
-  </h3>
+<h2 onclick=window.location.reload()>
+  UCT-ICRA model
+  <small style=font-size:12px>MLE (PST, AS, EBPR, CPR, NIT, DN, SST processes)</small>
+</h2><hr>
+
+<!--html-->
+<div id=plants>
+  <div>
+    <!--btn afegir/eliminar depuradora-->
+    <button v-on:click="add_plant()" style="padding:1em">Add plant</button>
+  </div><hr>
+  <!--no plants warning--><div v-if="plants.length==0" class=blank>[~No plants]</div>
+
+  <!--plant-->
+  <ul v-for="plant,i in plants" class=plant>
+    <li>
+      <input v-model="plant.name" placeholder="Plant name">
+      <!--btn execute model-->
+      <button v-on:click="run_model(plant)" style="background:#af0">Run model</button>
+      <button v-on:click="remove_plant(plant)">Remove plant</button>
+    </li>
+
+    <!--inputs and outputs-->
+    <li class=inputs_outputs>
+      <!--inputs-->
+      <div>
+        <a v-on:click="plant.visibles.inputs.visible^=true">
+          <span v-if="plant.visibles.inputs.visible">&darr;</span>
+          <span v-else>&rarr;</span>
+          <b>Inputs</b>
+        </a>
+        <ul v-if="plant.visibles.inputs.visible">
+          <!--influent (variables d'estat)-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.influent.visible^=true">
+              <span v-if="plant.visibles.inputs.influent.visible">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u>Influent</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.influent.visible">
+              <!--influent components-->
+              <li>
+                <a v-on:click="plant.visibles.inputs.influent.components^=true">
+                  <span v-if="plant.visibles.inputs.influent.components">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>State Variables (components)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.components">
+                  <!--influent Q-->
+                  <li v-bind:title="state_variables_info.Q.descr" class=grid-li>
+                    <div>Q:</div>
+                    <div><input type=number v-model.number="plant.influent.Q" v-on:keyup.enter="run_model(plant)" min=0></div>
+                    <div class=unit>ML/d</div>
+                  </li>
+
+                  <li v-for="component,key in plant.influent.components" class=grid-li
+                    v-bind:title="state_variables_info.components[key].descr">
+                    <div>{{key}}:</div>
+                    <div><input type=number v-model.number="plant.influent.components[key]"
+                      v-on:keyup.enter="run_model(plant)" min=0></div>
+                    <div class=unit>mg/L</span></div>
+                  </li>
+                </ul>
+              </li>
+
+              <!--influent mass ratios-->
+              <li>
+                <a v-on:click="plant.visibles.inputs.influent.mass_ratios^=true">
+                  <span v-if="plant.visibles.inputs.influent.mass_ratios">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Mass ratios (VSS)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.mass_ratios">
+                  <li v-for="par,key in plant.influent.mass_ratios" class=grid-li
+                      v-bind:title="state_variables_info.mass_ratios[key].descr">
+                    <div><small>{{key}}:</small></div>
+                    <div>
+                      <input type=number v-model.number="plant.influent.mass_ratios[key]" v-on:keyup.enter="run_model(plant)">
+                    </div>
+                    <div class=unit>{{state_variables_info.mass_ratios[key].unit}}</div>
+                  </li>
+                </ul>
+              </li>
+
+              <!--influent summary-->
+              <li title="Fraccionament calculat a partir de les variables d'estat (a sobre) i els mass ratios">
+                <a v-on:click="plant.visibles.inputs.influent.summary^=true">
+                  <span v-if="plant.visibles.inputs.influent.summary">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Fractionation (summary)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.summary"><li>
+                  <table border=1>
+                    <tr>
+                      <th title=Component>Comp
+                      <th title=Concentration>Conc <span class=unit>(mg/L)</span>
+                      <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
+                    <tr v-for="obj,key in plant.influent.summary" v-if="key!='Q'">
+                      <td>{{key}}
+                      <td class=number>{{Math.round(100*obj[0])/100}}
+                      <td class=number>{{Math.round(100*obj[1])/100}}
+                    </tr>
+                  </table>
+                </ul>
+              </li>
+
+              <!--influent totals-->
+              <li>
+                <a v-on:click="plant.visibles.inputs.influent.totals^=true">
+                  <span v-if="plant.visibles.inputs.influent.totals">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Fractionation (complete)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.totals"><li>
+                  <table border=1>
+                    <tr v-for="obj,key in plant.influent.totals">
+                      <td>{{key}}</td>
+                      <td>
+                        <ul>
+                          <li v-for="val,key in obj" class="grid-li five">
+                            <div>{{key}}</div>
+                            <div class=number>{{Math.round(100*val)/100}}</div>
+                            <div class=unit>mg/L</div>
+                            <div class=number>{{Math.round(100*val*plant.influent.Q)/100}}</div>
+                            <div class=unit>kg/d</div>
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </table>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <!--configuration-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.configuration^=true">
+              <span v-if="plant.visibles.inputs.configuration">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u>Configuration</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.configuration">
+              <li v-for="tech,key in plant.configuration"
+                  v-bind:title="plant_info.configuration[key]"
+                  class=grid-li
+              >
+                <div>{{plant_info.configuration[key]}}</div>
+                <div>
+                  <label>
+                    <input type=checkbox v-model="plant.configuration[key]">
+                  </label>
+                </div>
+                <div class=unit>{{tech}}</div>
+              </li>
+            </ul>
+          </li>
+
+          <!--parameters-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.parameters^=true">
+              <span v-if="plant.visibles.inputs.parameters">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u>Parameters</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.parameters">
+              <li v-for="par,key in plant.parameters" class="grid-li four" v-bind:title="plant_info.parameters[key].descr"
+                  v-if="
+                    key!='waste_from' &&
+                    plant.configuration[plant_info.parameters[key].tec]!=false
+                  "
+              >
+                <div>{{key}}:</div>
+                <div>
+                  <input type=number v-model.number="plant.parameters[key]" v-on:keyup.enter="run_model(plant)">
+                </div>
+                <div class=unit>
+                  {{plant_info.parameters[key].unit}}
+                </div>
+                <small>{{ plant_info.configuration[plant_info.parameters[key].tec]}}</small>
+              </li>
+
+              <li class=grid-li v-bind:title="plant_info.parameters.waste_from.descr">
+                <div>waste_from:</div>
+                <div>
+                  <select v-model="plant.parameters.waste_from" style=float:right>
+                    <option>reactor</option>
+                    <option>sst</option>
+                  </select>
+                </div>
+                <div class=unit>
+                  {{plant_info.parameters.waste_from.unit}}
+                  <small>({{ plant_info.configuration[plant_info.parameters.waste_from.tec] }})</small>
+                </div>
+              </li>
+            </ul>
+          </li>
+
+          <!--constants-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.constants^=true">
+              <span v-if="plant.visibles.inputs.constants">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u title="Kinetic constants">Constants</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.constants">
+              <li v-for="obj,key in plant.constants.info" class="grid-li four"
+                v-bind:title="obj.descr" v-if="plant.configuration[obj.tec]!=false">
+                <div>{{key}}</div>
+                <div>
+                  <input type=number v-model.number="plant.constants[key]" v-on:keyup.enter="run_model(plant)">
+                </div>
+                <div class=unit>
+                  {{obj.unit}}
+                </div>
+                <small>{{plant_info.configuration[obj.tec]}}</small>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!--outputs-->
+      <div v-if="plant.outputs">
+        <a v-on:click="plant.visibles.outputs.visible^=true">
+          <span v-if="plant.visibles.outputs.visible">&darr;</span>
+          <span v-else>&rarr;</span>
+          <b>Outputs</b>
+        </a>
+        <!--plant outputs-->
+        <div v-if="plant.visibles.outputs.visible">
+          <!--outputs: only if 0 warnings-->
+          <div>
+            <!--plant run-->
+            <ul>
+              <!--primary-->
+              <li v-if="plant.outputs.run.primary.wastage">
+                <a v-on:click="plant.visibles.outputs.primary.visible^=true">
+                  <span v-if="plant.visibles.outputs.primary.visible">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Primary</u>
+                </a>
+                <!--primary effluent and wastage-->
+                <div v-if="plant.visibles.outputs.primary.visible">
+                  <ul v-for="obj,key in plant.outputs.run.primary">
+                    <li>
+                      <a v-on:click="plant.visibles.outputs.primary[key].visible^=true">
+                        <span v-if="plant.visibles.outputs.primary[key].visible">&darr;</span><span v-else>&rarr;</span>
+                        <u>Primary {{key}}</u> |
+                        <span v-bind:title="obj.Q">
+                          Q={{Math.round(100*obj.Q)/100}}
+                          <span class=unit>{{state_variables_info.Q.unit}}</span>
+                        </span>
+                      </a>
+                      <ul v-if="plant.visibles.outputs.primary[key].visible">
+                        <!--primary streams summary-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.primary[key].summary^=true">
+                            <span v-if="plant.visibles.outputs.primary[key].summary">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (summary)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.primary[key].summary"><li>
+                            <table border=1>
+                              <tr>
+                                <th title=Component>Comp
+                                <th title=Concentration>Conc <span class=unit>(mg/L)</span>
+                                <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
+                              <tr v-for="obj,key in obj.summary" v-if="key!='Q'">
+                                <td>{{key}}
+                                <td class=number>{{Math.round(100*obj[0])/100}}
+                                <td class=number>{{Math.round(100*obj[1])/100}}
+                              </li>
+                            </table>
+                          </ul>
+                        </li>
+
+                        <!--primary streams totals-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.primary[key].totals^=true">
+                            <span v-if="plant.visibles.outputs.primary[key].totals">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (complete)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.primary[key].totals"><li>
+                            <table border=1>
+                              <tr v-for="obj,total in obj.totals">
+                                <td>{{total}}</td>
+                                <td>
+                                  <ul>
+                                    <li v-for="val,fraction in obj" class="grid-li five">
+                                      <div>{{fraction}}</div>
+                                      <div class=number>{{Math.round(100*val)/100}}</div>
+                                      <div class=unit>mg/L</div>
+                                      <div class=number>{{Math.round(100*val*plant.outputs.run.primary[key].Q)/100}}</div>
+                                      <div class=unit>kg/d</div>
+                                    </li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            </table>
+                          </ul>
+                        </li>
+                      </ul>
+                    <li>
+                  </ul>
+                </div>
+              </li>
+
+              <!--secondary-->
+              <li>
+                <a v-on:click="plant.visibles.outputs.secondary.visible^=true">
+                  <span v-if="plant.visibles.outputs.secondary.visible">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Secondary</u>
+                </a>
+                <div v-if="plant.visibles.outputs.secondary.visible">
+                  <ul v-for="obj,key in plant.outputs.run.secondary">
+                    <li>
+                      <a v-on:click="plant.visibles.outputs.secondary[key].visible^=true">
+                        <span v-if="plant.visibles.outputs.secondary[key].visible">&darr;</span>
+                        <span v-else>&rarr;</span>
+                        <u>Secondary {{key}}</u> |
+                        <span v-bind:title="obj.Q">
+                          Q={{Math.round(100*obj.Q)/100}}
+                          <span class=unit>{{state_variables_info.Q.unit}}</span>
+                        </span>
+                      </a>
+                      <ul v-if="plant.visibles.outputs.secondary[key].visible">
+                        <!--secondary stream summary-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.secondary[key].summary^=true">
+                            <span v-if="plant.visibles.outputs.secondary[key].summary">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (summary)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.secondary[key].summary"><li>
+                            <table border=1>
+                              <tr>
+                                <th title=Component>Comp
+                                <th title=Concentration>Conc <span class=unit>(mg/L)</span>
+                                <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
+                              <tr v-for="obj,key in obj.summary" v-if="key!='Q'">
+                                <td>{{key}}
+                                <td class=number>{{Math.round(100*obj[0])/100}}
+                                <td class=number>{{Math.round(100*obj[1])/100}}
+                              </li>
+                            </table>
+                          </ul>
+                        </li>
+
+                        <!--secondary stream totals-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.secondary[key].totals^=true">
+                            <span v-if="plant.visibles.outputs.secondary[key].totals">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (complete)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.secondary[key].totals"><li>
+                            <table border=1>
+                              <tr v-for="obj,total in obj.totals">
+                                <td>{{total}}</td>
+                                <td>
+                                  <ul>
+                                    <li v-for="val,fraction in obj" class="grid-li five">
+                                      <div>{{fraction}}</div>
+                                      <div class=number>{{Math.round(100*val)/100}}</div>
+                                      <div class=unit>mg/L</div>
+                                      <div class=number>{{Math.round(100*val*plant.outputs.run.secondary[key].Q)/100}}</div>
+                                      <div class=unit>kg/d</div>
+                                    </li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            </table>
+                          </ul>
+                        </li>
+                      </ul>
+                    <li>
+                  </ul>
+                </div>
+              </li>
+
+              <!--process variables-->
+              <li>
+                <a v-on:click="plant.visibles.outputs.process_variables.visible^=true">
+                  <span v-if="plant.visibles.outputs.process_variables.visible">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Process variables</u>
+                </a>
+
+                <!--as,nit,dn,cpr,cap,bpr-->
+                <div v-if="plant.visibles.outputs.process_variables.visible">
+                  <ul v-for="obj,key in plant.outputs.run.process_variables">
+                    <li v-if="obj">
+                      <a v-on:click="plant.visibles.outputs.process_variables[key]^=true">
+                        <span v-if="plant.visibles.outputs.process_variables[key]">&darr;</span>
+                        <span v-else>&rarr;</span>
+                        <u>{{plant_info.configuration[key]}}</u>
+                      </a>
+                      <!--resultats tecnologia-->
+                      <ul v-if="plant.visibles.outputs.process_variables[key]">
+                        <li v-for="obj,key in obj" class=grid-li v-bind:title="obj.descr">
+                          <div><small>{{key}}</small></div>
+                          <div class=number v-bind:title="obj.value">{{Math.round(100*obj.value)/100}}</div>
+                          <div class=unit>{{obj.unit}}</div>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div v-else class=blank>[Press 'Run model' button to generate outputs]</div>
+    </li>
+  </ul>
 </div>
 
-
-<!--main container-->
-<main class=flex>
-  <!--inputs-->
-  <div id=inputs>
-    <div class=card> <strong>Inputs</strong> </div>
-
-    <!--influent-->
-    <div class=card>
-      <code onclick=toggle_class_folded('#influent')>
-        <arrow></arrow> Influent composition
-      </code>
-      <div id=influent class=flex>
-        <div class=flex>
-          <div title="Flowrate">Q<sub> </sub><input type=number id=Q value=25 min=0><span class=unit>ML/d</span></div>
-        </div>
-        <div class=flex>
-          <div title="Volatile fatty acids"                >S<sub>VFA </sub><input type=number id=S_VFA  value=50   min=0><span class=unit>mg/L</span></div>
-          <div title="Fermentable organics"                >S<sub>FBSO</sub><input type=number id=S_FBSO value=115  min=0><span class=unit>mg/L</span></div>
-          <div title="Biodegradable particulate organics"  >X<sub>BPO </sub><input type=number id=X_BPO  value=440  min=0><span class=unit>mg/L</span></div>
-          <div title="Unbiodegradable particulate organics">X<sub>UPO </sub><input type=number id=X_UPO  value=100  min=0><span class=unit>mg/L</span></div>
-          <div title="Unbiodegradable soluble organics"    >S<sub>USO </sub><input type=number id=S_USO  value=45   min=0><span class=unit>mg/L</span></div>
-        </div>
-        <div class=flex>
-          <div title="Inert suspended solids"              >X<sub>iSS </sub><input type=number id=X_iSS  value=60   min=0><span class=unit>mg/L</span></div>
-          <div title="Free saline ammonia"                 >S<sub>NH4 </sub><input type=number id=S_FSA  value=39.1 min=0><span class=unit>mg/L</span></div>
-          <div title="Orthophosphate (PO4)"                >S<sub>PO4 </sub><input type=number id=S_OP   value=7.28 min=0><span class=unit>mg/L</span></div>
-          <div title="Nitrate (NO3), nitrite (NO2)"        >S<sub>NOx </sub><input type=number id=S_NOx  value=0    min=0><span class=unit>mg/L</span></div>
-          <div title="OHOs" style="display:none"           >X<sub>OHO </sub><input type=number id=X_OHO  value=0    min=0><span class=unit>mg/L</span></div>
-        </div>
-      </div>
-    </div>
-
-    <!--plant-->
-    <div class='card folded'>
-      <code onclick=toggle_class_folded('#edar')>
-        <arrow></arrow>
-        Plant parameters and configuration
-      </code>
-      <table id=edar style=width:100%;font-size:smaller>
-        <tr id=tr_pst>
-          <td><label><input type=checkbox id=pst> Primary settler</label>
-          <td title="Fraction of Q that goes to wastage">fw                   <span class=unit>(ø)</span><input type=number id=fw          value=0.005>
-          <td title="Removal of X_BPO"                  >removal<sub>BPO</sub><span class=unit>(%)</span><input type=number id=removal_BPO value=42.3352>
-          <td title="Removal of X_UPO"                  >removal<sub>UPO</sub><span class=unit>(%)</span><input type=number id=removal_UPO value=90.0500>
-          <td title="Removal of X_iSS"                  >removal<sub>iSS</sub><span class=unit>(%)</span><input type=number id=removal_iSS value=75.1250>
-        </tr><tr id=tr_as>
-          <td rowspan=2><label><input type=checkbox id=as checked=true disabled> Activated sludge</label>
-          <td title="Temperature"                        >T  <span class=unit>(ºC)</span>           <input type=number id=T   value=16>
-          <td title="Reactor volume"                     >Vp <span class=unit>(m<sup>3</sup>)</span><input type=number id=Vp  value=8473.3>
-          <td title="Sludge retention time or sludge age">Rs <span class=unit>(d)</span>            <input type=number id=Rs  value=15>
-          <td title="Underflow recycle ratio"            >RAS<span class=unit>(ø)</span>            <input type=number id=RAS value=1.0>
-        </tr><tr>
-          <td title="Sludge settleability"     >DSVI<span class=unit>(mL/gTSS)      </span><input type=number id=DSVI value=120>
-          <td title="Area of secondary settler">A_ST<span class=unit>(m<sup>2</sup>)</span><input type=number id=A_ST value=30000>
-          <td title="Peak flow (Qmax/Qavg)"    >fq  <span class=unit>(ø)            </span><input type=number id=fq   value=2.4>
-          <td title="Origin of wastage"        >waste from<select id=waste_from><option>reactor<option>sst</select>
-        </tr><tr id=tr_nit>
-          <td><label><input type=checkbox id=nit> Nitrification</label>
-          <td title="Safety factor"               >SF  <span class=unit>(ø)</span>   <input type=number id=SF  value=1.25>
-          <td title="Fraction of unaerated sludge">fxt <span class=unit>(ø)</span>   <input type=number id=fxt value=0.39>
-          <td title="Dissolved oxygen (reactor)"  >DO  <span class=unit>(mg/L)</span><input type=number id=DO  value=2.0 >
-          <td title="pH"                          >pH  <span class=unit>(ø)</span>   <input type=number id=pH  value=7.2 >
-        </tr><tr id=tr_dn>
-          <td><label><input type=checkbox id=dn> Denitrification</label>
-          <td title="Internal Recycle Ratio"                   >IR                    <span class=unit>(ø)   </span><input type=number id=IR           value=5.4>
-          <td title="Oxygen dissolved in the underflow recycle">DO<sub>RAS</sub>      <span class=unit>(mg/L)</span><input type=number id=DO_RAS       value=1.0>
-          <td title="Influent alkalinity"                      >influent<sub>alk</sub><span class=unit>(mg/L)</span><input type=number id=influent_alk value=250>
-        </tr><tr id=tr_cpr>
-          <td><label><input type=checkbox id=cpr> Chemical P removal</label>
-          <td title="Mass of FeCl3 added for P removal">FeCl<sub>3</sub> <span class=unit>(kg/d)</span> <input type=number id=mass_FeCl3 value=3000>
-        </tr>
-      </table>
-    </div>
-
-    <!--mass ratios-->
-    <div class='card folded'>
-      <code onclick=toggle_class_folded('#mass_ratios')>
-        <arrow></arrow> Mass ratios
-      </code>
-      <table id=mass_ratios style=width:100%>
-        <tr><td><td>fcv<div class=unit>gCOD/gVSS<td>fC<div class=unit>gC/gVSS<td>fN<div class=unit>gN/gVSS<td>fP<div class=unit>gP/gVSS
-        <tr><td>S<sub>VFA</sub>
-          <td><input id=f_CV_VFA  type=number value=1.0667 step=0.0001>
-          <td><input id=f_C_VFA   type=number value=0.4000 step=0.1000>
-          <td><input id=f_N_VFA   type=number value=0.0000 step=0.1000>
-          <td><input id=f_P_VFA   type=number value=0.0000 step=0.1000>
-        </tr>
-        <tr><td>S<sub>FBSO</sub>
-          <td><input id=f_CV_FBSO type=number value=1.4200 step=0.0100>
-          <td><input id=f_C_FBSO  type=number value=0.4710 step=0.0010>
-          <td><input id=f_N_FBSO  type=number value=0.0464 step=0.0001>
-          <td><input id=f_P_FBSO  type=number value=0.0118 step=0.0001>
-        <tr><td>X<sub>BPO</sub>
-          <td><input id=f_CV_BPO  type=number value=1.5230 step=0.0010>
-          <td><input id=f_C_BPO   type=number value=0.4980 step=0.0010>
-          <td><input id=f_N_BPO   type=number value=0.0323 step=0.0001>
-          <td><input id=f_P_BPO   type=number value=0.0072 step=0.0001>
-        </tr>
-        <tr><td>X<sub>UPO</sub>
-          <td><input id=f_CV_UPO  type=number value=1.4810 step=0.0010>
-          <td><input id=f_C_UPO   type=number value=0.5180 step=0.0010>
-          <td><input id=f_N_UPO   type=number value=0.1000 step=0.1000>
-          <td><input id=f_P_UPO   type=number value=0.0250 step=0.0010>
-        </tr>
-        <tr><td>S<sub>USO</sub>
-          <td><input id=f_CV_USO  type=number value=1.4930 step=0.0010>
-          <td><input id=f_C_USO   type=number value=0.4980 step=0.0010>
-          <td><input id=f_N_USO   type=number value=0.0366 step=0.0001>
-          <td><input id=f_P_USO   type=number value=0.0000 step=0.1000>
-        <tr><td>X<sub>OHO</sub>
-          <td><input id=f_CV_OHO  type=number value=1.4810 step=0.0010>
-          <td><input id=f_C_OHO   type=number value=0.5180 step=0.0010>
-          <td><input id=f_N_OHO   type=number value=0.1000 step=0.1000>
-          <td><input id=f_P_OHO   type=number value=0.0250 step=0.0010>
-        </tr>
-      </table>
-    </div>
-
-    <!--constants-->
-    <div class='card folded'>
-      <code onclick=toggle_class_folded('#constants')>
-        <arrow></arrow> Kinetic parameters
-      </code>
-      <div id=constants>
-        <div>
-          <code>Activated sludge</code>
-          <table>
-            <tr title="heterotrophic COD/COD yield"                        ><td>YH                     <td><input id="YH"          type=number value=0.666 step=0.01 ><td class=unit>gCOD/gCOD
-            <tr title="heterotrophic endogenous respiration rate at 20ºC"  ><td>bH                     <td><input id="bH"          type=number value=0.240 step=0.01 ><td class=unit>1/d
-            <tr title="bH temperature correction factor -> bHT=bH·θ^(T-20)"><td>&theta;<sub>bH</sub>   <td><input id="theta_bH"    type=number value=1.029 step=0.001><td class=unit>ø
-            <tr title="effluent FBSO (high value means effluent FBSO~0)"   ><td>k_v20                  <td><input id="k_v20"       type=number value=0.070 step=0.01 ><td class=unit>L/mgVSS·d
-            <tr title="k_v20 temperature correction factor"                ><td>&theta;<sub>k_v20</sub><td><input id="theta_k_v20" type=number value=1.035 step=0.001><td class=unit>ø
-            <tr title="endogenous residue fraction"                        ><td>fH                     <td><input id="fH"          type=number value=0.200 step=0.1  ><td class=unit>ø
-            <tr title="iSS content of OHOs"                                ><td>f_iOHO                 <td><input id="f_iOHO"      type=number value=0.150 step=0.01 ><td class=unit>giSS/gVSS
-          </table>
-        </div>
-        <div>
-          <code>Nitrification</code>
-          <table>
-            <tr title="autotrophic max specific growth rate at 20ºC"     ><td>µAm                  <td><input id="µAm"       type=number value=0.450 step=0.01 ><td class=unit>1/d
-            <tr title="µAm temperature correction factor"                ><td>&theta;<sub>µAm</sub><td><input id="theta_µAm" type=number value=1.123 step=0.001><td class=unit>ø
-            <tr title="autotrophic oxygen half saturation coefficient"   ><td>K_O                  <td><input id="K_O"       type=number value=0.400 step=0.1  ><td class=unit>mgO/L
-            <tr title="autotrophic pH sensitivity coefficient"           ><td>&theta;<sub>pH</sub> <td><input id="theta_pH"  type=number value=2.350 step=0.01 ><td class=unit>ø
-            <tr title="autotrophic pH inhibition Ki"                     ><td>Ki                   <td><input id="Ki"        type=number value=1.130 step=0.01 ><td class=unit>ø
-            <tr title="autotrophic pH inhibition Kii"                    ><td>Kii                  <td><input id="Kii"       type=number value=0.300 step=0.1  ><td class=unit>ø
-            <tr title="autotrophic pH inhibition Kmax"                   ><td>Kmax                 <td><input id="Kmax"      type=number value=9.500 step=0.1  ><td class=unit>ø
-            <tr title="autotrophic VSS/FSA yield at 20ºC"                ><td>YA                   <td><input id="YA"        type=number value=0.100 step=0.1  ><td class=unit>gVSS/gFSA
-            <tr title="ammonia half saturation coefficient at 20ºC"      ><td>Kn                   <td><input id="Kn"        type=number value=1.000 step=0.1  ><td class=unit>mg/L
-            <tr title="Kn temperature correction factor"                 ><td>&theta;<sub>Kn</sub> <td><input id="theta_Kn"  type=number value=1.123 step=0.001><td class=unit>ø
-            <tr title="autotrophic endogenous respiration rate at 20ºC"  ><td>bA                   <td><input id="bA"        type=number value=0.040 step=0.01 ><td class=unit>1/d
-            <tr title="bA temperature correction factor"                 ><td>&theta;<sub>bA</sub> <td><input id="theta_bA"  type=number value=1.029 step=0.001><td class=unit>ø
-          </table>
-        </div>
-        <div>
-          <code>Denitrification</code>
-          <table>
-            <tr title="K denitrification rate 2 at 20ºC"                 ><td>K2_20                <td><input id="K2_20"     type=number value=0.101 step=0.001><td class=unit>gN/gVSS·d
-            <tr title="K2_20 temperature correction factor"              ><td>&theta;<sub>K2</sub> <td><input id="theta_K2"  type=number value=1.080 step=0.001><td class=unit>ø
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!--outputs-->
-  <div id=outputs>
-    <div class=card> <strong>Outputs</strong>
-      <small>
-        <span>
-          <label onclick=""><input type=radio name=summary_units value=conc checked> mg/L</label>
-          <label onclick=""><input type=radio name=summary_units value=flux>         kg/d</label>
-          <label onclick=""><input type=radio name=summary_units value=both>         all </label>
-        </span>
-      </small>
-    </div>
-
-    <!--errors-->
-    <div class='card folded'>
-      <code onclick="toggle_class_folded('#outputs #errors')">
-        <arrow></arrow> Warnings/Errors <span id=error_counter>(0)</span>
-      </code>
-      <div id=errors style="display:"><small>loading...</small></div>
-    </div>
-
-    <!--summaries-->
-    <div class='card'>
-      <code onclick="toggle_class_folded('#outputs #summaries')">
-        <arrow></arrow> Summary
-      </code>
-      <div id=summaries></div>
-    </div>
-
-    <!--process variables-->
-    <div class='card folded'>
-      <code onclick="toggle_class_folded('#outputs #processes')">
-        <arrow></arrow> Process variables
-      </code>
-      <div id=processes class=flex></div>
-    </div>
-
-    <!--fractionation-->
-    <div class='card folded'>
-      <code onclick="toggle_class_folded('#outputs #fractionation')">
-        <arrow></arrow> Fractionation
-      </code>
-      <div id=fractionation></div>
-    </div>
-
-    <!--export-->
-    <div class='card folded'>
-      <code onclick="toggle_class_folded('#outputs #export')">
-        <arrow></arrow> Export
-      </code>
-      <textarea id=export style="width:99%;height:200px"></textarea>
-    </div>
-  </div>
-</main>
-
 <!--footer-->
-<footer style="border-top:1px solid #ccc;margin-top:20px;padding:1em">
-  About
-  <ul>
+<footer style="border-top:1px solid #ccc;margin-top:20px;padding:8px">
+  <b>About</b>
+  <ul id=about>
     <li><a target=_blank href="//github.com/icra/uct-icra-model">README</a>
     <li><a target=_blank href="//github.com/icra/uct-icra-model/blob/master/ASSUMPTIONS.md">MODEL ASSUMPTIONS</a>
     <li><a target=_blank href="//github.com/icra/uct-icra-model/tree/master/src">SOURCE CODE</a>
@@ -418,419 +536,149 @@
   </ul>
 </footer>
 
-<!--load backend-->
-<script src="../src/state-variables.js"></script>
-<script src="../src/constants.js"></script>
-<script src="../src/primary-settler.js"></script>
-<script src="../src/chemical-P-removal.js"></script>
-<script src="../src/capacity-estimation.js"></script>
-<script src="../src/activated-sludge.js"></script>
-<script src="../src/nitrification.js"></script>
-<script src="../src/denitrification.js"></script>
-<script src="../src/plant.js"></script>
-
-<!--run backend and integrate to frontend-->
+<!--backend: plants-->
 <script>
-  //GET inputs from URL
-  let url=new URL(window.location.href);
+  let plants=[]; //empty array
+</script>
 
-  //iterate GET keys
-  for(let pair of url.searchParams.entries()){
-    let key = pair[0];
-    let val = pair[1];
-    let el  = document.querySelector(`#inputs #${key}`);
-    if(el){
-      if(el.type=='checkbox'){
-        if(val=='true') el.checked=true;
-      }else{
-        //includes <input type=number> and <select id>
-        el.value = val;
-      }
+<!--frontend: visible items tree for each plant-->
+<script>
+  //arbre items visibles planta
+  class Visibles {
+    constructor(){
+      this.visible=true;
+      this.inputs={
+        visible:false,
+        influent:{
+          visible:false,
+          components:false,
+          summary:false,
+          totals:false,
+          mass_ratios:false,
+        },
+        configuration:false,
+        parameters:false,
+        constants:false,
+      };
+      this.outputs={
+        visible:false,
+        process_variables:{
+          visible:false,
+          as:false,
+          bpr:false,
+          nit:false,
+          dn:false,
+          cpr:false,
+          cap:false,
+        },
+        primary:{
+          visible:false,
+          effluent:{
+            visible:false,
+            summary:false,
+            totals:false,
+          },
+          wastage:{
+            visible:false,
+            summary:false,
+            totals:false,
+          },
+        },
+        secondary:{
+          visible:false,
+          effluent:{
+            visible:false,
+            summary:false,
+            totals:false,
+          },
+          wastage:{
+            visible:false,
+            summary:false,
+            totals:false,
+          },
+        },
+        errors:false,
+        energy:false,
+      };
     }
   }
+  plants.forEach(plant=>{plant.visibles=new Visibles();});
+</script>
 
-  //execute model
-  document.querySelector('button#run').addEventListener('click',function(){
-    //create new  influent
-    let influent = null;
-    try{
-      influent=new State_Variables(
-        parseFloat(document.querySelector('#influent #Q').value),
-        parseFloat(document.querySelector('#influent #S_VFA').value),
-        parseFloat(document.querySelector('#influent #S_FBSO').value),
-        parseFloat(document.querySelector('#influent #X_BPO').value),
-        parseFloat(document.querySelector('#influent #X_UPO').value),
-        parseFloat(document.querySelector('#influent #S_USO').value),
-        parseFloat(document.querySelector('#influent #X_iSS').value),
-        parseFloat(document.querySelector('#influent #S_FSA').value),
-        parseFloat(document.querySelector('#influent #S_OP').value),
-        parseFloat(document.querySelector('#influent #S_NOx').value),
-      );
-    }catch(e){
-      console.error(e);
-      alert(e);
-      return;
-    }
+<!--frontend: vue-->
+<script>
+  //view model xarxa
+  let vm_plants=new Vue({
+    el:'#plants',
+    data:{
+      plants:               plants,
+      //info: unitats i descripcions
+      plant_info:           Plant.info,
+      state_variables_info: State_Variables.info,
+    },
+    methods:{
+      add_plant:function(){
+        //nova planta
+        let plant = new Plant(
+          //syntax-----------( Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_NH4, S_PO4, S_NOx, S_O2, X_OHO, X_PAO)
+          new State_Variables(15,    50,    115,   440,   100,    45,    60,  39.1,    25,     0,    0,     0,     0), //influent
+          {pst:false, bpr:false, nit:false, dn:false}, //configuration
+          {                                        //parameters
+            //legend {PST:'primary settler', AS:'activated sludge', CE:'capacity estimation', NIT:'nitrification', DN:'denitrification', CPR:'chemical P removal'}
+            fw          : 0.00500,   //ø       | PST | fraction of Q that goes to wastage
+            removal_BPO : 42.3352,   //%       | PST | removal of the component X_BPO
+            removal_UPO : 90.0500,   //%       | PST | removal of the component X_UPO
+            removal_iSS : 75.1250,   //%       | PST | removal of the component X_iSS
+            T           : 16.0000,   //ºC      | AS  | temperature
+            Vp          :   10000,   //m3      | AS  | reactor volume
+            Rs          : 15.0000,   //d       | AS  | solids retention time or sludge age
+            DO          : 2.00000,   //mgO/L   | AS  | DO in the aerobic reactor
+            RAS         : 1.00000,   //ø       | AS  | SST underflow recycle ratio
+            waste_from  : "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
+            mass_FeCl3  : 3000.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+            S_NOx_RAS   : 0.50000,   //mgNOx/L | BPR | NOx concentration at RAS
+            DO_RAS      : 0.00000,   //mgO/L   | BPR | Dissolved oxygen at recycle
+            f_AN        : 0.10000,   //ø       | BPR | anaerobic mass fraction, different from fxt, value must be <= fxm
+            an_zones    : 2.00000,   //number of BPR | anaerobic zones
 
-    //read mass ratios from screen and modify influent object
-    ['CV','C','N','P'].forEach(c1=>{
-      ['VFA','FBSO','BPO','UPO','USO','OHO'].forEach(c2=>{
-        influent.mass_ratios[`f_${c1}_${c2}`] =
-          parseFloat(document.querySelector(`#mass_ratios #f_${c1}_${c2}`).value);
-      });
-    });
+            SF          : 1.25000,   //ø       | NIT | safety factor. design choice. Moves the sludge age
+            fxt         : 0.39000,   //ø       | NIT | current unaerated sludge mass fraction
+            pH          : 7.20000,   //ø       | NIT | pH
+            IR          : 5.40000,   //ø       | DN  | internal recirculation ratio
+            DO_RAS      : 1.00000,   //mgO/L   | DN  | DO in the underflow recycle
+            influent_alk: 250.000,   //mg/L    | DN  | influent alkalinity (mg/L CaCO3)
 
-    //read constants (kinetic parameters) from DOM
-    document.querySelectorAll('#inputs #constants input[id]').forEach(input=>{
-      constants[input.id]=parseFloat(input.value);
-    });
-
-    //get plant configuration from DOM
-    let conf={
-      pst:document.querySelector('#edar #pst').checked,
-      nit:document.querySelector('#edar #nit').checked,
-      dn :document.querySelector('#edar #dn').checked,
-      cpr:document.querySelector('#edar #cpr').checked,
-    };
-
-    //get plant configuration parameters from DOM
-    let parameters={
-      fw          : parseFloat(document.querySelector('#edar #fw').value),
-      removal_BPO : parseFloat(document.querySelector('#edar #removal_BPO').value),
-      removal_UPO : parseFloat(document.querySelector('#edar #removal_UPO').value),
-      removal_iSS : parseFloat(document.querySelector('#edar #removal_iSS').value),
-      T           : parseFloat(document.querySelector('#edar #T').value),
-      Vp          : parseFloat(document.querySelector('#edar #Vp').value),
-      Rs          : parseFloat(document.querySelector('#edar #Rs').value),
-      RAS         : parseFloat(document.querySelector('#edar #RAS').value),
-      waste_from  :            document.querySelector('#edar #waste_from').value,
-      mass_FeCl3  : parseFloat(document.querySelector('#edar #mass_FeCl3').value),
-      DSVI        : parseFloat(document.querySelector('#edar #DSVI').value),
-      A_ST        : parseFloat(document.querySelector('#edar #A_ST').value),
-      fq          : parseFloat(document.querySelector('#edar #fq').value),
-      SF          : parseFloat(document.querySelector('#edar #SF').value),
-      fxt         : parseFloat(document.querySelector('#edar #fxt').value),
-      DO          : parseFloat(document.querySelector('#edar #DO').value),
-      pH          : parseFloat(document.querySelector('#edar #pH').value),
-      IR          : parseFloat(document.querySelector('#edar #IR').value),
-      DO_RAS      : parseFloat(document.querySelector('#edar #DO_RAS').value),
-      influent_alk: parseFloat(document.querySelector('#edar #influent_alk').value),
-    };
-
-    /*create new plant, run the model*/
-    let plant = new Plant(influent, conf, parameters);
-    let run; //result of plant.run()
-    try{
-      run = plant.run();
-    }catch(e){
-      console.error(e);
-      alert(e);
-      return;
-    }
-    //console.log(run);
-    /*backend end-------*/
-
-    /*GUI integration (read 'run' object)*/
-    (function print_results(){
-      console.time('>> render frontend');
-
-      //draw fractionation columns
-      (function draw_fractionation(){
-        //state variables (per ordre)
-        let svs = {};
-        svs.Influent                      = plant.influent;         //state variables object
-        if(conf.pst) svs.Primary_wastage  = run.primary.wastage;    //state variables object
-        if(conf.pst) svs.Primary_effluent = run.primary.effluent;   //state variables object
-        svs.Secondary_wastage             = run.secondary.wastage;  //state variables object
-        svs.Secondary_effluent            = run.secondary.effluent; //state variables object
-
-        if(Object.keys(svs).length==0)return;
-        let div   = document.querySelector('div#fractionation');div.innerHTML=""; //buida div fractionation
-        let table = document.createElement('table');div.appendChild(table);       //crea nova taula
-        table.style.width="100%";
-        let newRow=table.insertRow(-1);
-        newRow.insertCell(-1).outerHTML="<td colspan=2>";
-
-        //posa noms variables d'estat
-        Object.keys(svs).forEach(nom=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller stream>"+nom.replace('_','<br>');});
-
-        //calcula tots els fraccionaments
-        let totals={};
-        Object.entries(svs).forEach(([nom,sv])=>{totals[nom]=sv.totals;});
-
-        //agafa el primer fraccionament per posar noms de les variables
-        let primer_fraccionament=Object.values(totals).find(e=>e);
-
-        //posa la mateixa nomenclatura de George Ekama
-        let nomenclatura_george={
-          "FSA":"N<sub>a</sub>",
-          "PO4":"P<sub>s</sub>",
-          "bCOD":"S<sub>b</sub>",
-          "uCOD":"S<sub>u</sub>",
-          "sCOD":"S<sub>s</sub>",
-          "pCOD":"S<sub>p</sub>",
-          "bsCOD":"S<sub>bs</sub>",
-          "usCOD":"S<sub>us</sub>",
-          "bpCOD":"S<sub>bp</sub>",
-          "upCOD":"S<sub>up</sub>",
-          "ON":"N<sub>o</sub>",
-          "bON":"N<sub>ob</sub>",
-          "uON":"N<sub>ou</sub>",
-          "sON":"N<sub>os</sub>",
-          "pON":"N<sub>op</sub>",
-          "bsON":"N<sub>obs</sub>",
-          "usON":"N<sub>ous</sub>",
-          "bpON":"N<sub>obp</sub>",
-          "upON":"N<sub>oup</sub>",
-          "OP":"P<sub>o</sub>",
-          "bOP":"P<sub>ob</sub>",
-          "uOP":"P<sub>ou</sub>",
-          "sOP":"P<sub>os</sub>",
-          "pOP":"P<sub>op</sub>",
-          "bsOP":"P<sub>obs</sub>",
-          "usOP":"P<sub>ous</sub>",
-          "bpOP":"P<sub>obp</sub>",
-          "upOP":"P<sub>oup</sub>",
-          "OC":"C<sub>o</sub>",
-          "bOC":"C<sub>ob</sub>",
-          "uOC":"C<sub>ou</sub>",
-          "sOC":"C<sub>os</sub>",
-          "pOC":"C<sub>op</sub>",
-          "bsOC":"C<sub>obs</sub>",
-          "usOC":"C<sub>ous</sub>",
-          "bpOC":"C<sub>obp</sub>",
-          "upOC":"C<sub>oup</sub>",
-          "iSS" :'X<sub>IO</sub>',
-          "VSS" :'X<sub>v</sub>',
-          "bVSS":'X<sub>vb</sub>',
-          "uVSS":'X<sub>vu</sub>',
-        };
-
-        //itera COD,TKN,TP,TOC,TSS
-        Object.entries(primer_fraccionament).forEach(([key,fraccions])=>{
-          let newRow = table.insertRow(-1);
-          let newCell = newRow.insertCell(-1);
-          newCell.innerHTML=key;                           //COD,TKN,TP,TOC,TSS
-          newCell.rowSpan=Object.keys(fraccions).length+1; //bsCOD,usCOD,bpCOD,upCOD...
-
-          //itera cada fracció dins de cada key
-          Object.keys(fraccions).forEach(fraction=>{
-            let newRow=table.insertRow(-1);
-            let nomenclatura = "hola que ases";
-
-            if(fraction=='total'){
-              if     (key=='COD')  nomenclatura='S<sub>t</sub>';
-              else if(key=='TOC')  nomenclatura='C<sub>t</sub>';
-              else if(key=='TKN')  nomenclatura='N<sub>t</sub>';
-              else if(key=='TP' )  nomenclatura='P<sub>t</sub>';
-              else if(key=='TSS' ) nomenclatura='X<sub>t</sub>';
-            }
-            else if(fraction=='active'){
-              if     (key=='COD')  nomenclatura='S<sub>OHO</sub>';
-              else if(key=='TOC')  nomenclatura='C<sub>OHO</sub>';
-              else if(key=='TKN')  nomenclatura='N<sub>OHO</sub>';
-              else if(key=='TP' )  nomenclatura='P<sub>OHO</sub>';
-              else if(key=='TSS' ) nomenclatura='X<sub>OHO</sub>';
-            }else{
-              nomenclatura = nomenclatura_george[fraction] || fraction;
-            }
-
-            newRow.insertCell(-1).innerHTML=nomenclatura;
-
-            //itera variables d'estat
-            Object.entries(svs).forEach(([nom,sv])=>{
-              let mgL = totals[nom][key][fraction]; //concentració
-              let kgd = sv.Q*mgL;                   //flux
-              newRow.insertCell(-1).outerHTML=`<td class=number conc>${format(mgL)}</td>`;
-              newRow.insertCell(-1).outerHTML=`<td class=number flux>${format(kgd)}</td>`;
-            });
-          });
-        });
-      })();
-
-      //dibuixa summaries en columnes
-      (function draw_summaries(){
-        //recopila summaries variables d'estat (per ordre)
-        let summaries = {};
-        summaries.Influent                      = plant.influent.summary;
-        if(conf.pst) summaries.Primary_wastage  = run.primary.wastage.summary;
-        if(conf.pst) summaries.Primary_effluent = run.primary.effluent.summary;
-        summaries.Secondary_wastage             = run.secondary.wastage.summary;
-        summaries.Secondary_effluent            = run.secondary.effluent.summary;
-
-        if(Object.keys(summaries).length==0)return;
-        let div   = document.querySelector('div#summaries'); div.innerHTML=""; //buida div summaries
-        let table = document.createElement('table');div.appendChild(table);    //crea nova taula
-        table.style.width="100%";
-        let newRow = table.insertRow(-1);newRow.insertCell(-1).innerHTML="";   //posa els noms de les variables d'estat
-        Object.keys(summaries).forEach(key=>{newRow.insertCell(-1).outerHTML="<td colspan=2 style=font-size:smaller stream>"+key.replace('_','<br>');});
-        //itera keys del primer objecte (Q,COD,TKN...)
-        Object.keys(Object.values(summaries)[0]).forEach(key=>{
-          let newRow = table.insertRow(-1);
-          if(key=="Q"){
-            newRow.insertCell(-1).innerHTML=`${key} <span class=unit>(ML/d)</span>`;
-          }else{
-            newRow.insertCell(-1).innerHTML=`${key} <span unit class=unit>(mg/L, kg/d)</span>`;
-          }
-          //itera cada variable d'estat
-          Object.entries(summaries).forEach(([name,sv])=>{
-            if(key=="Q"){
-              let Q = sv.Q;
-              newRow.insertCell(-1).outerHTML=`<td class=number colspan=2 flow title=${Q}>${format(Q)}</td>`;
-            }else{
-              let conc = sv[key][0];
-              let flux = sv[key][1];
-              let conc_txt = format(conc);
-              let flux_txt = format(flux);
-              if(name=="River_end" && (key!="NH4" && key!="PO4")){ conc_txt = flux_txt = "<span style=color:#ccc>ø</span>"; }
-              newRow.insertCell(-1).outerHTML=`<td class=number conc title=${conc}>${conc_txt}</td>`;
-              newRow.insertCell(-1).outerHTML=`<td class=number flux title=${flux}>${flux_txt}</td>`;
-            }
-          });
-        });
-      })();
-
-      //draw process variables (pvs)
-      (function draw_pvs(){
-        //recopila process_variables
-        let processes = document.querySelector('#processes');
-        processes.innerHTML="";
-        let pvs = {};
-        pvs.Activated_sludge                = run.process_variables.as;
-        if(conf.nit) pvs.Nitrification      = run.process_variables.nit;
-        if(conf.dn)  pvs.Denitrification    = run.process_variables.dn;
-        if(conf.cpr) pvs.Chemical_P_removal = run.process_variables.cpr;
-        pvs.Capacity_estimation             = run.process_variables.cap;
-
-        //dibuixa una taula per cada procés
-        Object.entries(pvs).forEach(([key,pv])=>{
-          //container pel key i la taula: <div><div>key</div><table></table></div>
-          let div = document.createElement('div'); processes.appendChild(div);
-
-          //nom tecnologia
-          let nom = document.createElement('code'); div.appendChild(nom);
-          nom.style.fontSize='small';
-          nom.innerHTML=key.replace(/_/g,' ');
-
-          //taula process variables
-          let table = document.createElement('table');
-          div.appendChild(table);
-          Object.entries(pv).forEach(([key,obj])=>{
-            let newRow = table.insertRow(-1);
-            newRow.id=key;
-            let value = obj.value;
-            newRow.value=value;
-            newRow.setAttribute('title',obj.descr);
-            newRow.insertCell(-1).innerHTML=key;
-            newRow.insertCell(-1).outerHTML=`<td class=number title='${value}'><small>${format(value)}</small>`;
-            newRow.insertCell(-1).outerHTML="<td class=unit>"+obj.unit.prettifyUnit();
-          });
-        });
-      })();
-
-      //dibuixa errors
-      (function draw_errors(errors){
-        document.querySelector('#error_counter').innerHTML=errors.length ? `(<b>${errors.length}</b>)`:'(0)';
-        let div=document.querySelector('#outputs #errors');
-        div.innerHTML=errors.length?"":"<li class=error style=background:#af0>no errors";
-        errors.forEach(error=>{
-          div.appendChild((function(){
-            let li=document.createElement('li');
-            li.classList.add('error');
-            li.innerHTML=error;
-            return li;
-          })());
-        });
-      })(run.errors);
-
-      //clica unitats marcades
-      document.querySelector('input[name=summary_units]:checked').click();
-
-      console.timeEnd('>> render frontend');
-    })();
+            DSVI        : 120,       //mL/gTSS | CE  | sludge settleability
+            A_ST        : 30000,     //m2      | CE  | area of the settler
+            fq          : 2.4,       //ø       | CE  | peak flow (Qmax/Qavg)
+          },
+        );
+        plant.name     = `Plant ${plants.length+1}`;
+        plant.visibles = new Visibles(); //arbre items visibles
+        plants.push(plant);
+        this.$forceUpdate();
+      },
+      remove_plant:function(plant){
+        let index = plants.indexOf(plant);
+        plants.splice(index,1);
+      },
+      run_model:function(plant){
+        try{
+          plant.outputs = null;
+          let run = plant.run();
+          plant.outputs = {run}; //pack results
+          this.$forceUpdate();
+        }catch(e){
+          alert(e);
+          throw(e);
+        }
+      },
+    },
   });
 
-  //genera URL amb els current inputs
-  document.querySelector('button#run').addEventListener('click',function(){
-    let newUrl = url.origin + url.pathname + '?'; //new url with all current inputs
-    //get <input> elements
-    document.querySelectorAll('#inputs input[id]').forEach(input=>{
-      if(input.type=='checkbox') input.value = input.checked;
-      newUrl += `${input.id}=${input.value}&`;
-    });
-    //get <select> elements
-    document.querySelectorAll('#inputs select[id]').forEach(select=>{
-      newUrl += `${select.id}=${select.value}&`;
-    });
-    //delete last '&' character
-    newUrl = newUrl.substring(0,newUrl.length-1);
-    //write newUrl to GUI
-    if(newUrl.length<2083){
-      document.querySelector('#outputs #export').value=newUrl;
-    }else{
-      document.querySelector('#outputs #export').value="url too long (unsolved error, please contact developers)";
-    }
-  });
+  //initialize plants
+  vm_plants.add_plant();
 
-  //select unit in summaries
-  document.querySelectorAll('input[name=summary_units]').forEach(input=>{
-    input.addEventListener('click',function(){
-      let outputs = document.querySelector('#outputs');
-      switch(this.value){
-        case "conc":
-          outputs.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
-          outputs.querySelectorAll('td[flux]').forEach(td=>td.style.display='none');
-          outputs.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
-          outputs.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
-          outputs.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L)");
-          break;
-        case "flux":
-          outputs.querySelectorAll('td[conc]').forEach(td=>td.style.display='none');
-          outputs.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
-          outputs.querySelectorAll('td[flow]').forEach(td=>td.colSpan=1);
-          outputs.querySelectorAll('td[stream]').forEach(td=>td.colSpan=1);
-          outputs.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(kg/d)");
-          break;
-        case "both":
-          outputs.querySelectorAll('td[conc]').forEach(td=>td.style.display='');
-          outputs.querySelectorAll('td[flux]').forEach(td=>td.style.display='');
-          outputs.querySelectorAll('td[flow]').forEach(td=>td.colSpan=2);
-          outputs.querySelectorAll('td[stream]').forEach(td=>td.colSpan=2);
-          outputs.querySelectorAll('span[unit]').forEach(td=>td.innerHTML="(mg/L, kg/d)");
-          break;
-      }
-    });
-  });
-
-  //keypress listener for enter key
-  document.querySelectorAll('#inputs input').forEach(input=>{
-    input.addEventListener('keypress',function(e){
-      if(e.key=="Enter"){
-        document.querySelector('button#run').click();
-      }
-    });
-  });
-
-  //click listener for title
-  document.querySelector('#title').addEventListener('click',function(){window.location=url.origin+url.pathname;});
-
-  //focus listener for #export
-  document.querySelector('#export').addEventListener('focus',function(){this.select();});
-
-  //click run button
-  document.querySelector('button#run').click();
-
-  //disable plant inputs when technology checkbox is not enabled
-  document.querySelectorAll('#inputs #edar input[type=checkbox][id]').forEach(input=>{
-    function disable_inner_inputs(el){
-      document.querySelectorAll(`#inputs #edar tr#tr_${el.id} input[id]`).forEach(inp=>{
-        if(inp.id==el.id)return;
-        inp.disabled=!el.checked;
-      });
-    }
-    disable_inner_inputs(input);
-    input.addEventListener('click',function(){
-      disable_inner_inputs(this);
-    });
-  });
+  //TODO
+  //create a vue component for state variables
 </script>
