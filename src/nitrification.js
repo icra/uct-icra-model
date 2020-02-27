@@ -1,64 +1,78 @@
 /*
-  AS + Nitrification + SST implementation
+  Nitrification implementation
   from G. Ekama notes
 
-  Qi → [Activated Sludge + Nitrification + SST] → Qe
-                  ↓
-                  Qw
+  this function modifies the output of the activated_sludge module OR the bio_P_removal module
+
+  input structure:
+    * parameters = object
+    * result     = {process_variables, effluent, wastage}
 */
 
 //import files
 try{
-  State_Variables=require("./state-variables.js");
-  constants      =require("./constants.js");
+  State_Variables = require("./state-variables.js");
+  constants       = require("./constants.js");
   require("./activated-sludge.js");
 }catch(e){}
 
-State_Variables.prototype.nitrification=function(
-    T, Vp, Rs, DO, RAS, waste_from,
-    mass_FeCl3,
-    SF, fxt, pH
-  ){
-  /*inputs and default values*/
-  //as inputs
-  T   = isNaN(T)   ? 16     : T  ; //ºC   | Temperature
-  Vp  = isNaN(Vp)  ? 8473.3 : Vp ; //m3   | Volume
-  Rs  = isNaN(Rs)  ? 15     : Rs ; //days | Solids retention time
-  DO  = isNaN(DO)  ? 2.0    : DO ; //mg/L | DO in the aerobic reactor
-  RAS = isNaN(RAS) ? 1.0    : RAS; //ø    | SST underflow recycle ratio
-  waste_from = waste_from || 'reactor'; //"reactor" or "sst"
+State_Variables.prototype.nitrification=function(parameters, result){
+  //check undefined inputs
+  if(parameters==undefined) throw new Error("parameters is undefined");
+  if(result    ==undefined) throw new Error("result     is undefined");
 
-  //chemical P removal inputs
-  mass_FeCl3 = isNaN(mass_FeCl3) ? 50 : mass_FeCl3; //kg/d | mass of FeCl3 added for chemical P removal
+  //check effluent and wastage
+  if(result.effluent.constructor!==State_Variables) throw new Error("effluent is not a State_Variables object");
+  if(result.wastage.constructor !==State_Variables) throw new Error("wastage  is not a State_Variables object");
 
-  //nitrification inputs (this module)
-  SF  = isNaN(SF) ? 1.25 : SF ; /* safety factor | Design choice. Increases the sludge age to dampen the effluent ammonia variation
-                                   choose a high value for high influent ammonia concentration variation */
-  fxt = isNaN(fxt) ? 0.39 : fxt; //ratio         | current unaerated sludge mass fraction
-  pH  = isNaN(pH)  ? 7.2  : pH ; //pH units
+  //unpack result from AS or BPR module
+  let as_ppvv  = result.process_variables; //object
+  let effluent = result.effluent;          //State_Variables object
+  let wastage  = result.wastage;           //State_Variables object
 
-  //input checks
+  //===========================================================================
+  // PARAMETERS
+  //===========================================================================
+  //SF: Design choice. Increases the
+  //sludge age to dampen the effluent ammonia variation choose a high value for
+  //high influent ammonia concentration variation
+  let T   = parameters.T;   //ºC   | Temperature
+  let Vp  = parameters.Vp;  //m3   | Volume of reactor
+  let Rs  = parameters.Rs;  //days | Solids Retention Time or Sludge Age
+  let DO  = parameters.DO;  //mg/L | DO in the aerobic reactor
+  let SF  = parameters.SF;  //ø    | safety factor
+  let fxt = parameters.fxt; //ø    | unaerated sludge mass fraction
+  let pH  = parameters.pH;  //pH units
+
+  //check undefined parameters
+  if(SF ==undefined) throw new Error(`SF  is undefined`);
+  if(fxt==undefined) throw new Error(`fxt is undefined`);
+  if(pH ==undefined) throw new Error(`pH  is undefined`);
+
+  //check variable type
+  if(typeof(SF )!="number") throw new Error(`SF  is not a number`);
+  if(typeof(fxt)!="number") throw new Error(`fxt is not a number`);
+  if(typeof(pH )!="number") throw new Error(`pH  is not a number`);
+
+  //numerical checks for physical sense
   if(SF  < 0) throw new Error(`Safety factor (SF=${SF}) not allowed`);
   if(fxt < 0) throw new Error(`Unaerated sludge mass fraction (fxt=${fxt}) not allowed`);
-
-  //influent fractionation
-  let frac = this.totals; //object
-
-  //execute activated sludge without nitrification first
-  let as = this.activated_sludge(T,Vp,Rs,DO,RAS,waste_from,mass_FeCl3); //object
 
   //flowrate
   let Q = this.Q; //ML/d
 
+  //influent fractionation
+  let frac = this.totals; //object
+
   //nitrification starts at page 17
   //get necessary TKN fractions
-  let Nti   = frac.TKN.total;              //mg/L | total TKN influent
-  let Nouse = frac.TKN.usON;               //mg/L | total N_USO_influent = N_USO_effluent
-  let Nobse = as.effluent.totals.TKN.bsON; //mg/L | total bsON (from FBSO not degraded)
+  let Nti   = frac.TKN.total;           //mg/L | total TKN influent
+  let Nouse = frac.TKN.usON;            //mg/L | total N_USO_influent = N_USO_effluent
+  let Nobse = effluent.totals.TKN.bsON; //mg/L | total bsON (from FBSO not degraded)
 
   //get necessary variables from activated_sludge or bpr TODO
-  let MX_T = as.process_variables.MX_T.value; //kg   | total sludge produced
-  let Ns   = as.process_variables.Ns.value;   //mg/L | N required from sludge production
+  let MX_T = as_ppvv.MX_T.value; //kg   | total sludge produced
+  let Ns   = as_ppvv.Ns.value;   //mg/L | N required from sludge production
 
   //3 - nitrification kinetics
   const µAm   = constants.µAm;            //0.450 1/d | auth. max specific growth rate at 20ºC
@@ -76,14 +90,14 @@ State_Variables.prototype.nitrification=function(
   const Kmax = constants.Kmax;     //9.5  page 471 and 113
   let µAm_pH = µAmO*Math.pow(ϴ_pH, pH-7.2)*Ki*(Kmax-pH)/(Kmax+Kii-pH); //page 471 and 113
 
-  //kinetic constants for AN organisms
-  const YA = constants.YA;          //0.100 gVSS/gNH4 | yield coefficient at 20ºC
-  const Kn = constants.Kn;          //1.000 mgN/L     | ammonia half saturation coefficient at 20ºC
-  const ϴ_Kn = constants.theta_Kn;  //1.123 mgN/L     | Kn temperature correction factor
-  let KnT = Kn*Math.pow(ϴ_Kn,T-20); //mgN/L           | Kn corrected by temperature
-  const bA = constants.bA;          //1/d             | endogenous respiration rate at 20ºC
-  const ϴ_bA = constants.theta_bA;  //ø               | bA temperature correction factor
-  let bAT = bA*Math.pow(ϴ_bA,T-20); //1/d             | bA corrected by temperature
+  //kinetic constants for NIT organisms
+  const YA   = constants.YA;           //0.100 gVSS/gNH4 | yield coefficient at 20ºC
+  const Kn   = constants.Kn;           //1.000 mgN/L     | ammonia half saturation coefficient at 20ºC
+  const ϴ_Kn = constants.theta_Kn;     //1.123 mgN/L     | Kn temperature correction factor
+  let KnT    = Kn*Math.pow(ϴ_Kn,T-20); //mgN/L           | Kn corrected by temperature
+  const bA   = constants.bA;           //1/d             | endogenous respiration rate at 20ºC
+  const ϴ_bA = constants.theta_bA;     //ø               | bA temperature correction factor
+  let bAT    = bA*Math.pow(ϴ_bA,T-20); //1/d             | bA corrected by temperature
 
   //page 17
   //maximum design unaerated sludge mass fraction
@@ -123,44 +137,27 @@ State_Variables.prototype.nitrification=function(
   //console.log({i_COD_NO3});//debugging
   let FOn_fxt = i_COD_NO3*Q*Nc_fxt; //kgO/d | O demand if fxt < fxm
   let FOn_fxm = i_COD_NO3*Q*Nc_fxm; //kgO/d | O demand if fxt = fxm
-  let FOc     = as.process_variables.FOc.value; //kg=/d
-  let FOt_fxt = FOc + FOn_fxt; //kgO/d | total O demand if fxt < fxm
-  let FOt_fxm = FOc + FOn_fxm; //kgO/d | total O demand if fxt = fxm
+  let FOc     = as_ppvv.FOc.value;  //kgO/d
+  let FOt_fxt = FOc + FOn_fxt;      //kgO/d | total O demand if fxt < fxm
+  let FOt_fxm = FOc + FOn_fxm;      //kgO/d | total O demand if fxt = fxm
   let OUR_fxt = FOt_fxt*1000/(Vp*(1-fxt)*24); //mgO/L·h
   let OUR_fxm = FOt_fxm*1000/(Vp*(1-fxm)*24); //mgO/L·h
 
   //page 475 4.14.22.3 book: calculate mass of nitrifiers
-  let f_XBA = YA*Rs/(1+bAT*Rs);    //gVSS·d/gNH4
-  let MX_BA = Q*Nc_fxt*f_XBA;      //kg VSS
-  let MX_BA_perc = 100*MX_BA/MX_T; //% percentage of nitrifiers VSS/TSS
-  let X_BA  = MX_BA/Vp;            //kgVSS/m3
+  let f_XBA = YA*Rs/(1+bAT*Rs);       //gVSS·d/gNH4
+  let MX_BA = Q*Nc_fxt*f_XBA;         //kg VSS
+  let MX_BA_perc = 100*MX_BA/MX_T||0; //% percentage of nitrifiers VSS/TSS
+  let X_BA  = MX_BA/Vp;               //kgVSS/m3
   //end nitrification ---------------------
 
-  //prepare nitrification outputs
-  let Qe   = as.effluent.Q;                //ML/d
-  let Qw   = as.wastage.Q;                 //ML/d
-  let Suse = as.effluent.components.S_USO; //mgCOD/L
-  let Pse  = as.effluent.components.S_PO4; //mgP/L
-
-  //concentration of particulated fractions in wastage
-  let iSS_was = as.wastage.components.X_iSS; //mg/L | iSS concentration
-  let UPO_was = as.wastage.components.X_UPO; //mg/L | UPO concentration
-  let OHO_was = as.wastage.components.X_OHO; //mg/L | OHO concentration
-  let PAO_was = as.wastage.components.X_PAO; //mg/L | PAO concentration
-
-  //FBSO from previous step
-  let Sbse = as.effluent.components.S_FBSO; //mg/L of bCOD not degraded
-
   //effluent nitrate: nitrate generated + influent
-  let Nne = Nc_fxt + as.effluent.components.S_NOx;
+  let Nne = Nc_fxt + effluent.components.S_NOx;
 
-  //output state variables----------(Q   VFA FBSO  BPO UPO      USO   iSS      NH4      PO4  NOx  O2  OHO      PAO    )
-  let effluent = new State_Variables(Qe, 0,  Sbse, 0,  0,       Suse, 0,       Nae_fxt, Pse, Nne, DO, 0,       0      );
-  let wastage  = new State_Variables(Qw, 0,  Sbse, 0,  UPO_was, Suse, iSS_was, Nae_fxt, Pse, Nne, DO, OHO_was, PAO_was);
-
-  //copy influent mass ratios
-  effluent.mass_ratios = this.mass_ratios;
-  wastage.mass_ratios  = this.mass_ratios;
+  //modify state variables (effluent and wastage)
+  effluent.components.S_NH4 = Nae_fxt;
+  wastage .components.S_NH4 = Nae_fxt;
+  effluent.components.S_NOx = Nne;
+  wastage .components.S_NOx = Nne;
 
   //pack nitrification process variables
   let process_variables={
@@ -197,24 +194,37 @@ State_Variables.prototype.nitrification=function(
   //hide description (debug)
   //Object.values(process_variables).forEach(obj=>delete obj.descr);
   return {
-    process_variables,                          //nitrification process variables
-    as_process_variables: as.process_variables, //activated sludge process variables
-    effluent,                                   //State_Variables object
-    wastage,                                    //State_Variables object
+    process_variables,             //nitrification process variables
+    as_process_variables: as_ppvv, //AS or BPR process variables
+    effluent,                      //State_Variables object
+    wastage,                       //State_Variables object
   };
 };
 
 /*test*/
 (function(){
   return
-  //new influent---------------(Q       VFA FBSO BPO  UPO USO iSS NH4   OP    NOx OHO)
-  let inf = new State_Variables(24.875, 50, 115, 255, 10, 45, 15, 39.1, 7.28, 0,  0  );
-  //call as+nit--------------(T   Vp      Rs  RAS  waste      mass_FeCl3 SF    fxt   DO   pH)
-  let nit = inf.nitrification(16, 8473.3, 15, 1.0, 'reactor', 3000,      1.25, 0.39, 2.0, 7.2);
+  //new influent---------------(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  NH4,  PO4, NOx, O2, OHO, PAO)
+  let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0,  0,   0,   0);
+
+  //execute AS + NIT
+  let parameters = {
+    T          : 16,        //ºC
+    Vp         : 8473.3,    //m3
+    Rs         : 15,        //days
+    DO         : 2.0,       //mgO2/L
+    RAS        : 1.0,       //ø
+    waste_from : 'reactor', //string
+    mass_FeCl3 : 3000,      //kgFeCl3/d
+    SF         : 1.25,      //ø
+    fxt        : 0.39,      //ø
+    pH         : 7.2,       //pH units
+  };
+  let as       = inf.activated_sludge(parameters); //AS results
+  console.log(as);
+  let nit      = inf.nitrification(parameters, as); //NIT results
+
   //print results
-  console.log("=== NIT process variables");   console.log(nit.process_variables);
-  return
-  //console.log("=== AS+NIT effluent summary"); console.log(nit.effluent.summary);
-  //console.log("=== AS+NIT TKN effluent");     console.log(nit.effluent.totals.TKN);
-  //console.log("=== AS+NIT wastage summary");  console.log(nit.wastage.summary);
+  console.log("=== NIT process variables");
+  console.log(nit.process_variables);
 })();

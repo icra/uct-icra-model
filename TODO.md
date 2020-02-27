@@ -1,5 +1,4 @@
 ## Pending Tasks
-  - bio P: george sends hand calculations and laura + lluís check it.
   - add note
     "this model was tested and checked against the ekama plant wide spreadsheet
     using the ww characteristics in [WRC 1984, EKAMA 2011, HENZE ET AL 2008,
@@ -30,6 +29,7 @@
   - stoichiometry for CO2 produced
 
 ## Tasks done/solved/clear/discussed
+  - [done] bio P: george sends hand calculations and laura + lluís check it.
   - [done] energy consumption module in ecoadvisor
   - [done] validate test values of X.tave and Q.ADWF in the user interface.
   - [done] validate test values of Rs/Rsm/Rs.bal/IR/a.opt/a.prac.

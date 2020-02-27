@@ -1,20 +1,20 @@
 /*
   Chemical P removal
   Metcalf & Eddy, Wastewater Engineering, 5th ed., 2014, page 484
+
+  note: AlCl3 still not implemented (only FeCl3)
 */
 
-function chemical_P_removal(Q, PO4i, mass_FeCl3, mass_AlCl3){
+function chemical_P_removal(parameters){
   //inputs and default values
-  Q          = isNaN(Q)          ? 1 : Q;          //ML/d      | influent flowrate
-  PO4i       = isNaN(PO4i)       ? 7 : PO4i;       //mgP/L     | named "Psa" in 'activated-sludge.js'
-  mass_FeCl3 = isNaN(mass_FeCl3) ? 0 : mass_FeCl3; //kgFeCl3/d | mass of FeCl3 added daily
-  mass_AlCl3 = isNaN(mass_AlCl3) ? 0 : mass_AlCl3; //kgAlCl3/d | mass of AlCl3 added daily
+  let Q          = parameters.Q;          //ML/d      | influent flowrate
+  let PO4i       = parameters.PO4i;       //mgP/L     | named "Psa" in 'activated-sludge.js'
+  let mass_FeCl3 = parameters.mass_FeCl3; //kgFeCl3/d | mass of FeCl3 added daily
 
   //input checks
   if(Q          <= 0) throw new Error(`Value of Flowrate (Q=${Q}) not allowed`);
   if(PO4i       <  0) throw new Error(`Value of Input PO4 (PO4i=${PO4i}) not allowed`);
   if(mass_FeCl3 <  0) throw new Error(`Value of Mass of FeCl3 (mass_FeCl3=${mass_FeCl3}) not allowed`);
-  if(mass_AlCl3 <  0) throw new Error(`Value of Mass of AlCl3 (mass_AlCl3=${mass_AlCl3}) not allowed`);
 
   //molecular weights
   const M_Fe        = 55.845;   //g/mol (Fe molecular weight)
@@ -128,6 +128,6 @@ try{module.exports=chemical_P_removal;}catch(e){}
   let Q          = 25;   //ML/d
   let PO4i       = 8;    //mg/L
   let mass_FeCl3 = 3145; //kg
-  let cpr = chemical_P_removal(Q, PO4i, mass_FeCl3);
+  let cpr = chemical_P_removal({Q, PO4i, mass_FeCl3});
   console.log(cpr);
 })();

@@ -1,23 +1,40 @@
 /*
   Primary settler implementation from G. Ekama notes
   Removal % of the particulated fractions: BPO, UPO and iSS
+
   Qi → [Primary Settler] → Qe
               ↓
               Qw
 */
 
 //import files
-try{State_Variables=require("./state-variables.js");}catch(e){}
+try{
+  State_Variables=require("./state-variables.js");
+}catch(e){}
 
-State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO, removal_iSS){
-  //inputs and default values
-  fw          = isNaN(fw)          ? 0.005                       : fw;          //fraction of Q that goes to wastage
-  removal_BPO = isNaN(removal_BPO) ? 100-100*24.875*255/(25*440) : removal_BPO; //% | removal of the component X_BPO
-  removal_UPO = isNaN(removal_UPO) ? 100-100*24.875* 10/(25*100) : removal_UPO; //% | removal of the component X_UPO
-  removal_iSS = isNaN(removal_iSS) ? 100-100*24.875* 15/(25* 60) : removal_iSS; //% | removal of the component X_iSS
+State_Variables.prototype.primary_settler=function(parameters){
+  //===========================================================================
+  // PARAMETERS
+  //===========================================================================
+  let fw          = parameters.fw;          //fraction of Q that goes to wastage
+  let removal_BPO = parameters.removal_BPO; //% | removal of the component X_BPO
+  let removal_UPO = parameters.removal_UPO; //% | removal of the component X_UPO
+  let removal_iSS = parameters.removal_iSS; //% | removal of the component X_iSS
 
-  //input checks
-  if(fw          <  0) throw new Error(`Value of Wastage fraction (fw=${fw}) not allowed`);
+  //check undefined parameters
+  if(fw         ==undefined) throw new Error(`fw          is undefined`);
+  if(removal_BPO==undefined) throw new Error(`removal_BPO is undefined`);
+  if(removal_UPO==undefined) throw new Error(`removal_UPO is undefined`);
+  if(removal_iSS==undefined) throw new Error(`removal_iSS is undefined`);
+
+  //check variable types
+  if(typeof(fw         )!="number") throw new Error(`fw          is not a number`);
+  if(typeof(removal_BPO)!="number") throw new Error(`removal_BPO is not a number`);
+  if(typeof(removal_UPO)!="number") throw new Error(`removal_UPO is not a number`);
+  if(typeof(removal_iSS)!="number") throw new Error(`removal_iSS is not a number`);
+
+  //numerical checks for physical sense
+  if(fw          <  0) throw new Error(`Value of PST Wastage fraction (fw=${fw}) not allowed`);
   if(removal_BPO <  0) throw new Error(`Value of BPO removal (removal_BPO=${removal_BPO}) not allowed`);
   if(removal_UPO <  0) throw new Error(`Value of UPO removal (removal_UPO=${removal_UPO}) not allowed`);
   if(removal_iSS <  0) throw new Error(`Value of iSS removal (removal_iSS=${removal_iSS}) not allowed`);
@@ -63,14 +80,15 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
   let S_VFA  = this.components.S_VFA;  //mg/L soluble
   let S_FBSO = this.components.S_FBSO; //mg/L soluble
   let S_USO  = this.components.S_USO;  //mg/L soluble
-  let S_FSA  = this.components.S_FSA;  //mg/L soluble
-  let S_OP   = this.components.S_OP;   //mg/L soluble
+  let S_NH4  = this.components.S_NH4;  //mg/L soluble
+  let S_PO4  = this.components.S_PO4;  //mg/L soluble
   let S_NOx  = this.components.S_NOx;  //mg/L soluble
+  let S_O2   = this.components.S_O2;   //mg/L soluble
 
   //new output state variables (wastage and effluent)
-  //syntax--------------------------(Qi  VFA    FBSO    BPO      UPO      USO    iSS      FSA    OP    NOx    OHO      PAO)
-  let effluent = new State_Variables(Qe, S_VFA, S_FBSO, X_BPO_e, X_UPO_e, S_USO, X_iSS_e, S_FSA, S_OP, S_NOx, X_OHO_e, X_PAO_e);
-  let wastage  = new State_Variables(Qw, S_VFA, S_FBSO, X_BPO_w, X_UPO_w, S_USO, X_iSS_w, S_FSA, S_OP, S_NOx, X_OHO_w, X_PAO_w);
+  //syntax                          (Qi, S_VFA, S_FBSO,   X_BPO,   X_UPO, S_USO,   X_iSS, S_NH4, S_PO4, S_NOx, S_O2,   X_OHO,   X_PAO)
+  let effluent = new State_Variables(Qe, S_VFA, S_FBSO, X_BPO_e, X_UPO_e, S_USO, X_iSS_e, S_NH4, S_PO4, S_NOx, S_O2, X_OHO_e, X_PAO_e);
+  let wastage  = new State_Variables(Qw, S_VFA, S_FBSO, X_BPO_w, X_UPO_w, S_USO, X_iSS_w, S_NH4, S_PO4, S_NOx, S_O2, X_OHO_w, X_PAO_w);
 
   //copy mass ratios for the new outputs
   effluent.mass_ratios = this.mass_ratios;
@@ -83,10 +101,16 @@ State_Variables.prototype.primary_settler=function(fw, removal_BPO, removal_UPO,
 //test
 (function test(){
   return
-  let inf = new State_Variables(/*default values*/); //object
-  let pst = inf.primary_settler(/*default values*/); //object
+  //syntax                     (  Q, VFA, FBSO, BPO, UPO, USO, iSS,  NH4,   PO4, NOx, O2, OHO PAO)
+  let inf = new State_Variables(100,  50,  186, 406, 130,  58, 100, 59.6, 14.15,   0,  0,   0,  0);
+  let pst = inf.primary_settler({
+    fw          : 0.005,                       //ø
+    removal_BPO : 100-100*24.875*255/(25*440), //%
+    removal_UPO : 100-100*24.875* 10/(25*100), //%
+    removal_iSS : 100-100*24.875* 15/(25* 60), //%
+  });
   //show info
-  console.log(inf.summary);
-  console.log(pst.effluent);
-  console.log(pst.wastage);
+  console.log(inf.components);
+  console.log(pst.effluent.components);
+  //console.log(pst.wastage.components);
 })();

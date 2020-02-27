@@ -9,23 +9,39 @@
   plant is underloaded
 */
 
-function capacity_estimation(DSVI, L, Sti, A_ST, VR, fq){
-  //inputs
-  DSVI = isNaN(DSVI)? 120    : DSVI; //mL/gTSS       | sludge settleability
-  L    = isNaN(L   )? 2.9615 : L   ; //kgTSS·d/kgCOD | LTSS (eq 10) = MX_T/FSti
-  Sti  = isNaN(Sti )? 1150   : Sti ; //mgCOD/L       | influent total COD
-  A_ST = isNaN(A_ST)? 1248.6 : A_ST; //m2            | area of the settler
-  VR   = isNaN(VR  )? 12461  : VR  ; //m3            | volume of the reactor
-  fq   = isNaN(fq  )? 2.4    : fq  ; //ø             | peak flow (Qmax/Qavg)
+function capacity_estimation(parameters){
+  //===========================================================================
+  // PARAMETERS
+  //===========================================================================
+  let DSVI = parameters.DSVI; //mL/gTSS       | sludge settleability
+  let L    = parameters.L   ; //kgTSS·d/kgCOD | LTSS (eq 10) = MX_T/FSti
+  let Sti  = parameters.Sti ; //mgCOD/L       | influent total COD
+  let A_ST = parameters.A_ST; //m2            | area of the settler
+  let VR   = parameters.Vp  ; //m3            | volume of the reactor
+  let fq   = parameters.fq  ; //ø             | peak flow (Qmax/Qavg)
 
-  //console.log({DSVI, L, Sti, A_ST, VR, fq});
+  //check undefined parameters
+  if(DSVI==undefined) throw new Error(`DSVI is undefined`);
+  if(L   ==undefined) throw new Error(`L    is undefined`);
+  if(Sti ==undefined) throw new Error(`Sti  is undefined`);
+  if(A_ST==undefined) throw new Error(`A_ST is undefined`);
+  if(VR  ==undefined) throw new Error(`VR   is undefined`);
+  if(fq  ==undefined) throw new Error(`fq   is undefined`);
 
-  //input checks
+  //check variable types
+  if(typeof(DSVI)!="number") throw new Error(`DSVI is not a number`);
+  if(typeof(L   )!="number") throw new Error(`L    is not a number`);
+  if(typeof(Sti )!="number") throw new Error(`Sti  is not a number`);
+  if(typeof(A_ST)!="number") throw new Error(`A_ST is not a number`);
+  if(typeof(VR  )!="number") throw new Error(`VR   is not a number`);
+  if(typeof(fq  )!="number") throw new Error(`fq   is not a number`);
+
+  //numerical checks for physical sense
   if(DSVI <= 0) throw new Error(`value for Sludge settleability (DSVI=${DSVI}) not allowed`);
   if(L    <  0) throw new Error(`value for L=MX_T/FSti (${L}) not allowed`);
   if(Sti  <  0) throw new Error(`value for influent COD (Sti=${Sti}) not allowed`);
   if(A_ST <= 0) throw new Error(`value for area of the settler (A_ST=${A_ST}) not allowed`);
-  if(VR   <= 0) throw new Error(`value for reactor volume (VR=${VR}) not allowed`);
+  if(VR   <  0) throw new Error(`value for reactor volume (VR=${VR}) not allowed`);
   if(fq   <  1) throw new Error(`value for peak flow (Qmax/Qavg) (fq=${fq}) not allowed`);
 
   //equations page 3
@@ -82,5 +98,12 @@ try{module.exports=capacity_estimation;}catch(e){}
 /*standalone test*/
 (function(){
   return
-  console.log(capacity_estimation(/*default values*/));
+  console.log(capacity_estimation({
+    DSVI : 120,    //mL/gTSS
+    L    : 2.9615, //kgTSS·d/kgCOD
+    Sti  : 1150,   //mgCOD/L
+    A_ST : 1248.6, //m2
+    VR   : 12461,  //m3
+    fq   : 2.4,    //ø
+  }));
 })();
