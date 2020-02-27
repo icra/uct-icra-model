@@ -306,9 +306,11 @@ State_Variables.prototype.activated_sludge=function(parameters){
     FOn      :{value:FOn,       unit:"kgO/d",       descr:"Nitrogenous Oxygen Demand"},
     FOt      :{value:FOt,       unit:"kgO/d",       descr:"Total Oxygen Demand"},
     OUR      :{value:OUR,       unit:"mgO/L·h",     descr:"Oxygen Uptake Rate"},
+
     f_was    :{value:f_was,     unit:"ø",           descr:"wastage concentrating factor"},
-    Qr       :{value:SST.Qr,    unit:"ML/d",        descr:"SST recycle flowrate"},
-    X_RAS    :{value:SST.X_RAS, unit:"kg/m3",       descr:"SST recycle flow TSS concentration"},
+    Qr       :{value:SST.Qr,    unit:"ML/d",        descr:"RAS recycle flowrate"},
+    X_T_RAS  :{value:SST.X_RAS, unit:"kgTSS/m3",    descr:"RAS recycle flow TSS concentration"},
+
     COD_balance :{value:COD_balance, unit:"%", descr:"COD balance"},
     N_balance   :{value:N_balance,   unit:"%", descr:"N balance"},
     Nae_balance :{value:Nae_balance, unit:"%", descr:"Ammonia balance"},
@@ -327,7 +329,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
 };
 
 /*test*/
-{
+(function(){
   return
   //--------new State_Variables(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  NH4,   OP, NOx, O2  OHO, PAO)
   let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0, 0,  0,   0);
@@ -353,4 +355,4 @@ State_Variables.prototype.activated_sludge=function(parameters){
   console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Effluent totals");        console.log(as.effluent.totals);
   */
-};
+})();

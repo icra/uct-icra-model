@@ -4,12 +4,6 @@
   - should be used as:
       plant.activated_sludge( parameters )
 
-doing now:
-  S_FSA --> S_NH4
-  S_OP  --> S_PO4
-  S_b   --> Sbse
-  DO in activated sludge
-
 * Adapt nomenclature for OHOs, for example:
   YH --> Y_OHO
   bH --> b_OHO
@@ -19,22 +13,15 @@ doing now:
 
   - [VERIFICAR] se puede tener bio P sin nitrificación?
 
-  - [PENDIENTE] calcular 'r' recycle ratio: no lo calculamos la planta ya lo sabe, añadir como input
-    - r sirve para recalcular Dp1
-
-  - [PENDIENTE] f_iPAO_calculated revisar (luego calcular MX_IO_calculated)
+  - [PENDIENTE, bio P] recalcular Dp1: calcular 'r' recycle ratio: no lo calculamos la planta ya lo sabe, añadir como input
 
   - [PENDIENTE] f_VT_PAO (gPAOVSS/gTSS) = 0.46
-    - se usa para calcular f_P_TSS
-    - en "f_VT_PAO_calculated" obtenemos valor bastante distinto a 0.46 (~0.14)
     - f_P_TSS revisar
     - comprobar si X_P_TSS funciona para calcular el balance
+
+  - [PENDIENTE] The FBSO not consumed (kvT)
+    has to be included in the formula for S_FBSO available for conversion into VFAs?
 
   - [OK] single tank is the same as number_of_an_zones==1?
     - significa solo un aerobico
 
-  - [OK] The FBSO not consumed (kvT)
-    has to be included in the formula for S_FBSO available for conversion into VFAs?
-
-  - [OK] The DO is the one that we already ask? (says influent DO, confirm)
-    - S_O2 como nueva variable de estado

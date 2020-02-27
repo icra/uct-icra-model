@@ -103,12 +103,41 @@ State_Variables.prototype.denitrification=function(parameters, result){
   //console.log({i_NO3_N2, i_COD_NO3});//debugging
 
   //compute denitrification potential (Dp1)
-  const YH    = constants.YH;                     //0.666 gCOD/gCOD
-  const YHvss = YH/fCV_OHO;                       //0.45  gVSS/gCOD
-  let f_XBH   = as_ppvv.f_XBH.value; //gVSS·d/gCOD | YHvss*Rs/(1+bHT*Rs)
-  let Dp1RBSO = Sbsi*(1-YH)/i_NO3_N2;             //mgN/L | influent
-  let Dp1BPO  = K2T*fxt*(Sbi-Sbse)*f_XBH;         //mgN/L | influent
-  let Dp1     = Dp1RBSO+Dp1BPO;                   //mgN/L | influent
+  const YH    = constants.YH;             //0.666 gCOD/gCOD
+  const YHvss = YH/fCV_OHO;               //0.45  gVSS/gCOD
+  let f_XBH   = as_ppvv.f_XBH.value;      //gVSS·d/gCOD | YHvss*Rs/(1+bHT*Rs)
+  let Dp1RBSO = Sbsi*(1-YH)/i_NO3_N2;     //mgN/L
+  let Dp1BPO  = K2T*fxt*(Sbi-Sbse)*f_XBH; //mgN/L
+  let Dp1     = Dp1RBSO+Dp1BPO;           //mgN/L
+
+  /*
+    modification for Dp1 (denitrification potential)
+    when there is bio P removal
+    TODO
+  */
+  if(as_ppvv.MX_PAO){
+    Dp1 = (function(){ //mgN/L
+      let r         = 0;                                 //recirculation from anoxic to anaerobic reactor
+      let fxm       = 0.5;                               //ø | get value from "nitrification.js"
+      let f_AN      = parameters.f_AN;                   //ø
+      let fx1       = fxm - f_AN;                        //ø
+      let K2_20_PAO = constants.K2_20_PAO;               //0.255 gN/gVSS·d
+      let ϴ_K2_PAO  = constants.theta_K2_PAO;            //1.080
+      let K2T_PAO   = K2_20_PAO*Math.pow(ϴ_K2_PAO,T-20); //gN/gVSS·d
+
+      //compute Dp1 modified for bio P removal
+      //note: 40/14 is ≈ 2.86 stoichiometric constant (gCOD/gN) NO3 reduction to N2
+      //let Dp1 = S_FBSO_AN*(1+r)*(1-YH)/(40/14) + K2T_PAO*fx1*(F_sb_OHO/Q)*(YH/f_CV_OHO)/(1+bHT*Rs);
+      let S_FBSO_AN = as_ppvv.S_FBSO_AN.value; //mgCOD/L
+      let F_sb_OHO  = as_ppvv.F_sb_OHO.value; //kgCOD/d
+
+      let Dp1RBSO = S_FBSO_AN*(1+r)*(1-YH)/i_NO3_N2;     //mgN/L | influent
+      let Dp1BPO  = K2T_PAO*fx1*(F_sb_OHO/Q-Sbse)*f_XBH; //mgN/L | influent
+      let Dp1     = Dp1RBSO+Dp1BPO;                      //mgN/L | influent
+      return Dp1;
+    })();
+  }
+
 
   //compute optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
@@ -170,7 +199,7 @@ State_Variables.prototype.denitrification=function(parameters, result){
 
   //check effluent alkalinity value, must be above 50 mgCaCO3/L
   if(effluent_alk < 50){
-    console.warn(`Warning: effluent_alk (${effluent_alk}) < 50 mgCaCO3/L`);
+    console.warn(`WARNING: effluent_alk (${effluent_alk}) < 50 mgCaCO3/L`);
     //TBD should this be an error instead of warning?
   }
 

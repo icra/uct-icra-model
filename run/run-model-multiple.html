@@ -8,11 +8,12 @@
   <script src='../src/state-variables.js'></script>
   <script src="../src/constants.js"></script>
   <script src="../src/primary-settler.js"></script>
-  <script src="../src/chemical-P-removal.js"></script>
-  <script src="../src/capacity-estimation.js"></script>
   <script src="../src/activated-sludge.js"></script>
+  <script src="../src/bio-p-removal.js"></script>
+  <script src="../src/chemical-P-removal.js"></script>
   <script src="../src/nitrification.js"></script>
   <script src="../src/denitrification.js"></script>
+  <script src="../src/capacity-estimation.js"></script>
   <script src='../src/plant.js'></script>
 
   <!--Vue JS toggle production/development-->
@@ -25,7 +26,9 @@
 
   <!--css general-->
   <style>
+    /*
     @import url('https://fonts.googleapis.com/css?family=Roboto+Mono:400,700|Roboto:300,400,700');
+    */
     body {
       overflow-y:scroll;
       font-family: 'Roboto', verdana;
@@ -53,6 +56,7 @@
     .number{text-align:right;}
     .unit{font-size:smaller;color:#555;}
   </style>
+
   <!--css plants-->
   <style>
     #plants a{
@@ -89,6 +93,7 @@
       float:right;
     }
   </style>
+
   <!--css footer-->
   <style>
     footer ul#about li{
@@ -100,7 +105,7 @@
 <!--title-->
 <h2 onclick=window.location.reload()>
   UCT-ICRA wwtp model
-  <small style=font-size:12px>MLE (PST, AS, NIT, DN, EBPR, SST processes)</small>
+  <small style=font-size:12px>MLE (PST, AS, EBPR, CPR, NIT, DN, SST processes)</small>
 </h2><hr>
 
 <!--html-->
@@ -327,25 +332,8 @@
       </a>
       <!--plant outputs-->
       <div v-if="plant.visibles.outputs.visible">
-        <!--warnings (errors)-->
-        <ul>
-          <li>
-            <a v-on:click="plant.visibles.outputs.errors^=true">
-              <span v-if="plant.visibles.outputs.errors">&darr;</span>
-              <span v-else>&rarr;</span>
-              <u>Warnings ({{plant.outputs.run.errors.length}})</u>
-            </a>
-            <ul v-if="plant.visibles.outputs.errors">
-              <li v-if="plant.outputs.run.errors.length==0" class=blank>[No warnings]</li>
-              <li v-for="warning in plant.outputs.run.errors">
-                <span style=color:red>{{warning}}</span>
-              </li>
-            </ul>
-          </li>
-        </ul>
-
         <!--outputs: only if 0 warnings-->
-        <div v-if="plant.outputs.run.errors.length==0">
+        <div>
           <!--plant run-->
           <ul>
             <!--primary-->
@@ -500,7 +488,7 @@
                 <u>Process variables</u>
               </a>
 
-              <!--as,nit,dn,cpr,cap,bip-->
+              <!--as,nit,dn,cpr,cap,bpr-->
               <div v-if="plant.visibles.outputs.process_variables.visible">
                 <ul v-for="obj,key in plant.outputs.run.process_variables">
                   <li v-if="obj && plant.configuration[key]!=false">
@@ -569,11 +557,11 @@
         process_variables:{
           visible:false,
           as:false,
+          bpr:false,
           nit:false,
           dn:false,
           cpr:false,
           cap:false,
-          bip:false,
         },
         primary:{
           visible:false,
@@ -624,10 +612,10 @@
       add_plant:function(){
         //nova planta
         let plant = new Plant(
-          //syntax-----------( Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_FSA, S_OP, S_NOx, X_OHO)  //influent syntax
-          new State_Variables(25,    50,    115,   440,   100,    45,    60,  39.1, 7.28,     0,     0), //influent
-          {pst:true, nit:true, dn:true, cpr:true, bip:false },                                                     //configuration
-          {                                                                                             //parameters
+          //syntax-----------( Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_NH4, S_PO4, S_NOx, S_O2, X_OHO, X_PAO)
+          new State_Variables(25,    50,    115,   440,   100,    45,    60,  39.1, 15.28,     0,    0,     0,     0), //influent
+          {pst:true, bpr:true, nit:true, dn:true}, //configuration
+          {                                        //parameters
             //legend {PST:'primary settler', AS:'activated sludge', CE:'capacity estimation', NIT:'nitrification', DN:'denitrification', CPR:'chemical P removal'}
             fw          : 0.00500,   //ø       | PST | fraction of Q that goes to wastage
             removal_BPO : 42.3352,   //%       | PST | removal of the component X_BPO
@@ -636,19 +624,25 @@
             T           : 16.0000,   //ºC      | AS  | temperature
             Vp          : 8473.30,   //m3      | AS  | reactor volume
             Rs          : 15.0000,   //d       | AS  | solids retention time or sludge age
+            DO          : 2.00000,   //mgO/L   | AS  | DO in the aerobic reactor
             RAS         : 1.00000,   //ø       | AS  | SST underflow recycle ratio
-            DSVI        : 120,       //mL/gTSS | CE  | sludge settleability
-            A_ST        : 30000,     //m2      | CE  | area of the settler
-            fq          : 2.4,       //ø       | CE  | peak flow (Qmax/Qavg)
             waste_from  : "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
+            mass_FeCl3  : 3000.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+            S_NOx_RAS   : 0.50000,   //mgNOx/L | BPR | NOx concentration at RAS
+            DO_RAS      : 0.00000,   //mgO/L   | BPR | Dissolved oxygen at recycle
+            f_AN        : 0.10000,   //ø       | BPR | anaerobic mass fraction, different from fxt, value must be <= fxm
+            an_zones    : 2.00000,   //number of BPR | anaerobic zones
+
             SF          : 1.25000,   //ø       | NIT | safety factor. design choice. Moves the sludge age
             fxt         : 0.39000,   //ø       | NIT | current unaerated sludge mass fraction
-            DO          : 2.00000,   //mgO/L   | NIT | DO in the aerobic reactor
             pH          : 7.20000,   //ø       | NIT | pH
             IR          : 5.40000,   //ø       | DN  | internal recirculation ratio
             DO_RAS      : 1.00000,   //mgO/L   | DN  | DO in the underflow recycle
             influent_alk: 250.000,   //mg/L    | DN  | influent alkalinity (mg/L CaCO3)
-            mass_FeCl3  : 3000.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+
+            DSVI        : 120,       //mL/gTSS | CE  | sludge settleability
+            A_ST        : 30000,     //m2      | CE  | area of the settler
+            fq          : 2.4,       //ø       | CE  | peak flow (Qmax/Qavg)
           },
         );
         plant.name     = `Plant ${plants.length+1}`;
@@ -662,6 +656,7 @@
       },
       run_model:function(plant){
         try{
+          plant.outputs = null;
           let run = plant.run();
           plant.outputs = {run}; //pack results
           this.$forceUpdate();
@@ -676,6 +671,6 @@
   //initialize plants
   vm_plants.add_plant();
 
-  //TODO TBD
-  //create a vue component for state variables (?)
+  //TODO
+  //create a vue component for state variables
 </script>

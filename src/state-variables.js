@@ -37,19 +37,19 @@ class State_Variables {
     X_OHO, X_PAO                        //live biomass
   ){
     //numeric input checks
-    if(Q      < 0) throw `Error: Flowrate (Q=${Q}) not allowed`;
-    if(S_VFA  < 0) throw `Error: volatile fatty acids (S_VFA=${S_VFA}) not allowed`;
-    if(S_FBSO < 0) throw `Error: fermentable biodegradable soluble organics (S_FBSO=${S_FBSO}) not allowed`;
-    if(X_BPO  < 0) throw `Error: biodegradable particulated organics (X_BPO=${X_BPO}) not allowed`;
-    if(X_UPO  < 0) throw `Error: unbiodegradable particulated organics (X_UPO=${X_UPO}) not allowed`;
-    if(S_USO  < 0) throw `Error: unbiodegradable soluble organics (S_USO=${S_USO}) not allowed`;
-    if(X_iSS  < 0) throw `Error: inert suspended solids (X_iSS=${X_iSS}) not allowed`;
-    if(S_NH4  < 0) throw `Error: free saline ammonia (S_NH4=${S_NH4}) not allowed`;
-    if(S_PO4  < 0) throw `Error: orthophosphate (S_PO4=${S_PO4}) not allowed`;
-    if(S_NOx  < 0) throw `Error: nitrate/nitrite (S_NOx=${S_NOx}) not allowed`;
-    if(S_O2   < 0) throw `Error: dissolved oxygen (S_O2=${S_O2}) not allowed`;
-    if(X_OHO  < 0) throw `Error: ordinary heterotrophic organisms (X_OHO=${X_OHO}) not allowed`;
-    if(X_PAO  < 0) throw `Error: polyphosphate accumulating organisms (X_PAO=${X_PAO}) not allowed`;
+    if(Q      < 0) throw new Error(`Value for Flowrate (Q=${Q}) not allowed`);
+    if(S_VFA  < 0) throw new Error(`Value for volatile fatty acids (S_VFA=${S_VFA}) not allowed`);
+    if(S_FBSO < 0) throw new Error(`Value for fermentable biodegradable soluble organics (S_FBSO=${S_FBSO}) not allowed`);
+    if(X_BPO  < 0) throw new Error(`Value for biodegradable particulated organics (X_BPO=${X_BPO}) not allowed`);
+    if(X_UPO  < 0) throw new Error(`Value for unbiodegradable particulated organics (X_UPO=${X_UPO}) not allowed`);
+    if(S_USO  < 0) throw new Error(`Value for unbiodegradable soluble organics (S_USO=${S_USO}) not allowed`);
+    if(X_iSS  < 0) throw new Error(`Value for inert suspended solids (X_iSS=${X_iSS}) not allowed`);
+    if(S_NH4  < 0) throw new Error(`Value for free saline ammonia (S_NH4=${S_NH4}) not allowed`);
+    if(S_PO4  < 0) throw new Error(`Value for orthophosphate (S_PO4=${S_PO4}) not allowed`);
+    if(S_NOx  < 0) throw new Error(`Value for nitrate/nitrite (S_NOx=${S_NOx}) not allowed`);
+    if(S_O2   < 0) throw new Error(`Value for dissolved oxygen (S_O2=${S_O2}) not allowed`);
+    if(X_OHO  < 0) throw new Error(`Value for ordinary heterotrophic organisms (X_OHO=${X_OHO}) not allowed`);
+    if(X_PAO  < 0) throw new Error(`Value for polyphosphate accumulating organisms (X_PAO=${X_PAO}) not allowed`);
 
     //inputs and default values
     this.Q = isNaN(Q) ? 0 : Q; //ML/d | flowrate

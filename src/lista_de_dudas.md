@@ -11,11 +11,3 @@ preguntar al usuario (nuevos inputs que estarán relacionados con "Bio P removal
 Leyenda:
   - : aclaración
   * : duda
-
-* DO=0, y DO_RAS=0 (mgO/L)
-  - se usan sólo para calcular "S_FBSO_conv (mgCOD/L, fermentable lost in the
-    effluent of las anaerobic reactor)"
-  * ¿estos números son 0 porque es la DO en el tanque anaeróbico?
-  * ¿son un nuevo input, o se pueden calcular?
-
-* se puede tener bio P sin nitrificación?

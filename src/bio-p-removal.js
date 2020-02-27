@@ -28,7 +28,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     let T          = parameters.T;          //ºC      | Temperature
     let Vp         = parameters.Vp;         //m3      | Volume of reactor
     let Rs         = parameters.Rs;         //days    | Solids Retention Time or Sludge Age
-    let DO         = 0;                     //mgO2/L  | Dissolved Oxygen in anaerobic reactor is 0
+    let DO         = parameters.DO;         //mg/L    | DO in the aerobic reactor
     let RAS        = parameters.RAS;        //ø       | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string  | origin of wastage ('sst' or 'reactor')
     let mass_FeCl3 = parameters.mass_FeCl3; //kg/d    | mass of FeCl3 added for P precipitation
@@ -233,8 +233,9 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   //compute the influent P concentration required for sludge production
   let Pti = inf_frac.TP.total; //mgP/L | total TP influent concentration
   let Ps  = (f_P_OHO*MX_BH + f_P_PAO*MX_PAO + f_P_UPO*(MX_I + MX_EH + MX_E_PAO))/(Rs*Q); //mgP/L
+
   if(Ps > Pti){
-    throw new Error(`Warning: Ps (${Ps}) > Pti (${Pti}): not enough influent TP to fill up the PAOs with polyphosphate`);
+    throw new Error(`Ps (${Ps}) > Pti (${Pti}): not enough influent TP to fill up the PAOs with polyphosphate`);
     //TODO: should this be an error instead of warning?
   }
 
@@ -349,9 +350,9 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   let OHO_was = f_was*f_CV_OHO*(MX_BH +MX_EH   )/Vp*1e3; //mgCOD/L | OHO wastage
   let PAO_was = f_was*f_CV_PAO*(MX_PAO+MX_E_PAO)/Vp*1e3; //mgCOD/L | PAO wastage
 
-  //output streams------------------( Q, VFA, FBSO,     BPO,     UPO,   USO,     iSS, FSA,  OP,   NOx, O2, OHO,     PAO)
-  let effluent = new State_Variables(Qe,   0,    0,       0,       0, S_USO,       0, Nae, Pse, S_NOx, 0,  0,       0);
-  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, S_USO, iSS_was, Nae, Pse, S_NOx, 0,  OHO_was, PAO_was);
+  //output streams------------------( Q, VFA, FBSO,     BPO,     UPO,   USO,     iSS, FSA,  OP,   NOx, O2,     OHO,     PAO)
+  let effluent = new State_Variables(Qe,   0,    0,       0,       0, S_USO,       0, Nae, Pse, S_NOx, DO,       0,       0);
+  let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, S_USO, iSS_was, Nae, Pse, S_NOx, DO, OHO_was, PAO_was);
 
   //copy influent mass ratios for the new outputs
   effluent.mass_ratios = this.mass_ratios; //object
@@ -409,7 +410,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   //note: f_P_PAO_calculated should be lower than f_P_PAO (0.38)
   let f_P_PAO_calculated = (Q*Pti*Rs - Q*Psa*Rs - f_P_OHO*MX_BH - f_P_UPO*(MX_I + MX_EH + MX_E_PAO))/MX_PAO||0; //gP/gVSS
   if(f_P_PAO_calculated > f_P_PAO){
-    console.warn(`Warning: f_P_PAO_calculated (${f_P_PAO_calculated}) > f_P_PAO (${f_P_PAO}) [gP/gVSS]`);
+    console.warn(`WARNING: f_P_PAO_calculated (${f_P_PAO_calculated}) > f_P_PAO (${f_P_PAO}) [gP/gVSS]`);
   }
 
   /*2. compute f_iPAO (1.3 giSS/gVSS) TODO */
@@ -419,7 +420,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   let f_iPAO_calculated = Math.min(f_iPAO, f_iOHO + 3.268*f_P_PAO_calculated); //giSS/gVSS
   //(3.268 is experimental value)
   if(f_iPAO_calculated > f_iPAO){
-    console.warn(`Warning: f_iPAO_calculated (${f_iPAO_calculated}) > f_iPAO (${f_iPAO}) [giSS/gVSS]`);
+    console.warn(`WARNING: f_iPAO_calculated (${f_iPAO_calculated}) > f_iPAO (${f_iPAO}) [giSS/gVSS]`);
     //TODO confirm with george in the future
   }
 
@@ -465,28 +466,11 @@ State_Variables.prototype.bio_p_removal=function(parameters){
 
   //TODO
 
-  /*
-    modification for Dp1 (denitrification potential)
-    when there is bio P removal
-    TODO
-  */
-  let Dp1 = (function(){ //mgN/L
-    let r         = 0;                                 //recirculation from anoxic to anaerobic reactor
-    let fxm       = 0.5;                               //ø | get value from "nitrification.js"
-    let fx1       = fxm - f_AN;                        //ø
-    let K2_20_PAO = constants.K2_20_PAO;               //0.255 gN/gVSS·d
-    let ϴ_K2_PAO  = constants.theta_K2_PAO;            //1.080
-    let K2T_PAO   = K2_20_PAO*Math.pow(ϴ_K2_PAO,T-20); //gN/gVSS·d
-
-    //compute Dp1 modified for bio P removal
-    //note: 40/14 is ≈ 2.86 stoichiometric constant (gCOD/gN) NO3 reduction to N2
-    let Dp1 = S_FBSO_AN*(1+r)*(1-YH)/(40/14) +
-      fx1*K2T_PAO*(F_sb_OHO/Q)*(YH/f_CV_OHO)/(1+bHT*Rs);
-
-    return Dp1;
-  })();
-
-  //END
+  //are balances 100%?
+  if(isNaN(COD_balance) || (COD_balance < 99.9 || COD_balance > 100.1) ) throw new Error(`COD_balance is ${COD_balance}%`);
+  if(isNaN(N_balance  ) || (N_balance   < 99.9 || N_balance   > 100.1) ) throw new Error(`N_balance is ${N_balance}%`);
+  if(isNaN(Nae_balance) || (Nae_balance < 99.9 || Nae_balance > 100.1) ) throw new Error(`Nae_balance is ${Nae_balance}%`);
+  if(isNaN(P_balance  ) || (P_balance   < 99.9 || P_balance   > 100.1) ) throw new Error(`P_balance is ${P_balance}%`);
 
   //pack all process variables
   let process_variables={
@@ -554,11 +538,8 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     //SST related
     Qe          :{value:Qe,          unit:"ML/d",        descr:"Effluent flowrate"},
     Qr          :{value:SST.Qr,      unit:"ML/d",        descr:"SST recycle flowrate"},
-    f_was       :{value:f_was,       unit:"ø",           descr:"SST concentrating factor"},
-    X_RAS       :{value:SST.X_RAS,   unit:"kg/m3",       descr:"SST recycle flow TSS concentration"},
-
-    //Dp1
-    Dp1         :{value:Dp1,         unit:"mgN/L",       descr:"Denitrification Potential"},
+    f_was       :{value:f_was,       unit:"ø",           descr:"wastage concentrating factor"},
+    X_T_RAS     :{value:SST.X_RAS,   unit:"kgTSS/m3",    descr:"RAS recycle flow TSS concentration"},
 
     //Mass balances
     COD_balance :{value:COD_balance, unit:"%", descr:"COD balance"},
@@ -593,6 +574,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     T          : 14,        //ºC
     Vp         : 21370,     //m3
     Rs         : 20,        //days
+    DO         : 2.0,       //mgO2/L
     RAS        : 0.75,      //ø
     IR         : 1.5,       //ø
     waste_from : 'reactor', //string
