@@ -88,37 +88,37 @@ let parameters={
 
 //kinetic constants
 let constants={
-  YH           :    0.666, //gCOD/gCOD | heterotrophic yield (not affected by temperature)
-  bH           :    0.240, //1/d       | heterotrophic endogenous respiration rate at 20ºC
-  theta_bH     :    1.029, //ø         | bH temperature correction factor
-  k_v20        : 1000.000, //L/mgVSS·d | constant for not degraded bCOD (FBSO)
-  theta_k_v20  :    1.035, //ø         | k_v20 temperature correction factor
-  fH           :    0.200, //ø         | heterotrophic endogenous residue fraction
-  f_iOHO       :    0.150, //giSS/gVSS | iSS content of OHOs
-  µAm          :    0.450, //1/d       | autotrophic max specific growth rate at 20ºC
-  theta_µAm    :    1.123, //ø         | µAm temperature correction factor
-  K_O          :    0.000, //mgDO/L    | autotrophic DO µA sensitivity constant
-  theta_pH     :    2.350, //ø         | autotrophic pH sensitivity coefficient
-  Ki           :    1.130, //ø         | autotrophic pH inhibition to µA
-  Kii          :    0.300, //ø         | autotrophic pH inhibition to µA
-  Kmax         :    9.500, //ø         | autotrophic pH inhibition to µA
-  YA           :    0.100, //gVSS/gFSA | autotrophic yield
-  Kn           :    1.000, //mgN/L     | ammonia half saturation coefficient at 20ºC
-  theta_Kn     :    1.123, //ø         | Kn temperature correction factor
-  bA           :    0.040, //1/d       | autotrophic endogenous respiration rate at 20ºC
-  theta_bA     :    1.029, //ø         | bA temperature correction factor
-  K1_20        :    0.720, //gN/gVSS·d | DN K1 at 20ºC page 482 and 113
-  theta_K1     :    1.200, //ø         | temperature correction factor for K1_20
-  K2_20        :    0.101, //gN/gVSS·d | DN K2 at 20ºC page 482 and 113
-  theta_K2     :    1.080, //ø         | temperature correction factor for K2_20
-  b_PAO        :    0.040, //1/d       | PAO endogenous residue respiration rate at 20ºC
-  theta_b_PAO  :    1.029, //ø         | b_PAO temperature correction factor
-  f_PAO        :    0.250, //ø         | PAO endogenous residue fraction
-  f_P_iSS      :    0.020, //gP/giSS   | fraction of P in iSS
-  f_iPAO       :    1.300, //giSS/gVSS | fraction of iSS in PAO
-  f_PO4_rel    :    0.500, //gP/gCOD   | ratio of P release/VFA uptake (1molP/1molCOD)
-  K2_20_PAO    :    0.255, //gN/gVSS·d | at 20ºC page 482 and 113
-  theta_K2_PAO :    1.080, //ø         | temperature correction factor for K2_20
+  YH        :    0.666, //gCOD/gCOD | heterotrophic yield (not affected by temperature)
+  bH        :    0.240, //1/d       | heterotrophic endogenous respiration rate at 20ºC
+  ϴ_bH      :    1.029, //ø         | bH temperature correction factor
+  k_v20     : 1000.000, //L/mgVSS·d | constant for not degraded bCOD (FBSO)
+  ϴ_k_v20   :    1.035, //ø         | k_v20 temperature correction factor
+  fH        :    0.200, //ø         | heterotrophic endogenous residue fraction
+  f_iOHO    :    0.150, //giSS/gVSS | iSS content of OHOs
+  µAm       :    0.450, //1/d       | autotrophic max specific growth rate at 20ºC
+  ϴ_µAm     :    1.123, //ø         | µAm temperature correction factor
+  K_O       :    0.000, //mgDO/L    | autotrophic DO µA sensitivity constant
+  ϴ_pH      :    2.350, //ø         | autotrophic pH sensitivity coefficient
+  Ki        :    1.130, //ø         | autotrophic pH inhibition to µA
+  Kii       :    0.300, //ø         | autotrophic pH inhibition to µA
+  Kmax      :    9.500, //ø         | autotrophic pH inhibition to µA
+  YA        :    0.100, //gVSS/gFSA | autotrophic yield
+  Kn        :    1.000, //mgN/L     | ammonia half saturation coefficient at 20ºC
+  ϴ_Kn      :    1.123, //ø         | Kn temperature correction factor
+  bA        :    0.040, //1/d       | autotrophic endogenous respiration rate at 20ºC
+  ϴ_bA      :    1.029, //ø         | bA temperature correction factor
+  K1_20     :    0.720, //gN/gVSS·d | DN K1 at 20ºC page 482 and 113
+  ϴ_K1      :    1.200, //ø         | temperature correction factor for K1_20
+  K2_20     :    0.101, //gN/gVSS·d | DN K2 at 20ºC page 482 and 113
+  ϴ_K2      :    1.080, //ø         | temperature correction factor for K2_20
+  b_PAO     :    0.040, //1/d       | PAO endogenous residue respiration rate at 20ºC
+  ϴ_b_PAO   :    1.029, //ø         | b_PAO temperature correction factor
+  f_PAO     :    0.250, //ø         | PAO endogenous residue fraction
+  f_P_iSS   :    0.020, //gP/giSS   | fraction of P in iSS
+  f_iPAO    :    1.300, //giSS/gVSS | fraction of iSS in PAO
+  f_PO4_rel :    0.500, //gP/gCOD   | ratio of P release/VFA uptake (1molP/1molCOD)
+  K2_20_PAO :    0.255, //gN/gVSS·d | at 20ºC page 482 and 113
+  ϴ_K2_PAO  :    1.080, //ø         | temperature correction factor for K2_20
 };
 
 /*create plant, run model and display results*/

@@ -1,25 +1,41 @@
-* turn "state variables" prototypes into "plant" prototypes.
+TASKS
+
+================================================================================
+* [PENDIENTE] generar urls con los inputs (como en la version anterior de la
+  interficie grafica).
+
+* [PENDIENTE] [bio P] provar exemple llibre ekama amb la interficie grafica
+
+* [PENDIENTE] estudiar si con el modelo se pueden simular todas estas
+  configuraciones de plantas:
+  - Single Tank                    (aerobic                                 + sst)
+  - MLE                            (anox      + aerobic                     + sst)
+  - 4 stage bardenpho              (anox      + aerobic + anoxic  + aerobic + sst)
+  - A2O or 3-stage modif bardenpho (anaerobic + anoxic  + aerobic           + sst)
+  - AO or "Phorodex"               (anaerobic + aerobic                     + sst)
+  - 5 stage modified bardenpho     (anaerobic + anoxic  + aerobic + anoxic  + sst)
+  - Johannesburg (JHB)             (anaerobic + anoxic  + aerobic           + sst + anoxic)
+  - UCT                            (anaerobic + anoxic  + aerobic           + sst)
+  - MUCT                           (anaerobic + anoxic  + anoxic  + aerobic + sst)
+
+* [PENDIENTE] comprobar si X_P_TSS funciona para calcular el balance
+
+* [PENDIENTE] The FBSO not consumed (kvT)
+  has to be included in the formula for S_FBSO available for conversion into
+  VFA
+
+================================================================================
+* [MAYBE] turn "state variables" prototypes into "plant" prototypes.
   - for example, instead of calling:
       influent.activated_sludge( parameters )
   - should be used as:
       plant.activated_sludge( parameters )
 
-* Adapt nomenclature for OHOs, for example:
+* [MAYBE] Adapt nomenclature for OHOs, for example:
   YH --> Y_OHO
   bH --> b_OHO
   fH --> f_OHO
 
-3. bio P:
-  - [PENDIENTE] [bio P] recalcular Dp1
-    lo calculamos la planta ya lo sabe, añadir como input
-
-  - [PENDIENTE] [bio P] provar exemple llibre ekama amb la interficie grafica
-
-  - [PENDIENTE] comprobar si X_P_TSS funciona para calcular el balance
-
-  - [PENDIENTE] The FBSO not consumed (kvT)
-    has to be included in the formula for S_FBSO available for conversion into VFA
-
-  - [OK] single tank is the same as number_of_an_zones==0
-    - significa solo un aerobico (no anaerobico)
-
+================================================================================
+* [OK] single tank is the same as number_of_an_zones==0
+  - significa solo un aerobico (no anaerobico)

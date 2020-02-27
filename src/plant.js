@@ -43,7 +43,7 @@ try{
 }catch(e){}
 
 class Plant{
-  constructor(influent, configuration, parameters){
+  constructor(influent, configuration, parameters, constants){
     /*
      * - influent:      state variables object
      * - configuration: plant configuration | dictionary of booleans {pst,nit,dn,bpr}
@@ -112,6 +112,7 @@ class Plant{
     //input objects
     let config     = this.configuration;
     let parameters = this.parameters;
+    constants      = this.constants;
 
     //check incompatible configurations
     if(config.dn && config.nit==false){
@@ -159,9 +160,9 @@ class Plant{
     }
 
     //check BPR condition
-    if(config.nit==true && config.dn==false && parameters.an_zones==0){
+    if(config.bpr && config.nit && config.dn==false && parameters.an_zones==0){
       if(parameters.f_AN>nit.process_variables.fxm.value){
-        throw new Error(`f_AN (${p.f_AN})> fxm (${nit.fxm.value})`);
+        throw new Error(`f_AN (${parameters.f_AN})> fxm (${nit.process_variables.fxm.value})`);
       }
     }
 
@@ -234,40 +235,41 @@ class Plant{
     return {
       configuration:{
         pst:"Primary settler",
-        as: "Activated sludge (aerobic)",
-        nit:"Nitrification (anoxic)",
-        dn: "Denitrification",
+        as: "Aerobic (Activated Sludge)",
+        bpr:"Anaerobic (Bio P Removal)",
+        nit:"Nitrification (Aerobic)",
+        dn: "Anoxic (Denitrification)",
         cpr:"Chemical P removal",
         cap:"Capacity Estimation",
-        bpr:"Bio P removal (anaerobic)",
       },
       parameters:{
-        fw          :{unit:"ø",         tec:"pst", type:"number", descr:"Fraction of Q that goes to primary wastage"},
-        removal_BPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_BPO"},
-        removal_UPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_UPO"},
-        removal_iSS :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal of the component X_iSS"},
+        fw          :{unit:"ø",         tec:"pst", type:"number", descr:"Fraction of Q going to primary wastage"},
+        removal_BPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal percentage of X_BPO"},
+        removal_UPO :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal percentage of X_UPO"},
+        removal_iSS :{unit:"%",         tec:"pst", type:"number", descr:"Primary settler removal percentage of X_iSS"},
 
         T           :{unit:"ºC",        tec:"as",  type:"number", descr:"Temperature"},
-        Vp          :{unit:"m3",        tec:"as",  type:"number", descr:"Reactor volume"},
-        Rs          :{unit:"d",         tec:"as",  type:"number", descr:"Solids retention time or sludge age"},
-        DO          :{unit:"mgO/L",     tec:"as",  type:"number", descr:"DO in the aerobic reactor"},
-        RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"SST underflow recycle ratio"},
-        waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Waste_from | options {'reactor','sst'}"},
+        Vp          :{unit:"m3",        tec:"as",  type:"number", descr:"Volume (total process)"},
+        Rs          :{unit:"d",         tec:"as",  type:"number", descr:"Solids Retention Time (SRT) or Sludge Age"},
+        DO          :{unit:"mgO2/L",    tec:"as",  type:"number", descr:"Dissolved Oxygen in the Aerobic Reactor"},
+        RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"Sludge recycle ratio based on influent flow"},
+        waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Origin of wastage. Options {'reactor','sst'}"},
 
-        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 added for chemical P removal"},
+        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 added for Chemical P removal"},
 
-        S_NOx_RAS   :{unit:"mgNOx/L",   tec:"bpr", type:"number", descr:"NOx concentration at RAS"},
-        DO_RAS      :{unit:"mgO/L",     tec:"bpr", type:"number", descr:"Dissolved oxygen at recycle"},
-        f_AN        :{unit:"ø",         tec:"bpr", type:"number", descr:"anaerobic mass fraction, different from fxt, value must be <= fxm"},
-        an_zones    :{unit:"number",    tec:"bpr", type:"number", descr:"number of anaerobic zones"},
+        f_AN        :{unit:"gVSS/gVSS", tec:"bpr", type:"number", descr:"Anaerobic mass fraction (must be f_AN <= fxm)"},
+        an_zones    :{unit:"number",    tec:"bpr", type:"number", descr:"Number of anaerobic zones"},
+        DO_RAS      :{unit:"mgO/L",     tec:"bpr", type:"number", descr:"Dissolved oxygen at RAS recycle"},
+        S_NOx_RAS   :{unit:"mgNOx/L",   tec:"bpr", type:"number", descr:"NOx concentration at RAS recycle"},
+        RR          :{unit:"ø",         tec:"bpr", type:"number", descr:"Recycle from anoxic to anaerobic"},
 
-        SF          :{unit:"ø",         tec:"nit", type:"number", descr:"Safety factor. design choice. Moves the sludge age"},
-        fxt         :{unit:"ø",         tec:"nit", type:"number", descr:"Current unaerated sludge mass fraction"},
+        fxt         :{unit:"gVSS/gVSS", tec:"nit", type:"number", descr:"Unaerated sludge mass fraction"},
+        SF          :{unit:"ø",         tec:"nit", type:"number", descr:"Safety factor. Design choice. Increases the sludge age to dampen the effluent ammonia variation. Choose a high value for high influent ammonia concentration variation"},
         pH          :{unit:"ø",         tec:"nit", type:"number", descr:"pH"},
 
-        IR          :{unit:"ø",         tec:"dn",  type:"number", descr:"Internal recirculation ratio"},
+        IR          :{unit:"ø",         tec:"dn",  type:"number", descr:"Internal recirculation ratio (aerobic to anoxic)"},
         DO_RAS      :{unit:"mgO/L",     tec:"dn",  type:"number", descr:"DO in the underflow recycle"},
-        influent_alk:{unit:"mgCaCO3/L", tec:"dn",  type:"number", descr:"Influent alkalinity (mg/L CaCO3)"},
+        influent_alk:{unit:"mgCaCO3/L", tec:"dn",  type:"number", descr:"Influent alkalinity (mg/L of CaCO3)"},
 
         DSVI        :{unit:"mL/gTSS",   tec:"cap", type:"number", descr:"Sludge settleability"},
         A_ST        :{unit:"m2",        tec:"cap", type:"number", descr:"Area of the settler"},
@@ -320,37 +322,37 @@ try{module.exports=Plant}catch(e){}
     influent.mass_ratios.f_P_PAO   = 0.3800; //  gP/gVSS
 
   //constants (kinetic and stoichiometric)
-    constants.YH           =    0.666; //gCOD/gCOD | heterotrophic yield (not affected by temperature)
-    constants.bH           =    0.240; //1/d       | heterotrophic endogenous respiration rate at 20ºC
-    constants.theta_bH     =    1.029; //ø         | bH temperature correction factor
-    constants.k_v20        = 1000.000; //L/mgVSS·d | constant for not degraded bCOD (FBSO)
-    constants.theta_k_v20  =    1.035; //ø         | k_v20 temperature correction factor
-    constants.fH           =    0.200; //ø         | heterotrophic endogenous residue fraction
-    constants.f_iOHO       =    0.150; //giSS/gVSS | iSS content of OHOs
-    constants.µAm          =    0.450; //1/d       | autotrophic max specific growth rate at 20ºC
-    constants.theta_µAm    =    1.123; //ø         | µAm temperature correction factor
-    constants.K_O          =    0.000; //mgDO/L    | autotrophic DO µA sensitivity constant
-    constants.theta_pH     =    2.350; //ø         | autotrophic pH sensitivity coefficient
-    constants.Ki           =    1.130; //ø         | autotrophic pH inhibition to µA
-    constants.Kii          =    0.300; //ø         | autotrophic pH inhibition to µA
-    constants.Kmax         =    9.500; //ø         | autotrophic pH inhibition to µA
-    constants.YA           =    0.100; //gVSS/gNH4 | autotrophic yield
-    constants.Kn           =    1.000; //mgN/L     | ammonia half saturation coefficient at 20ºC
-    constants.theta_Kn     =    1.123; //ø         | Kn temperature correction factor
-    constants.bA           =    0.040; //1/d       | autotrophic endogenous respiration rate at 20ºC
-    constants.theta_bA     =    1.029; //ø         | bA temperature correction factor
-    constants.K1_20        =    0.720; //gN/gVSS·d | DN K1 at 20ºC page 482 and 113
-    constants.theta_K1     =    1.200; //ø         | temperature correction factor for K1_20
-    constants.K2_20        =    0.101; //gN/gVSS·d | DN K2 at 20ºC page 482 and 113
-    constants.theta_K2     =    1.080; //ø         | temperature correction factor for K2_20
-    constants.b_PAO        =    0.040; //1/d       | PAO endogenous residue respiration rate at 20ºC
-    constants.theta_b_PAO  =    1.029; //ø         | b_PAO temperature correction factor
-    constants.f_PAO        =    0.250; //ø         | PAO endogenous residue fraction
-    constants.f_P_iSS      =    0.020; //gP/giSS   | fraction of P in iSS
-    constants.f_iPAO       =    1.300; //giSS/gVSS | fraction of iSS in PAO
-    constants.f_PO4_rel    =    0.500; //gP/gCOD   | ratio of P release/VFA uptake (1molP/1molCOD)
-    constants.K2_20_PAO    =    0.255; //gN/gVSS·d | at 20ºC page 482 and 113
-    constants.theta_K2_PAO =    1.080; //ø         | temperature correction factor for K2_20
+    constants.YH        =    0.666; //gCOD/gCOD | heterotrophic yield (not affected by temperature)
+    constants.bH        =    0.240; //1/d       | heterotrophic endogenous respiration rate at 20ºC
+    constants.ϴ_bH      =    1.029; //ø         | bH temperature correction factor
+    constants.k_v20     = 1000.000; //L/mgVSS·d | constant for not degraded bCOD (FBSO)
+    constants.ϴ_k_v20   =    1.035; //ø         | k_v20 temperature correction factor
+    constants.fH        =    0.200; //ø         | heterotrophic endogenous residue fraction
+    constants.f_iOHO    =    0.150; //giSS/gVSS | iSS content of OHOs
+    constants.µAm       =    0.450; //1/d       | autotrophic max specific growth rate at 20ºC
+    constants.ϴ_µAm     =    1.123; //ø         | µAm temperature correction factor
+    constants.K_O       =    0.000; //mgDO/L    | autotrophic DO µA sensitivity constant
+    constants.ϴ_pH      =    2.350; //ø         | autotrophic pH sensitivity coefficient
+    constants.Ki        =    1.130; //ø         | autotrophic pH inhibition to µA
+    constants.Kii       =    0.300; //ø         | autotrophic pH inhibition to µA
+    constants.Kmax      =    9.500; //ø         | autotrophic pH inhibition to µA
+    constants.YA        =    0.100; //gVSS/gNH4 | autotrophic yield
+    constants.Kn        =    1.000; //mgN/L     | ammonia half saturation coefficient at 20ºC
+    constants.ϴ_Kn      =    1.123; //ø         | Kn temperature correction factor
+    constants.bA        =    0.040; //1/d       | autotrophic endogenous respiration rate at 20ºC
+    constants.ϴ_bA      =    1.029; //ø         | bA temperature correction factor
+    constants.K1_20     =    0.720; //gN/gVSS·d | DN K1 at 20ºC page 482 and 113
+    constants.ϴ_K1      =    1.200; //ø         | temperature correction factor for K1_20
+    constants.K2_20     =    0.101; //gN/gVSS·d | DN K2 at 20ºC page 482 and 113
+    constants.ϴ_K2      =    1.080; //ø         | temperature correction factor for K2_20
+    constants.b_PAO     =    0.040; //1/d       | PAO endogenous residue respiration rate at 20ºC
+    constants.ϴ_b_PAO   =    1.029; //ø         | b_PAO temperature correction factor
+    constants.f_PAO     =    0.250; //ø         | PAO endogenous residue fraction
+    constants.f_P_iSS   =    0.020; //gP/giSS   | fraction of P in iSS
+    constants.f_iPAO    =    1.300; //giSS/gVSS | fraction of iSS in PAO
+    constants.f_PO4_rel =    0.500; //gP/gCOD   | ratio of P release/VFA uptake (1molP/1molCOD)
+    constants.K2_20_PAO =    0.255; //gN/gVSS·d | at 20ºC page 482 and 113
+    constants.ϴ_K2_PAO  =    1.080; //ø         | temperature correction factor for K2_20
 
   //plant configuration and parameters
   let configuration={
@@ -386,8 +388,8 @@ try{module.exports=Plant}catch(e){}
     fq          :     2.50000, //ø       | CE  | peak flow (Qmax/Qavg)
   };
 
-  //create plant
-  let plant = new Plant(influent, configuration, parameters);
+  //new Plant syntax   (influent, configuration, parameters, constants)
+  let plant = new Plant(influent, configuration, parameters, constants);
 
   //run model
   let run = plant.run(debug_mode=true);

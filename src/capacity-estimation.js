@@ -78,7 +78,7 @@ function capacity_estimation(parameters){
   while(true){
     //console.log({x0,x1});//debug
     //check if solution has been found or didn't converge
-    if(Math.abs(x0-x1) < 0.0000001 || iterations > 1000){
+    if(Math.abs(x0-x1) < 0.0000001 || iterations >= 1000){
       //console.log({iterations}); //debug
       break; //exit the loop
     }else{
@@ -88,8 +88,8 @@ function capacity_estimation(parameters){
       iterations++;            //add 1 to iterations
     }
   }
-  let X_Tave = x1;                //kgTSS/m3 | take the last iteration of x1
-  let Q_ADWF = VR*X_Tave/(L*Sti); //ML/d     | capacity of the treatment plant
+  let X_Tave = x1;                   //kgTSS/m3 | take the last iteration of x1
+  let Q_ADWF = VR*X_Tave/(L*Sti)||Q; //ML/d     | capacity of the treatment plant
 
   let results={
     Q     :{value:Q,      unit:"ML/d",     descr:"Actual flowrate"},

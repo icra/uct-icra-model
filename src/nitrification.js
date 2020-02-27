@@ -33,9 +33,6 @@ State_Variables.prototype.nitrification=function(parameters, result){
   //===========================================================================
   // PARAMETERS
   //===========================================================================
-  //SF: Design choice. Increases the
-  //sludge age to dampen the effluent ammonia variation choose a high value for
-  //high influent ammonia concentration variation
   let T   = parameters.T;   //ºC   | Temperature
   let Vp  = parameters.Vp;  //m3   | Volume of reactor
   let Rs  = parameters.Rs;  //days | Solids Retention Time or Sludge Age
@@ -55,8 +52,8 @@ State_Variables.prototype.nitrification=function(parameters, result){
   if(typeof(pH )!="number") throw new Error(`pH  is not a number`);
 
   //numerical checks for physical sense
-  if(SF  < 0) throw new Error(`Safety factor (SF=${SF}) not allowed`);
-  if(fxt < 0) throw new Error(`Unaerated sludge mass fraction (fxt=${fxt}) not allowed`);
+  if(SF  <= 1) throw new Error(`Safety factor (SF=${SF}) not allowed`);
+  if(fxt < 0 || fxt>=1) throw new Error(`Unaerated sludge mass fraction (fxt=${fxt}) not allowed`);
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -76,7 +73,7 @@ State_Variables.prototype.nitrification=function(parameters, result){
 
   //3 - nitrification kinetics
   const µAm   = constants.µAm;            //0.450 1/d | auth. max specific growth rate at 20ºC
-  const ϴ_µAm = constants.theta_µAm;      //1.123 1/d | temperature correction factor
+  const ϴ_µAm = constants.ϴ_µAm;          //1.123 1/d | temperature correction factor
   let µAmT    = µAm*Math.pow(ϴ_µAm,T-20); //1/d       | growth rate corrected by temperature
 
   //correct µA by DO (book page 468)
@@ -84,19 +81,19 @@ State_Variables.prototype.nitrification=function(parameters, result){
   let µAmO  = µAmT*DO/(DO+K_O); //1/d        | growth rate corrected by temperature and DO
 
   //correct µA by pH inhibition
-  const ϴ_pH = constants.theta_pH; //2.35 page 471 and 113
-  const Ki   = constants.Ki;       //1.13 page 471 and 113
-  const Kii  = constants.Kii;      //0.3  page 471 and 113
-  const Kmax = constants.Kmax;     //9.5  page 471 and 113
+  const ϴ_pH = constants.ϴ_pH; //2.35 page 471 and 113
+  const Ki   = constants.Ki;   //1.13 page 471 and 113
+  const Kii  = constants.Kii;  //0.3  page 471 and 113
+  const Kmax = constants.Kmax; //9.5  page 471 and 113
   let µAm_pH = µAmO*Math.pow(ϴ_pH, pH-7.2)*Ki*(Kmax-pH)/(Kmax+Kii-pH); //page 471 and 113
 
   //kinetic constants for NIT organisms
   const YA   = constants.YA;           //0.100 gVSS/gNH4 | yield coefficient at 20ºC
   const Kn   = constants.Kn;           //1.000 mgN/L     | ammonia half saturation coefficient at 20ºC
-  const ϴ_Kn = constants.theta_Kn;     //1.123 mgN/L     | Kn temperature correction factor
+  const ϴ_Kn = constants.ϴ_Kn;         //1.123 mgN/L     | Kn temperature correction factor
   let KnT    = Kn*Math.pow(ϴ_Kn,T-20); //mgN/L           | Kn corrected by temperature
   const bA   = constants.bA;           //1/d             | endogenous respiration rate at 20ºC
-  const ϴ_bA = constants.theta_bA;     //ø               | bA temperature correction factor
+  const ϴ_bA = constants.ϴ_bA;         //ø               | bA temperature correction factor
   let bAT    = bA*Math.pow(ϴ_bA,T-20); //1/d             | bA corrected by temperature
 
   //page 17

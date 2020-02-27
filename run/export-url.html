@@ -1,0 +1,94 @@
+<!--export-->
+<div class='card folded'>
+  <code onclick="toggle_class_folded('#outputs #export')">
+    <arrow></arrow> Export
+  </code>
+  <textarea id=export style="width:99%;height:200px"></textarea>
+</div>
+
+<script>
+  //GET inputs from URL
+  let url=new URL(window.location.href);
+
+  //iterate GET keys
+  for(let pair of url.searchParams.entries()){
+    let key = pair[0];
+    let val = pair[1];
+    let el  = document.querySelector(`#inputs #${key}`);
+    if(el){
+      if(el.type=='checkbox'){
+        if(val=='true') el.checked=true;
+      }else{
+        //includes <input type=number> and <select id>
+        el.value = val;
+      }
+    }
+  }
+
+  //posa la mateixa nomenclatura de George Ekama
+  let nomenclatura_george={
+    "FSA":"N<sub>a</sub>",
+    "PO4":"P<sub>s</sub>",
+    "bCOD":"S<sub>b</sub>",
+    "uCOD":"S<sub>u</sub>",
+    "sCOD":"S<sub>s</sub>",
+    "pCOD":"S<sub>p</sub>",
+    "bsCOD":"S<sub>bs</sub>",
+    "usCOD":"S<sub>us</sub>",
+    "bpCOD":"S<sub>bp</sub>",
+    "upCOD":"S<sub>up</sub>",
+    "ON":"N<sub>o</sub>",
+    "bON":"N<sub>ob</sub>",
+    "uON":"N<sub>ou</sub>",
+    "sON":"N<sub>os</sub>",
+    "pON":"N<sub>op</sub>",
+    "bsON":"N<sub>obs</sub>",
+    "usON":"N<sub>ous</sub>",
+    "bpON":"N<sub>obp</sub>",
+    "upON":"N<sub>oup</sub>",
+    "OP":"P<sub>o</sub>",
+    "bOP":"P<sub>ob</sub>",
+    "uOP":"P<sub>ou</sub>",
+    "sOP":"P<sub>os</sub>",
+    "pOP":"P<sub>op</sub>",
+    "bsOP":"P<sub>obs</sub>",
+    "usOP":"P<sub>ous</sub>",
+    "bpOP":"P<sub>obp</sub>",
+    "upOP":"P<sub>oup</sub>",
+    "OC":"C<sub>o</sub>",
+    "bOC":"C<sub>ob</sub>",
+    "uOC":"C<sub>ou</sub>",
+    "sOC":"C<sub>os</sub>",
+    "pOC":"C<sub>op</sub>",
+    "bsOC":"C<sub>obs</sub>",
+    "usOC":"C<sub>ous</sub>",
+    "bpOC":"C<sub>obp</sub>",
+    "upOC":"C<sub>oup</sub>",
+    "iSS" :'X<sub>IO</sub>',
+    "VSS" :'X<sub>v</sub>',
+    "bVSS":'X<sub>vb</sub>',
+    "uVSS":'X<sub>vu</sub>',
+  };
+
+  //genera URL amb els current inputs
+  document.querySelector('button#run').addEventListener('click',function(){
+    let newUrl = url.origin + url.pathname + '?'; //new url with all current inputs
+    //get <input> elements
+    document.querySelectorAll('#inputs input[id]').forEach(input=>{
+      if(input.type=='checkbox') input.value = input.checked;
+      newUrl += `${input.id}=${input.value}&`;
+    });
+    //get <select> elements
+    document.querySelectorAll('#inputs select[id]').forEach(select=>{
+      newUrl += `${select.id}=${select.value}&`;
+    });
+    //delete last '&' character
+    newUrl = newUrl.substring(0,newUrl.length-1);
+    //write newUrl to GUI
+    if(newUrl.length<2083){
+      document.querySelector('#outputs #export').value=newUrl;
+    }else{
+      document.querySelector('#outputs #export').value="url too long (unsolved error, please contact developers)";
+    }
+  });
+</script>

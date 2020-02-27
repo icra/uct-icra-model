@@ -235,10 +235,10 @@ class State_Variables {
       O2:  [components.S_O2,  fluxes.components.S_O2],   //dissolved oxygen
       TP:  [totals.TP.total,  fluxes.totals.TP.total],   //total phosphorus
       PO4: [totals.TP.PO4,    fluxes.totals.TP.PO4],     //inorganic phosphorus
+      TOC: [totals.TOC.total, fluxes.totals.TOC.total],  //total organic carbon
       VSS: [totals.TSS.VSS,   fluxes.totals.TSS.VSS],    //volatile suspended solids
       iSS: [totals.TSS.iSS,   fluxes.totals.TSS.iSS],    //inorganic suspended solids
       TSS: [totals.TSS.total, fluxes.totals.TSS.total],  //total suspended solids
-      TOC: [totals.TOC.total, fluxes.totals.TOC.total],  //total organic carbon
     }
   }
 

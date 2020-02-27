@@ -32,6 +32,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     let RAS        = parameters.RAS;        //ø       | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string  | origin of wastage ('sst' or 'reactor')
     let mass_FeCl3 = parameters.mass_FeCl3; //kg/d    | mass of FeCl3 added for P precipitation
+
     let S_NOx_RAS  = parameters.S_NOx_RAS;  //mgNOx/L | NOx concentration at RAS
     let DO_RAS     = parameters.DO_RAS;     //mgO/L   | Dissolved oxygen at recycle
     let IR         = parameters.IR;         //ø       | aerobic to anoxic recycle ratio
@@ -39,48 +40,54 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     let an_zones   = parameters.an_zones;   //number of anaerobic zones
 
     //check undefined parameters
-    if(undefined==T         ) throw new Error(`T          is undefined`);
-    if(undefined==Vp        ) throw new Error(`Vp         is undefined`);
-    if(undefined==Rs        ) throw new Error(`Rs         is undefined`);
-    if(undefined==DO        ) throw new Error(`DO         is undefined`);
-    if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
-    if(undefined==waste_from) throw new Error(`waste_from is undefined`);
-    if(undefined==mass_FeCl3) throw new Error(`mass_FeCl3 is undefined`);
-    if(undefined==S_NOx_RAS ) throw new Error(`S_NOx_RAS  is undefined`);
-    if(undefined==DO_RAS    ) throw new Error(`DO_RAS     is undefined`);
-    if(undefined==IR        ) throw new Error(`IR         is undefined`);
-    if(undefined==f_AN      ) throw new Error(`f_AN       is undefined`);
-    if(undefined==an_zones  ) throw new Error(`an_zones   is undefined`);
+      if(undefined==T         ) throw new Error(`T          is undefined`);
+      if(undefined==Vp        ) throw new Error(`Vp         is undefined`);
+      if(undefined==Rs        ) throw new Error(`Rs         is undefined`);
+      if(undefined==DO        ) throw new Error(`DO         is undefined`);
+      if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
+      if(undefined==waste_from) throw new Error(`waste_from is undefined`);
+      if(undefined==mass_FeCl3) throw new Error(`mass_FeCl3 is undefined`);
+      if(undefined==S_NOx_RAS ) throw new Error(`S_NOx_RAS  is undefined`);
+      if(undefined==DO_RAS    ) throw new Error(`DO_RAS     is undefined`);
+      if(undefined==IR        ) throw new Error(`IR         is undefined`);
+      if(undefined==f_AN      ) throw new Error(`f_AN       is undefined`);
+      if(undefined==an_zones  ) throw new Error(`an_zones   is undefined`);
 
     //check variable types
-    if("number"!=typeof T         ) throw new Error(`T          is not a number`);
-    if("number"!=typeof Vp        ) throw new Error(`Vp         is not a number`);
-    if("number"!=typeof Rs        ) throw new Error(`Rs         is not a number`);
-    if("number"!=typeof DO        ) throw new Error(`DO         is not a number`);
-    if("number"!=typeof RAS       ) throw new Error(`RAS        is not a number`);
-    if("string"!=typeof waste_from) throw new Error(`waste_from is not a string`);
-    if("number"!=typeof mass_FeCl3) throw new Error(`mass_FeCl3 is not a number`);
-    if("number"!=typeof S_NOx_RAS ) throw new Error(`S_NOx_RAS  is not a number`);
-    if("number"!=typeof DO_RAS    ) throw new Error(`DO_RAS     is not a number`);
-    if("number"!=typeof IR        ) throw new Error(`IR         is not a number`);
-    if("number"!=typeof f_AN      ) throw new Error(`f_AN       is not a number`);
-    if("number"!=typeof an_zones  ) throw new Error(`an_zones   is not a number`);
+      if("number"!=typeof T         ) throw new Error(`T          is not a number`);
+      if("number"!=typeof Vp        ) throw new Error(`Vp         is not a number`);
+      if("number"!=typeof Rs        ) throw new Error(`Rs         is not a number`);
+      if("number"!=typeof DO        ) throw new Error(`DO         is not a number`);
+      if("number"!=typeof RAS       ) throw new Error(`RAS        is not a number`);
+      if("string"!=typeof waste_from) throw new Error(`waste_from is not a string`);
+      if("number"!=typeof mass_FeCl3) throw new Error(`mass_FeCl3 is not a number`);
+      if("number"!=typeof S_NOx_RAS ) throw new Error(`S_NOx_RAS  is not a number`);
+      if("number"!=typeof DO_RAS    ) throw new Error(`DO_RAS     is not a number`);
+      if("number"!=typeof IR        ) throw new Error(`IR         is not a number`);
+      if("number"!=typeof f_AN      ) throw new Error(`f_AN       is not a number`);
+      if("number"!=typeof an_zones  ) throw new Error(`an_zones   is not a number`);
 
     //numerical checks for physical sense
-    if(Vp        <= 0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
-    if(Rs        <= 0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
-    if(DO        <  0) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
-    if(RAS       <= 0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
-    if(S_NOx_RAS <  0) throw new Error(`Value of Recirculation NOx concentration (${S_NOx_RAS}) not allowed`);
-    if(DO_RAS    <  0) throw new Error(`Value of DO in recycle (DO_RAS=${DO_RAS}) not allowed`);
-    if(IR        <  0) throw new Error(`Value of Aerobic to anoxic recycle ratio (IR=${IR}) not allowed`);
-    if(f_AN      <= 0) throw new Error(`Value of Anaerobic Sludge Fraction (f_AN=${f_AN}) not allowed`);
-    if(an_zones  <  0) throw new Error(`Value of Number of Anaerobic Zones (${an_zones}) not allowed`);
+      if(T   > 50) throw new Error(`Value of Temperature (T=${T}) not allowed`);
+      if(Vp  <= 0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
+      if(Rs  <= 0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
+      if(RAS <= 0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
 
-    //string checks
-    if(['reactor','sst'].indexOf(waste_from)==-1){
-      throw new Error(`The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`);
-    }
+      //DO: between 0 and 15 (checked at ecoinvent)
+      if(DO     < 0 || DO > 15) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
+      if(DO_RAS < 0 || DO > 15) throw new Error(`Value of DO in RAS recycle (DO_RAS=${DO_RAS}) not allowed`);
+
+      if(S_NOx_RAS <  0) throw new Error(`Value of Recirculation NOx concentration (${S_NOx_RAS}) not allowed`);
+      if(IR        <  0) throw new Error(`Value of Aerobic to anoxic recycle ratio (IR=${IR}) not allowed`);
+      if(an_zones  <  0) throw new Error(`Value of Number of Anaerobic Zones (${an_zones}) not allowed`);
+
+      //f_AN: between 0 and 1
+      if(f_AN <= 0 || f_AN>=1) throw new Error(`Value of Anaerobic Sludge Fraction (f_AN=${f_AN}) not allowed`);
+
+      //waste_from: 'reactor' or 'sst'
+      if(['reactor','sst'].indexOf(waste_from)==-1){
+        throw new Error(`The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`);
+      }
 
   //influent state variables
   let Q      = this.Q;                 //ML/d    | flowrate
@@ -125,7 +132,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   const f_iOHO = constants.f_iOHO;       //0.15 giSS/gVSS | fraction of inert solids in biomass
   const fH     = constants.fH;           //0.20 ø         | endogenous OHO fraction
   const bH     = constants.bH;           //0.24 1/d       | endogenous respiration rate at 20ºC
-  const ϴ_bH   = constants.theta_bH;     //1.029 ø        | bH temperature correction factor
+  const ϴ_bH   = constants.ϴ_bH;         //1.029 ø        | bH temperature correction factor
   const bHT    = bH*Math.pow(ϴ_bH,T-20); //1/d            | bH corrected by temperature
 
   //kinetic constants (PAO)
@@ -133,7 +140,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   const f_iPAO  = constants.f_iPAO;             //giSS/gVSS | iSS content of PAOs
   const f_PAO   = constants.f_PAO;              //ø         | endogenous PAO fraction
   const b_PAO   = constants.b_PAO;              //1/d       | PAOs endogenous residue respiration rate at 20ºC
-  const ϴ_b_PAO = constants.theta_b_PAO;        //ø         | b_PAO temperature correction factor
+  const ϴ_b_PAO = constants.ϴ_b_PAO;            //ø         | b_PAO temperature correction factor
   const b_PAO_T = b_PAO*Math.pow(ϴ_b_PAO,T-20); //1/d       | b_PAO corrected by temperature
 
   //P in iSS mass fraction
@@ -141,7 +148,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
 
   //FBSO constants
   const k_v20   = constants.k_v20;              //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
-  const ϴ_k_v20 = constants.theta_k_v20;        //1.035 ø         | k_v20 temperature correction factor
+  const ϴ_k_v20 = constants.ϴ_k_v20;        //1.035 ø         | k_v20 temperature correction factor
   const k_vT    = k_v20*Math.pow(ϴ_k_v20,T-20); //L/mgVSS·d       | k_v corrected by temperature
 
   //COD conversion (stoichiometric constants)
@@ -470,6 +477,9 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   if(isNaN(Nae_balance) || (Nae_balance < 99.9 || Nae_balance > 100.1) ) throw new Error(`Nae_balance is ${Nae_balance}%`);
   if(isNaN(P_balance  ) || (P_balance   < 99.9 || P_balance   > 100.1) ) throw new Error(`P_balance is ${P_balance}%`);
 
+  //Volume of anaerobic zone
+  let Vp_AN = f_AN*Vp; //m3
+
   //pack all process variables
   let process_variables={
     fSus        :{value:fSus,        unit:"gUSO/gCOD",   descr:"USO/COD ratio (influent)"},
@@ -507,6 +517,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     Ns          :{value:Ns,          unit:"mgN/L",       descr:"N required for sludge production"},
     Cs          :{value:Cs,          unit:"mgC/L",       descr:"C required for sludge production"},
     HRT         :{value:HRT,         unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
+    Vp_AN       :{value:Vp_AN,       unit:"m3",          descr:"Volume of the anaerobic zone"},
 
     //Phosphorus
     Pti         :{value:Pti,         unit:"mgP/L",       descr:"Influent TP"},

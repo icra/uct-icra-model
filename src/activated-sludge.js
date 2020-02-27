@@ -36,29 +36,36 @@ State_Variables.prototype.activated_sludge=function(parameters){
     let mass_FeCl3 = parameters.mass_FeCl3; //kg/d   | mass of FeCl3 added for P precipitation
 
     //check undefined parameters
-    if(undefined==T         ) throw new Error(`T          is undefined`);
-    if(undefined==Vp        ) throw new Error(`Vp         is undefined`);
-    if(undefined==Rs        ) throw new Error(`Rs         is undefined`);
-    if(undefined==DO        ) throw new Error(`DO         is undefined`);
-    if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
-    if(undefined==waste_from) throw new Error(`waste_from is undefined`);
-    if(undefined==mass_FeCl3) throw new Error(`mass_FeCl3 is undefined`);
+      if(undefined==T         ) throw new Error(`T          is undefined`);
+      if(undefined==Vp        ) throw new Error(`Vp         is undefined`);
+      if(undefined==Rs        ) throw new Error(`Rs         is undefined`);
+      if(undefined==DO        ) throw new Error(`DO         is undefined`);
+      if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
+      if(undefined==waste_from) throw new Error(`waste_from is undefined`);
+      if(undefined==mass_FeCl3) throw new Error(`mass_FeCl3 is undefined`);
 
     //check variable types
-    if("number"!=typeof T          ) throw new Error(`T          is not a number`);
-    if("number"!=typeof Vp         ) throw new Error(`Vp         is not a number`);
-    if("number"!=typeof Rs         ) throw new Error(`Rs         is not a number`);
-    if("number"!=typeof DO         ) throw new Error(`DO         is not a number`);
-    if("number"!=typeof RAS        ) throw new Error(`RAS        is not a number`);
-    if("string"!=typeof waste_from ) throw new Error(`waste_from is not a string`);
-    if("number"!=typeof mass_FeCl3 ) throw new Error(`mass_FeCl3 is not a number`);
+      if("number"!=typeof T          ) throw new Error(`T          is not a number`);
+      if("number"!=typeof Vp         ) throw new Error(`Vp         is not a number`);
+      if("number"!=typeof Rs         ) throw new Error(`Rs         is not a number`);
+      if("number"!=typeof DO         ) throw new Error(`DO         is not a number`);
+      if("number"!=typeof RAS        ) throw new Error(`RAS        is not a number`);
+      if("string"!=typeof waste_from ) throw new Error(`waste_from is not a string`);
+      if("number"!=typeof mass_FeCl3 ) throw new Error(`mass_FeCl3 is not a number`);
 
     //numerical checks for physical sense
-    if(Vp  <= 0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
-    if(Rs  <= 0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
-    if(RAS <  0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
-    if(DO  <  0) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
-    if(['reactor','sst'].indexOf(waste_from)==-1) throw new Error(`The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`);
+      if(T   >  50) throw new Error(`Value of Temperature (T=${T}) not allowed`);
+      if(Vp  <=  0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
+      if(Rs  <=  0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
+      if(RAS <   0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
+
+      //DO: between 0 and 15 (checked at ecoinvent)
+      if(DO < 0 || DO > 15) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
+
+      //waste_from: 'reactor' or 'sst'
+      if(['reactor','sst'].indexOf(waste_from)==-1){
+        throw new Error(`The input "waste_from" must be equal to "reactor" or "sst" ("${waste_from}" not allowed)`);
+      }
 
   //flowrate
   let Q = this.Q; //ML/d
@@ -109,12 +116,12 @@ State_Variables.prototype.activated_sludge=function(parameters){
   const YHvss = YH/f_CV_OHO;            //0.45 gVSS/gCOD | heterotrophic yield coefficient (does not change with temperature)
   const fH    = constants.fH;           //0.20 ø         | endogenous OHO fraction
   const bH    = constants.bH;           //0.24 1/d       | endogenous respiration rate at 20ºC
-  const ϴ_bH  = constants.theta_bH;     //1.029 ø        | bH temperature correction factor
+  const ϴ_bH  = constants.ϴ_bH;         //1.029 ø        | bH temperature correction factor
   let bHT     = bH*Math.pow(ϴ_bH,T-20); //1/d            | endogenous respiration rate corrected by temperature
 
   //kinetics for effluent FBSO (not all influent FBSO is degraded)
   const k_v20   = constants.k_v20;              //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
-  const ϴ_k_v20 = constants.theta_k_v20;        //1.035 ø         | k_v20 temperature correction factor
+  const ϴ_k_v20 = constants.ϴ_k_v20;        //1.035 ø         | k_v20 temperature correction factor
   let k_vT      = k_v20*Math.pow(ϴ_k_v20,T-20); //L/mgVSS·d       | k_v corrected by temperature
 
   //compute OHO biomass production rate
@@ -168,12 +175,12 @@ State_Variables.prototype.activated_sludge=function(parameters){
 
   //2.6 - Nitrogen - page 12
   let Ns    = (f_N_OHO*(MX_BH+MX_EH)+f_N_UPO*MX_I)/(Rs*Q); //mgN/L | N in influent required for sludge production
-  let Nti   = inf_frac.TKN.total;                              //mgN/L | total TKN influent
+  let Nti   = inf_frac.TKN.total;                          //mgN/L | total TKN influent
   let Nai   = this.components.S_NH4;                       //mgN/L | total ammonia influent
-  let Nobsi = inf_frac.TKN.bsON;                               //mgN/L | bsON influent (VFA + FBSO)
-  let Nouse = inf_frac.TKN.usON;                               //mgN/L | usON influent = effluent
-  let Nobpi = inf_frac.TKN.bpON;                               //mgN/L | bpON influent
-  let Noupi = inf_frac.TKN.upON;                               //mgN/L | upON influent
+  let Nobsi = inf_frac.TKN.bsON;                           //mgN/L | bsON influent (VFA + FBSO)
+  let Nouse = inf_frac.TKN.usON;                           //mgN/L | usON influent = effluent
+  let Nobpi = inf_frac.TKN.bpON;                           //mgN/L | bpON influent
+  let Noupi = inf_frac.TKN.upON;                           //mgN/L | upON influent
   let Nobse = Sbse*f_N_FBSO/f_CV_FBSO;                     //mgN/L | bsON effluent (not all FBSO is degraded)
 
   //effluent ammonia = total TKN - Ns - usON - bsON
@@ -183,7 +190,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
   //ammonia balance
   //console.log({Nae,Nai,Nobsi,Nobpi,Ns,Noupi,Nobse});
   let Nae_balance = (Nae == (Nai + Nobsi + Nobpi - Ns + Noupi - Nobse)) ? 100 :
-      100*Nae/(Nai + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
+                    100*Nae/(Nai + Nobsi + Nobpi - Ns + Noupi - Nobse); //percentage
 
   //in AS only: influent nitrate = effluent nitrate
   let Nne = this.components.S_NOx; //mgN/L
@@ -254,24 +261,27 @@ State_Variables.prototype.activated_sludge=function(parameters){
   let COD_balance = (FSout==FSti) ? 100 : 100*FSout/FSti; //percentage
 
   //2.10 - TKN balance
-  let FNti      = inf_flux.totals.TKN.total;          //kgN/d | total TKN influent
-  let FNte      = eff_flux.totals.TKN.total;          //kgN/d | total TKN effluent
-  let FNw       = was_flux.totals.TKN.total;          //kgN/d | total TKN wastage
+  let FNti      = inf_flux.totals.TKN.total;            //kgN/d | total TKN influent
+  let FNte      = eff_flux.totals.TKN.total;            //kgN/d | total TKN effluent
+  let FNw       = was_flux.totals.TKN.total;            //kgN/d | total TKN wastage
   let FNout     = FNte + FNw;                           //kgN/d | total TKN out
   let N_balance = (FNout==FNti) ? 100 : 100*FNout/FNti; //percentage
+  //console.log({FNti,FNte,FNw,FNout,N_balance});
 
   //2.11 - P balance
-  let FPti      = inf_flux.totals.TP.total;           //kgP/d | total TP influent
-  let FPte      = eff_flux.totals.TP.total;           //kgP/d | total TP effluent
-  let FPw       = was_flux.totals.TP.total;           //kgP/d | total TP wastage
-  let FPremoved = cpr.PO4_removed.value;                //kgP/d | total PO4 removed by FeCl3
+  let FPti      = inf_flux.totals.TP.total;             //kgP/d | total TP influent
+  let FPte      = eff_flux.totals.TP.total;             //kgP/d | total TP effluent
+  let FPw       = was_flux.totals.TP.total;             //kgP/d | total TP wastage
+  let FPremoved = cpr.PO4_removed.value;                //kgP/d | PO4 removed by FeCl3
   let FPout     = FPte + FPw + FPremoved;               //kgP/d | total TP out
   let P_balance = (FPout==FPti) ? 100 : 100*FPout/FPti; //percentage
+  //console.log({FPti,FPte,FPw,FPremoved,FPout,P_balance});
 
   //do we have enough influent nutrients to generate biomass?
   if(Ns > Nti) throw new Error(`Ns (${Ns}) > Nti (${Nti}): not enough influent TKN to produce biomass`);
   if(Ps > Pti) throw new Error(`Ps (${Ps}) > Pti (${Pti}): not enough influent TP to produce biomass`);
   if(Cs > Cti) throw new Error(`Cs (${Cs}) > Cti (${Cti}): not enough influent TOC to produce biomass`);
+  //console.log({Ns,Nti,Ps,Pti,Cs,Cti});
 
   //are balances 100%?
   if(isNaN(COD_balance) || (COD_balance < 99.9 || COD_balance > 100.1) ) throw new Error(`COD_balance is ${COD_balance}%`);
@@ -330,9 +340,9 @@ State_Variables.prototype.activated_sludge=function(parameters){
 
 /*test*/
 (function(){
-  return
-  //--------new State_Variables(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  NH4,   OP, NOx, O2  OHO, PAO)
-  let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0, 0,  0,   0);
+  return;
+  //--------new State_Variables(     Q, VFA, FBSO, BPO, UPO, USO, iSS,  NH4,   OP, NOx, O2, OHO, PAO)
+  let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0,  0,   0,   0);
 
   let as = inf.activated_sludge({
     T          : 16,        //ºC

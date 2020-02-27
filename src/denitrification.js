@@ -89,10 +89,10 @@ State_Variables.prototype.denitrification=function(parameters, result){
 
   //denitrification kinetics (page 19)
   //3.2 - denitrification kinetic constants
-  const K1_20 = constants.K1_20;                         //0.720 gN/gVSS·d | at 20ºC page 482 and 113
-  const K2_20 = constants.K2_20;                         //0.101 gN/gVSS·d | at 20ºC page 482 and 113
-  const K1T   = K1_20*Math.pow(constants.theta_K1,T-20); //gN/gVSS·d       | corrected by temperature (ϴ = 1.200)
-  const K2T   = K2_20*Math.pow(constants.theta_K2,T-20); //gN/gVSS·d       | corrected by temperature (ϴ = 1.080)
+  const K1_20 = constants.K1_20;                     //0.720 gN/gVSS·d | at 20ºC page 482 and 113
+  const K2_20 = constants.K2_20;                     //0.101 gN/gVSS·d | at 20ºC page 482 and 113
+  const K1T   = K1_20*Math.pow(constants.ϴ_K1,T-20); //gN/gVSS·d       | corrected by temperature (ϴ = 1.200)
+  const K2T   = K2_20*Math.pow(constants.ϴ_K2,T-20); //gN/gVSS·d       | corrected by temperature (ϴ = 1.080)
 
   //3.2 bsCOD/bCOD ratio
   let fSb_s = Sbsi/Sbi||0; //ratio BSO/(BSO+BPO)
@@ -117,23 +117,26 @@ State_Variables.prototype.denitrification=function(parameters, result){
   */
   if(as_ppvv.MX_PAO){
     Dp1 = (function(){ //mgN/L
-      let r         = 0;                                 //recirculation from anoxic to anaerobic reactor
-      let fxm       = 0.5;                               //ø | get value from "nitrification.js"
-      let f_AN      = parameters.f_AN;                   //ø
+      let RR = parameters.RR; //ø | r-recycle (anoxic to anaerobic)
+      if(RR==undefined)         throw new Error("r-recycle (anoxic to anaerobic, RR) is undefined");
+      if(typeof RR != "number") throw new Error(`r-recycle (anoxic to anaerobic, RR) is not a number`);
+      if(RR < 0)                throw new Error(`Value of r-recycle (anoxic to anaerobic) (RR=${RR}) not allowed`);
+
+      let fxm       = nit_ppvv.fxm.value;                //ø | maximum unaerated sludge fraction for nitrification
+      let f_AN      = parameters.f_AN;                   //ø | anaerobic sludge fraction
       let fx1       = fxm - f_AN;                        //ø
       let K2_20_PAO = constants.K2_20_PAO;               //0.255 gN/gVSS·d
-      let ϴ_K2_PAO  = constants.theta_K2_PAO;            //1.080
+      let ϴ_K2_PAO  = constants.ϴ_K2_PAO;            //1.080
       let K2T_PAO   = K2_20_PAO*Math.pow(ϴ_K2_PAO,T-20); //gN/gVSS·d
 
       //compute Dp1 modified for bio P removal
       //note: 40/14 is ≈ 2.86 stoichiometric constant (gCOD/gN) NO3 reduction to N2
       //let Dp1 = S_FBSO_AN*(1+r)*(1-YH)/(40/14) + K2T_PAO*fx1*(F_sb_OHO/Q)*(YH/f_CV_OHO)/(1+bHT*Rs);
-      let S_FBSO_AN = as_ppvv.S_FBSO_AN.value; //mgCOD/L
-      let F_sb_OHO  = as_ppvv.F_sb_OHO.value; //kgCOD/d
-
-      let Dp1RBSO = S_FBSO_AN*(1+r)*(1-YH)/i_NO3_N2;     //mgN/L | influent
-      let Dp1BPO  = K2T_PAO*fx1*(F_sb_OHO/Q-Sbse)*f_XBH; //mgN/L | influent
-      let Dp1     = Dp1RBSO+Dp1BPO;                      //mgN/L | influent
+      let S_FBSO_AN = as_ppvv.S_FBSO_AN.value;             //mgCOD/L
+      let F_sb_OHO  = as_ppvv.F_sb_OHO.value;              //kgCOD/d
+      let Dp1RBSO   = S_FBSO_AN*(1+RR)*(1-YH)/i_NO3_N2;    //mgN/L
+      let Dp1BPO    = K2T_PAO*fx1*(F_sb_OHO/Q-Sbse)*f_XBH; //mgN/L
+      let Dp1       = Dp1RBSO+Dp1BPO;                      //mgN/L
       return Dp1;
     })();
   }
