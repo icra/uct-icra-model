@@ -150,12 +150,7 @@
             <ul v-if="plant.visibles.inputs.influent.visible">
               <!--influent components-->
               <li>
-                <a v-on:click="plant.visibles.inputs.influent.components^=true">
-                  <span v-if="plant.visibles.inputs.influent.components">&darr;</span>
-                  <span v-else>&rarr;</span>
-                  <u>State Variables (components)</u>
-                </a>
-                <ul v-if="plant.visibles.inputs.influent.components">
+                <ul>
                   <!--influent Q-->
                   <li v-bind:title="state_variables_info.Q.descr" class=grid-li>
                     <div>Q:</div>
@@ -551,13 +546,12 @@
         visible:true,
         influent:{
           visible:true,
-          components:true,
           summary:false,
           totals:false,
           mass_ratios:false,
         },
-        configuration:false,
-        parameters:false,
+        configuration:true,
+        parameters:true,
         constants:false,
       };
       this.outputs={

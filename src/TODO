@@ -10,18 +10,16 @@
   fH --> f_OHO
 
 3. bio P:
+  - [PENDIENTE] [bio P] recalcular Dp1
+    calcular 'r' recycle ratio: no lo calculamos la planta ya lo sabe, añadir como input
 
-  - [VERIFICAR] se puede tener bio P sin nitrificación?
+  - [PENDIENTE] [bio P] provar exemple llibre ekama amb la interficie grafica
 
-  - [PENDIENTE, bio P] recalcular Dp1: calcular 'r' recycle ratio: no lo calculamos la planta ya lo sabe, añadir como input
-
-  - [PENDIENTE] f_VT_PAO (gPAOVSS/gTSS) = 0.46
-    - f_P_TSS revisar
-    - comprobar si X_P_TSS funciona para calcular el balance
+  - [PENDIENTE] comprobar si X_P_TSS funciona para calcular el balance
 
   - [PENDIENTE] The FBSO not consumed (kvT)
-    has to be included in the formula for S_FBSO available for conversion into VFAs?
+    has to be included in the formula for S_FBSO available for conversion into VFA
 
-  - [OK] single tank is the same as number_of_an_zones==1?
-    - significa solo un aerobico
+  - [OK] single tank is the same as number_of_an_zones==0
+    - significa solo un aerobico (no anaerobico)
 
