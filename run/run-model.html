@@ -290,7 +290,7 @@
                 <small>{{ plant_info.configuration[plant_info.parameters[key].tec]}}</small>
               </li>
 
-              <li class=grid-li v-bind:title="plant_info.parameters.waste_from.descr">
+              <li class="grid-li four" v-bind:title="plant_info.parameters.waste_from.descr">
                 <div>waste_from:</div>
                 <div>
                   <select v-model="plant.parameters.waste_from" style=float:right>
@@ -300,8 +300,8 @@
                 </div>
                 <div class=unit>
                   {{plant_info.parameters.waste_from.unit}}
-                  <small>({{ plant_info.configuration[plant_info.parameters.waste_from.tec] }})</small>
                 </div>
+                <small>{{ plant_info.configuration[plant_info.parameters.waste_from.tec]}}</small>
               </li>
             </ul>
           </li>
@@ -520,7 +520,7 @@
           </div>
         </div>
       </div>
-      <div v-else class=blank>[Press 'Run model' button to generate outputs]</div>
+      <div v-else class=blank>[Press 'Run model']</div>
     </li>
   </ul>
 </div>
@@ -548,10 +548,10 @@
     constructor(){
       this.visible=true;
       this.inputs={
-        visible:false,
+        visible:true,
         influent:{
-          visible:false,
-          components:false,
+          visible:true,
+          components:true,
           summary:false,
           totals:false,
           mass_ratios:false,
@@ -561,9 +561,9 @@
         constants:false,
       };
       this.outputs={
-        visible:false,
+        visible:true,
         process_variables:{
-          visible:false,
+          visible:true,
           as:false,
           bpr:false,
           nit:false,
@@ -585,10 +585,10 @@
           },
         },
         secondary:{
-          visible:false,
+          visible:true,
           effluent:{
-            visible:false,
-            summary:false,
+            visible:true,
+            summary:true,
             totals:false,
           },
           wastage:{

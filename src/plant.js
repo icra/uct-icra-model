@@ -235,12 +235,12 @@ class Plant{
     return {
       configuration:{
         pst:"Primary settler",
-        as: "Activated sludge (aerobic zone)",
-        nit:"Nitrification (anoxic zone)",
+        as: "Activated sludge (aerobic)",
+        nit:"Nitrification (anoxic)",
         dn: "Denitrification",
         cpr:"Chemical P removal",
         cap:"Capacity Estimation",
-        bpr:"Bio P removal (anaerobic zone)",
+        bpr:"Bio P removal (anaerobic)",
       },
       parameters:{
         fw          :{unit:"ø",         tec:"pst", type:"number", descr:"Fraction of Q that goes to primary wastage"},
