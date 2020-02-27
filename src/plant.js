@@ -166,7 +166,6 @@ class Plant{
     }
 
     //sixth step: capacity estimation module
-    //TODO
     {
       let DSVI = parameters.DSVI;
       let MX_T = bpr ? bpr.process_variables.MX_T.value : as.process_variables.MX_T.value;

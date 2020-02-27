@@ -454,7 +454,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   */
 
   /*
-    at this point we need a select system type and reactor volume
+    TODO at this point we need a select system type and reactor volume
       - AO (MLE)
       - A2O (3 stage bardenpho)
       - UCT system
@@ -463,8 +463,6 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     - UCT: we calculate the 'a' recycle. The 'r' recycle (from anoxic to
       anaerobic) and the 's' recycle are given as inputs.
   */
-
-  //TODO
 
   //are balances 100%?
   if(isNaN(COD_balance) || (COD_balance < 99.9 || COD_balance > 100.1) ) throw new Error(`COD_balance is ${COD_balance}%`);
