@@ -280,7 +280,7 @@ class State_Variables {
         S_NH4 :{unit:"mgN/L",   descr:"Inorganic Free Saline Ammonia (FSA)"},
         S_PO4 :{unit:"mgP/L",   descr:"Inorganic OrthoPhosphate (PO4)"},
         S_NOx :{unit:"mgN/L",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
-        S_O2  :{unit:"mgO/L",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
+        S_O2  :{unit:"mgO/L",   descr:"Dissolved Oxygen"},
         X_OHO :{unit:"mgCOD/L", descr:"Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)"},
         X_PAO :{unit:"mgCOD/L", descr:"Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)"},
       },

@@ -1,10 +1,10 @@
 /*
   CAPACITY ESTIMATION MODULE
   reference: "BalancedMLEEquations.pdf"
-  Calculates max flowrate (Q_ADWF) and total solids concentration (X_tave) that
+  Calculates max flowrate (Q_ADWF) and total solids concentration (X_Tave) that
   the plant can process before being overloaded
   - Q_ADWF: average dry weather flow capacity
-  - X_tave: average total solids concentration
+  - X_Tave: average total solids concentration
   if the plant is tretating more than Q_ADWF, is overloaded. if is less, the
   plant is underloaded
 */
@@ -13,14 +13,18 @@ function capacity_estimation(parameters){
   //===========================================================================
   // PARAMETERS
   //===========================================================================
+  let Q    = parameters.Q   ; //ML/d          | flowrate
+  let X_T  = parameters.X_T ; //kgTSS/m3      | current TSS concentration
   let DSVI = parameters.DSVI; //mL/gTSS       | sludge settleability
   let L    = parameters.L   ; //kgTSS·d/kgCOD | LTSS (eq 10) = MX_T/FSti
   let Sti  = parameters.Sti ; //mgCOD/L       | influent total COD
   let A_ST = parameters.A_ST; //m2            | area of the settler
-  let VR   = parameters.Vp  ; //m3            | volume of the reactor
+  let VR   = parameters.VR  ; //m3            | volume of the reactor
   let fq   = parameters.fq  ; //ø             | peak flow (Qmax/Qavg)
 
   //check undefined parameters
+  if(Q   ==undefined) throw new Error(`Q    is undefined`);
+  if(X_T ==undefined) throw new Error(`X_T  is undefined`);
   if(DSVI==undefined) throw new Error(`DSVI is undefined`);
   if(L   ==undefined) throw new Error(`L    is undefined`);
   if(Sti ==undefined) throw new Error(`Sti  is undefined`);
@@ -29,6 +33,8 @@ function capacity_estimation(parameters){
   if(fq  ==undefined) throw new Error(`fq   is undefined`);
 
   //check variable types
+  if(typeof(Q   )!="number") throw new Error(`Q    is not a number`);
+  if(typeof(X_T )!="number") throw new Error(`X_T  is not a number`);
   if(typeof(DSVI)!="number") throw new Error(`DSVI is not a number`);
   if(typeof(L   )!="number") throw new Error(`L    is not a number`);
   if(typeof(Sti )!="number") throw new Error(`Sti  is not a number`);
@@ -37,6 +43,8 @@ function capacity_estimation(parameters){
   if(typeof(fq  )!="number") throw new Error(`fq   is not a number`);
 
   //numerical checks for physical sense
+  if(Q    <  0) throw new Error(`value for Flowrate (Q=${Q}) not allowed`);
+  if(X_T  <  0) throw new Error(`value for TSS concentration (X_T=${X_T}) not allowed`);
   if(DSVI <= 0) throw new Error(`value for Sludge settleability (DSVI=${DSVI}) not allowed`);
   if(L    <  0) throw new Error(`value for L=MX_T/FSti (${L}) not allowed`);
   if(Sti  <  0) throw new Error(`value for influent COD (Sti=${Sti}) not allowed`);
@@ -53,7 +61,7 @@ function capacity_estimation(parameters){
 
   //console.log({DSVI,A_ST,fq});//debug
   //console.log({SSVI,V0_n,n,V0,H});//debug
-  //X_tave (=x) is found using the newton-raphson method
+  //X_Tave (=x) is found using the newton-raphson method
   //f(x) = x - H*e^(-n*x)
   //can be also expressed as: H = x*e^(n*x)
   function newton_raphson(x){       //1 iteration of newton-raphson method
@@ -62,7 +70,7 @@ function capacity_estimation(parameters){
     return x-fx/dx;                 //next value for x
   }
 
-  //start at X_tave=1
+  //start at X_Tave=1
   let x  = 10;                 //initial value for x
   let x0 = x;                  //current value for x
   let x1 = newton_raphson(x0); //next value for x
@@ -80,15 +88,22 @@ function capacity_estimation(parameters){
       iterations++;            //add 1 to iterations
     }
   }
-  let X_tave = x1;                //kgTSS/m3 | take the last iteration of x1
-  let Q_ADWF = VR*X_tave/(L*Sti); //ML/d     | capacity of the treatment plant
+  let X_Tave = x1;                //kgTSS/m3 | take the last iteration of x1
+  let Q_ADWF = VR*X_Tave/(L*Sti); //ML/d     | capacity of the treatment plant
 
   let results={
-    X_Tave:{value:X_tave, unit:"kgTSS/m3", descr:"Average TSS conccentration in reactor"},
+    Q     :{value:Q,      unit:"ML/d",     descr:"Actual flowrate"},
     Q_ADWF:{value:Q_ADWF, unit:"ML/d",     descr:"Average dry weather flow"},
-    iterations:{value:iterations, unit:'iterations', descr:'amount of newton-raphson iterations performed to compute X_tave'},
+    X_T   :{value:X_T,    unit:"kgTSS/m3", descr:"Current TSS concentration in reactor"},
+    X_Tave:{value:X_Tave, unit:"kgTSS/m3", descr:"Average TSS concentration in reactor"},
+    iterations:{value:iterations, unit:'iterations', descr:'amount of newton-raphson iterations performed to compute X_Tave'},
   }
   //console.log(results);
+
+  //check if plant is overloaded (allow 5% overloaded)
+  if(Q   > 1.05*Q_ADWF) throw new Error(`Q (${Q}) > Q_ADWF (${Q_ADWF}): plant overloaded (more than 5%)`);
+  if(X_T > 1.05*X_Tave) throw new Error(`X_T (${X_T}) > X_Tave (${X_Tave}): plant overloaded (more than 5%)`);
+
   return results;
 }
 
@@ -99,6 +114,8 @@ try{module.exports=capacity_estimation;}catch(e){}
 (function(){
   return
   console.log(capacity_estimation({
+    Q    : 10,     //ML/d
+    X_T  : 3.5,    //kgTSS/m3
     DSVI : 120,    //mL/gTSS
     L    : 2.9615, //kgTSS·d/kgCOD
     Sti  : 1150,   //mgCOD/L

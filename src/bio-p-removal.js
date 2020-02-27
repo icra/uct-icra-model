@@ -355,8 +355,8 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   let wastage  = new State_Variables(Qw,   0,    0, BPO_was, UPO_was, S_USO, iSS_was, Nae, Pse, S_NOx, DO, OHO_was, PAO_was);
 
   //copy influent mass ratios for the new outputs
-  effluent.mass_ratios = this.mass_ratios; //object
-  wastage.mass_ratios  = this.mass_ratios; //object
+  effluent.mass_ratios = Object.assign({}, this.mass_ratios);
+  wastage .mass_ratios = Object.assign({}, this.mass_ratios);
 
   //recalculate f_P_PAO mass ratio (since PAO mass is MX_PAO + MX_E_PAO)
   //and they have different P content

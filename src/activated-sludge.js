@@ -224,8 +224,8 @@ State_Variables.prototype.activated_sludge=function(parameters){
   let wastage  = new State_Variables(Qw,   0, Sbse, BPO_was, UPO_was, Susi, iSS_was, Nae, Pse, Nne, DO, OHO_was,   0);
 
   //copy influent mass ratios for the new outputs
-  effluent.mass_ratios = this.mass_ratios;
-  wastage.mass_ratios  = this.mass_ratios;
+  effluent.mass_ratios = Object.assign({}, this.mass_ratios);
+  wastage .mass_ratios = Object.assign({}, this.mass_ratios);
 
   //get output mass fluxes (kg/d)
   let eff_flux = effluent.fluxes; //object

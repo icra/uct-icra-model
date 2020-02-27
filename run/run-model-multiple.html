@@ -92,6 +92,11 @@
     .grid-li input[type=number]{
       float:right;
     }
+
+    #plants li.inputs_outputs {
+      display:grid;
+      grid-template-columns:50% 50%;
+    }
   </style>
 
   <!--css footer-->
@@ -112,7 +117,7 @@
 <div id=plants>
   <div>
     <!--btn afegir/eliminar depuradora-->
-    <button v-on:click="add_plant()" style="padding:1em">New plant</button>
+    <button v-on:click="add_plant()" style="padding:1em">Add plant</button>
   </div><hr>
   <!--no plants warning--><div v-if="plants.length==0" class=blank>[~No plants]</div>
 
@@ -125,395 +130,398 @@
       <button v-on:click="remove_plant(plant)">Remove plant</button>
     </li>
 
-    <!--plant inputs-->
-    <li>
-      <a v-on:click="plant.visibles.inputs.visible^=true">
-        <span v-if="plant.visibles.inputs.visible">&darr;</span>
-        <span v-else>&rarr;</span>
-        <b>Inputs</b>
-      </a>
-      <ul v-if="plant.visibles.inputs.visible">
-        <!--influent (variables d'estat)-->
-        <li>
-          <a v-on:click="plant.visibles.inputs.influent.visible^=true">
-            <span v-if="plant.visibles.inputs.influent.visible">&darr;</span>
-            <span v-else>&rarr;</span>
-            <u>Influent</u>
-          </a>
-          <ul v-if="plant.visibles.inputs.influent.visible">
-            <!--influent components-->
-            <li>
-              <a v-on:click="plant.visibles.inputs.influent.components^=true">
-                <span v-if="plant.visibles.inputs.influent.components">&darr;</span>
-                <span v-else>&rarr;</span>
-                <u>State Variables (components)</u>
-              </a>
-              <ul v-if="plant.visibles.inputs.influent.components">
-                <!--influent Q-->
-                <li v-bind:title="state_variables_info.Q.descr" class=grid-li>
-                  <div>Q:</div>
-                  <div><input type=number v-model.number="plant.influent.Q" v-on:keyup.enter="run_model(plant)" min=0></div>
-                  <div class=unit>ML/d</div>
-                </li>
+    <!--inputs and outputs-->
+    <li class=inputs_outputs>
+      <!--inputs-->
+      <div>
+        <a v-on:click="plant.visibles.inputs.visible^=true">
+          <span v-if="plant.visibles.inputs.visible">&darr;</span>
+          <span v-else>&rarr;</span>
+          <b>Inputs</b>
+        </a>
+        <ul v-if="plant.visibles.inputs.visible">
+          <!--influent (variables d'estat)-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.influent.visible^=true">
+              <span v-if="plant.visibles.inputs.influent.visible">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u>Influent</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.influent.visible">
+              <!--influent components-->
+              <li>
+                <a v-on:click="plant.visibles.inputs.influent.components^=true">
+                  <span v-if="plant.visibles.inputs.influent.components">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>State Variables (components)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.components">
+                  <!--influent Q-->
+                  <li v-bind:title="state_variables_info.Q.descr" class=grid-li>
+                    <div>Q:</div>
+                    <div><input type=number v-model.number="plant.influent.Q" v-on:keyup.enter="run_model(plant)" min=0></div>
+                    <div class=unit>ML/d</div>
+                  </li>
 
-                <li v-for="component,key in plant.influent.components" class=grid-li
-                  v-bind:title="state_variables_info.components[key].descr">
-                  <div>{{key}}:</div>
-                  <div><input type=number v-model.number="plant.influent.components[key]"
-                    v-on:keyup.enter="run_model(plant)" min=0></div>
-                  <div class=unit>mg/L</span></div>
-                </li>
-              </ul>
-            </li>
-
-            <!--influent mass ratios-->
-            <li>
-              <a v-on:click="plant.visibles.inputs.influent.mass_ratios^=true">
-                <span v-if="plant.visibles.inputs.influent.mass_ratios">&darr;</span>
-                <span v-else>&rarr;</span>
-                <u>Mass ratios (VSS)</u>
-              </a>
-              <ul v-if="plant.visibles.inputs.influent.mass_ratios">
-                <li v-for="par,key in plant.influent.mass_ratios" class=grid-li
-                    v-bind:title="state_variables_info.mass_ratios[key].descr">
-                  <div><small>{{key}}:</small></div>
-                  <div>
-                    <input type=number v-model.number="plant.influent.mass_ratios[key]" v-on:keyup.enter="run_model(plant)">
-                  </div>
-                  <div class=unit>{{state_variables_info.mass_ratios[key].unit}}</div>
-                </li>
-              </ul>
-            </li>
-
-            <!--influent summary-->
-            <li title="Fraccionament calculat a partir de les variables d'estat (a sobre) i els mass ratios">
-              <a v-on:click="plant.visibles.inputs.influent.summary^=true">
-                <span v-if="plant.visibles.inputs.influent.summary">&darr;</span>
-                <span v-else>&rarr;</span>
-                <u>Fractionation (summary)</u>
-              </a>
-              <ul v-if="plant.visibles.inputs.influent.summary"><li>
-                <table border=1>
-                  <tr>
-                    <th title=Component>Comp
-                    <th title=Concentration>Conc <span class=unit>(mg/L)</span>
-                    <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
-                  <tr v-for="obj,key in plant.influent.summary" v-if="key!='Q'">
-                    <td>{{key}}
-                    <td class=number>{{Math.round(100*obj[0])/100}}
-                    <td class=number>{{Math.round(100*obj[1])/100}}
-                  </tr>
-                </table>
-              </ul>
-            </li>
-
-            <!--influent totals-->
-            <li>
-              <a v-on:click="plant.visibles.inputs.influent.totals^=true">
-                <span v-if="plant.visibles.inputs.influent.totals">&darr;</span>
-                <span v-else>&rarr;</span>
-                <u>Fractionation (complete)</u>
-              </a>
-              <ul v-if="plant.visibles.inputs.influent.totals"><li>
-                <table border=1>
-                  <tr v-for="obj,key in plant.influent.totals">
-                    <td>{{key}}</td>
-                    <td>
-                      <ul>
-                        <li v-for="val,key in obj" class="grid-li five">
-                          <div>{{key}}</div>
-                          <div class=number>{{Math.round(100*val)/100}}</div>
-                          <div class=unit>mg/L</div>
-                          <div class=number>{{Math.round(100*val*plant.influent.Q)/100}}</div>
-                          <div class=unit>kg/d</div>
-                        </li>
-                      </ul>
-                    </td>
-                  </tr>
-                </table>
-              </ul>
-            </li>
-          </ul>
-        </li>
-
-        <!--configuration-->
-        <li>
-          <a v-on:click="plant.visibles.inputs.configuration^=true">
-            <span v-if="plant.visibles.inputs.configuration">&darr;</span>
-            <span v-else>&rarr;</span>
-            <u>Configuration</u>
-          </a>
-          <ul v-if="plant.visibles.inputs.configuration">
-            <li v-for="tech,key in plant.configuration"
-                v-bind:title="plant_info.configuration[key]"
-                class=grid-li
-            >
-              <div>{{plant_info.configuration[key]}}</div>
-              <div>
-                <label>
-                  <input type=checkbox v-model="plant.configuration[key]">
-                </label>
-              </div>
-              <div class=unit>{{tech}}</div>
-            </li>
-          </ul>
-        </li>
-
-        <!--parameters-->
-        <li>
-          <a v-on:click="plant.visibles.inputs.parameters^=true">
-            <span v-if="plant.visibles.inputs.parameters">&darr;</span>
-            <span v-else>&rarr;</span>
-            <u>Parameters</u>
-          </a>
-          <ul v-if="plant.visibles.inputs.parameters">
-            <li v-for="par,key in plant.parameters" class="grid-li four" v-bind:title="plant_info.parameters[key].descr"
-                v-if="
-                  key!='waste_from' &&
-                  plant.configuration[plant_info.parameters[key].tec]!=false
-                "
-            >
-              <div>{{key}}:</div>
-              <div>
-                <input type=number v-model.number="plant.parameters[key]" v-on:keyup.enter="run_model(plant)">
-              </div>
-              <div class=unit>
-                {{plant_info.parameters[key].unit}}
-              </div>
-              <small>{{ plant_info.configuration[plant_info.parameters[key].tec]}}</small>
-            </li>
-
-            <li class=grid-li v-bind:title="plant_info.parameters.waste_from.descr">
-              <div>waste_from:</div>
-              <div>
-                <select v-model="plant.parameters.waste_from" style=float:right>
-                  <option>reactor</option>
-                  <option>sst</option>
-                </select>
-              </div>
-              <div class=unit>
-                {{plant_info.parameters.waste_from.unit}}
-                <small>({{ plant_info.configuration[plant_info.parameters.waste_from.tec] }})</small>
-              </div>
-            </li>
-          </ul>
-        </li>
-
-        <!--constants-->
-        <li>
-          <a v-on:click="plant.visibles.inputs.constants^=true">
-            <span v-if="plant.visibles.inputs.constants">&darr;</span>
-            <span v-else>&rarr;</span>
-            <u title="Kinetic constants">Constants</u>
-          </a>
-          <ul v-if="plant.visibles.inputs.constants">
-            <li v-for="obj,key in plant.constants.info" class="grid-li four"
-              v-bind:title="obj.descr" v-if="plant.configuration[obj.tec]!=false">
-              <div>{{key}}</div>
-              <div>
-                <input type=number v-model.number="plant.constants[key]" v-on:keyup.enter="run_model(plant)">
-              </div>
-              <div class=unit>
-                {{obj.unit}}
-              </div>
-              <small>{{plant_info.configuration[obj.tec]}}</small>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-
-    <!--plant outputs-->
-    <li v-if="plant.outputs">
-      <a v-on:click="plant.visibles.outputs.visible^=true">
-        <span v-if="plant.visibles.outputs.visible">&darr;</span>
-        <span v-else>&rarr;</span>
-        <b>Outputs</b>
-      </a>
-      <!--plant outputs-->
-      <div v-if="plant.visibles.outputs.visible">
-        <!--outputs: only if 0 warnings-->
-        <div>
-          <!--plant run-->
-          <ul>
-            <!--primary-->
-            <li v-if="plant.outputs.run.primary.wastage">
-              <a v-on:click="plant.visibles.outputs.primary.visible^=true">
-                <span v-if="plant.visibles.outputs.primary.visible">&darr;</span>
-                <span v-else>&rarr;</span>
-                <u>Primary</u>
-              </a>
-              <!--primary effluent and wastage-->
-              <div v-if="plant.visibles.outputs.primary.visible">
-                <ul v-for="obj,key in plant.outputs.run.primary">
-                  <li>
-                    <a v-on:click="plant.visibles.outputs.primary[key].visible^=true">
-                      <span v-if="plant.visibles.outputs.primary[key].visible">&darr;</span><span v-else>&rarr;</span>
-                      <u>Primary {{key}}</u> |
-                      <span v-bind:title="obj.Q">
-                        Q={{Math.round(100*obj.Q)/100}}
-                        <span class=unit>{{state_variables_info.Q.unit}}</span>
-                      </span>
-                    </a>
-                    <ul v-if="plant.visibles.outputs.primary[key].visible">
-                      <!--primary streams summary-->
-                      <li>
-                        <a v-on:click="plant.visibles.outputs.primary[key].summary^=true">
-                          <span v-if="plant.visibles.outputs.primary[key].summary">&darr;</span><span v-else>&rarr;</span>
-                          <u>Fractionation (summary)</u>
-                        </a>
-                        <ul v-if="plant.visibles.outputs.primary[key].summary"><li>
-                          <table border=1>
-                            <tr>
-                              <th title=Component>Comp
-                              <th title=Concentration>Conc <span class=unit>(mg/L)</span>
-                              <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
-                            <tr v-for="obj,key in obj.summary" v-if="key!='Q'">
-                              <td>{{key}}
-                              <td class=number>{{Math.round(100*obj[0])/100}}
-                              <td class=number>{{Math.round(100*obj[1])/100}}
-                            </li>
-                          </table>
-                        </ul>
-                      </li>
-
-                      <!--primary streams totals-->
-                      <li>
-                        <a v-on:click="plant.visibles.outputs.primary[key].totals^=true">
-                          <span v-if="plant.visibles.outputs.primary[key].totals">&darr;</span><span v-else>&rarr;</span>
-                          <u>Fractionation (complete)</u>
-                        </a>
-                        <ul v-if="plant.visibles.outputs.primary[key].totals"><li>
-                          <table border=1>
-                            <tr v-for="obj,total in obj.totals">
-                              <td>{{total}}</td>
-                              <td>
-                                <ul>
-                                  <li v-for="val,fraction in obj" class="grid-li five">
-                                    <div>{{fraction}}</div>
-                                    <div class=number>{{Math.round(100*val)/100}}</div>
-                                    <div class=unit>mg/L</div>
-                                    <div class=number>{{Math.round(100*val*plant.outputs.run.primary[key].Q)/100}}</div>
-                                    <div class=unit>kg/d</div>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-                          </table>
-                        </ul>
-                      </li>
-                    </ul>
-                  <li>
-                </ul>
-              </div>
-            </li>
-
-            <!--secondary-->
-            <li>
-              <a v-on:click="plant.visibles.outputs.secondary.visible^=true">
-                <span v-if="plant.visibles.outputs.secondary.visible">&darr;</span>
-                <span v-else>&rarr;</span>
-                <u>Secondary</u>
-              </a>
-              <div v-if="plant.visibles.outputs.secondary.visible">
-                <ul v-for="obj,key in plant.outputs.run.secondary">
-                  <li>
-                    <a v-on:click="plant.visibles.outputs.secondary[key].visible^=true">
-                      <span v-if="plant.visibles.outputs.secondary[key].visible">&darr;</span>
-                      <span v-else>&rarr;</span>
-                      <u>Secondary {{key}}</u> |
-                      <span v-bind:title="obj.Q">
-                        Q={{Math.round(100*obj.Q)/100}}
-                        <span class=unit>{{state_variables_info.Q.unit}}</span>
-                      </span>
-                    </a>
-                    <ul v-if="plant.visibles.outputs.secondary[key].visible">
-                      <!--secondary stream summary-->
-                      <li>
-                        <a v-on:click="plant.visibles.outputs.secondary[key].summary^=true">
-                          <span v-if="plant.visibles.outputs.secondary[key].summary">&darr;</span><span v-else>&rarr;</span>
-                          <u>Fractionation (summary)</u>
-                        </a>
-                        <ul v-if="plant.visibles.outputs.secondary[key].summary"><li>
-                          <table border=1>
-                            <tr>
-                              <th title=Component>Comp
-                              <th title=Concentration>Conc <span class=unit>(mg/L)</span>
-                              <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
-                            <tr v-for="obj,key in obj.summary" v-if="key!='Q'">
-                              <td>{{key}}
-                              <td class=number>{{Math.round(100*obj[0])/100}}
-                              <td class=number>{{Math.round(100*obj[1])/100}}
-                            </li>
-                          </table>
-                        </ul>
-                      </li>
-
-                      <!--secondary stream totals-->
-                      <li>
-                        <a v-on:click="plant.visibles.outputs.secondary[key].totals^=true">
-                          <span v-if="plant.visibles.outputs.secondary[key].totals">&darr;</span><span v-else>&rarr;</span>
-                          <u>Fractionation (complete)</u>
-                        </a>
-                        <ul v-if="plant.visibles.outputs.secondary[key].totals"><li>
-                          <table border=1>
-                            <tr v-for="obj,total in obj.totals">
-                              <td>{{total}}</td>
-                              <td>
-                                <ul>
-                                  <li v-for="val,fraction in obj" class="grid-li five">
-                                    <div>{{fraction}}</div>
-                                    <div class=number>{{Math.round(100*val)/100}}</div>
-                                    <div class=unit>mg/L</div>
-                                    <div class=number>{{Math.round(100*val*plant.outputs.run.secondary[key].Q)/100}}</div>
-                                    <div class=unit>kg/d</div>
-                                  </li>
-                                </ul>
-                              </td>
-                            </tr>
-                          </table>
-                        </ul>
-                      </li>
-                    </ul>
-                  <li>
-                </ul>
-              </div>
-            </li>
-
-            <!--process variables-->
-            <li>
-              <a v-on:click="plant.visibles.outputs.process_variables.visible^=true">
-                <span v-if="plant.visibles.outputs.process_variables.visible">&darr;</span>
-                <span v-else>&rarr;</span>
-                <u>Process variables</u>
-              </a>
-
-              <!--as,nit,dn,cpr,cap,bpr-->
-              <div v-if="plant.visibles.outputs.process_variables.visible">
-                <ul v-for="obj,key in plant.outputs.run.process_variables">
-                  <li v-if="obj && plant.configuration[key]!=false">
-                    <a v-on:click="plant.visibles.outputs.process_variables[key]^=true">
-                      <span v-if="plant.visibles.outputs.process_variables[key]">&darr;</span>
-                      <span v-else>&rarr;</span>
-                      <u>{{plant_info.configuration[key]}}</u>
-                    </a>
-                    <!--resultats tecnologia-->
-                    <ul v-if="plant.visibles.outputs.process_variables[key]">
-                      <li v-for="obj,key in obj" class=grid-li v-bind:title="obj.descr">
-                        <div><small>{{key}}</small></div>
-                        <div class=number v-bind:title="obj.value">{{Math.round(100*obj.value)/100}}</div>
-                        <div class=unit>{{obj.unit}}</div>
-                      </li>
-                    </ul>
+                  <li v-for="component,key in plant.influent.components" class=grid-li
+                    v-bind:title="state_variables_info.components[key].descr">
+                    <div>{{key}}:</div>
+                    <div><input type=number v-model.number="plant.influent.components[key]"
+                      v-on:keyup.enter="run_model(plant)" min=0></div>
+                    <div class=unit>mg/L</span></div>
                   </li>
                 </ul>
-              </div>
-            </li>
-          </ul>
+              </li>
+
+              <!--influent mass ratios-->
+              <li>
+                <a v-on:click="plant.visibles.inputs.influent.mass_ratios^=true">
+                  <span v-if="plant.visibles.inputs.influent.mass_ratios">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Mass ratios (VSS)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.mass_ratios">
+                  <li v-for="par,key in plant.influent.mass_ratios" class=grid-li
+                      v-bind:title="state_variables_info.mass_ratios[key].descr">
+                    <div><small>{{key}}:</small></div>
+                    <div>
+                      <input type=number v-model.number="plant.influent.mass_ratios[key]" v-on:keyup.enter="run_model(plant)">
+                    </div>
+                    <div class=unit>{{state_variables_info.mass_ratios[key].unit}}</div>
+                  </li>
+                </ul>
+              </li>
+
+              <!--influent summary-->
+              <li title="Fraccionament calculat a partir de les variables d'estat (a sobre) i els mass ratios">
+                <a v-on:click="plant.visibles.inputs.influent.summary^=true">
+                  <span v-if="plant.visibles.inputs.influent.summary">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Fractionation (summary)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.summary"><li>
+                  <table border=1>
+                    <tr>
+                      <th title=Component>Comp
+                      <th title=Concentration>Conc <span class=unit>(mg/L)</span>
+                      <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
+                    <tr v-for="obj,key in plant.influent.summary" v-if="key!='Q'">
+                      <td>{{key}}
+                      <td class=number>{{Math.round(100*obj[0])/100}}
+                      <td class=number>{{Math.round(100*obj[1])/100}}
+                    </tr>
+                  </table>
+                </ul>
+              </li>
+
+              <!--influent totals-->
+              <li>
+                <a v-on:click="plant.visibles.inputs.influent.totals^=true">
+                  <span v-if="plant.visibles.inputs.influent.totals">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Fractionation (complete)</u>
+                </a>
+                <ul v-if="plant.visibles.inputs.influent.totals"><li>
+                  <table border=1>
+                    <tr v-for="obj,key in plant.influent.totals">
+                      <td>{{key}}</td>
+                      <td>
+                        <ul>
+                          <li v-for="val,key in obj" class="grid-li five">
+                            <div>{{key}}</div>
+                            <div class=number>{{Math.round(100*val)/100}}</div>
+                            <div class=unit>mg/L</div>
+                            <div class=number>{{Math.round(100*val*plant.influent.Q)/100}}</div>
+                            <div class=unit>kg/d</div>
+                          </li>
+                        </ul>
+                      </td>
+                    </tr>
+                  </table>
+                </ul>
+              </li>
+            </ul>
+          </li>
+
+          <!--configuration-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.configuration^=true">
+              <span v-if="plant.visibles.inputs.configuration">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u>Configuration</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.configuration">
+              <li v-for="tech,key in plant.configuration"
+                  v-bind:title="plant_info.configuration[key]"
+                  class=grid-li
+              >
+                <div>{{plant_info.configuration[key]}}</div>
+                <div>
+                  <label>
+                    <input type=checkbox v-model="plant.configuration[key]">
+                  </label>
+                </div>
+                <div class=unit>{{tech}}</div>
+              </li>
+            </ul>
+          </li>
+
+          <!--parameters-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.parameters^=true">
+              <span v-if="plant.visibles.inputs.parameters">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u>Parameters</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.parameters">
+              <li v-for="par,key in plant.parameters" class="grid-li four" v-bind:title="plant_info.parameters[key].descr"
+                  v-if="
+                    key!='waste_from' &&
+                    plant.configuration[plant_info.parameters[key].tec]!=false
+                  "
+              >
+                <div>{{key}}:</div>
+                <div>
+                  <input type=number v-model.number="plant.parameters[key]" v-on:keyup.enter="run_model(plant)">
+                </div>
+                <div class=unit>
+                  {{plant_info.parameters[key].unit}}
+                </div>
+                <small>{{ plant_info.configuration[plant_info.parameters[key].tec]}}</small>
+              </li>
+
+              <li class=grid-li v-bind:title="plant_info.parameters.waste_from.descr">
+                <div>waste_from:</div>
+                <div>
+                  <select v-model="plant.parameters.waste_from" style=float:right>
+                    <option>reactor</option>
+                    <option>sst</option>
+                  </select>
+                </div>
+                <div class=unit>
+                  {{plant_info.parameters.waste_from.unit}}
+                  <small>({{ plant_info.configuration[plant_info.parameters.waste_from.tec] }})</small>
+                </div>
+              </li>
+            </ul>
+          </li>
+
+          <!--constants-->
+          <li>
+            <a v-on:click="plant.visibles.inputs.constants^=true">
+              <span v-if="plant.visibles.inputs.constants">&darr;</span>
+              <span v-else>&rarr;</span>
+              <u title="Kinetic constants">Constants</u>
+            </a>
+            <ul v-if="plant.visibles.inputs.constants">
+              <li v-for="obj,key in plant.constants.info" class="grid-li four"
+                v-bind:title="obj.descr" v-if="plant.configuration[obj.tec]!=false">
+                <div>{{key}}</div>
+                <div>
+                  <input type=number v-model.number="plant.constants[key]" v-on:keyup.enter="run_model(plant)">
+                </div>
+                <div class=unit>
+                  {{obj.unit}}
+                </div>
+                <small>{{plant_info.configuration[obj.tec]}}</small>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+
+      <!--outputs-->
+      <div v-if="plant.outputs">
+        <a v-on:click="plant.visibles.outputs.visible^=true">
+          <span v-if="plant.visibles.outputs.visible">&darr;</span>
+          <span v-else>&rarr;</span>
+          <b>Outputs</b>
+        </a>
+        <!--plant outputs-->
+        <div v-if="plant.visibles.outputs.visible">
+          <!--outputs: only if 0 warnings-->
+          <div>
+            <!--plant run-->
+            <ul>
+              <!--primary-->
+              <li v-if="plant.outputs.run.primary.wastage">
+                <a v-on:click="plant.visibles.outputs.primary.visible^=true">
+                  <span v-if="plant.visibles.outputs.primary.visible">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Primary</u>
+                </a>
+                <!--primary effluent and wastage-->
+                <div v-if="plant.visibles.outputs.primary.visible">
+                  <ul v-for="obj,key in plant.outputs.run.primary">
+                    <li>
+                      <a v-on:click="plant.visibles.outputs.primary[key].visible^=true">
+                        <span v-if="plant.visibles.outputs.primary[key].visible">&darr;</span><span v-else>&rarr;</span>
+                        <u>Primary {{key}}</u> |
+                        <span v-bind:title="obj.Q">
+                          Q={{Math.round(100*obj.Q)/100}}
+                          <span class=unit>{{state_variables_info.Q.unit}}</span>
+                        </span>
+                      </a>
+                      <ul v-if="plant.visibles.outputs.primary[key].visible">
+                        <!--primary streams summary-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.primary[key].summary^=true">
+                            <span v-if="plant.visibles.outputs.primary[key].summary">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (summary)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.primary[key].summary"><li>
+                            <table border=1>
+                              <tr>
+                                <th title=Component>Comp
+                                <th title=Concentration>Conc <span class=unit>(mg/L)</span>
+                                <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
+                              <tr v-for="obj,key in obj.summary" v-if="key!='Q'">
+                                <td>{{key}}
+                                <td class=number>{{Math.round(100*obj[0])/100}}
+                                <td class=number>{{Math.round(100*obj[1])/100}}
+                              </li>
+                            </table>
+                          </ul>
+                        </li>
+
+                        <!--primary streams totals-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.primary[key].totals^=true">
+                            <span v-if="plant.visibles.outputs.primary[key].totals">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (complete)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.primary[key].totals"><li>
+                            <table border=1>
+                              <tr v-for="obj,total in obj.totals">
+                                <td>{{total}}</td>
+                                <td>
+                                  <ul>
+                                    <li v-for="val,fraction in obj" class="grid-li five">
+                                      <div>{{fraction}}</div>
+                                      <div class=number>{{Math.round(100*val)/100}}</div>
+                                      <div class=unit>mg/L</div>
+                                      <div class=number>{{Math.round(100*val*plant.outputs.run.primary[key].Q)/100}}</div>
+                                      <div class=unit>kg/d</div>
+                                    </li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            </table>
+                          </ul>
+                        </li>
+                      </ul>
+                    <li>
+                  </ul>
+                </div>
+              </li>
+
+              <!--secondary-->
+              <li>
+                <a v-on:click="plant.visibles.outputs.secondary.visible^=true">
+                  <span v-if="plant.visibles.outputs.secondary.visible">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Secondary</u>
+                </a>
+                <div v-if="plant.visibles.outputs.secondary.visible">
+                  <ul v-for="obj,key in plant.outputs.run.secondary">
+                    <li>
+                      <a v-on:click="plant.visibles.outputs.secondary[key].visible^=true">
+                        <span v-if="plant.visibles.outputs.secondary[key].visible">&darr;</span>
+                        <span v-else>&rarr;</span>
+                        <u>Secondary {{key}}</u> |
+                        <span v-bind:title="obj.Q">
+                          Q={{Math.round(100*obj.Q)/100}}
+                          <span class=unit>{{state_variables_info.Q.unit}}</span>
+                        </span>
+                      </a>
+                      <ul v-if="plant.visibles.outputs.secondary[key].visible">
+                        <!--secondary stream summary-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.secondary[key].summary^=true">
+                            <span v-if="plant.visibles.outputs.secondary[key].summary">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (summary)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.secondary[key].summary"><li>
+                            <table border=1>
+                              <tr>
+                                <th title=Component>Comp
+                                <th title=Concentration>Conc <span class=unit>(mg/L)</span>
+                                <th title="Mass flux">Flux   <span class=unit>(kg/d)</span>
+                              <tr v-for="obj,key in obj.summary" v-if="key!='Q'">
+                                <td>{{key}}
+                                <td class=number>{{Math.round(100*obj[0])/100}}
+                                <td class=number>{{Math.round(100*obj[1])/100}}
+                              </li>
+                            </table>
+                          </ul>
+                        </li>
+
+                        <!--secondary stream totals-->
+                        <li>
+                          <a v-on:click="plant.visibles.outputs.secondary[key].totals^=true">
+                            <span v-if="plant.visibles.outputs.secondary[key].totals">&darr;</span><span v-else>&rarr;</span>
+                            <u>Fractionation (complete)</u>
+                          </a>
+                          <ul v-if="plant.visibles.outputs.secondary[key].totals"><li>
+                            <table border=1>
+                              <tr v-for="obj,total in obj.totals">
+                                <td>{{total}}</td>
+                                <td>
+                                  <ul>
+                                    <li v-for="val,fraction in obj" class="grid-li five">
+                                      <div>{{fraction}}</div>
+                                      <div class=number>{{Math.round(100*val)/100}}</div>
+                                      <div class=unit>mg/L</div>
+                                      <div class=number>{{Math.round(100*val*plant.outputs.run.secondary[key].Q)/100}}</div>
+                                      <div class=unit>kg/d</div>
+                                    </li>
+                                  </ul>
+                                </td>
+                              </tr>
+                            </table>
+                          </ul>
+                        </li>
+                      </ul>
+                    <li>
+                  </ul>
+                </div>
+              </li>
+
+              <!--process variables-->
+              <li>
+                <a v-on:click="plant.visibles.outputs.process_variables.visible^=true">
+                  <span v-if="plant.visibles.outputs.process_variables.visible">&darr;</span>
+                  <span v-else>&rarr;</span>
+                  <u>Process variables</u>
+                </a>
+
+                <!--as,nit,dn,cpr,cap,bpr-->
+                <div v-if="plant.visibles.outputs.process_variables.visible">
+                  <ul v-for="obj,key in plant.outputs.run.process_variables">
+                    <li v-if="obj">
+                      <a v-on:click="plant.visibles.outputs.process_variables[key]^=true">
+                        <span v-if="plant.visibles.outputs.process_variables[key]">&darr;</span>
+                        <span v-else>&rarr;</span>
+                        <u>{{plant_info.configuration[key]}}</u>
+                      </a>
+                      <!--resultats tecnologia-->
+                      <ul v-if="plant.visibles.outputs.process_variables[key]">
+                        <li v-for="obj,key in obj" class=grid-li v-bind:title="obj.descr">
+                          <div><small>{{key}}</small></div>
+                          <div class=number v-bind:title="obj.value">{{Math.round(100*obj.value)/100}}</div>
+                          <div class=unit>{{obj.unit}}</div>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
+      <div v-else class=blank>[Press 'Run model' button to generate outputs]</div>
     </li>
-    <li v-else class=blank>[Press 'Run model' button to generate outputs]</li>
   </ul>
 </div>
 
@@ -613,8 +621,8 @@
         //nova planta
         let plant = new Plant(
           //syntax-----------( Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_NH4, S_PO4, S_NOx, S_O2, X_OHO, X_PAO)
-          new State_Variables(25,    50,    115,   440,   100,    45,    60,  39.1, 15.28,     0,    0,     0,     0), //influent
-          {pst:true, bpr:true, nit:true, dn:true}, //configuration
+          new State_Variables(15,    50,    115,   440,   100,    45,    60,  39.1,    25,     0,    0,     0,     0), //influent
+          {pst:false, bpr:false, nit:false, dn:false}, //configuration
           {                                        //parameters
             //legend {PST:'primary settler', AS:'activated sludge', CE:'capacity estimation', NIT:'nitrification', DN:'denitrification', CPR:'chemical P removal'}
             fw          : 0.00500,   //ø       | PST | fraction of Q that goes to wastage
@@ -622,7 +630,7 @@
             removal_UPO : 90.0500,   //%       | PST | removal of the component X_UPO
             removal_iSS : 75.1250,   //%       | PST | removal of the component X_iSS
             T           : 16.0000,   //ºC      | AS  | temperature
-            Vp          : 8473.30,   //m3      | AS  | reactor volume
+            Vp          :   10000,   //m3      | AS  | reactor volume
             Rs          : 15.0000,   //d       | AS  | solids retention time or sludge age
             DO          : 2.00000,   //mgO/L   | AS  | DO in the aerobic reactor
             RAS         : 1.00000,   //ø       | AS  | SST underflow recycle ratio

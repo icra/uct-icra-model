@@ -71,11 +71,6 @@ class Plant{
       }
     });
 
-    //check incompatible configurations
-    if(this.configuration.dn && this.configuration.nit==false){
-      throw new Error(`Cannot have DN without NIT`);
-    }
-
     //check influent, configuration and parameters according to static info object
     let info=Plant.info;
 
@@ -117,6 +112,11 @@ class Plant{
     //input objects
     let config     = this.configuration;
     let parameters = this.parameters;
+
+    //check incompatible configurations
+    if(config.dn && config.nit==false){
+      throw new Error(`Cannot have DN without NIT`);
+    }
 
     //execute modules (pst, as, nit, dn, bpr)
     let pst = null; //primary settler
@@ -175,18 +175,11 @@ class Plant{
       let FSti = Q*Sti;
       let L    = MX_T/FSti;
       let A_ST = parameters.A_ST;
-      let Vp   = parameters.Vp;
-      let X_T  = MX_T/Vp; //kgTSS/m3
+      let VR   = parameters.Vp;
+      let X_T  = MX_T/VR; //kgTSS/m3
       let fq   = parameters.fq;
-      cap = capacity_estimation({DSVI, L, Sti, A_ST, Vp, fq}); //object
+      cap = capacity_estimation({Q, X_T, DSVI, L, Sti, A_ST, VR, fq}); //object
       //console.log(cap);//debug
-      
-      let Q_ADWF = cap.Q_ADWF.value;
-      let X_Tave = cap.X_Tave.value;
-
-      //check if plant is overloaded (allow 5% overloaded)
-      if(Q   > 1.05*Q_ADWF) throw new Error(`Q (${Q}) > Q_ADWF (${Q_ADWF}): plant overloaded (more than 5%)`);
-      if(X_T > 1.05*X_Tave) throw new Error(`X_T (${X_T}) > X_Tave (${X_Tave}): plant overloaded (more than 5%)`);
     }
 
     //pack all process variables
