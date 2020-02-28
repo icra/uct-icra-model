@@ -107,7 +107,9 @@ class Plant{
 
   //run the plant model
   run(debug_mode){
-    console.time('>> run uct-icra model'); //measure performance
+    //measure performance (start)
+    console.time('>> run uct-icra model');
+    let perf_start = performance.now(); //ms
 
     //input objects
     let config     = this.configuration;
@@ -191,7 +193,6 @@ class Plant{
       dn  : dn  ? dn.process_variables  : null,
       cap,
     };
-    console.timeEnd('>> run uct-icra model');
 
     let secondary_effluent = null;
     let secondary_wastage  = null;
@@ -217,6 +218,10 @@ class Plant{
       });
     }
 
+    //measure performance (end)
+    console.timeEnd('>> run uct-icra model');
+    let perf = performance.now() - perf_start; //ms
+
     return{
       process_variables,
       primary:{
@@ -227,6 +232,7 @@ class Plant{
         effluent: secondary_effluent, //secondary effluent (state variables object)
         wastage : secondary_wastage,  //secondary wastage  (state variables object)
       },
+      performance: perf,
     };
   };
 

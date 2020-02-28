@@ -348,7 +348,7 @@
       <div v-if="plant.outputs">
         <a v-on:click="plant.visibles.outputs.visible^=true">
           <div class=arrow :folded="plant.visibles.outputs.visible"></div>
-          <b>Outputs</b>
+          <b>Outputs <small>(performance: {{Math.round(100*plant.outputs.run.performance)/100}}ms)</small></b>
         </a>
         <!--plant outputs-->
         <div v-if="plant.visibles.outputs.visible">
