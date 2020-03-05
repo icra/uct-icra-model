@@ -85,9 +85,9 @@ class State_Variables {
 
   //update a state variable value. example -> sv.set("S_VFA",10);
   set(key, newValue){
-    if(this.components[key]===undefined) throw `component "${key}" not found`;
-    if(typeof newValue != 'number')      throw `component "${key}" newValue ("${newValue}") is not a number`;
-    if(newValue < 0)                     throw `component "${key}" newValue ("${newValue}") is negative`;
+    if(this.components[key]===undefined) throw new Error(`component "${key}" not found`);
+    if(typeof newValue != 'number')      throw new Error(`component "${key}" newValue ("${newValue}") is not a number`);
+    if(newValue < 0)                     throw new Error(`component "${key}" newValue ("${newValue}") is negative`);
     //update state variable value
     this.components[key]=newValue;
   };
@@ -271,18 +271,18 @@ class State_Variables {
     return {
       Q:{unit:"ML/d", descr:"flowrate"},
       components:{
-        S_VFA :{unit:"mgCOD/L", descr:"Biodegradable Soluble Organics (BSO) (volatile fatty acids)"},
-        S_FBSO:{unit:"mgCOD/L", descr:"Biodegradable Soluble Organics (BSO) (fermentable organics)"},
-        X_BPO :{unit:"mgCOD/L", descr:"Biodegradable Particulate Organics (BPO)"},
-        X_UPO :{unit:"mgCOD/L", descr:"Unbiodegradable Particulate Organics (UPO)"},
-        S_USO :{unit:"mgCOD/L", descr:"Unbiodegradable Soluble Organics (USO)"},
-        X_iSS :{unit:"mgiSS/L", descr:"Inert Suspended Solids (sand)"},
-        S_NH4 :{unit:"mgN/L",   descr:"Inorganic Free Saline Ammonia (FSA)"},
-        S_PO4 :{unit:"mgP/L",   descr:"Inorganic OrthoPhosphate (PO4)"},
-        S_NOx :{unit:"mgN/L",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)"},
+        S_VFA :{unit:"mgCOD/L", descr:"Volatile Fatty Acids (part of Biodegradable Soluble Organics)"},
+        S_FBSO:{unit:"mgCOD/L", descr:"Fermentable Organics (part of Biodegradable Soluble Organics)"},
+        X_BPO :{unit:"mgCOD/L", descr:"Biodegradable Particulated Organics"},
+        X_UPO :{unit:"mgCOD/L", descr:"Unbiodegradable Particulated Organics"},
+        S_USO :{unit:"mgCOD/L", descr:"Unbiodegradable Soluble Organics"},
+        X_iSS :{unit:"mgiSS/L", descr:"Inert Suspended Solids"},
+        S_NH4 :{unit:"mgN/L",   descr:"Inorganic Free Saline Ammonia, FSA"},
+        S_PO4 :{unit:"mgP/L",   descr:"Inorganic OrthoPhosphate"},
+        S_NOx :{unit:"mgN/L",   descr:"Inorganic Nitrite and Nitrate (NO2 + NO3)"},
         S_O2  :{unit:"mgO/L",   descr:"Dissolved Oxygen"},
-        X_OHO :{unit:"mgCOD/L", descr:"Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)"},
-        X_PAO :{unit:"mgCOD/L", descr:"Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)"},
+        X_OHO :{unit:"mgCOD/L", descr:"Ordinary Heterotrophic Organisms (expressed in COD units)"},
+        X_PAO :{unit:"mgCOD/L", descr:"Polyphosphate Accumulating Organisms (expressed in COD units)"},
       },
       mass_ratios:{
         f_CV_VFA :{unit:"gCOD/gVSS",descr:"COD from S_VFA/VSS mass ratio"},
@@ -318,6 +318,50 @@ class State_Variables {
         //f_N_NIT  :{unit:"gN/gVSS",  descr:"N from X_NIT/VSS mass ratio"},
         //f_P_NIT  :{unit:"gP/gVSS",  descr:"P from X_NIT/VSS mass ratio"},
       },
+      totals:{
+        bsCOD  : {unit:"mgCOD/L", descr:"Biodegradable Soluble COD"},
+        usCOD  : {unit:"mgCOD/L", descr:"Unbiodegradable Soluble COD"},
+        bpCOD  : {unit:"mgCOD/L", descr:"Biodegradable Particulated COD"},
+        upCOD  : {unit:"mgCOD/L", descr:"Unbiodegradable Particulated COD"},
+         bCOD  : {unit:"mgCOD/L", descr:"Biodegradable COD (Soluble + Particulated)"},
+         uCOD  : {unit:"mgCOD/L", descr:"Unbiodegradable COD (Soluble + Particulated)"},
+         sCOD  : {unit:"mgCOD/L", descr:"Soluble COD (Biodegradable + Unbiodegradable)"},
+         pCOD  : {unit:"mgCOD/L", descr:"Particulated COD (Biodegradable + Unbiodegradable)"},
+
+        bsOC   : {unit:"mgC/L", descr:"Biodegradable Soluble Organic Carbon"},
+        usOC   : {unit:"mgC/L", descr:"Unbiodegradable Soluble Organic Carbon"},
+        bpOC   : {unit:"mgC/L", descr:"Biodegradable Particulated Organic Carbon"},
+        upOC   : {unit:"mgC/L", descr:"Unbiodegradable Particulated Organic Carbon"},
+         bOC   : {unit:"mgC/L", descr:"Biodegradable Organic Carbon (Soluble + Particulated)"},
+         uOC   : {unit:"mgC/L", descr:"Unbiodegradable Organic Carbon (Soluble + Particulated)"},
+         sOC   : {unit:"mgC/L", descr:"Soluble Organic Carbon (Biodegradable + Unbiodegradable)"},
+         pOC   : {unit:"mgC/L", descr:"Particulated Organic Carbon (Biodegradable + Unbiodegradable)"},
+        actOC  : {unit:"mgC/L", descr:"Organic Carbon in active biomass"},
+
+        bsON   : {unit:"mgN/L", descr:"Biodegradable Soluble Organic Nitrogen"},
+        usON   : {unit:"mgN/L", descr:"Unbiodegradable Soluble Organic Nitrogen"},
+        bpON   : {unit:"mgN/L", descr:"Biodegradable Particulated Organic Nitrogen"},
+        upON   : {unit:"mgN/L", descr:"Unbiodegradable Particulated Organic Nitrogen"},
+         bON   : {unit:"mgN/L", descr:"Biodegradable Organic Nitrogen (Soluble + Particulated)"},
+         uON   : {unit:"mgN/L", descr:"Unbiodegradable Organic Nitrogen (Soluble + Particulated)"},
+         sON   : {unit:"mgN/L", descr:"Soluble Organic Nitrogen (Biodegradable + Unbiodegradable)"},
+         pON   : {unit:"mgN/L", descr:"Particulated Organic Nitrogen (Biodegradable + Unbiodegradable)"},
+        actON  : {unit:"mgN/L", descr:"Organic Nitrogen in active biomass"},
+
+        bsOP   : {unit:"mgP/L", descr:"Biodegradable Soluble Organic Phosphorus"},
+        usOP   : {unit:"mgP/L", descr:"Unbiodegradable Soluble Organic Phosphorus"},
+        bpOP   : {unit:"mgP/L", descr:"Biodegradable Particulated Organic Phosphorus"},
+        upOP   : {unit:"mgP/L", descr:"Unbiodegradable Particulated Organic Phosphorus"},
+         bOP   : {unit:"mgP/L", descr:"Biodegradable Organic Phosphorus (Soluble + Particulated)"},
+         uOP   : {unit:"mgP/L", descr:"Unbiodegradable Organic Phosphorus (Soluble + Particulated)"},
+         sOP   : {unit:"mgP/L", descr:"Soluble Organic Phosphorus (Biodegradable + Unbiodegradable)"},
+         pOP   : {unit:"mgP/L", descr:"Particulated Organic Phosphorus (Biodegradable + Unbiodegradable)"},
+        actOP  : {unit:"mgP/L", descr:"Organic Phosphorus in active biomass"},
+
+        bVSS   : {unit:"mgVSS/L", descr:"Biodegradable VSS"},
+        uVSS   : {unit:"mgVSS/L", descr:"Unbiodegradable VSS"},
+        actVSS : {unit:"mgVSS/L", descr:"OHO VSS active biomass"},
+      },
     }
   }
 }
@@ -326,7 +370,7 @@ class State_Variables {
 try{module.exports=State_Variables}catch(e){}
 
 /*tests*/
-{
+(function(){
   //test 1: print totals and fluxes
   (function(){
     return
@@ -382,4 +426,4 @@ try{module.exports=State_Variables}catch(e){}
     s.set('X_iSS',34);
     console.log(s.summary);
   })();
-};
+})();

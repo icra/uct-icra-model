@@ -109,7 +109,10 @@ class Plant{
   run(debug_mode){
     //measure performance (start)
     console.time('>> run uct-icra model');
-    let perf_start = performance.now(); //ms
+    let perf_start = false;
+    if(typeof performance != "undefined"){
+      perf_start = performance.now(); //ms
+    }
 
     //input objects
     let config     = this.configuration;
@@ -220,7 +223,10 @@ class Plant{
 
     //measure performance (end)
     console.timeEnd('>> run uct-icra model');
-    let perf = performance.now() - perf_start; //ms
+    let perf = false;
+    if(typeof performance != "undefined"){
+      perf = performance.now() - perf_start; //ms
+    }
 
     return{
       process_variables,

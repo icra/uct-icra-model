@@ -153,7 +153,7 @@
     <li>
       <input v-model="plant.name" placeholder="Plant name">
       <!--btn execute model-->
-      <button v-on:click="run_model(plant)" style="background:#af0">Run model</button>
+      <button v-on:click="run_model(plant)" style="background:#af0;font-weight:bold">Run model</button>
       <button v-on:click="remove_plant(plant)">Remove plant</button>
     </li>
 
@@ -368,10 +368,10 @@
                     <li>
                       <a v-on:click="plant.visibles.outputs.primary[key].visible^=true">
                         <div class=arrow :folded="plant.visibles.outputs.primary[key].visible"></div>
-                        <u>Primary {{key}}</u> |
+                        <u>Primary {{key}}</u>
                         <span v-bind:title="obj.Q">
-                          Q={{Math.round(100*obj.Q)/100}}
-                          <span class=unit>{{state_variables_info.Q.unit}}</span>
+                          ({{Math.round(100*obj.Q)/100}}
+                          <span class=unit>{{state_variables_info.Q.unit}}</span>)
                         </span>
                       </a>
                       <ul v-if="plant.visibles.outputs.primary[key].visible">
@@ -433,11 +433,13 @@
                     <li>
                       <a v-on:click="plant.visibles.outputs.secondary[key].visible^=true">
                         <div class=arrow :folded="plant.visibles.outputs.secondary[key].visible"></div>
-                        <u>Secondary {{key}}</u> |
+                        <u>Secondary {{key}}</u>
+
                         <span v-bind:title="obj.Q">
-                          Q={{Math.round(100*obj.Q)/100}}
-                          <span class=unit>{{state_variables_info.Q.unit}}</span>
+                          ({{Math.round(100*obj.Q)/100}}
+                          <span class=unit>{{state_variables_info.Q.unit}}</span>)
                         </span>
+
                       </a>
                       <ul v-if="plant.visibles.outputs.secondary[key].visible">
                         <!--secondary stream summary-->
@@ -534,9 +536,8 @@
   </ul>
 </footer>
 
-<!--plants frontend linking-->
+<!--frontend linking-->
 <script>
-
   //tree of visible items for each plant
   class Visibles {
     constructor(){
@@ -595,7 +596,7 @@
   plants.forEach(plant=>{plant.visibles=new Visibles();});
 </script>
 
-<!--frontend: vue-->
+<!--vue app-->
 <script>
   //view model xarxa
   let vm_plants=new Vue({
