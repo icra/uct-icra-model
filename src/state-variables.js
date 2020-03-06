@@ -156,6 +156,13 @@ class State_Variables {
         active: actON,
       }
 
+    //TN = TKN + NOx
+      let TN = {
+        total: Total_TKN + this.components.S_NOx,
+        TKN: Total_TKN,
+        NOx: this.components.S_NOx,
+      };
+
     //TP all fractions (Organic P (OP) + Inorganic Phosphate (PO4))
       let bsOP  = co.S_VFA *mr.f_P_VFA /mr.f_CV_VFA +
                   co.S_FBSO*mr.f_P_FBSO/mr.f_CV_FBSO; //bio + soluble OP
@@ -195,7 +202,7 @@ class State_Variables {
       };
 
     //pack components
-    return {COD,TKN,TP,TOC,TSS};
+    return {COD,TKN,TN,TP,TOC,TSS};
   };
 
   //convert "components" (mg/L) and "totals" (mg/L) to mass fluxes (kg/d)
@@ -232,6 +239,7 @@ class State_Variables {
       TKN: [totals.TKN.total, fluxes.totals.TKN.total],  //total kjeldahl nitrogen
       NH4: [totals.TKN.NH4,   fluxes.totals.TKN.NH4],    //inorganic nitrogen (NH4 or free saline ammonia or FSA)
       NOx: [components.S_NOx, fluxes.components.S_NOx],  //nitrate (NO3) and nitrite (NO2) is not TKN
+      TN:  [totals.TN.total,  fluxes.totals.TN.total],   //total nitrogen
       O2:  [components.S_O2,  fluxes.components.S_O2],   //dissolved oxygen
       TP:  [totals.TP.total,  fluxes.totals.TP.total],   //total phosphorus
       PO4: [totals.TP.PO4,    fluxes.totals.TP.PO4],     //inorganic phosphorus
@@ -374,7 +382,7 @@ try{module.exports=State_Variables}catch(e){}
   //test 1: print totals and fluxes
   (function(){
     return
-    let s = new State_Variables(1,1,0,0,0,0,0,0,0,0,0);
+    let s = new State_Variables(1,1,1,1,1,1,1,1,1,1,1);
     console.log("=== Inputs (components) (mg/L) ==="); console.log(s.components);
     console.log("=== Summary (mg/L & kg/d) ===");      console.log(s.summary);
     console.log("=== Totals (mg/L) ===");              console.log(s.totals);
