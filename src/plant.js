@@ -124,7 +124,9 @@ class Plant{
       throw new Error(`Cannot have DN without NIT`);
     }
 
-    //execute modules (pst, as, nit, dn, bpr)
+    /*EXECUTE MODULES (PST, AS, NIT, DN, BPR)*/
+
+    //initialize result objects
     let pst = null; //primary settler
     let as  = null; //activated sludge (aerobic)
     let nit = null; //nitrification (aerobic)
@@ -247,11 +249,11 @@ class Plant{
     return {
       configuration:{
         pst:"Primary settler",
-        as: "Aerobic (Activated Sludge)",
-        bpr:"Anaerobic (Bio P Removal)",
+        as: "Activated Sludge (Aerobic)",
+        bpr:"Bio P Removal (Anaerobic)",
         nit:"Nitrification (Aerobic)",
-        dn: "Anoxic (Denitrification)",
-        cpr:"Chemical P removal",
+        dn: "Denitrification (Anoxic)",
+        cpr:"Chemical P Removal",
         cap:"Capacity Estimation",
       },
       parameters:{
@@ -296,8 +298,10 @@ try{module.exports=Plant}catch(e){}
 
 /*unit test*/
 (function(){
-  return
-  /* CREATE PLANT and RUN MODEL (complete example with all inputs, parameters and constants)*/
+  /*
+     CREATE A PLANT AND RUN THE MODEL
+     complete example with all inputs, parameters and constants
+  */
 
   /*influent state variables*/
   //syntax                        ( Q, VFA, FBSO, BPO, UPO, USO, iSS, NH4, PO4, NOx, O2, OHO, PAO)
@@ -366,13 +370,15 @@ try{module.exports=Plant}catch(e){}
     constants.K2_20_PAO =    0.255; //gN/gVSS·d | at 20ºC page 482 and 113
     constants.ϴ_K2_PAO  =    1.080; //ø         | temperature correction factor for K2_20
 
-  //plant configuration and parameters
+  //plant configuration
   let configuration={
     pst: true, //primary settler
     bpr: false, //bio P removal
     nit: true, //nitrification
     dn : false, //denitrification
   };
+
+  //plant parameters
   let parameters={
     fw          :     0.00893, //ø       | PST | fraction of Q to pst wastage
     removal_BPO :    57.42000, //%       | PST | removal of X_BPO
@@ -400,10 +406,10 @@ try{module.exports=Plant}catch(e){}
     fq          :     2.50000, //ø       | CE  | peak flow (Qmax/Qavg)
   };
 
-  //new Plant syntax   (influent, configuration, parameters, constants)
+  //new Plant          (influent, configuration, parameters, constants)
   let plant = new Plant(influent, configuration, parameters, constants);
 
-  //run model
-  let run = plant.run(debug_mode=true);
-  console.log(run)
+  //run model and log results
+  let results = plant.run(debug_mode=true);
+  //console.log(results)
 })();

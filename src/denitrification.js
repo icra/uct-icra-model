@@ -113,7 +113,6 @@ State_Variables.prototype.denitrification=function(parameters, result){
   /*
     modification for Dp1 (denitrification potential)
     when there is bio P removal
-    TODO
   */
   if(as_ppvv.MX_PAO){
     Dp1 = (function(){ //mgN/L
@@ -140,7 +139,6 @@ State_Variables.prototype.denitrification=function(parameters, result){
       return Dp1;
     })();
   }
-
 
   //compute optimum internal recirculation (a_opt)
   let a = IR; //symbol change from "IR" to "a"
