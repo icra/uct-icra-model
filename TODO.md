@@ -16,19 +16,19 @@
     "error" capturing functionality.
   - [for reporting] function for pretty printing a plant.run() result.
 
-## discussed in skype
+## discussed but not done yet
   - do not show results if we have warnings
   - put Rs-bal in capacity estimation module
 
 ## Future / new modules TBD
-  - chemical P removal (as found on Szabo et al paper)
+  - improved chemical P removal (as found on Szabo et al paper)
   - oxygen limitation module (reuse ecoinvent equations)
-  - bio P removal EBPR module (in development)
   - anaerobic digestion module (will consider inorganic carbon exiting, created
     from TOC)
   - stoichiometry for CO2 produced
 
 ## Tasks done/solved/clear/discussed
+  - [done] bio P removal EBPR module
   - [done] bio P: george sends hand calculations and laura + lluís check it.
   - [done] energy consumption module in ecoadvisor
   - [done] validate test values of X.tave and Q.ADWF in the user interface.
