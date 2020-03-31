@@ -298,6 +298,7 @@ try{module.exports=Plant}catch(e){}
 
 /*unit test*/
 (function(){
+  return
   /*
      CREATE A PLANT AND RUN THE MODEL
      complete example with all inputs, parameters and constants
