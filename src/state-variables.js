@@ -51,22 +51,26 @@ class State_Variables {
     if(X_OHO  < 0) throw new Error(`Value for ordinary heterotrophic organisms (X_OHO=${X_OHO}) not allowed`);
     if(X_PAO  < 0) throw new Error(`Value for polyphosphate accumulating organisms (X_PAO=${X_PAO}) not allowed`);
 
-    //inputs and default values
-    this.Q = isNaN(Q) ? 0 : Q; //ML/d | flowrate
+    //FLOWRATE
+    this.Q = isNaN(Q) ? 0 : Q; //ML/d
+
+    //ACTUAL STATE VARIABLES
     this.components={
-      S_VFA : isNaN(S_VFA )? 0 : S_VFA ,//mg/L | Biodegradable   Soluble     Organics (BSO) (volatile fatty acids)
-      S_FBSO: isNaN(S_FBSO)? 0 : S_FBSO,//mg/L | Biodegradable   Soluble     Organics (BSO) (fermentable organics)
-      X_BPO : isNaN(X_BPO )? 0 : X_BPO ,//mg/L | Biodegradable   Particulate Organics (BPO)
-      X_UPO : isNaN(X_UPO )? 0 : X_UPO ,//mg/L | Unbiodegradable Particulate Organics (UPO)
-      S_USO : isNaN(S_USO )? 0 : S_USO ,//mg/L | Unbiodegradable Soluble     Organics (USO)
-      X_iSS : isNaN(X_iSS )? 0 : X_iSS ,//mg/L | Inert Suspended Solids (sand)
-      S_NH4 : isNaN(S_NH4 )? 0 : S_NH4 ,//mg/L | Inorganic Free Saline Ammonia (NH4)
-      S_PO4 : isNaN(S_PO4 )? 0 : S_PO4 ,//mg/L | Inorganic OrthoPhosphate (PO4)
-      S_NOx : isNaN(S_NOx )? 0 : S_NOx ,//mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
-      S_O2  : isNaN(S_O2  )? 0 : S_O2  ,//mg/L | Dissolved O2
-      X_OHO : isNaN(X_OHO )? 0 : X_OHO ,//mg/L | Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
-      X_PAO : isNaN(X_PAO )? 0 : X_PAO ,//mg/L | Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)
+      S_VFA : isNaN(S_VFA ) ? 0 : S_VFA ,//mg/L | Biodegradable   Soluble     Organics (BSO) (volatile fatty acids)
+      S_FBSO: isNaN(S_FBSO) ? 0 : S_FBSO,//mg/L | Biodegradable   Soluble     Organics (BSO) (fermentable organics)
+      X_BPO : isNaN(X_BPO ) ? 0 : X_BPO ,//mg/L | Biodegradable   Particulate Organics (BPO)
+      X_UPO : isNaN(X_UPO ) ? 0 : X_UPO ,//mg/L | Unbiodegradable Particulate Organics (UPO)
+      S_USO : isNaN(S_USO ) ? 0 : S_USO ,//mg/L | Unbiodegradable Soluble     Organics (USO)
+      X_iSS : isNaN(X_iSS ) ? 0 : X_iSS ,//mg/L | Inert Suspended Solids (sand)
+      S_NH4 : isNaN(S_NH4 ) ? 0 : S_NH4 ,//mg/L | Inorganic Free Saline Ammonia (NH4)
+      S_PO4 : isNaN(S_PO4 ) ? 0 : S_PO4 ,//mg/L | Inorganic OrthoPhosphate (PO4)
+      S_NOx : isNaN(S_NOx ) ? 0 : S_NOx ,//mg/L | Inorganic Nitrite and Nitrate (NO2 + NO3) (not part of TKN)
+      S_O2  : isNaN(S_O2  ) ? 0 : S_O2  ,//mg/L | Dissolved O2
+      X_OHO : isNaN(X_OHO ) ? 0 : X_OHO ,//mg/L | Ordinary Heterotrophic Organisms (expressed as COD) influent OHO should always be 0 (model assumption)
+      X_PAO : isNaN(X_PAO ) ? 0 : X_PAO ,//mg/L | Polyphosphate Accumulating Organisms (expressed as COD) influent PAO should always be 0 (model assumption)
     };
+
+    //VSS MASS RATIOS
     this.mass_ratios={
       /*----+------------------+----------------+-----------------+-----------------+
       |     | COD              | C              | N               | P               |
@@ -277,7 +281,7 @@ class State_Variables {
   //units and descriptions. Syntax--> let info = State_Variables.info; console.log(info.components.S_VFA.unit);
   static get info(){
     return {
-      Q:{unit:"ML/d", descr:"flowrate"},
+      Q:{unit:"ML/d", descr:"Flowrate"},
       components:{
         S_VFA :{unit:"mgCOD/L", descr:"Volatile Fatty Acids (part of Biodegradable Soluble Organics)"},
         S_FBSO:{unit:"mgCOD/L", descr:"Fermentable Organics (part of Biodegradable Soluble Organics)"},
