@@ -374,6 +374,17 @@ class State_Variables {
         uVSS   : {unit:"mgVSS/L", descr:"Unbiodegradable VSS"},
         actVSS : {unit:"mgVSS/L", descr:"OHO VSS active biomass"},
       },
+      summary:{
+        COD :{unit:"mgCOD/L", descr:"Total Chemical Oxygen Demand"},
+        TKN :{unit:"mgN/L",   descr:"Total Kjeldahl Nitrogen"     },
+        NH4 :{unit:"mgN/L",   descr:"Free Saline Ammonia"         },
+        NOx :{unit:"mgN/L",   descr:"Nitrate and nitrite"         },
+        TN  :{unit:"mgN/L",   descr:"Total Nitrogen (TKN+NOx)"    },
+        TP  :{unit:"mgP/L",   descr:"Total Phosphorus"            },
+        PO4 :{unit:"mgP/L",   descr:"Total Phosphorus"            },
+        TOC :{unit:"mgC/L",   descr:"Total Organic Carbon"        }, 
+        TSS :{unit:"mgTSS/L", descr:"Total Suspended Solids"      },
+      },
     }
   }
 }
