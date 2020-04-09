@@ -42,7 +42,7 @@ This file describes the main data structures for the ASM model (but not the actu
 - Rs (days, solids retention time or sludge age)
 - RAS (ø, SST underflow recycle ratio)
 - waste_from (string, 'reactor' or 'sst')
-- mass_FeCl3 (kgFeCl3, mass of FeCl3 added for chemical P removal)
+- mass_MeCl3 (kgFeCl3, mass of FeCl3 added for chemical P removal)
 **** Outputs (process variables)
 - fSus        (gUSO/gCOD,   USO/COD ratio (influent))
 - fSup        (gUPO/gCOD,   UPO/COD ratio (influent))
@@ -78,7 +78,7 @@ This file describes the main data structures for the ASM model (but not the actu
 **** Inputs
 - Q (ML/d, flowrate)
 - PO4i (mg/L, P available for chemical P removal, (calculated automatically in activated sludge function))
-- mass_FeCl3 (kg/d FeCl3 added)
+- mass_MeCl3 (kg/d FeCl3 added)
 **** Outputs
 - Fe_P_mole_ratio  (molFe/molP, Fe/P mole ratio (Fe added for P available))
 - PO4e             (mgP/L,      PO4 effluent)

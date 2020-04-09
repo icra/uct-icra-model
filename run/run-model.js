@@ -69,7 +69,7 @@ let parameters={
   RAS         :     1.00000, //ø       | AS  | SST underflow recycle ratio
   waste_from  : "reactor",   //option  | AS  | waste_from | options {'reactor','sst'}
 
-  mass_FeCl3  :     0.00000, //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+  mass_MeCl3  :     0.00000, //kg/d    | CPR | mass of FeCl3 added for chemical P removal
 
   S_NOx_RAS   :     0.50000, //mgNOx/L | BPR | NOx concentration at RAS
   DO_RAS      :     0.00000, //mgO/L   | BPR | Dissolved oxygen at recycle

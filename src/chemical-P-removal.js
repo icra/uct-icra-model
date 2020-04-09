@@ -2,14 +2,14 @@
   Chemical P removal
   Metcalf & Eddy, Wastewater Engineering, 5th ed., 2014, page 484
 
-  note: only FeCl3 addition implemented
+  note: only FeCl3 implemented (not AlCl3)
 */
 
 function chemical_P_removal(parameters){
   //inputs and default values
   let Q          = parameters.Q;          //ML/d      | influent flowrate
   let PO4i       = parameters.PO4i;       //mgP/L     | named "Psa" in 'activated-sludge.js'
-  let mass_FeCl3 = parameters.mass_FeCl3; //kgFeCl3/d | mass of FeCl3 added daily
+  let mass_FeCl3 = parameters.mass_MeCl3; //kgFeCl3/d | mass of FeCl3 added daily
 
   //input checks
   if(Q          <= 0) throw new Error(`Value of Flowrate (Q=${Q}) not allowed`);
@@ -124,13 +124,13 @@ try{module.exports=chemical_P_removal;}catch(e){}
 
 /*standalone test*/
 (function(){
-  return
+  //return
   let Q    = 0.5914; //ML/d
   let PO4i = 2.8;    //mg/L
 
-  [33.1184, 26.0216, 21.2904, 16.5592, 11.828, 9.4624, 4.7312].forEach(mass_FeCl3 => {
-    let cpr = chemical_P_removal({Q, PO4i, mass_FeCl3});
+  [33.1184, 26.0216, 21.2904, 16.5592, 11.828, 9.4624, 4.7312].forEach(mass_MeCl3 => {
+    let cpr = chemical_P_removal({Q, PO4i, mass_MeCl3});
     Object.keys(cpr).forEach(key=>{ cpr[key]=cpr[key].value; });
-    console.log({mass_FeCl3, cpr});
+    console.log({mass_MeCl3, cpr});
   });
 })();

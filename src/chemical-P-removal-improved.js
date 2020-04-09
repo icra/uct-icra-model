@@ -22,14 +22,6 @@ function chemical_P_removal_improved(parameters){
   let a_1        = parameters.a_1;        //calibrated value 1
   let a_2        = parameters.a_2;        //calibrated value 2
 
-  //adapt for previous module version nomenclature
-  if(typeof parameters.mass_FeCl3 == 'number'){
-    if(!mass_MeCl3) mass_MeCl3 = parameters.mass_FeCl3;
-    if(!Me)         Me         = 'Fe';
-    if(!a_1)        a_1        = 0.9488571429; //calibrated value 1
-    if(!a_2)        a_2        = 0.9740000000; //calibrated value 2
-  }
-
   //input checks
   Object.entries({Q,PO4i,pH,Me,mass_MeCl3,a_1,a_2}).forEach(([key,val])=>{
     if(val==undefined){

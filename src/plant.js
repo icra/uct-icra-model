@@ -277,8 +277,7 @@ class Plant{
         RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"Sludge recycle ratio based on influent flow"},
         waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Origin of wastage. Options {'reactor','sst'}", options:['reactor','sst']},
 
-        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 dosed for Chemical P removal"},
-        mass_MeCl3  :{unit:"kg/d",      tec:"cpr_v2", type:"number", descr:"Mass of FeCl3 or AlCl3 dosed for Chemical P removal"},
+        mass_MeCl3  :{unit:"kg/d",      tec:"cpr",    type:"number", descr:"Mass of FeCl3 or AlCl3 dosed for Chemical P removal"},
         Me          :{unit:"option",    tec:"cpr_v2", type:"string", descr:"Salt dosed for chemical P removal (FeCl3 or AlCl3)", options:['Fe','Al']},
         a_1         :{unit:"ø",         tec:"cpr_v2", type:"number", descr:"PO4e = a_1*PO4i*exp(-a_2*Me_P_mole_ratio) calibrated parameter 1"},
         a_2         :{unit:"ø",         tec:"cpr_v2", type:"number", descr:"PO4e = a_1*PO4i*exp(-a_2*Me_P_mole_ratio) calibrated parameter 2"},
@@ -403,7 +402,12 @@ try{module.exports=Plant}catch(e){}
     DO          :     2.00000, //mgO/L   | AS  | DO aerobic reactor
     RAS         :     1.00000, //ø       | AS  | SST underflow recycle ratio
     waste_from  :   "reactor", //string  | AS  | options {'reactor','sst'}
-    mass_FeCl3  :    10.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
+
+    mass_MeCl3  :    10.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
+    Me          :   "Fe",      //string  | CPR2| metal used
+    a_1         :     0.94885, //ø       | CPR2| calibrated value 1
+    a_2         :     0.97376, //ø       | CPR2| calibrated value 2
+
     SF          :     1.25000, //ø       | NIT | safety factor
     fxt         :     0.27600, //ø       | NIT | unaerated sludge mass fraction
     pH          :     7.20000, //ø       | NIT | pH

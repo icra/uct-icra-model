@@ -32,7 +32,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     let DO         = parameters.DO;         //mg/L    | DO in the aerobic reactor
     let RAS        = parameters.RAS;        //ø       | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string  | origin of wastage ('sst' or 'reactor')
-    let mass_FeCl3 = parameters.mass_FeCl3; //kg/d    | mass of FeCl3 added for P precipitation
+    let mass_MeCl3 = parameters.mass_MeCl3; //kg/d    | mass of FeCl3 added for P precipitation
 
     let S_NOx_RAS  = parameters.S_NOx_RAS;  //mgNOx/L | NOx concentration at RAS
     let DO_RAS     = parameters.DO_RAS;     //mgO/L   | Dissolved oxygen at recycle
@@ -47,7 +47,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
       if(undefined==DO        ) throw new Error(`DO         is undefined`);
       if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
       if(undefined==waste_from) throw new Error(`waste_from is undefined`);
-      if(undefined==mass_FeCl3) throw new Error(`mass_FeCl3 is undefined`);
+      if(undefined==mass_MeCl3) throw new Error(`mass_MeCl3 is undefined`);
       if(undefined==S_NOx_RAS ) throw new Error(`S_NOx_RAS  is undefined`);
       if(undefined==DO_RAS    ) throw new Error(`DO_RAS     is undefined`);
       if(undefined==IR        ) throw new Error(`IR         is undefined`);
@@ -61,7 +61,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
       if("number"!=typeof DO        ) throw new Error(`DO         is not a number`);
       if("number"!=typeof RAS       ) throw new Error(`RAS        is not a number`);
       if("string"!=typeof waste_from) throw new Error(`waste_from is not a string`);
-      if("number"!=typeof mass_FeCl3) throw new Error(`mass_FeCl3 is not a number`);
+      if("number"!=typeof mass_MeCl3) throw new Error(`mass_MeCl3 is not a number`);
       if("number"!=typeof S_NOx_RAS ) throw new Error(`S_NOx_RAS  is not a number`);
       if("number"!=typeof DO_RAS    ) throw new Error(`DO_RAS     is not a number`);
       if("number"!=typeof IR        ) throw new Error(`IR         is not a number`);
@@ -263,7 +263,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   /*chemical P removal (module)*/
   //compute Psa: inorganic soluble P available for chemical P removal
   let Psa         = Math.max(0, Pti - Ps - Pouse - Pobse);  //mgP/L
-  let cpr         = chemical_P_removal({Q, PO4i:Psa, mass_FeCl3}); //object | chemical P removal results
+  let cpr         = chemical_P_removal({Q, PO4i:Psa, mass_MeCl3}); //object | chemical P removal results
   let P_chem_rem  = cpr.PO4_removed.value/Q;                //mgP/L
   let F_extra_iSS = cpr.extra_iSS.value;                    //kgiSS/d precipitation
   let Pse         = cpr.PO4e.value;                         //mgP/L | PO4 effluent after chemical P removal
@@ -274,7 +274,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     Ps,
     P_bio_rem,
     Psa,
-    mass_FeCl3,
+    mass_MeCl3,
     P_chem_rem,
     Pse,
     Pobse,
@@ -595,7 +595,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     RAS        : 0.75,      //ø
     IR         : 1.5,       //ø
     waste_from : 'reactor', //string
-    mass_FeCl3 : 100,       //kg/d
+    mass_MeCl3 : 100,       //kg/d
     pH         : 7.2,       //pH units
     S_NOx_RAS  : 0.5,       //mgNOx/L
     f_AN       : 0.1,       //ø

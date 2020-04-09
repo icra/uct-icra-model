@@ -37,7 +37,7 @@ To run the model open the file "index.html" using a web browser.
   - IR              =  6.0
   - DO_RAS          =  1.0
   - influent_alk    =  300
-  - mass_FeCl3      =  0
+  - mass_MeCl3      =  0
   - f_CV_VFA        =  1.0667
   - f_C_VFA         =  0.4000
   - f_N_VFA         =  0.0000
@@ -116,5 +116,5 @@ To run the model open the file "index.html" using a web browser.
   - DO_RAS        =  1.0
   - influent_alk  =  250
   - cpr           =  true
-  - mass_FeCl3    =  20
+  - mass_MeCl3    =  20
   - waste_from    =  sst

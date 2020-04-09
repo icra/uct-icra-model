@@ -626,7 +626,9 @@
             waste_from  : "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
 
             mass_MeCl3  :   20.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
-            Me          : "Fe",      //option  | CPR | metal dosed ("Fe" or "Al")
+            Me          : "Fe",      //option  | CPR2| metal dosed ("Fe" or "Al")
+            a_1         :   0.94885, //ø       | CPR2| calibrated value 1
+            a_2         :   0.97376, //ø       | CPR2| calibrated value 2
 
             S_NOx_RAS   : 0.50000,   //mgNOx/L | BPR | NOx concentration at RAS
             DO_RAS      : 0.00000,   //mgO/L   | BPR | Dissolved oxygen at recycle

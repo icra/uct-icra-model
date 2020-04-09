@@ -34,7 +34,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
     let DO         = parameters.DO;         //mg/L   | DO in the aerobic reactor
     let RAS        = parameters.RAS;        //ø      | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string | origin of wastage ('sst' or 'reactor')
-    let mass_FeCl3 = parameters.mass_FeCl3; //kg/d   | mass of FeCl3 added for P precipitation
+    let mass_MeCl3 = parameters.mass_MeCl3; //kg/d   | mass of FeCl3 added for P precipitation
 
     //check undefined parameters
       if(undefined==T         ) throw new Error(`T          is undefined`);
@@ -43,7 +43,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
       if(undefined==DO        ) throw new Error(`DO         is undefined`);
       if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
       if(undefined==waste_from) throw new Error(`waste_from is undefined`);
-      if(undefined==mass_FeCl3) throw new Error(`mass_FeCl3 is undefined`);
+      if(undefined==mass_MeCl3) throw new Error(`mass_MeCl3 is undefined`);
 
     //check variable types
       if("number"!=typeof T          ) throw new Error(`T          is not a number`);
@@ -52,7 +52,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
       if("number"!=typeof DO         ) throw new Error(`DO         is not a number`);
       if("number"!=typeof RAS        ) throw new Error(`RAS        is not a number`);
       if("string"!=typeof waste_from ) throw new Error(`waste_from is not a string`);
-      if("number"!=typeof mass_FeCl3 ) throw new Error(`mass_FeCl3 is not a number`);
+      if("number"!=typeof mass_MeCl3 ) throw new Error(`mass_MeCl3 is not a number`);
 
     //numerical checks for physical sense
       if(T   >  50) throw new Error(`Value of Temperature (T=${T}) not allowed`);
@@ -150,7 +150,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
   //console.log({Pti,Ps,Pouse,Pobse,Psa});
 
   /*execute chemical P removal module*/
-  let cpr = chemical_P_removal({Q, PO4i:Psa, mass_FeCl3}); //object
+  let cpr = chemical_P_removal({Q, PO4i:Psa, mass_MeCl3}); //object
   let F_extra_iSS = cpr.extra_iSS.value;                   //kgiSS/d
   let Pse         = cpr.PO4e.value;                        //mgP/L | PO4 effluent after chemical P removal
 
@@ -360,7 +360,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
     DO         : 2.0,       //mgO2/L
     RAS        : 1.0,       //ø
     waste_from : 'reactor', //string
-    mass_FeCl3 : 3000,      //kgFeCl3/d
+    mass_MeCl3 : 3000,      //kgFeCl3/d
     pH         : 7.2,
   });
 
