@@ -2,7 +2,7 @@
   Chemical P removal
   Metcalf & Eddy, Wastewater Engineering, 5th ed., 2014, page 484
 
-  note: AlCl3 still not implemented (only FeCl3)
+  note: only FeCl3 addition implemented
 */
 
 function chemical_P_removal(parameters){
@@ -125,9 +125,12 @@ try{module.exports=chemical_P_removal;}catch(e){}
 /*standalone test*/
 (function(){
   return
-  let Q          = 25;   //ML/d
-  let PO4i       = 8;    //mg/L
-  let mass_FeCl3 = 3145; //kg
-  let cpr = chemical_P_removal({Q, PO4i, mass_FeCl3});
-  console.log(cpr);
+  let Q    = 0.5914; //ML/d
+  let PO4i = 2.8;    //mg/L
+
+  [33.1184, 26.0216, 21.2904, 16.5592, 11.828, 9.4624, 4.7312].forEach(mass_FeCl3 => {
+    let cpr = chemical_P_removal({Q, PO4i, mass_FeCl3});
+    Object.keys(cpr).forEach(key=>{ cpr[key]=cpr[key].value; });
+    console.log({mass_FeCl3, cpr});
+  });
 })();

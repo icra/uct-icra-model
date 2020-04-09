@@ -8,9 +8,10 @@
   <script src='../src/state-variables.js'></script>
   <script src="../src/constants.js"></script>
   <script src="../src/primary-settler.js"></script>
+  <script src="../src/chemical-P-removal.js"></script>
+  <script src="../src/chemical-P-removal-improved.js"></script>
   <script src="../src/activated-sludge.js"></script>
   <script src="../src/bio-p-removal.js"></script>
-  <script src="../src/chemical-P-removal.js"></script>
   <script src="../src/nitrification.js"></script>
   <script src="../src/denitrification.js"></script>
   <script src="../src/capacity-estimation.js"></script>
@@ -142,9 +143,12 @@
 
 <!--html-->
 <div id=plants>
-  <div>
+  <div style=display:flex;justify-content:space-between>
     <!--btn afegir/eliminar depuradora-->
     <button v-on:click="add_plant()" style="padding:1em">Add plant</button>
+    <div>
+      <a href="cpr-calibration" target=_blank>Chemical P removal calibration tool</a>
+    </div>
   </div><hr>
   <!--no plants warning--><div v-if="plants.length==0" class=blank>[~No plants]</div>
 
@@ -290,33 +294,25 @@
             </a>
             <ul v-if="plant.visibles.inputs.parameters">
               <li v-for="par,key in plant.parameters" class="grid-li four" v-bind:title="plant_info.parameters[key].descr"
-                  v-if="
-                    key!='waste_from' &&
-                    plant.configuration[plant_info.parameters[key].tec]!=false
-                  "
+                  v-if="plant.configuration[plant_info.parameters[key].tec]!=false"
               >
-                <div>{{key}}:</div>
-                <div>
+                <!--parameter key--><div>{{key}}:</div>
+
+                <!--parameter value-->
+                <div v-if="plant_info.parameters[key].type=='number'">
                   <input type=number v-model.number="plant.parameters[key]" v-on:keyup.enter="run_model(plant)">
                 </div>
+                <div v-if="plant_info.parameters[key].type=='string'">
+                  <select v-model="plant.parameters[key]" style=float:right>
+                    <option v-for="option in plant_info.parameters[key].options">{{option}}</option>
+                  </select>
+                </div>
+
+                <!--parameter unit and technology-->
                 <div class=unit>
                   {{plant_info.parameters[key].unit}}
                 </div>
                 <small>{{ plant_info.configuration[plant_info.parameters[key].tec]}}</small>
-              </li>
-
-              <li class="grid-li four" v-bind:title="plant_info.parameters.waste_from.descr">
-                <div>waste_from:</div>
-                <div>
-                  <select v-model="plant.parameters.waste_from" style=float:right>
-                    <option>reactor</option>
-                    <option>sst</option>
-                  </select>
-                </div>
-                <div class=unit>
-                  {{plant_info.parameters.waste_from.unit}}
-                </div>
-                <small>{{ plant_info.configuration[plant_info.parameters.waste_from.tec]}}</small>
               </li>
             </ul>
           </li>
@@ -563,6 +559,7 @@
           nit:false,
           dn:false,
           cpr:false,
+          cpr_v2:false,
           cap:false,
         },
         primary:{
@@ -627,7 +624,10 @@
             DO          : 2.00000,   //mgO/L   | AS  | DO in the aerobic reactor
             RAS         : 1.00000,   //ø       | AS  | SST underflow recycle ratio
             waste_from  : "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
-            mass_FeCl3  :   20.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+
+            mass_MeCl3  :   20.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+            Me          : "Fe",      //option  | CPR | metal dosed ("Fe" or "Al")
+
             S_NOx_RAS   : 0.50000,   //mgNOx/L | BPR | NOx concentration at RAS
             DO_RAS      : 0.00000,   //mgO/L   | BPR | Dissolved oxygen at recycle
             f_AN        : 0.10000,   //ø       | BPR | anaerobic mass fraction, different from fxt, value must be <= fxm

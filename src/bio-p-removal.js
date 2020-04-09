@@ -16,9 +16,10 @@
 
 //load modules
 try{
-  State_Variables    = require("./state-variables.js");
-  constants          = require("./constants.js");
-  chemical_P_removal = require("./chemical-P-removal.js");
+  State_Variables             = require("./state-variables.js");
+  constants                   = require("./constants.js");
+  chemical_P_removal          = require("./chemical-P-removal.js");
+  chemical_P_removal_improved = require("./chemical-P-removal-improved.js");
 }catch(e){}
 
 State_Variables.prototype.bio_p_removal=function(parameters){
@@ -236,7 +237,6 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   let MX_I = FXti*Rs;                                  //kgVSS | VSS inert biomass (UPO)
   let MX_V = MX_BH + MX_EH + MX_I + MX_PAO + MX_E_PAO; //kgVSS | total VSS mass
 
-  /*chemical P removal*/
   //compute the influent P concentration required for sludge production
   let Pti = inf_frac.TP.total; //mgP/L | total TP influent concentration
   let Ps  = (f_P_OHO*MX_BH + f_P_PAO*MX_PAO + f_P_UPO*(MX_I + MX_EH + MX_E_PAO))/(Rs*Q); //mgP/L
@@ -281,6 +281,13 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     Pouse,
   });
   */
+
+  //chemical P removal improved TODO
+  parameters.Q = Q;
+  parameters.PO4i = Psa;
+  let cpr_v2 = chemical_P_removal_improved(parameters); //object
+  delete parameters.Q;
+  delete parameters.PO4i;
 
   //total P concentration removed = bio + chemical
   let P_total_rem = P_bio_rem + P_chem_rem; //mgP/L
@@ -565,7 +572,8 @@ State_Variables.prototype.bio_p_removal=function(parameters){
 
   return{
     process_variables,
-    cpr,      //chemical P removal process variables
+    cpr,      //chemical P removal process variables (model 1)
+    cpr_v2,   //chemical P removal process variables (model 2)
     effluent, //State_Variables object
     wastage,  //State_Variables object
   }
@@ -588,9 +596,11 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     IR         : 1.5,       //ø
     waste_from : 'reactor', //string
     mass_FeCl3 : 100,       //kg/d
+    pH         : 7.2,       //pH units
     S_NOx_RAS  : 0.5,       //mgNOx/L
     f_AN       : 0.1,       //ø
     DO_RAS     : 0,         //mgO/L
     an_zones   : 2,         //number of anaerobic zones
   });
+  console.log(bip);
 })();

@@ -18,9 +18,10 @@
 
 //load modules
 try{
-  State_Variables    = require("./state-variables.js");
-  constants          = require("./constants.js");
-  chemical_P_removal = require("./chemical-P-removal.js");
+  State_Variables             = require("./state-variables.js");
+  constants                   = require("./constants.js");
+  chemical_P_removal          = require("./chemical-P-removal.js");
+  chemical_P_removal_improved = require("./chemical-P-removal-improved.js");
 }catch(e){}
 
 State_Variables.prototype.activated_sludge=function(parameters){
@@ -150,8 +151,15 @@ State_Variables.prototype.activated_sludge=function(parameters){
 
   /*execute chemical P removal module*/
   let cpr = chemical_P_removal({Q, PO4i:Psa, mass_FeCl3}); //object
-  let F_extra_iSS = cpr.extra_iSS.value;            //kgiSS/d
-  let Pse         = cpr.PO4e.value;                 //mgP/L | PO4 effluent after chemical P removal
+  let F_extra_iSS = cpr.extra_iSS.value;                   //kgiSS/d
+  let Pse         = cpr.PO4e.value;                        //mgP/L | PO4 effluent after chemical P removal
+
+  //chemical P removal improved TODO
+  parameters.Q = Q;
+  parameters.PO4i = Psa;
+  let cpr_v2 = chemical_P_removal_improved(parameters); //object
+  delete parameters.Q;
+  delete parameters.PO4i;
 
   //compute total inert solids
   const f_iOHO = constants.f_iOHO;                     //0.15 giSS/gVSS | fraction of inert solids in biomass
@@ -332,7 +340,8 @@ State_Variables.prototype.activated_sludge=function(parameters){
   //Object.values(cpr).forEach(obj=>delete obj.descr);
   return {
     process_variables, //activated sludge process variables
-    cpr,               //chemical P removal process variables
+    cpr,               //chemical P removal process variables (model 1)
+    cpr_v2,            //chemical P removal process variables (model 2)
     effluent,          //State_Variables object
     wastage,           //State_Variables object
   };
@@ -352,12 +361,14 @@ State_Variables.prototype.activated_sludge=function(parameters){
     RAS        : 1.0,       //ø
     waste_from : 'reactor', //string
     mass_FeCl3 : 3000,      //kgFeCl3/d
+    pH         : 7.2,
   });
 
   //show results
-  console.log("=== AS process variables");   console.log(as.process_variables);
-  /*
+  //console.log("=== AS process variables");   console.log(as.process_variables);
   console.log("=== AS chemical P removal "); console.log(as.cpr);
+  console.log("=== AS chemical P removal "); console.log(as.cpr_v2);
+  /*
   console.log("=== Effluent summary");       console.log(as.effluent.summary);
   console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Wastage summary");        console.log(as.wastage.components);

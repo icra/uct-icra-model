@@ -37,9 +37,11 @@ try{
   require('./primary-settler.js');    //State_Variables.prototype.primary_settler
   require('./activated-sludge.js');   //State_Variables.prototype.activated_sludge
   require('./bio-P-removal.js');      //State_Variables.prototype.bio_P_removal
-  require('./chemical-P-removal.js'); //function chemical P rem (in activated sludge)
   require('./nitrification.js');      //State_Variables.prototype.nitrification
   require('./denitrification.js');    //State_Variables.prototype.denitrification
+
+  require('./chemical-P-removal.js');          //function chemical P rem (model 1)
+  require('./chemical-P-removal-improved.js'); //function chemical P rem (model 2)
 }catch(e){}
 
 class Plant{
@@ -135,6 +137,8 @@ class Plant{
     let cpr = null; //chemical P removal
     let cap = null; //capacity estimation
 
+    let cpr_v2 = null; //chemical P removal model 2
+
     //first step: primary settler
     if(config.pst) pst = this.influent.primary_settler(parameters);
     else           pst = {effluent:this.influent, wastage:null};
@@ -148,8 +152,9 @@ class Plant{
       bpr = null;
     }
 
-    //third step: get chemical P removal results
-    cpr = bpr ? bpr.cpr : as.cpr;
+    //third step: get chemical P removal results (both models)
+    cpr    = bpr ? bpr.cpr    : as.cpr;
+    cpr_v2 = bpr ? bpr.cpr_v2 : as.cpr_v2;
 
     //fourth step: nitrification
     if(config.nit){
@@ -194,6 +199,7 @@ class Plant{
       as  : as  ? as.process_variables  : null,
       bpr : bpr ? bpr.process_variables : null,
       cpr,
+      cpr_v2,
       nit : nit ? nit.process_variables : null,
       dn  : dn  ? dn.process_variables  : null,
       cap,
@@ -253,8 +259,10 @@ class Plant{
         bpr:"Bio P Removal (Anaerobic)",
         nit:"Nitrification (Aerobic)",
         dn: "Denitrification (Anoxic)",
-        cpr:"Chemical P Removal",
         cap:"Capacity Estimation",
+
+        cpr:   "Chemical P Removal (model 1, Metcalf&Eddy)",
+        cpr_v2:"Chemical P Removal (model 2, Hass et al 2001)",
       },
       parameters:{
         fw          :{unit:"ø",         tec:"pst", type:"number", descr:"Fraction of Q going to primary wastage"},
@@ -267,9 +275,13 @@ class Plant{
         Rs          :{unit:"d",         tec:"as",  type:"number", descr:"Solids Retention Time (SRT) or Sludge Age"},
         DO          :{unit:"mgO2/L",    tec:"as",  type:"number", descr:"Dissolved Oxygen in the Aerobic Reactor"},
         RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"Sludge recycle ratio based on influent flow"},
-        waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Origin of wastage. Options {'reactor','sst'}"},
+        waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Origin of wastage. Options {'reactor','sst'}", options:['reactor','sst']},
 
-        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 added for Chemical P removal"},
+        mass_FeCl3  :{unit:"kg/d",      tec:"cpr", type:"number", descr:"Mass of FeCl3 dosed for Chemical P removal"},
+        mass_MeCl3  :{unit:"kg/d",      tec:"cpr_v2", type:"number", descr:"Mass of FeCl3 or AlCl3 dosed for Chemical P removal"},
+        Me          :{unit:"option",    tec:"cpr_v2", type:"string", descr:"Salt dosed for chemical P removal (FeCl3 or AlCl3)", options:['Fe','Al']},
+        a_1         :{unit:"ø",         tec:"cpr_v2", type:"number", descr:"PO4e = a_1*PO4i*exp(-a_2*Me_P_mole_ratio) calibrated parameter 1"},
+        a_2         :{unit:"ø",         tec:"cpr_v2", type:"number", descr:"PO4e = a_1*PO4i*exp(-a_2*Me_P_mole_ratio) calibrated parameter 2"},
 
         f_AN        :{unit:"gVSS/gVSS", tec:"bpr", type:"number", descr:"Anaerobic mass fraction (must be f_AN <= fxm)"},
         an_zones    :{unit:"number",    tec:"bpr", type:"number", descr:"Number of anaerobic zones"},
