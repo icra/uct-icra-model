@@ -1,6 +1,6 @@
 <!doctype html><html><head>
   <meta charset=utf8>
-  <title>Chemical P removal calibration</title>
+  <title>Chemical P removal calibration tool</title>
   <!--
     library Vue JS
     - development version
@@ -32,75 +32,72 @@
     }
   </style>
 </head><body>
-
-<h1>Chemical P removal calibration</h1>
-<small>Haas et al, 2001</small>
+<h1>Chemical P removal calibration tool</h1>
+<small><a href="../../dev/dev-docs/chemical-P-removal/Haas 2001.pdf" target=_blank>Haas et al, 2001</a></small>
 
 <div id=container>
-
-<!--equations-->
-<div>
-  <p>
-    With known <b>PO4e</b>, <b>PO4i</b> and <b>Me_P_mole_ratio</b> measures,
-    find <b>a<sub>1</sub></b> and <b>a<sub>2</sub></b> such that:
-  </p>
-  <fieldset>
-    PO4e = a<sub>1</sub> · PO4i · e<sup>-a<sub>2</sub>·(Me_P_mole_ratio)</sup>
-  </fieldset>
-
-  <p>The above equation can be linearized (y=mx+n) as:</p>
-
-  <fieldset>
-    ln(PO4e/PO4i) = ln(a<sub>1</sub>) - a<sub>2</sub>·(Me_P_mole_ratio)
-  </fieldset>
+  <!--equations-->
   <div>
-    where:
-    <ul>
-      <li> y = ln(PO4e/PO4i)
-      <li> x = Me_P_mole_ratio
-      <li> m = - a<sub>2</sub> (slope)
-      <li> n = ln(a<sub>1</sub>) (intercept)
-    </ul>
+    <p>
+      With known <b>PO4e</b>, <b>PO4i</b> and <b>Me_P_mole_ratio</b> measures,
+      find <b>a<sub>1</sub></b> and <b>a<sub>2</sub></b> such that:
+    </p>
+    <fieldset>
+      PO4e = a<sub>1</sub> · PO4i · e<sup>-a<sub>2</sub>·(Me_P_mole_ratio)</sup>
+    </fieldset>
+
+    <p>The above equation can be linearized (y=mx+n) as:</p>
+
+    <fieldset>
+      ln(PO4e/PO4i) = ln(a<sub>1</sub>) - a<sub>2</sub>·(Me_P_mole_ratio)
+    </fieldset>
+    <div>
+      where:
+      <ul>
+        <li> y = ln(PO4e/PO4i)
+        <li> x = Me_P_mole_ratio
+        <li> m = - a<sub>2</sub> (slope)
+        <li> n = ln(a<sub>1</sub>) (intercept)
+      </ul>
+    </div>
   </div>
-</div>
 
-<!--points-->
-<div id=app>
-  Add measures (points) to this table to find <b>a<sub>1</sub></b> and <b>a<sub>2</sub></b>
-  <table border=1>
-    <tr>
-      <th>PO4e<br><span class=unit>(mg/L)</span>
-      <th>PO4i<br><span class=unit>(mg/L)</span>
-      <th>
-        x = Me_P_mole_ratio<br>
-        <span class=unit>(moles Me dosed / moles P available)</span>
-      </th>
-      <th> y = ln(PO4e/PO4i)
-      <th>Remove point
-    </tr>
-    <tr v-for="p,i in points">
-      <td><input type=number v-model.number="p.PO4e">
-      <td><input type=number v-model.number="p.PO4i">
-      <td><input type=number v-model.number="p.Me_P_mole_ratio">
-      <td>{{Math.log(p.PO4e/p.PO4i)}}
-      <td><button @click="remove_point(i)">Remove point</button>
-    </tr>
-    <tr>
-      <td colspan=5><button @click=add_point>Add new point</button>
-    </tr>
-  </table>
-
-  <div style=font-size:x-large>
-    Results of linear regression
+  <!--points-->
+  <div id=app>
+    Add measures (points) to this table to find <b>a<sub>1</sub></b> and <b>a<sub>2</sub></b>
     <table border=1>
-      <tr v-for="obj,key in compute_linear_regression()">
-        <th v-html="obj.html">
-        <td>{{obj.value}}
+      <tr>
+        <th>PO4e<br><span class=unit>(mg/L)</span>
+        <th>PO4i<br><span class=unit>(mg/L)</span>
+        <th>
+          x = Me_P_mole_ratio<br>
+          <span class=unit>(moles Me dosed / moles P available)</span>
+        </th>
+        <th> y = ln(PO4e/PO4i)
+        <th>Remove point
+      </tr>
+      <tr v-for="p,i in points">
+        <td><input type=number v-model.number="p.PO4e">
+        <td><input type=number v-model.number="p.PO4i">
+        <td><input type=number v-model.number="p.Me_P_mole_ratio">
+        <td>{{Math.log(p.PO4e/p.PO4i)}}
+        <td><button @click="remove_point(i)">Remove point</button>
+      </tr>
+      <tr>
+        <td colspan=5><button @click=add_point>Add new point</button>
       </tr>
     </table>
-  </div>
-</div>
 
+    <div style=font-size:x-large>
+      Results of linear regression
+      <table border=1>
+        <tr v-for="obj,key in compute_linear_regression()">
+          <th v-html="obj.html">
+          <td>{{obj.value}}
+        </tr>
+      </table>
+    </div>
+  </div>
 </div>
 
 <!--vue-->
