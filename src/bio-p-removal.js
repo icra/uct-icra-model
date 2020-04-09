@@ -145,11 +145,11 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   const b_PAO_T = b_PAO*Math.pow(ϴ_b_PAO,T-20); //1/d       | b_PAO corrected by temperature
 
   //P in iSS mass fraction
-  const f_P_iSS = constants.f_P_iSS;  //0.02  gP/giSS   | fraction of P in iSS
+  const f_P_iSS = constants.f_P_iSS; //0.02  gP/giSS   | fraction of P in iSS
 
   //FBSO constants
   const k_v20   = constants.k_v20;              //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
-  const ϴ_k_v20 = constants.ϴ_k_v20;        //1.035 ø         | k_v20 temperature correction factor
+  const ϴ_k_v20 = constants.ϴ_k_v20;            //1.035 ø         | k_v20 temperature correction factor
   const k_vT    = k_v20*Math.pow(ϴ_k_v20,T-20); //L/mgVSS·d       | k_v corrected by temperature
 
   //COD conversion (stoichiometric constants)
@@ -185,7 +185,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   while(true){
     S_FBSO_AN  = S_FBSO_conv/(1+RAS)/Math.pow(1+(k_vT*(f_AN*MX_BH/(an_zones*Q*(1+RAS)))), an_zones); //mgCOD/L
     F_ss_PAO   = Math.max(0, Q*(S_FBSO_conv - (1+RAS)*S_FBSO_AN + S_VFA) ); //kgCOD/d | VFA stored by PAOs
-    F_sb_OHO   = Math.max(0, FSbi - F_ss_PAO);                             //kgCOD/d | remaining bCOD for OHOs
+    F_sb_OHO   = Math.max(0, FSbi - F_ss_PAO);                              //kgCOD/d | remaining bCOD for OHOs
     MX_BH_next = F_sb_OHO*f_XBH;                                            //kgVSS   | active OHO biomass
 
     //(debugging) show current iteration
@@ -595,7 +595,11 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     RAS        : 0.75,      //ø
     IR         : 1.5,       //ø
     waste_from : 'reactor', //string
+    Me         : "Fe",      //string
     mass_MeCl3 : 100,       //kg/d
+    a_1        : 1,
+    a_2        : 2,
+
     pH         : 7.2,       //pH units
     S_NOx_RAS  : 0.5,       //mgNOx/L
     f_AN       : 0.1,       //ø

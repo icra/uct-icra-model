@@ -623,12 +623,13 @@
             Rs          : 15.0000,   //d       | AS  | solids retention time or sludge age
             DO          : 2.00000,   //mgO/L   | AS  | DO in the aerobic reactor
             RAS         : 1.00000,   //ø       | AS  | SST underflow recycle ratio
+            pH          : 7.20000,   //ø       | AS  | pH
             waste_from  : "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
 
-            mass_MeCl3  :    3000,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
             Me          : "Fe",      //option  | CPR2| metal dosed ("Fe" or "Al")
-            a_1         :   0.94885, //ø       | CPR2| calibrated value 1
-            a_2         :   0.97376, //ø       | CPR2| calibrated value 2
+            mass_MeCl3  : 3000,      //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+            a_1         : 0.94885,   //ø       | CPR2| calibrated value 1
+            a_2         : 0.97376,   //ø       | CPR2| calibrated value 2
 
             S_NOx_RAS   : 0.50000,   //mgNOx/L | BPR | NOx concentration at RAS
             DO_RAS      : 0.00000,   //mgO/L   | BPR | Dissolved oxygen at recycle
@@ -637,7 +638,6 @@
 
             SF          : 1.25000,   //ø       | NIT | safety factor. design choice. Moves the sludge age
             fxt         : 0.39000,   //ø       | NIT | current unaerated sludge mass fraction
-            pH          : 7.20000,   //ø       | NIT | pH
             IR          : 5.40000,   //ø       | DN  | internal recirculation ratio
             DO_RAS      : 1.00000,   //mgO/L   | DN  | DO in the underflow recycle
             influent_alk: 250.000,   //mg/L    | DN  | influent alkalinity (mg/L CaCO3)

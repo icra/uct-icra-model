@@ -141,8 +141,8 @@ State_Variables.prototype.activated_sludge=function(parameters){
 
   //2.8 - effluent Phosphorus
   let Ps    = (f_P_OHO*(MX_BH+MX_EH)+f_P_UPO*MX_I)/(Rs*Q); //mgP/L | P influent required for sludge production
-  let Pti   = inf_frac.TP.total;                               //mgP/L | total P influent
-  let Pouse = inf_frac.TP.usOP;                                //mgP/L | P organic unbiodegradable soluble effluent
+  let Pti   = inf_frac.TP.total;                           //mgP/L | total P influent
+  let Pouse = inf_frac.TP.usOP;                            //mgP/L | P organic unbiodegradable soluble effluent
   let Pobse = Sbse*f_P_FBSO/f_CV_FBSO;                     //mgP/L | P organic biodegradable soluble effluent
 
   //compute inorganic P available for chemical P removal (PO4)
@@ -360,7 +360,10 @@ State_Variables.prototype.activated_sludge=function(parameters){
     DO         : 2.0,       //mgO2/L
     RAS        : 1.0,       //ø
     waste_from : 'reactor', //string
+    Me         : "Fe",      //string
     mass_MeCl3 : 3000,      //kgFeCl3/d
+    a_1        : 1,
+    a_2        : 1,
     pH         : 7.2,
   });
 

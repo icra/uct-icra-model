@@ -326,7 +326,10 @@ State_Variables.prototype.denitrification=function(parameters, result){
     DO           : 2.0,       //mgO2/L
     RAS          : 1.0,       //ø
     waste_from   : 'reactor', //string
+    Me           : "Fe",
     mass_MeCl3   : 3000,      //kgFeCl3/d
+    a_1          : 1,
+    a_2          : 1,
     SF           : 1.25,      //ø
     fxt          : 0.39,      //ø
     pH           : 7.2,       //pH units

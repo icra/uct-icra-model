@@ -276,9 +276,10 @@ class Plant{
         DO          :{unit:"mgO2/L",    tec:"as",  type:"number", descr:"Dissolved Oxygen in the Aerobic Reactor"},
         RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"Sludge recycle ratio based on influent flow"},
         waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Origin of wastage. Options {'reactor','sst'}", options:['reactor','sst']},
+        pH          :{unit:"ø",         tec:"as",  type:"number", descr:"pH"},
 
-        mass_MeCl3  :{unit:"kg/d",      tec:"cpr",    type:"number", descr:"Mass of FeCl3 or AlCl3 dosed for Chemical P removal"},
         Me          :{unit:"option",    tec:"cpr_v2", type:"string", descr:"Salt dosed for chemical P removal (FeCl3 or AlCl3)", options:['Fe','Al']},
+        mass_MeCl3  :{unit:"kg/d",      tec:"cpr_v2", type:"number", descr:"Mass of FeCl3 or AlCl3 dosed for Chemical P removal"},
         a_1         :{unit:"ø",         tec:"cpr_v2", type:"number", descr:"PO4e = a_1*PO4i*exp(-a_2*Me_P_mole_ratio) calibrated parameter 1"},
         a_2         :{unit:"ø",         tec:"cpr_v2", type:"number", descr:"PO4e = a_1*PO4i*exp(-a_2*Me_P_mole_ratio) calibrated parameter 2"},
 
@@ -290,7 +291,6 @@ class Plant{
 
         fxt         :{unit:"gVSS/gVSS", tec:"nit", type:"number", descr:"Unaerated sludge mass fraction"},
         SF          :{unit:"ø",         tec:"nit", type:"number", descr:"Safety factor. Design choice. Increases the sludge age to dampen the effluent ammonia variation. Choose a high value for high influent ammonia concentration variation"},
-        pH          :{unit:"ø",         tec:"nit", type:"number", descr:"pH"},
 
         IR          :{unit:"ø",         tec:"dn",  type:"number", descr:"Internal recirculation ratio (aerobic to anoxic)"},
         DO_RAS      :{unit:"mgO/L",     tec:"dn",  type:"number", descr:"DO in the underflow recycle"},
