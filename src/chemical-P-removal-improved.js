@@ -123,7 +123,7 @@ function chemical_P_removal_improved(parameters){
   let results={}; //new empty object
   results[`${Me}_P_mole_ratio`] = {value:Me_P_mole_ratio, unit:`mol${Me}/molP`, descr:`${Me}/P mole ratio`};
   results.PO4i                  = {value:PO4i,            unit:"mgP/L",         descr:"PO4 available for precipitation"};
-  results.PO4e                  = {value:PO4e,            unit:"mgP/L",         descr:"PO4 effluent"};
+  results.PO4e                  = {value:PO4e,            unit:"mgP/L",         descr:"PO4 residual after precipitation"};
   results.PO4_removed           = {value:PO4_removed,     unit:"kgP/d",         descr:"P removed by chemical P removal"};
   results.extra_iSS             = {value:extra_iSS,       unit:"kgiSS/d",       descr:"extra iSS formed by chemical P removal"};
   return results;

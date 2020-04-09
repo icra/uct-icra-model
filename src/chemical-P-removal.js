@@ -113,7 +113,7 @@ function chemical_P_removal(parameters){
   return {
     Fe_P_mole_ratio: {value:Fe_P_mole_ratio, unit:"molFe/molP", descr:"Fe/P mole ratio"},
     PO4i:            {value:PO4i,            unit:"mgP/L",      descr:"PO4 available"},
-    PO4e:            {value:PO4e,            unit:"mgP/L",      descr:"PO4 effluent"},
+    PO4e:            {value:PO4e,            unit:"mgP/L",      descr:"PO4 residual after precipitation"},
     PO4_removed:     {value:PO4_removed,     unit:"kgP/d",      descr:"P removed"},
     extra_iSS:       {value:extra_iSS,       unit:"kgiSS/d",    descr:"iSS produced by FeCl3 coprecipitation (Fe(OH)3 and Fe(1.6)H2PO4(OH)3.8)"},
   };
@@ -124,7 +124,7 @@ try{module.exports=chemical_P_removal;}catch(e){}
 
 /*standalone test*/
 (function(){
-  //return
+  return
   let Q    = 0.5914; //ML/d
   let PO4i = 2.8;    //mg/L
 

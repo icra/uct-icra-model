@@ -261,8 +261,8 @@ class Plant{
         dn: "Denitrification (Anoxic)",
         cap:"Capacity Estimation",
 
-        cpr:   "Chemical P Removal (model 1, Metcalf&Eddy)",
-        cpr_v2:"Chemical P Removal (model 2, Hass et al 2001)",
+        cpr:   "Chemical P Removal (model 1: Metcalf&Eddy)",
+        cpr_v2:"Chemical P Removal (model 2: Hass et al 2001)",
       },
       parameters:{
         fw          :{unit:"ø",         tec:"pst", type:"number", descr:"Fraction of Q going to primary wastage"},

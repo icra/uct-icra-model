@@ -546,7 +546,7 @@
           totals:false,
           mass_ratios:false,
         },
-        configuration:true,
+        configuration:false,
         parameters:true,
         constants:false,
       };
@@ -580,7 +580,7 @@
             totals:false,
           },
           wastage:{
-            visible:true,
+            visible:false,
             totals:false,
           },
         },
@@ -610,7 +610,7 @@
         //new Plant syntax   (influent, configuration, parameters, constants)
         let plant = new Plant(
           //syntax-----------( Q, S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, X_iSS, S_NH4, S_PO4, S_NOx, S_O2, X_OHO, X_PAO)
-          new State_Variables(15,    50,    115,   440,   100,    45,    60,  39.1,    25,     0,    0,     0,     0), //influent
+          new State_Variables(15,    50,    115,   440,   100,    45,    60,  39.1,    15,     0,    0,     0,     0), //influent
           {pst:false, bpr:false, nit:false, dn:false},   //configuration
           {                                        //parameters
             //legend {PST:'primary settler', AS:'activated sludge', CE:'capacity estimation', NIT:'nitrification', DN:'denitrification', CPR:'chemical P removal'}
@@ -625,7 +625,7 @@
             RAS         : 1.00000,   //ø       | AS  | SST underflow recycle ratio
             waste_from  : "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
 
-            mass_MeCl3  :   20.00,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
+            mass_MeCl3  :    3000,   //kg/d    | CPR | mass of FeCl3 added for chemical P removal
             Me          : "Fe",      //option  | CPR2| metal dosed ("Fe" or "Al")
             a_1         :   0.94885, //ø       | CPR2| calibrated value 1
             a_2         :   0.97376, //ø       | CPR2| calibrated value 2

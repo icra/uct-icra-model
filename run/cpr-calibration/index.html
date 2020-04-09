@@ -40,7 +40,7 @@
   <div>
     <p>
       With known <b>PO4e</b>, <b>PO4i</b> and <b>Me_P_mole_ratio</b> measures,
-      find <b>a<sub>1</sub></b> and <b>a<sub>2</sub></b> such that:
+      this tool finds <b>a<sub>1</sub></b> and <b>a<sub>2</sub></b> such that:
     </p>
     <fieldset>
       PO4e = a<sub>1</sub> · PO4i · e<sup>-a<sub>2</sub>·(Me_P_mole_ratio)</sup>
@@ -121,12 +121,12 @@
         {Me_P_mole_ratio:1.909371147,  PO4e:0.45, PO4i:2.8},
         {Me_P_mole_ratio:1.363836533,  PO4e:0.65, PO4i:2.8},
         {Me_P_mole_ratio:1.091069227,  PO4e:0.95, PO4i:2.8},
-        {Me_P_mole_ratio:0.5455346134, PO4e:1.5, PO4i:2.8},
+        {Me_P_mole_ratio:0.5455346134, PO4e:1.5,  PO4i:2.8},
       ],
     },
     methods:{
       add_point(){
-        this.points.push({PO4e:1, PO4i:1, Me_P_mole_ratio:1});
+        this.points.push({PO4e:0, PO4i:0, Me_P_mole_ratio:0});
       },
 
       remove_point(index){
