@@ -4,30 +4,23 @@
     using the ww characteristics in [WRC 1984, EKAMA 2011, HENZE ET AL 2008,
     EKAMA 2017] and gave answers less than 0.1% difference for the raw and settled ww characteristics"
   - replace FOt calculations in denitrification (add a note in nitrification "without denitrification")
-  - save plant layout to json file in "run-model-multiple.html".
   - discuss with george:
-    - "what if all influent BSO is VFA" scenario (what happens to MX-BH?).
-    - idea: compute OHO mass ratios instead of being inputs from influent
-      composition.
     - play with the run-model interface and observe Rs, Rsm, a, a-opt
       relationship.
-    - chemical P removal (see papers at dev-docs folder).
-  - implement "warnings" module (numeric checks for physical meaning) -> expand
-    "error" capturing functionality.
+    - discuss chemical P removal improved (see papers at dev-docs folder).
   - [for reporting] function for pretty printing a plant.run() result.
 
 ## discussed but not done yet
-  - do not show results if we have warnings
   - put Rs-bal in capacity estimation module
 
 ## Future / new modules TBD
-  - improved chemical P removal (as found on Szabo et al paper)
   - oxygen limitation module (reuse ecoinvent equations)
   - anaerobic digestion module (will consider inorganic carbon exiting, created
     from TOC)
   - stoichiometry for CO2 produced
 
 ## Tasks done/solved/clear/discussed
+  - [done] improved chemical P removal (as found on Szabo et al paper)
   - [done] bio P removal EBPR module
   - [done] bio P: george sends hand calculations and laura + lluís check it.
   - [done] energy consumption module in ecoadvisor
@@ -35,7 +28,7 @@
   - [done] validate test values of Rs/Rsm/Rs.bal/IR/a.opt/a.prac.
   - [done] K.O in ASM1 = 0.4
   - [done] confirm final Rsm formula (min sludge age to ensure nitrification).
-  - [done] add errors in nitrification when: (1) fxt > fxm, (2) Rs < Rsm
+  - [done] add errors in nitrification when: (1) fxt &gt; fxm, (2) Rs &lt; Rsm
   - [done] add incomplete BOD removal
   - [done] mass of nitrifiers (MX-BA): do not worry about it (because is less than 3% of MX-T)
   - [done] anoxic volume (fxt related)
