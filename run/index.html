@@ -273,15 +273,14 @@
             <ul v-if="plant.visibles.inputs.configuration">
               <li v-for="tech,key in plant.configuration"
                   v-bind:title="plant_info.configuration[key]"
-                  class="grid-li"
               >
-                <div style="grid-column:span 2">{{plant_info.configuration[key]}}</div>
-                <div>
-                  <label>
-                    <input type=checkbox v-model="plant.configuration[key]">
-                    <span class=unit>{{tech}}</span>
-                  </label>
-                </div>
+                <label class="grid-li">
+                  <div style="grid-column:span 2">{{plant_info.configuration[key]}}</div>
+                  <div>
+                      <input type=checkbox v-model="plant.configuration[key]">
+                      <span class=unit>{{tech}}</span>
+                  </div>
+                </label>
               </li>
             </ul>
           </li>
@@ -373,7 +372,6 @@
                       <ul v-if="plant.visibles.outputs.primary[key].visible">
                         <!--primary streams summary-->
                         <li>
-                          <code>Fractionation (summary)</code>
                           <table border=1>
                             <tr>
                               <th title=Component>Comp
@@ -440,7 +438,6 @@
                       <ul v-if="plant.visibles.outputs.secondary[key].visible">
                         <!--secondary stream summary-->
                         <li>
-                          <code>Fractionation (summary)</code>
                           <table border=1>
                             <tr>
                               <th title=Component>Comp
