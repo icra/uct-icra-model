@@ -154,10 +154,12 @@ State_Variables.prototype.activated_sludge=function(parameters){
   let F_extra_iSS = cpr.extra_iSS.value;                   //kgiSS/d
   let Pse         = cpr.PO4e.value;                        //mgP/L | PO4 effluent after chemical P removal
 
-  //chemical P removal improved TODO
+  //chemical P removal improved
   parameters.Q = Q;
   parameters.PO4i = Psa;
-  let cpr_v2 = chemical_P_removal_improved(parameters); //object
+  let cpr_v2  = chemical_P_removal_improved(parameters); //object
+  F_extra_iSS = cpr_v2.extra_iSS.value;                  //kgiSS/d
+  Pse         = cpr_v2.PO4e.value;                       //mgP/L | PO4 effluent after chemical P removal
   delete parameters.Q;
   delete parameters.PO4i;
 
@@ -280,7 +282,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
   let FPti      = inf_flux.totals.TP.total;             //kgP/d | total TP influent
   let FPte      = eff_flux.totals.TP.total;             //kgP/d | total TP effluent
   let FPw       = was_flux.totals.TP.total;             //kgP/d | total TP wastage
-  let FPremoved = cpr.PO4_removed.value;                //kgP/d | PO4 removed by FeCl3
+  let FPremoved = cpr_v2.PO4_removed.value;             //kgP/d | PO4 removed by FeCl3
   let FPout     = FPte + FPw + FPremoved;               //kgP/d | total TP out
   let P_balance = (FPout==FPti) ? 100 : 100*FPout/FPti; //percentage
   //console.log({FPti,FPte,FPw,FPremoved,FPout,P_balance});
