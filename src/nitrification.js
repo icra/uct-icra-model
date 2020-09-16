@@ -211,7 +211,8 @@ State_Variables.prototype.nitrification=function(parameters, result){
     Rs         : 15,        //days
     DO         : 2.0,       //mgO2/L
     RAS        : 1.0,       //ø
-    waste_from : 'reactor', //string
+    waste_from : 'sst',     //string
+    ideal_sst  : 1.0,       //number between 0 and 1
     Me         : "Fe",
     mass_MeCl3 : 3000,      //kgFeCl3/d
     a_1        : 1,

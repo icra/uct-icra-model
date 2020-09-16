@@ -276,6 +276,7 @@ class Plant{
         DO          :{unit:"mgO2/L",    tec:"as",  type:"number", descr:"Dissolved Oxygen in the Aerobic Reactor"},
         RAS         :{unit:"ø",         tec:"as",  type:"number", descr:"Sludge recycle ratio based on influent flow"},
         waste_from  :{unit:"option",    tec:"as",  type:"string", descr:"Origin of wastage. Options {'reactor','sst'}", options:['reactor','sst']},
+        ideal_sst   :{unit:"ideality",  tec:"as",  type:"number", descr:"Ideality of SST (number between 0 and 1)"},
         pH          :{unit:"ø",         tec:"as",  type:"number", descr:"pH"},
 
         Me          :{unit:"option",    tec:"cpr_v2", type:"string", descr:"Salt dosed for chemical P removal (FeCl3 or AlCl3)", options:['Fe','Al']},
@@ -402,6 +403,7 @@ try{module.exports=Plant}catch(e){}
     DO          :     2.00000, //mgO/L   | AS  | DO aerobic reactor
     RAS         :     1.00000, //ø       | AS  | SST underflow recycle ratio
     waste_from  :   "reactor", //string  | AS  | options {'reactor','sst'}
+    ideal_sst   :         0.9, //number  | SST | number between 0 and 1 (ideality of SST)
 
     mass_MeCl3  :    10.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
     Me          :   "Fe",      //string  | CPR2| metal used

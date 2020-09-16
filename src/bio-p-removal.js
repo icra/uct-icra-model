@@ -33,7 +33,9 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     let RAS        = parameters.RAS;        //ø       | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string  | origin of wastage ('sst' or 'reactor')
     let mass_MeCl3 = parameters.mass_MeCl3; //kg/d    | mass of FeCl3 added for P precipitation
+    let ideal_sst  = parameters.ideal_sst;  //how ideal is the sst (0 to 1)
 
+    //bio P specific inputs
     let S_NOx_RAS  = parameters.S_NOx_RAS;  //mgNOx/L | NOx concentration at RAS
     let DO_RAS     = parameters.DO_RAS;     //mgO/L   | Dissolved oxygen at recycle
     let IR         = parameters.IR;         //ø       | aerobic to anoxic recycle ratio
@@ -48,6 +50,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
       if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
       if(undefined==waste_from) throw new Error(`waste_from is undefined`);
       if(undefined==mass_MeCl3) throw new Error(`mass_MeCl3 is undefined`);
+      if(undefined==ideal_sst)  throw new Error(`ideal_sst  is undefined`);
       if(undefined==S_NOx_RAS ) throw new Error(`S_NOx_RAS  is undefined`);
       if(undefined==DO_RAS    ) throw new Error(`DO_RAS     is undefined`);
       if(undefined==IR        ) throw new Error(`IR         is undefined`);
@@ -62,6 +65,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
       if("number"!=typeof RAS       ) throw new Error(`RAS        is not a number`);
       if("string"!=typeof waste_from) throw new Error(`waste_from is not a string`);
       if("number"!=typeof mass_MeCl3) throw new Error(`mass_MeCl3 is not a number`);
+      if("number"!=typeof ideal_sst ) throw new Error(`ideal_sst  is not a number`);
       if("number"!=typeof S_NOx_RAS ) throw new Error(`S_NOx_RAS  is not a number`);
       if("number"!=typeof DO_RAS    ) throw new Error(`DO_RAS     is not a number`);
       if("number"!=typeof IR        ) throw new Error(`IR         is not a number`);
@@ -73,6 +77,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
       if(Vp  <= 0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
       if(Rs  <= 0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
       if(RAS <= 0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
+      if(ideal_sst < 0 || ideal_sst > 1) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
 
       //DO: between 0 and 15 (checked at ecoinvent)
       if(DO     < 0 || DO > 15) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
@@ -342,10 +347,10 @@ State_Variables.prototype.bio_p_removal=function(parameters){
 
   //secondary settler (SST) and recycle flow (RAS) equations
   let SST=(function(RAS){
-    let f     = (1+RAS)/RAS;    //ø     | f=concentrating factor
-    let X_RAS = f*X_T;          //kg/m3 | TSS concentration in RAS
-    let Qr    = Q*RAS;          //ML/d  | RAS flowrate
-    let Qw    = (Vp/Rs)/f/1000; //ML/d  | SST wastage flowrate
+    let f     = ideal_sst*(1+RAS)/RAS; //ø     | f=concentrating factor
+    let X_RAS = f*X_T;                 //kg/m3 | TSS concentration in RAS
+    let Qr    = Q*RAS;                 //ML/d  | RAS flowrate
+    let Qw    = (Vp/Rs)/f/1000;        //ML/d  | SST wastage flowrate
     return {f,X_RAS,Qr,Qw};
   })(RAS);
 
@@ -496,9 +501,17 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     fSup        :{value:fSup,        unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"},
     YHvss       :{value:YHvss,       unit:"gVSS/gCOD",   descr:"OHO yield coefficient"},
     Y_PAO       :{value:Y_PAO,       unit:"gVSS/gCOD",   descr:"PAO yield coefficient"},
+    k_vT        :{value:k_vT,        unit:"L/mgVSS·d",   descr:"k_v20 corrected by temperature"},
     bHT         :{value:bHT,         unit:"1/d",         descr:"OHO endogenous respiration rate corrected by temperature"},
     b_PAO_T     :{value:b_PAO_T,     unit:"1/d",         descr:"PAO endogenous respiration rate corrected by temperature"},
-    k_vT        :{value:k_vT,        unit:"L/mgVSS·d",   descr:"k_v20 corrected by temperature"},
+
+    //hydraulic retention time
+    HRT         :{value:HRT,         unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
+
+    //influent concentrations required for sludge production
+    Ns          :{value:Ns,          unit:"mgN/L",       descr:"N required for sludge production"},
+    Cs          :{value:Cs,          unit:"mgC/L",       descr:"C required for sludge production"},
+    Ps          :{value:Ps,          unit:"mgP/L",       descr:"P required for sludge production"},
 
     //Biomass production
     S_FBSO_conv :{value:S_FBSO_conv, unit:"mgCOD/L",     descr:""},
@@ -516,22 +529,18 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     MX_V        :{value:MX_V,        unit:"kgVSS",       descr:"Total volatile suspended solids"},
     MX_IO       :{value:MX_IO,       unit:"kgiSS",       descr:"Inert Solids (influent+biomass)"},
     MX_T        :{value:MX_T,        unit:"kgTSS",       descr:"Total suspended solids"},
-    X_V         :{value:X_V,         unit:"kgVSS/m3",    descr:"VSS concentration"},
-    X_T         :{value:X_T,         unit:"kgTSS/m3",    descr:"TSS concentration"},
+    X_V         :{value:X_V,         unit:"kgVSS/m3",    descr:"VSS concentration in reactor"},
+    X_T         :{value:X_T,         unit:"kgTSS/m3",    descr:"TSS concentration in reactor"},
     f_VT        :{value:f_VT,        unit:"gVSS/gTSS",   descr:"VSS/TSS ratio"},
     f_VT_PAO    :{value:f_VT_PAO,    unit:"gVSS/gTSS",   descr:"PAO/TSS ratio"},
     f_AV        :{value:f_AV,        unit:"gAVSS/gVSS",  descr:"Active_VSS/VSS ratio"},
     f_AT        :{value:f_AT,        unit:"gAVSS/gTSS",  descr:"Active_VSS/TSS ratio "},
 
     //Misc
-    Ns          :{value:Ns,          unit:"mgN/L",       descr:"N required for sludge production"},
-    Cs          :{value:Cs,          unit:"mgC/L",       descr:"C required for sludge production"},
-    HRT         :{value:HRT,         unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
     Vp_AN       :{value:Vp_AN,       unit:"m3",          descr:"Volume of the anaerobic zone"},
 
     //Phosphorus
     Pti         :{value:Pti,         unit:"mgP/L",       descr:"Influent TP"},
-    Ps          :{value:Ps,          unit:"mgP/L",       descr:"P required for sludge production"},
     PO4_release :{value:PO4_release, unit:"mgP/L",       descr:""},
     P_bio_PAO   :{value:P_bio_PAO,   unit:"mgP/L",       descr:"P removed by active PAO VSS"},
     P_bio_OHO   :{value:P_bio_OHO,   unit:"mgP/L",       descr:"P removed by active OHO VSS"},
@@ -597,17 +606,20 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     DO         : 2.0,       //mgO2/L
     RAS        : 0.75,      //ø
     IR         : 1.5,       //ø
-    waste_from : 'reactor', //string
+    waste_from : 'sst', //string
+    ideal_sst  : 1.0,       //number between 0 and 1
+
     Me         : "Fe",      //string
     mass_MeCl3 : 100,       //kg/d
     a_1        : 1,
     a_2        : 2,
-
     pH         : 7.2,       //pH units
+
     S_NOx_RAS  : 0.5,       //mgNOx/L
     f_AN       : 0.1,       //ø
     DO_RAS     : 0,         //mgO/L
     an_zones   : 2,         //number of anaerobic zones
   });
-  console.log(bip);
+  console.log({wastage:bip.wastage.summary});
+  console.log({wastage:bip.process_variables});
 })();

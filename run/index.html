@@ -183,15 +183,19 @@
                   <!--influent Q-->
                   <li v-bind:title="state_variables_info.Q.descr" class=grid-li>
                     <div>Q:</div>
-                    <div><input type=number v-model.number="plant.influent.Q" v-on:keyup.enter="run_model(plant)" min=0></div>
+                    <div><input type=number v-model.number="plant.influent.Q" v-on:keyup.enter="run_model(plant)" min=0 step=any></div>
                     <div class=unit>ML/d</div>
                   </li>
 
                   <li v-for="component,key in plant.influent.components" class=grid-li
                     v-bind:title="state_variables_info.components[key].descr">
                     <div>{{key}}:</div>
-                    <div><input type=number v-model.number="plant.influent.components[key]"
-                      v-on:keyup.enter="run_model(plant)" min=0></div>
+                    <div>
+                      <input type=number
+                        v-model.number="plant.influent.components[key]"
+                        v-on:keyup.enter="run_model(plant)"
+                        min=0 step=any
+                      ></div>
                     <div class=unit>mg/L</span></div>
                   </li>
                 </ul>
@@ -208,7 +212,11 @@
                       v-bind:title="state_variables_info.mass_ratios[key].descr">
                     <div><small>{{key}}:</small></div>
                     <div>
-                      <input type=number v-model.number="plant.influent.mass_ratios[key]" v-on:keyup.enter="run_model(plant)">
+                      <input type=number
+                        v-model.number="plant.influent.mass_ratios[key]"
+                        v-on:keyup.enter="run_model(plant)"
+                        min=0 step=any
+                      >
                     </div>
                     <div class=unit>{{state_variables_info.mass_ratios[key].unit}}</div>
                   </li>
@@ -299,7 +307,12 @@
 
                 <!--parameter value-->
                 <div v-if="plant_info.parameters[key].type=='number'">
-                  <input type=number v-model.number="plant.parameters[key]" v-on:keyup.enter="run_model(plant)">
+                  <input
+                    type=number
+                    v-model.number="plant.parameters[key]"
+                    v-on:keyup.enter="run_model(plant)"
+                    step=any
+                  >
                 </div>
                 <div v-if="plant_info.parameters[key].type=='string'">
                   <select v-model="plant.parameters[key]" style=float:right>
@@ -327,7 +340,11 @@
                 v-bind:title="obj.descr" v-if="plant.configuration[obj.tec]!=false">
                 <div>{{key}}</div>
                 <div>
-                  <input type=number v-model.number="plant.constants[key]" v-on:keyup.enter="run_model(plant)">
+                  <input type=number
+                    v-model.number="plant.constants[key]"
+                    v-on:keyup.enter="run_model(plant)"
+                    step=any
+                  >
                 </div>
                 <div class=unit>
                   {{obj.unit}}
@@ -621,7 +638,8 @@
             DO          : 2.00000,   //mgO/L   | AS  | DO in the aerobic reactor
             RAS         : 1.00000,   //ø       | AS  | SST underflow recycle ratio
             pH          : 7.20000,   //ø       | AS  | pH
-            waste_from  : "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
+            waste_from  : "sst",     //option  | AS  | waste_from | options {'reactor','sst'}
+            ideal_sst   : 1.0,       //number  | AS  | ideality of SST (number between 0 and 1)
 
             Me          : "Fe",      //option  | CPR2| metal dosed ("Fe" or "Al")
             mass_MeCl3  : 3000,      //kg/d    | CPR | mass of FeCl3 added for chemical P removal

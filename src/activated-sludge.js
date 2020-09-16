@@ -35,6 +35,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
     let RAS        = parameters.RAS;        //ø      | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string | origin of wastage ('sst' or 'reactor')
     let mass_MeCl3 = parameters.mass_MeCl3; //kg/d   | mass of FeCl3 added for P precipitation
+    let ideal_sst  = parameters.ideal_sst;  //how ideal is the sst (0 to 1)
 
     //check undefined parameters
       if(undefined==T         ) throw new Error(`T          is undefined`);
@@ -44,6 +45,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
       if(undefined==RAS       ) throw new Error(`RAS        is undefined`);
       if(undefined==waste_from) throw new Error(`waste_from is undefined`);
       if(undefined==mass_MeCl3) throw new Error(`mass_MeCl3 is undefined`);
+      if(undefined==ideal_sst)  throw new Error(`ideal_sst  is undefined`);
 
     //check variable types
       if("number"!=typeof T          ) throw new Error(`T          is not a number`);
@@ -53,12 +55,14 @@ State_Variables.prototype.activated_sludge=function(parameters){
       if("number"!=typeof RAS        ) throw new Error(`RAS        is not a number`);
       if("string"!=typeof waste_from ) throw new Error(`waste_from is not a string`);
       if("number"!=typeof mass_MeCl3 ) throw new Error(`mass_MeCl3 is not a number`);
+      if("number"!=typeof ideal_sst  ) throw new Error(`ideal_sst  is not a number`);
 
     //numerical checks for physical sense
       if(T   >  50) throw new Error(`Value of Temperature (T=${T}) not allowed`);
       if(Vp  <=  0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
       if(Rs  <=  0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
       if(RAS <   0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
+      if(ideal_sst < 0 || ideal_sst > 1) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
 
       //DO: between 0 and 15 (checked at ecoinvent)
       if(DO < 0 || DO > 15) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
@@ -207,15 +211,15 @@ State_Variables.prototype.activated_sludge=function(parameters){
 
   //calculate necessary C for biomass
   let Cs  = (f_C_OHO*(MX_BH+MX_EH)+f_C_UPO*MX_I)/(Rs*Q); //mgC/L | C in influent required for sludge production
-  let Cti = inf_frac.TOC.total;                              //mgC/L | total TOC influent
+  let Cti = inf_frac.TOC.total;                          //mgC/L | total TOC influent
 
   //secondary settler (SST) and recycle flow (RAS) equations
   //TODO: create an independent module (future)
   let SST=(function(RAS){
-    let f     = (1+RAS)/RAS;    //ø     | concentrating factor
-    let X_RAS = f*X_T;          //kg/m3 | TSS concentration in RAS
-    let Qr    = Q*RAS;          //ML/d  | RAS flowrate
-    let Qw    = (Vp/Rs)/f/1000; //ML/d  | SST wastage flowrate
+    let f     = ideal_sst*(1+RAS)/RAS; //ø     | f=concentrating factor
+    let X_RAS = f*X_T;                 //kg/m3 | TSS concentration in RAS
+    let Qr    = Q*RAS;                 //ML/d  | RAS flowrate
+    let Qw    = (Vp/Rs)/f/1000;        //ML/d  | SST wastage flowrate
     return {f,X_RAS,Qr,Qw};
   })(RAS);
 
@@ -299,38 +303,56 @@ State_Variables.prototype.activated_sludge=function(parameters){
   if(isNaN(Nae_balance) || (Nae_balance < 99.9 || Nae_balance > 100.1) ) throw new Error(`Nae_balance is ${Nae_balance}%`);
   if(isNaN(P_balance  ) || (P_balance   < 99.9 || P_balance   > 100.1) ) throw new Error(`P_balance is ${P_balance}%`);
 
+  //MLSS
+  //let X_T_was = f_was*X_T*1000;          //gTSS/m3
+  //let X_T_eff = effluent.summary.TSS[0]; //gTSS/m3
+  //let MLSS = (Rs*(Qe*1000*X_T_eff + Qw*1000*X_T_was))/Vp;
+
   //process_variables
   let process_variables={
-    YHvss    :{value:YHvss,     unit:"gVSS/gCOD",   descr:"Heterotrophic yield coefficient"},
     fSus     :{value:fSus,      unit:"gUSO/gCOD",   descr:"USO/COD ratio (influent)"},
     fSup     :{value:fSup,      unit:"gUPO/gCOD",   descr:"UPO/COD ratio (influent)"},
+    YHvss    :{value:YHvss,     unit:"gVSS/gCOD",   descr:"Heterotrophic yield coefficient"},
     k_vT     :{value:k_vT,      unit:"L/mgVSS·d",   descr:"k_v20 corrected by temperature"},
+    bHT      :{value:bHT,       unit:"1/d",         descr:"OHO Endogenous respiration rate corrected by temperature"},
+    f_XBH    :{value:f_XBH,     unit:"gVSS·d/gCOD", descr:"OHO Biomass production rate"},
+
+    //hydraulic retention time
+    HRT      :{value:HRT,       unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
+
+    //influent concentrations required for sludge production
     Ns       :{value:Ns,        unit:"mgN/L",       descr:"influent N required for sludge production"},
     Ps       :{value:Ps,        unit:"mgP/L",       descr:"influent P required for sludge production"},
     Cs       :{value:Cs,        unit:"mgC/L",       descr:"influent C required for sludge production"},
-    HRT      :{value:HRT,       unit:"hour",        descr:"Nominal Hydraulic Retention Time"},
-    bHT      :{value:bHT,       unit:"1/d",         descr:"OHO Endogenous respiration rate corrected by temperature"},
-    f_XBH    :{value:f_XBH,     unit:"gVSS·d/gCOD", descr:"OHO Biomass production rate"},
+
+    //solids
     MX_BH    :{value:MX_BH,     unit:"kgVSS",       descr:"OHO Biomass produced VSS"},
     MX_EH    :{value:MX_EH,     unit:"kgVSS",       descr:"OHO Endogenous residue VSS"},
     MX_I     :{value:MX_I,      unit:"kgVSS",       descr:"Unbiodegradable organics VSS"},
     MX_V     :{value:MX_V,      unit:"kgVSS",       descr:"Volatile Suspended Solids"},
     MX_IO    :{value:MX_IO,     unit:"kgiSS",       descr:"Inert Solids (influent+biomass)"},
     MX_T     :{value:MX_T,      unit:"kgTSS",       descr:"Total Suspended Solids"},
-    X_V      :{value:X_V,       unit:"kgVSS/m3",    descr:"VSS concentration in SST"},
-    X_T      :{value:X_T,       unit:"kgTSS/m3",    descr:"TSS concentration in SST"},
+    X_V      :{value:X_V,       unit:"kgVSS/m3",    descr:"VSS concentration in reactor"},
+    X_T      :{value:X_T,       unit:"kgTSS/m3",    descr:"TSS concentration in reactor"},
+
+    //calculated fractions
     f_VT     :{value:f_VT,      unit:"gVSS/gTSS",   descr:"VSS/TSS ratio"},
     f_AV_OHO :{value:f_AV_OHO,  unit:"gOHO/gVSS",   descr:"ActiveOHO/VSS ratio"},
     f_AT_OHO :{value:f_AT_OHO,  unit:"gOHO/gTSS",   descr:"ActiveOHO/TSS ratio"},
+
+    //O2 demand
     FOc      :{value:FOc,       unit:"kgO/d",       descr:"Carbonaceous Oxygen Demand"},
     FOn      :{value:FOn,       unit:"kgO/d",       descr:"Nitrogenous Oxygen Demand"},
     FOt      :{value:FOt,       unit:"kgO/d",       descr:"Total Oxygen Demand"},
     OUR      :{value:OUR,       unit:"mgO/L·h",     descr:"Oxygen Uptake Rate"},
 
-    f_was    :{value:f_was,     unit:"ø",           descr:"wastage concentrating factor"},
+    //SST related
+    Qe       :{value:Qe,        unit:"ML/d",        descr:"Effluent flowrate"},
     Qr       :{value:SST.Qr,    unit:"ML/d",        descr:"RAS recycle flowrate"},
+    f_was    :{value:f_was,     unit:"ø",           descr:"wastage concentrating factor"},
     X_T_RAS  :{value:SST.X_RAS, unit:"kgTSS/m3",    descr:"RAS recycle flow TSS concentration"},
 
+    //Mass balances
     COD_balance :{value:COD_balance, unit:"%", descr:"COD balance"},
     N_balance   :{value:N_balance,   unit:"%", descr:"N balance"},
     Nae_balance :{value:Nae_balance, unit:"%", descr:"Ammonia balance"},
@@ -361,24 +383,24 @@ State_Variables.prototype.activated_sludge=function(parameters){
     Rs         : 15,        //days
     DO         : 2.0,       //mgO2/L
     RAS        : 1.0,       //ø
-    waste_from : 'reactor', //string
+    waste_from : 'sst', //string
+    ideal_sst  : 0.5,       //number between 0 and 1
+
     Me         : "Fe",      //string
     mass_MeCl3 : 3000,      //kgFeCl3/d
     a_1        : 1,
     a_2        : 1,
-    pH         : 7.2,
+    pH         : 7.2,       //pH units
   });
 
   //show results
-  //console.log("=== AS process variables");   console.log(as.process_variables);
-  console.log("=== AS chemical P removal "); console.log(as.cpr);
-  console.log("=== AS chemical P removal "); console.log(as.cpr_v2);
+  console.log("=== AS process variables");   console.log(as.process_variables);
+  console.log("=== Wastage summary");        console.log(as.wastage.summary);
+  //console.log("=== AS chemical P removal "); console.log(as.cpr);
+  //console.log("=== AS chemical P removal "); console.log(as.cpr_v2);
   /*
+  console.log("=== Effluent components");    console.log(as.effluent.components);
   console.log("=== Effluent summary");       console.log(as.effluent.summary);
-  console.log("=== Effluent summary");       console.log(as.effluent.components);
-  console.log("=== Wastage summary");        console.log(as.wastage.components);
-  console.log("=== Wastage totals");         console.log(as.wastage.totals);
-  console.log("=== Effluent summary");       console.log(as.effluent.components);
   console.log("=== Effluent totals");        console.log(as.effluent.totals);
   */
 })();
