@@ -35,7 +35,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
     let RAS        = parameters.RAS;        //ø      | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string | origin of wastage ('sst' or 'reactor')
     let mass_MeCl3 = parameters.mass_MeCl3; //kg/d   | mass of FeCl3 added for P precipitation
-    let ideal_sst  = parameters.ideal_sst;  //how ideal is the sst (0 to 1)
+    let ideal_sst  = parameters.ideal_sst;  //ideality of the SST (number between 0 and infinite)
 
     //check undefined parameters
       if(undefined==T         ) throw new Error(`T          is undefined`);
@@ -58,11 +58,11 @@ State_Variables.prototype.activated_sludge=function(parameters){
       if("number"!=typeof ideal_sst  ) throw new Error(`ideal_sst  is not a number`);
 
     //numerical checks for physical sense
-      if(T   >  50) throw new Error(`Value of Temperature (T=${T}) not allowed`);
-      if(Vp  <=  0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
-      if(Rs  <=  0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
-      if(RAS <   0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
-      if(ideal_sst < 0 || ideal_sst > 1) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
+      if(T   >  50)     throw new Error(`Value of Temperature (T=${T}) not allowed`);
+      if(Vp  <=  0)     throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
+      if(Rs  <=  0)     throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
+      if(RAS <   0)     throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
+      if(ideal_sst < 0) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
 
       //DO: between 0 and 15 (checked at ecoinvent)
       if(DO < 0 || DO > 15) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
@@ -378,19 +378,19 @@ State_Variables.prototype.activated_sludge=function(parameters){
   let inf = new State_Variables(24.875,  50,  115, 255,  10,  45,  15, 39.1, 7.28,   0,  0,   0,   0);
 
   let as = inf.activated_sludge({
-    T          : 16,        //ºC
-    Vp         : 8473.3,    //m3
-    Rs         : 15,        //days
-    DO         : 2.0,       //mgO2/L
-    RAS        : 1.0,       //ø
-    waste_from : 'sst', //string
-    ideal_sst  : 0.5,       //number between 0 and 1
+    T          :   16.0, //ºC
+    Vp         : 8473.3, //m3
+    Rs         :   15.0, //days
+    DO         :    2.0, //mgO2/L
+    RAS        :    1.0, //ø
+    waste_from :  'sst', //string
+    ideal_sst  :    1.0, //number between 0 and 1
 
-    Me         : "Fe",      //string
-    mass_MeCl3 : 3000,      //kgFeCl3/d
-    a_1        : 1,
-    a_2        : 1,
-    pH         : 7.2,       //pH units
+    Me         :   "Fe", //string
+    mass_MeCl3 :   3000, //kgFeCl3/d
+    a_1        :    1.0, //cpr calibrated value 1
+    a_2        :    1.0, //cpr calibrated value 2
+    pH         :    7.2, //pH units
   });
 
   //show results

@@ -33,7 +33,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
     let RAS        = parameters.RAS;        //ø       | SST underflow recycle ratio
     let waste_from = parameters.waste_from; //string  | origin of wastage ('sst' or 'reactor')
     let mass_MeCl3 = parameters.mass_MeCl3; //kg/d    | mass of FeCl3 added for P precipitation
-    let ideal_sst  = parameters.ideal_sst;  //how ideal is the sst (0 to 1)
+    let ideal_sst  = parameters.ideal_sst;  //ideality of the SST (number between 0 and infinite)
 
     //bio P specific inputs
     let S_NOx_RAS  = parameters.S_NOx_RAS;  //mgNOx/L | NOx concentration at RAS
@@ -73,11 +73,11 @@ State_Variables.prototype.bio_p_removal=function(parameters){
       if("number"!=typeof an_zones  ) throw new Error(`an_zones   is not a number`);
 
     //numerical checks for physical sense
-      if(T   > 50) throw new Error(`Value of Temperature (T=${T}) not allowed`);
-      if(Vp  <= 0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
-      if(Rs  <= 0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
-      if(RAS <= 0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
-      if(ideal_sst < 0 || ideal_sst > 1) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
+      if(T   > 50)      throw new Error(`Value of Temperature (T=${T}) not allowed`);
+      if(Vp  <= 0)      throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
+      if(Rs  <= 0)      throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
+      if(RAS <= 0)      throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
+      if(ideal_sst < 0) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
 
       //DO: between 0 and 15 (checked at ecoinvent)
       if(DO     < 0 || DO > 15) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
@@ -600,25 +600,25 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   //console.log(inf.summary);
   //console.log(inf.fluxes);
   let bip = inf.bio_p_removal({
-    T          : 14,        //ºC
-    Vp         : 21370,     //m3
-    Rs         : 20,        //days
-    DO         : 2.0,       //mgO2/L
-    RAS        : 0.75,      //ø
-    IR         : 1.5,       //ø
+    T          : 14,    //ºC
+    Vp         : 21370, //m3
+    Rs         : 20,    //days
+    DO         : 2.0,   //mgO2/L
+    RAS        : 0.75,  //ø
+    IR         : 1.5,   //ø
     waste_from : 'sst', //string
-    ideal_sst  : 1.0,       //number between 0 and 1
+    ideal_sst  : 1.0,   //number between 0 and 1
 
-    Me         : "Fe",      //string
-    mass_MeCl3 : 100,       //kg/d
-    a_1        : 1,
-    a_2        : 2,
-    pH         : 7.2,       //pH units
+    Me         : "Fe",  //string
+    mass_MeCl3 : 100,   //kg/d
+    a_1        : 1,     //cpr calibrated value 1
+    a_2        : 1,     //cpr calibrated value 2
+    pH         : 7.2,   //pH units
 
-    S_NOx_RAS  : 0.5,       //mgNOx/L
-    f_AN       : 0.1,       //ø
-    DO_RAS     : 0,         //mgO/L
-    an_zones   : 2,         //number of anaerobic zones
+    S_NOx_RAS  : 0.5,   //mgNOx/L
+    f_AN       : 0.1,   //ø
+    DO_RAS     : 0,     //mgO/L
+    an_zones   : 2,     //number of anaerobic zones
   });
   console.log({wastage:bip.wastage.summary});
   console.log({wastage:bip.process_variables});

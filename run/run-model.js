@@ -68,7 +68,7 @@ let parameters={
   DO          :     2.00000, //mgO/L   | AS  | DO in the aerobic reactor
   RAS         :     1.00000, //ø       | AS  | SST underflow recycle ratio
   waste_from  :   "reactor", //option  | AS  | waste_from | options {'reactor','sst'}
-  ideal_sst   :         1.0, //number  | AS  | ideality of SST (number between 0 and 1)
+  ideal_sst   :         1.0, //number  | AS  | ideality of SST (number between 0 and infinite)
 
   mass_MeCl3  :     0.00000, //kg/d    | CPR | mass of FeCl3 added for chemical P removal
 

@@ -326,7 +326,7 @@ State_Variables.prototype.denitrification=function(parameters, result){
     DO           : 2.0,       //mgO2/L
     RAS          : 1.0,       //ø
     waste_from   : 'sst',     //string
-    ideal_sst    : 1.0,       //number between 0 and 1
+    ideal_sst    : 1.0,       //number between 0 and infinite
     Me           : "Fe",
     mass_MeCl3   : 3000,      //kgFeCl3/d
     a_1          : 1,
