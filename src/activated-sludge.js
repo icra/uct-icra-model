@@ -58,11 +58,11 @@ State_Variables.prototype.activated_sludge=function(parameters){
       if("number"!=typeof ideal_sst  ) throw new Error(`ideal_sst  is not a number`);
 
     //numerical checks for physical sense
-      if(T   >  50)     throw new Error(`Value of Temperature (T=${T}) not allowed`);
-      if(Vp  <=  0)     throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
-      if(Rs  <=  0)     throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
-      if(RAS <   0)     throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
-      if(ideal_sst < 0) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
+      if(T         > 50) throw new Error(`Value of Temperature (T=${T}) not allowed`);
+      if(Vp        <= 0) throw new Error(`Value of Reactor volume (Vp=${Vp}) not allowed`);
+      if(Rs        <= 0) throw new Error(`Value of Solids retention time (Rs=${Rs}) not allowed`);
+      if(RAS       <= 0) throw new Error(`Value of SST recycle ratio (RAS=${RAS}) not allowed`);
+      if(ideal_sst <= 0) throw new Error(`Value of ideal_sst (${ideal_sst}) not allowed`);
 
       //DO: between 0 and 15 (checked at ecoinvent)
       if(DO < 0 || DO > 15) throw new Error(`Value of Dissolved oxygen (DO=${DO}) not allowed`);
