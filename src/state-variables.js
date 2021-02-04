@@ -1,15 +1,20 @@
 /*
   STATE VARIABLES CLASS
-  Each removal technology is be a method inside state variables, implemented in
+  represents just a stream of water with components (contaminants)
+
+  Each removal technology is a method implemented in
   its own file (e.g. nitrification.js) as
   "State_Variables.prototype.technology_name=function(){implementation}"
-  technologies are:
-    "primary-settler",
-    "activated-sludge",
-    "chemical-P-removal"
-    "nitrification",
-    "denitrification"
-    "bio-P-removal"
+  exapmles:
+    "primary-settler"     --> is called as "obj.primary_settler(parameters)"
+    "activated-sludge"    --> is called as "obj.activated_sludge(parameters)"
+    "chemical-P-removal"  --> is called as "obj.
+    "nitrification"       --> is called as "obj.
+    "denitrification"     --> is called as "obj.
+    "bio-P-removal"       --> is called as "obj.
+
+  each technology returns 2 state variable objects: effluent and wastage
+  also each technology returns  a list of "process_variables"
 
   A State_Variables oject represents an arrow in a WWTP model, for example:
     Qi → [PST] → [AS] → [nitrification] → Qe
@@ -33,8 +38,8 @@
 class State_Variables {
   constructor(Q,
     S_VFA, S_FBSO, X_BPO, X_UPO, S_USO, //COD fractions
-    X_iSS, S_NH4, S_PO4, S_NOx, S_O2,   //other components
-    X_OHO, X_PAO                        //live biomass
+    X_iSS, S_NH4, S_PO4, S_NOx, S_O2,   //inorganic components
+    X_OHO, X_PAO                        //alive biomass
   ){
     //numeric input checks
     if(Q      < 0) throw new Error(`Value for Flowrate (Q=${Q}) not allowed`);
@@ -181,9 +186,9 @@ class State_Variables {
                   co.X_PAO*mr.f_P_PAO/mr.f_CV_PAO;    //OP in active biomass (PAO)
       let Total_TP = co.S_PO4 + bsOP + usOP + bpOP + upOP + actOP;
       let TP={
-        total:Total_TP,
-        PO4:co.S_PO4,
-        OP:sOP+pOP,
+        total: Total_TP,
+        PO4:   co.S_PO4,
+        OP:    sOP+pOP,
         bOP,  uOP,  sOP,  pOP,
         bsOP, usOP, bpOP, upOP,
         active: actOP,
@@ -232,7 +237,7 @@ class State_Variables {
     return {components, totals};
   }
 
-  //create summary table (concentrations and fluxes) for important components
+  //summary table (concentrations and fluxes) for important components
   get summary(){
     let totals     = this.totals;     //object | concentrations (mg/L)
     let fluxes     = this.fluxes;     //object | mass fluxes (kg/d)
@@ -270,10 +275,10 @@ class State_Variables {
 
     //new concentrations: mass flux divided by the new Q
     Object.keys(this.components).forEach(key=>{
-      let mass=0;
+      let mass = 0;
       mass += this.Q * this.components[key];
-      mass += sv.Q   * sv.components[key];
-      new_sv.set(key,mass/Q);
+      mass +=   sv.Q *   sv.components[key];
+      new_sv.set(key,mass/Q); //set new concentration
     });
     return new_sv;
   }
