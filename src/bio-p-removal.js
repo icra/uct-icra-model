@@ -378,7 +378,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
 
   //copy influent mass ratios for the new outputs
   effluent.mass_ratios = Object.assign({}, this.mass_ratios);
-  wastage .mass_ratios = Object.assign({}, this.mass_ratios);
+  wastage.mass_ratios  = Object.assign({}, this.mass_ratios);
 
   //recalculate f_P_PAO mass ratio (since PAO mass is MX_PAO + MX_E_PAO)
   //and they have different P content
@@ -439,8 +439,8 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   //fraction of fixed inorganic suspended solids of PAO
   //f_iPAO has to be calculated (0.15 - 1.3) (1.3 is PAOs full of polyPP)
   //f_iPAO_calculated should be lower than 1.3
-  let f_iPAO_calculated = Math.min(f_iPAO, f_iOHO + 3.268*f_P_PAO_calculated); //giSS/gVSS
   //(3.268 is experimental value)
+  let f_iPAO_calculated = Math.min(f_iPAO, f_iOHO + 3.268*f_P_PAO_calculated); //giSS/gVSS
   if(f_iPAO_calculated > f_iPAO){
     console.warn(`WARNING: f_iPAO_calculated (${f_iPAO_calculated}) > f_iPAO (${f_iPAO}) [giSS/gVSS]`);
     //TODO confirm with george in the future

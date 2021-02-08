@@ -308,7 +308,7 @@ class Plant{
 /*export module*/
 try{module.exports=Plant}catch(e){}
 
-/*unit test*/
+/*unit test 1: Agullana WWTP*/
 (function(){
   return
   /*
@@ -317,8 +317,21 @@ try{module.exports=Plant}catch(e){}
   */
 
   /*influent state variables*/
-  //syntax                        ( Q, VFA, FBSO, BPO, UPO, USO, iSS, NH4, PO4, NOx, O2, OHO, PAO)
-  let influent=new State_Variables(30, 100,  185, 400, 149,  57, 100,  60,  35,   5,  0,   0,   0);
+  let Q    = 0.1172667;
+  let VFA  = 21.44;
+  let FBSO = 113.96;
+  let BPO  = 344.9832;
+  let UPO  = 58.53;
+  let USO  = 28.5;
+  let iSS  = 8.5;
+  let NH4  = 43.455
+  let PO4  = 3.024;
+  let NOx  = 0.076;
+  let O2   = 0;
+  let OHO  = 0.1;
+  let PAO  = 0.1;
+  //syntax                        (Q, VFA, FBSO, BPO, UPO, USO, iSS, NH4, PO4, NOx, O2, OHO, PAO)
+  let influent=new State_Variables(Q, VFA, FBSO, BPO, UPO, USO, iSS, NH4, PO4, NOx, O2, OHO, PAO);
 
   //VSS mass ratios
     influent.mass_ratios.f_CV_VFA  = 1.0667; //gCOD/gVSS
@@ -327,20 +340,164 @@ try{module.exports=Plant}catch(e){}
     influent.mass_ratios.f_P_VFA   = 0.0000; //  gP/gVSS
     influent.mass_ratios.f_CV_FBSO = 1.4200; //gCOD/gVSS
     influent.mass_ratios.f_C_FBSO  = 0.4710; //  gC/gVSS
-    influent.mass_ratios.f_N_FBSO  = 0.0231; //  gN/gVSS
-    influent.mass_ratios.f_P_FBSO  = 0.0068; //  gP/gVSS
+    influent.mass_ratios.f_N_FBSO  = 0.0700; //  gN/gVSS
+    influent.mass_ratios.f_P_FBSO  = 0.0155; //  gP/gVSS
+    influent.mass_ratios.f_CV_BPO  = 1.6800; //gCOD/gVSS
+    influent.mass_ratios.f_C_BPO   = 0.4980; //  gC/gVSS
+    influent.mass_ratios.f_N_BPO   = 0.0700; //  gN/gVSS
+    influent.mass_ratios.f_P_BPO   = 0.0175; //  gP/gVSS
+    influent.mass_ratios.f_CV_USO  = 1.8000; //gCOD/gVSS
+    influent.mass_ratios.f_C_USO   = 0.4980; //  gC/gVSS
+    influent.mass_ratios.f_N_USO   = 0.0700; //  gN/gVSS
+    influent.mass_ratios.f_P_USO   = 0.0090; //  gP/gVSS
+    influent.mass_ratios.f_CV_UPO  = 1.8000; //gCOD/gVSS
+    influent.mass_ratios.f_C_UPO   = 0.5180; //  gC/gVSS
+    influent.mass_ratios.f_N_UPO   = 0.0700; //  gN/gVSS
+    influent.mass_ratios.f_P_UPO   = 0.0090; //  gP/gVSS
+    influent.mass_ratios.f_CV_OHO  = 1.4000; //gCOD/gVSS
+    influent.mass_ratios.f_C_OHO   = 0.5180; //  gC/gVSS
+    influent.mass_ratios.f_N_OHO   = 0.0700; //  gN/gVSS
+    influent.mass_ratios.f_P_OHO   = 0.0090; //  gP/gVSS
+    influent.mass_ratios.f_CV_PAO  = 3.0000; //gCOD/gVSS
+    influent.mass_ratios.f_C_PAO   = 0.5180; //  gC/gVSS
+    influent.mass_ratios.f_N_PAO   = 0.0700; //  gN/gVSS
+    influent.mass_ratios.f_P_PAO   = 0.3000; //  gP/gVSS
+
+  //constants (kinetic and stoichiometric)
+    constants.YH        =    0.666; //gCOD/gCOD | heterotrophic yield (not affected by temperature)
+    constants.bH        =    0.240; //1/d       | heterotrophic endogenous respiration rate at 20ºC
+    constants.ϴ_bH      =    1.029; //ø         | bH temperature correction factor
+    constants.k_v20     =    0.070; //L/mgVSS·d | constant for not degraded bCOD (FBSO)
+    constants.ϴ_k_v20   =    1.035; //ø         | k_v20 temperature correction factor
+    constants.fH        =    0.200; //ø         | heterotrophic endogenous residue fraction
+    constants.f_iOHO    =    0.150; //giSS/gVSS | iSS content of OHOs
+    constants.µAm       =    0.450; //1/d       | autotrophic max specific growth rate at 20ºC
+    constants.ϴ_µAm     =    1.123; //ø         | µAm temperature correction factor
+    constants.K_O       =    0.400; //mgDO/L    | autotrophic DO µA sensitivity constant
+    constants.ϴ_pH      =    2.350; //ø         | autotrophic pH sensitivity coefficient
+    constants.Ki        =    1.130; //ø         | autotrophic pH inhibition to µA
+    constants.Kii       =    0.300; //ø         | autotrophic pH inhibition to µA
+    constants.Kmax      =    9.500; //ø         | autotrophic pH inhibition to µA
+    constants.YA        =    0.100; //gVSS/gNH4 | autotrophic yield
+    constants.Kn        =    1.000; //mgN/L     | ammonia half saturation coefficient at 20ºC
+    constants.ϴ_Kn      =    1.123; //ø         | Kn temperature correction factor
+    constants.bA        =    0.040; //1/d       | autotrophic endogenous respiration rate at 20ºC
+    constants.ϴ_bA      =    1.029; //ø         | bA temperature correction factor
+    constants.K1_20     =    0.720; //gN/gVSS·d | DN K1 at 20ºC page 482 and 113
+    constants.ϴ_K1      =    1.200; //ø         | temperature correction factor for K1_20
+    constants.K2_20     =    0.101; //gN/gVSS·d | DN K2 at 20ºC page 482 and 113
+    constants.ϴ_K2      =    1.080; //ø         | temperature correction factor for K2_20
+    constants.b_PAO     =    0.040; //1/d       | PAO endogenous residue respiration rate at 20ºC
+    constants.ϴ_b_PAO   =    1.029; //ø         | b_PAO temperature correction factor
+    constants.f_PAO     =    0.250; //ø         | PAO endogenous residue fraction
+    constants.f_P_iSS   =    0.020; //gP/giSS   | fraction of P in iSS
+    constants.f_iPAO    =    1.300; //giSS/gVSS | fraction of iSS in PAO
+    constants.f_PO4_rel =    0.500; //gP/gCOD   | ratio of P release/VFA uptake (1molP/1molCOD)
+    constants.K2_20_PAO =    0.255; //gN/gVSS·d | at 20ºC page 482 and 113
+    constants.ϴ_K2_PAO  =    1.080; //ø         | temperature correction factor for K2_20
+
+  //plant configuration
+  let configuration={
+    pst: false, //primary settler
+    bpr: true, //bio P removal
+    nit: true, //nitrification
+    dn : true, //denitrification
+  };
+
+  //plant parameters
+  let parameters={
+    fw          :     0.00893, //ø       | PST | fraction of Q to pst wastage
+    removal_BPO :    57.42000, //%       | PST | removal of X_BPO
+    removal_UPO :    86.67000, //%       | PST | removal of X_UPO
+    removal_iSS :    65.70000, //%       | PST | removal of X_iSS
+
+    T           :    25.26000, //ºC      | AS  | temperature
+    Vp          :   190.00000, //m3      | AS  | reactor volume
+    Rs          :    17.50000, //d       | AS  | solids retention time
+    DO          :     1.00000, //mgO/L   | AS  | DO aerobic reactor
+    RAS         :     0.70000, //ø       | AS  | SST underflow recycle ratio
+    waste_from  :       "sst", //string  | AS  | options {'reactor','sst'}
+    ideal_sst   :     1.00000, //number  | SST | number between 0 and infinite (ideality of SST)
+
+    mass_MeCl3  :     0.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
+    Me          :        "Fe", //string  | CPR2| metal used
+    a_1         :     1.00000, //ø       | CPR2| calibrated value 1
+    a_2         :     0.00000, //ø       | CPR2| calibrated value 2
+
+    SF          :     1.25000, //ø       | NIT | safety factor
+    fxt         :     0.45000, //ø       | NIT | unaerated sludge mass fractio5
+    pH          :     7.09000, //ø       | NIT | pH
+    IR          :     248.000, //ø       | DN  | internal recirculation ratio
+    DO_RAS      :     0.00000, //mgO/L   | DN  | DO in the underflow recycle
+    influent_alk:  1095.00000, //mg/L    | DN  | influent alkalinity (CaCO3)
+    S_NOx_RAS   :     0.00000, //mgNOx/L | BPR
+    f_AN        :     0.80000, //ø       | BPR
+    an_zones    :     1.00000, //an zones| BPR
+    RR          :   400.00000, //        | BPR
+
+    DSVI        :   182.00000, //mL/gTSS | CE  | sludge settleability
+    A_ST        :    20.40000, //m2      | CE  | area of the settler
+    fq          :     3.70000, //ø       | CE  | peak flow (Qmax/Qavg)
+  };
+
+  //new Plant          (influent, configuration, parameters, constants)
+  let plant = new Plant(influent, configuration, parameters, constants);
+
+  //run model and log results
+  let results = plant.run(debug_mode=true);
+  console.log(results)
+  console.log('effluent:')
+  console.log(results.secondary.effluent.summary)
+  console.log('wastage:')
+  console.log(results.secondary.wastage.summary)
+})();
+
+/*unit test 2: St Sadurni WWTP*/
+(function(){
+  return
+  /*
+     CREATE A PLANT AND RUN THE MODEL
+     complete example with all inputs, parameters and constants
+  */
+
+  /*influent state variables*/
+  let Q    = 2.845;
+  let VFA  = 50;
+  let FBSO = 116.5;
+  let BPO  = 239.67
+  let UPO  = 300;
+  let USO  = 43.5;
+  let iSS  = 50;
+  let NH4  = 40;
+  let PO4  = 7;
+  let NOx  = 1;
+  let O2   = 0;
+  let OHO  = 0.1;
+  let PAO  = 0;
+  //syntax                        (Q, VFA, FBSO, BPO, UPO, USO, iSS, NH4, PO4, NOx, O2, OHO, PAO)
+  let influent=new State_Variables(Q, VFA, FBSO, BPO, UPO, USO, iSS, NH4, PO4, NOx, O2, OHO, PAO);
+
+  //VSS mass ratios
+    influent.mass_ratios.f_CV_VFA  = 1.0667; //gCOD/gVSS
+    influent.mass_ratios.f_C_VFA   = 0.4000; //  gC/gVSS
+    influent.mass_ratios.f_N_VFA   = 0.0000; //  gN/gVSS
+    influent.mass_ratios.f_P_VFA   = 0.0000; //  gP/gVSS
+    influent.mass_ratios.f_CV_FBSO = 1.4200; //gCOD/gVSS
+    influent.mass_ratios.f_C_FBSO  = 0.4710; //  gC/gVSS
+    influent.mass_ratios.f_N_FBSO  = 0.0464; //  gN/gVSS
+    influent.mass_ratios.f_P_FBSO  = 0.0118; //  gP/gVSS
     influent.mass_ratios.f_CV_BPO  = 1.5230; //gCOD/gVSS
     influent.mass_ratios.f_C_BPO   = 0.4980; //  gC/gVSS
-    influent.mass_ratios.f_N_BPO   = 0.0350; //  gN/gVSS
-    influent.mass_ratios.f_P_BPO   = 0.0054; //  gP/gVSS
+    influent.mass_ratios.f_N_BPO   = 0.0323; //  gN/gVSS
+    influent.mass_ratios.f_P_BPO   = 0.0072; //  gP/gVSS
+    influent.mass_ratios.f_CV_USO  = 1.4930; //gCOD/gVSS
+    influent.mass_ratios.f_C_USO   = 0.4980; //  gC/gVSS
+    influent.mass_ratios.f_N_USO   = 0.0366; //  gN/gVSS
+    influent.mass_ratios.f_P_USO   = 0.0000; //  gP/gVSS
     influent.mass_ratios.f_CV_UPO  = 1.4810; //gCOD/gVSS
     influent.mass_ratios.f_C_UPO   = 0.5180; //  gC/gVSS
     influent.mass_ratios.f_N_UPO   = 0.1000; //  gN/gVSS
     influent.mass_ratios.f_P_UPO   = 0.0250; //  gP/gVSS
-    influent.mass_ratios.f_CV_USO  = 1.4930; //gCOD/gVSS
-    influent.mass_ratios.f_C_USO   = 0.4980; //  gC/gVSS
-    influent.mass_ratios.f_N_USO   = 0.0258; //  gN/gVSS
-    influent.mass_ratios.f_P_USO   = 0.0000; //  gP/gVSS
     influent.mass_ratios.f_CV_OHO  = 1.4810; //gCOD/gVSS
     influent.mass_ratios.f_C_OHO   = 0.5180; //  gC/gVSS
     influent.mass_ratios.f_N_OHO   = 0.1000; //  gN/gVSS
@@ -354,13 +511,13 @@ try{module.exports=Plant}catch(e){}
     constants.YH        =    0.666; //gCOD/gCOD | heterotrophic yield (not affected by temperature)
     constants.bH        =    0.240; //1/d       | heterotrophic endogenous respiration rate at 20ºC
     constants.ϴ_bH      =    1.029; //ø         | bH temperature correction factor
-    constants.k_v20     = 1000.000; //L/mgVSS·d | constant for not degraded bCOD (FBSO)
+    constants.k_v20     =    1.000; //L/mgVSS·d | constant for not degraded bCOD (FBSO)
     constants.ϴ_k_v20   =    1.035; //ø         | k_v20 temperature correction factor
     constants.fH        =    0.200; //ø         | heterotrophic endogenous residue fraction
     constants.f_iOHO    =    0.150; //giSS/gVSS | iSS content of OHOs
-    constants.µAm       =    0.450; //1/d       | autotrophic max specific growth rate at 20ºC
+    constants.µAm       =    0.550; //1/d       | autotrophic max specific growth rate at 20ºC
     constants.ϴ_µAm     =    1.123; //ø         | µAm temperature correction factor
-    constants.K_O       =    0.000; //mgDO/L    | autotrophic DO µA sensitivity constant
+    constants.K_O       =    0.400; //mgDO/L    | autotrophic DO µA sensitivity constant
     constants.ϴ_pH      =    2.350; //ø         | autotrophic pH sensitivity coefficient
     constants.Ki        =    1.130; //ø         | autotrophic pH inhibition to µA
     constants.Kii       =    0.300; //ø         | autotrophic pH inhibition to µA
@@ -386,43 +543,46 @@ try{module.exports=Plant}catch(e){}
   //plant configuration
   let configuration={
     pst: true, //primary settler
-    bpr: false, //bio P removal
+    bpr: true, //bio P removal
     nit: true, //nitrification
-    dn : false, //denitrification
+    dn : true, //denitrification
   };
 
   //plant parameters
   let parameters={
-    fw          :     0.00893, //ø       | PST | fraction of Q to pst wastage
-    removal_BPO :    57.42000, //%       | PST | removal of X_BPO
-    removal_UPO :    86.67000, //%       | PST | removal of X_UPO
-    removal_iSS :    65.70000, //%       | PST | removal of X_iSS
-    T           :    16.00000, //ºC      | AS  | temperature
-    Vp          : 49844.00000, //m3      | AS  | reactor volume
-    Rs          :     7.80500, //d       | AS  | solids retention time
-    DO          :     2.00000, //mgO/L   | AS  | DO aerobic reactor
-    RAS         :     1.00000, //ø       | AS  | SST underflow recycle ratio
-    waste_from  :   "reactor", //string  | AS  | options {'reactor','sst'}
-    ideal_sst   :         1.0, //number  | SST | number between 0 and infinite (ideality of SST)
+    fw          :     0.00500, //ø       | PST | fraction of Q to pst wastage
+    removal_BPO :    78.00000, //%       | PST | removal of X_BPO
+    removal_UPO :    80.00000, //%       | PST | removal of X_UPO
+    removal_iSS :    99.00000, //%       | PST | removal of X_iSS
 
-    mass_MeCl3  :    10.00000, //kg/d    | CPR | daily FeCl3 mass for cpr
-    Me          :   "Fe",      //string  | CPR2| metal used
-    a_1         :     0.94885, //ø       | CPR2| calibrated value 1
-    a_2         :     0.97376, //ø       | CPR2| calibrated value 2
+    T           :    22.00000, //ºC      | AS  | temperature
+    Vp          :  6000.00000, //m3      | AS  | reactor volume
+    Rs          :    27.00000, //d       | AS  | solids retention time
+    DO          :     1.00000, //mgO/L   | AS  | DO aerobic reactor
+    RAS         :     1.27530, //ø       | AS  | SST underflow recycle ratio
+    waste_from  :       "sst", //string  | AS  | options {'reactor','sst'}
+    ideal_sst   :     1.00000, //number  | SST | number between 0 and infinite (ideality of SST)
+
+    mass_MeCl3  :    23.33300, //kg/d    | CPR | daily FeCl3 mass for cpr
+    Me          :        "Fe", //string  | CPR2| metal used
+    a_1         :     1.00000, //ø       | CPR2| calibrated value 1
+    a_2         :     0.20000, //ø       | CPR2| calibrated value 2
 
     SF          :     1.25000, //ø       | NIT | safety factor
-    fxt         :     0.27600, //ø       | NIT | unaerated sludge mass fraction
+    fxt         :     0.60000, //ø       | NIT | unaerated sludge mass fractio5
     pH          :     7.20000, //ø       | NIT | pH
-    IR          :     6.00000, //ø       | DN  | internal recirculation ratio
+    IR          :    56.48000, //ø       | DN  | internal recirculation ratio
     DO_RAS      :     1.00000, //mgO/L   | DN  | DO in the underflow recycle
-    influent_alk:   300.00000, //mg/L    | DN  | influent alkalinity (CaCO3)
-    S_NOx_RAS   :     0.50000, //mgNOx/L | BPR
+    influent_alk:   270.00000, //mg/L    | DN  | influent alkalinity (CaCO3)
+
+    S_NOx_RAS   :     1.82000, //mgNOx/L | BPR
     f_AN        :     0.10000, //ø       | BPR
-    DO_RAS      :     0.00000, //mgO/L   | BPR
-    an_zones    :     2.00000, //an zones| BPR
-    DSVI        :   120.00000, //mL/gTSS | CE  | sludge settleability
-    A_ST        :  4995.00000, //m2      | CE  | area of the settler
-    fq          :     2.50000, //ø       | CE  | peak flow (Qmax/Qavg)
+    an_zones    :     0.10000, //an zones| BPR
+    RR          :     0.00000, //        | BPR
+
+    DSVI        :   220.00000, //mL/gTSS | CE  | sludge settleability
+    A_ST        :   380.00000, //m2      | CE  | area of the settler
+    fq          :     2.40000, //ø       | CE  | peak flow (Qmax/Qavg)
   };
 
   //new Plant          (influent, configuration, parameters, constants)
@@ -430,5 +590,12 @@ try{module.exports=Plant}catch(e){}
 
   //run model and log results
   let results = plant.run(debug_mode=true);
-  //console.log(results)
+  console.log("ST SADURNÍ:");
+  console.log(results.process_variables);
+  console.log('effluent:')
+  console.log(results.secondary.effluent.summary)
+  console.log('1ry wastage:')
+  console.log(results.primary.wastage.summary)
+  console.log('2ndary wastage:')
+  console.log(results.secondary.wastage.summary)
 })();
