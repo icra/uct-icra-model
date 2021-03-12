@@ -119,6 +119,8 @@ function chemical_P_removal_improved(parameters){
   let X_MeH     = M_MeOH3/M_Me*(Me_0 - M_Me/M_P*(PO4i - PO4e) - Me_T); //mg/L   | metal hydroxide formed
   let extra_iSS = Q*(X_MeP + X_MeH);                                   //kg/d   | extra iSS formed
 
+  if(extra_iSS < 0) extra_iSS = 0;
+
   //return cpr process variables
   let results={}; //new empty object
   results[`${Me}_P_mole_ratio`] = {value:Me_P_mole_ratio, unit:`mol${Me}/molP`, descr:`${Me}/P mole ratio`};

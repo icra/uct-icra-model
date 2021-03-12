@@ -9,6 +9,7 @@
       relationship.
     - discuss chemical P removal improved (see papers at dev-docs folder).
   - [for reporting] function for pretty printing a plant.run() result.
+  - move tests to independent files
 
 ## discussed but not done yet
   - put Rs-bal in capacity estimation module

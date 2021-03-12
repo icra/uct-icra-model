@@ -125,9 +125,9 @@ State_Variables.prototype.activated_sludge=function(parameters){
   let bHT     = bH*Math.pow(ϴ_bH,T-20); //1/d            | endogenous respiration rate corrected by temperature
 
   //kinetics for effluent FBSO (not all influent FBSO is degraded)
-  const k_v20   = constants.k_v20;              //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
-  const ϴ_k_v20 = constants.ϴ_k_v20;        //1.035 ø         | k_v20 temperature correction factor
-  let k_vT      = k_v20*Math.pow(ϴ_k_v20,T-20); //L/mgVSS·d       | k_v corrected by temperature
+  const k_v20   = constants.k_v20;   //0.070 L/mgVSS·d | note: a high value (~1000) makes FBSO effluent ~0
+  const ϴ_k_v20 = constants.ϴ_k_v20; //1.035 ø         | k_v20 temperature correction factor
+  let k_vT      = k_v20*Math.pow(ϴ_k_v20,T-20); //L/mgVSS·d | k_v corrected by temperature
 
   //compute OHO biomass production rate
   let f_XBH = (YHvss*Rs)/(1+bHT*Rs); //gVSS·d/gCOD
@@ -159,7 +159,7 @@ State_Variables.prototype.activated_sludge=function(parameters){
   let Pse         = cpr.PO4e.value;                        //mgP/L | PO4 effluent after chemical P removal
 
   //chemical P removal improved
-  parameters.Q = Q;
+  parameters.Q    = Q;
   parameters.PO4i = Psa;
   let cpr_v2  = chemical_P_removal_improved(parameters); //object
   F_extra_iSS = cpr_v2.extra_iSS.value;                  //kgiSS/d

@@ -267,11 +267,11 @@ State_Variables.prototype.bio_p_removal=function(parameters){
 
   /*chemical P removal (module)*/
   //compute Psa: inorganic soluble P available for chemical P removal
-  let Psa         = Math.max(0, Pti - Ps - Pouse - Pobse);  //mgP/L
+  let Psa         = Math.max(0, Pti - Ps - Pouse - Pobse);          //mgP/L
   let cpr         = chemical_P_removal({Q, PO4i:Psa, mass_MeCl3}); //object | chemical P removal results
-  let P_chem_rem  = cpr.PO4_removed.value/Q;                //mgP/L
-  let F_extra_iSS = cpr.extra_iSS.value;                    //kgiSS/d precipitation
-  let Pse         = cpr.PO4e.value;                         //mgP/L | PO4 effluent after chemical P removal
+  let P_chem_rem  = cpr.PO4_removed.value/Q; //mgP/L
+  let F_extra_iSS = cpr.extra_iSS.value;     //kgiSS/d precipitation
+  let Pse         = cpr.PO4e.value;          //mgP/L | PO4 effluent after chemical P removal
   /*
   console.log(cpr);
   console.log({
@@ -287,7 +287,7 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   });
   */
 
-  //chemical P removal improved TODO
+  //chemical P removal improve 
   parameters.Q = Q;
   parameters.PO4i = Psa;
   let cpr_v2  = chemical_P_removal_improved(parameters); //object
@@ -431,8 +431,8 @@ State_Variables.prototype.bio_p_removal=function(parameters){
   /*1. compute f_P_PAO (0.38 gP/gVSS) | only for active VSS mass*/
   //note: f_P_PAO_calculated should be lower than f_P_PAO (0.38)
   let f_P_PAO_calculated = (Q*Pti*Rs - Q*Psa*Rs - f_P_OHO*MX_BH - f_P_UPO*(MX_I + MX_EH + MX_E_PAO))/MX_PAO||0; //gP/gVSS
-  if(f_P_PAO_calculated > f_P_PAO){
-    console.warn(`WARNING: f_P_PAO_calculated (${f_P_PAO_calculated}) > f_P_PAO (${f_P_PAO}) [gP/gVSS]`);
+  if(Math.abs(f_P_PAO_calculated - f_P_PAO) > 1e6 ){
+    console.warn(`WARNING: f_P_PAO_calculated (${f_P_PAO_calculated}) != f_P_PAO (${f_P_PAO}) [gP/gVSS]`);
   }
 
   /*2. compute f_iPAO (1.3 giSS/gVSS) TODO */

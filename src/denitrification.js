@@ -197,11 +197,12 @@ State_Variables.prototype.denitrification=function(parameters, result){
   const i_7_14 = 100/14;
   const i_3_57 = 50/14;
   let effluent_alk = influent_alk + i_3_57*Nobi - i_3_57*(Ns-Noupi) - i_7_14*Nc + i_3_57*(Nc-Nne); //mg/L as CaCO3
+  if(effluent_alk < 0) effluent_alk = 0;
 
   //check effluent alkalinity value, must be above 50 mgCaCO3/L
   if(effluent_alk < 50){
     console.warn(`WARNING: effluent_alk (${effluent_alk}) < 50 mgCaCO3/L`);
-    //TBD should this be an error instead of warning?
+    //TBD should this be an error instead of warning? TODO
   }
 
   //TOD balance (TOD = COD + i_COD_NO3*TKN)

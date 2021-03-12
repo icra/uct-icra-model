@@ -1,9 +1,12 @@
 /*
- * All kinetic and stoichiometric constants for
- * - Activated Sludge
- * - Nitrification
- * - Denitrification
- * - Bio P Removal (EBPR)
+* All kinetic and stoichiometric constants for
+* - Activated Sludge
+* - Nitrification
+* - Denitrification
+* - Bio P Removal (EBPR)
+
+ TODO: transform this object into a class
+
 */
 
 let constants={
@@ -23,7 +26,7 @@ let constants={
   YH      : 0.666, //gCOD/gCOD | heterotrophic yield (not affected by temperature)
   bH      : 0.240, //1/d       | heterotrophic endogenous respiration rate at 20ºC
   ϴ_bH    : 1.029, //ø         | bH temperature correction factor
-  k_v20   : 0.070, //L/mgVSS·d | constant for not degraded bCOD (FBSO)
+  k_v20   :  0.07, //L/mgVSS·d | constant for not degraded bCOD (FBSO) (default value is 0.07. A high value (~1000) makes FBSO effluent ~0)
   ϴ_k_v20 : 1.035, //ø         | k_v20 temperature correction factor
   fH      : 0.200, //ø         | heterotrophic endogenous residue fraction
   f_iOHO  : 0.150, //giSS/gVSS | iSS content of OHOs

@@ -1,5 +1,4 @@
 #!/bin/bash
-
-#desplegar model a strato server
-folder="/var/www/vhosts/h2793818.stratoserver.net/ecoadvisor.icra.cat/uct-icra-model"
-ssh root@85.214.122.54 "cd $folder; git pull; git status"
+#desplegar repositori a servidor via ssh
+folder='/var/www/vhosts/icradev.cat/ecoadvisor.icra.cat/uct-icra-model'
+ssh root@217.61.208.188 "cd $folder; git pull;"

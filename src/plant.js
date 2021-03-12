@@ -31,14 +31,14 @@
 
 /*import modules*/
 try{
-  State_Variables     = require('./state-variables.js'); //class State_Variables
+  State_Variables     = require('./state-variables.js'); //class
   constants           = require("./constants.js"); //object
   capacity_estimation = require('./capacity-estimation.js'); //function
-  require('./primary-settler.js');    //State_Variables.prototype.primary_settler
-  require('./activated-sludge.js');   //State_Variables.prototype.activated_sludge
-  require('./bio-P-removal.js');      //State_Variables.prototype.bio_P_removal
-  require('./nitrification.js');      //State_Variables.prototype.nitrification
-  require('./denitrification.js');    //State_Variables.prototype.denitrification
+  require('./primary-settler.js');  //State_Variables.prototype.primary_settler
+  require('./activated-sludge.js'); //State_Variables.prototype.activated_sludge
+  require('./bio-P-removal.js');    //State_Variables.prototype.bio_P_removal
+  require('./nitrification.js');    //State_Variables.prototype.nitrification
+  require('./denitrification.js');  //State_Variables.prototype.denitrification
 
   require('./chemical-P-removal.js');          //function chemical P rem (model 1)
   require('./chemical-P-removal-improved.js'); //function chemical P rem (model 2)
@@ -430,6 +430,7 @@ try{module.exports=Plant}catch(e){}
     IR          :     248.000, //ø       | DN  | internal recirculation ratio
     DO_RAS      :     0.00000, //mgO/L   | DN  | DO in the underflow recycle
     influent_alk:  1095.00000, //mg/L    | DN  | influent alkalinity (CaCO3)
+
     S_NOx_RAS   :     0.00000, //mgNOx/L | BPR
     f_AN        :     0.80000, //ø       | BPR
     an_zones    :     1.00000, //an zones| BPR
