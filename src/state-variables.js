@@ -93,7 +93,7 @@ class State_Variables {
   };
 
   //update a state variable value. example -> sv.set("S_VFA",10);
-  set(key, newValue){
+  set(key, newValue){ //->void
     if(this.components[key]===undefined) throw new Error(`component "${key}" not found`);
     if(typeof newValue != 'number')      throw new Error(`component "${key}" newValue ("${newValue}") is not a number`);
     if(newValue < 0)                     throw new Error(`component "${key}" newValue ("${newValue}") is negative`);
